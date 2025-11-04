@@ -179,7 +179,7 @@ import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway
             [reference]="mbwayResponse()?.mbway?.reference"
             [amount]="mbwayResponse()?.donation?.amount"
             [phoneNumber]="mbwayResponse()?.mbway?.phoneNumber"
-            [expiresAt]="mbwayResponse()?.mbway?.expiresAt ? new Date(mbwayResponse()!.mbway.expiresAt) : undefined"
+            [expiresAt]="getExpirationDate()"
             [status]="paymentStatus()"
           />
 
@@ -337,6 +337,12 @@ export class DonationComponent {
   showMBWayQR = signal(false);
   mbwayResponse = signal<MBWayPaymentResponse | null>(null);
   paymentStatus = signal<'pending' | 'paid' | 'expired' | 'cancelled'>('pending');
+
+  // Helper method to convert expiration date
+  getExpirationDate(): Date | undefined {
+    const expiresAt = this.mbwayResponse()?.mbway?.expiresAt;
+    return expiresAt ? new Date(expiresAt) : undefined;
+  }
 
   donationForm = new FormGroup({
     ongId: new FormControl('default-ong-id'), // This should come from route or selection
