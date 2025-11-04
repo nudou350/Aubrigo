@@ -9,7 +9,8 @@ A comprehensive Progressive Web App designed to connect animal NGOs with potenti
 - 📱 Mobile-first PWA - Install to home screen for app-like experience
 - ❤️ Favorite pets and save them for later
 - 📅 Schedule visits to meet pets
-- 💰 Make one-time or recurring donations
+- 💰 Make donations via **MB Way QR Code**, Stripe, or Multibanco (one-time or recurring)
+- 📲 **MB Way Integration**: Scan QR code to donate instantly
 - 🗺️ View shelter locations and contact information
 
 ### For NGOs:
@@ -27,7 +28,11 @@ A comprehensive Progressive Web App designed to connect animal NGOs with potenti
 - **ORM**: TypeORM
 - **Authentication**: JWT with bcrypt
 - **API Documentation**: Swagger/OpenAPI
-- **Payment**: Stripe (ready for integration)
+- **Payment**:
+  - **MB Way** ✅ (with QR code generation)
+  - Stripe (ready for integration)
+  - Multibanco (ready for integration)
+- **QR Code**: qrcode library for MB Way payments
 - **File Storage**: AWS S3 (ready for integration)
 - **Email**: SendGrid/NodeMailer (ready for integration)
 
@@ -250,9 +255,11 @@ Once the backend is running, visit:
 - `PUT /api/pets/:id` - Update pet (auth required)
 - `DELETE /api/pets/:id` - Delete pet (auth required)
 
-**Donations:** (to be implemented)
-- `POST /api/donations` - Create donation
-- `GET /api/donations/ong/:id` - Get NGO donations
+**Donations:** ✅
+- `POST /api/donations` - Create donation (MB Way, Stripe, Multibanco)
+- `GET /api/donations/:id/status` - Check payment status
+- `POST /api/donations/mbway/confirm/:transactionId` - Confirm MB Way payment (webhook)
+- `GET /api/donations/ong/:ongId` - Get NGO donations (auth required)
 
 **Appointments:** (to be implemented)
 - `POST /api/appointments` - Schedule visit
@@ -318,12 +325,15 @@ MIT License - see LICENSE file
 - [x] Frontend (Auth, Home page)
 - [x] PWA Setup
 - [x] Design System
+- [x] **MB Way Payment Integration** 🎉
+- [x] Donation System with QR Code
 - [ ] Database seeding
 - [ ] Basic styling implementation
 
 ### Phase 2
 - [ ] Complete all UI pages
-- [ ] Donation system (Stripe)
+- [ ] Stripe payment integration
+- [ ] Multibanco integration
 - [ ] Appointment booking
 - [ ] Email notifications
 - [ ] File upload (AWS S3)
@@ -350,4 +360,4 @@ Built with ❤️ for animals in need.
 
 ---
 
-**Note**: This is an MVP implementation. Features like Stripe integration, AWS S3, and email services require additional configuration with your API keys.
+**Note**: This MVP includes a fully functional **MB Way payment system with QR code generation**! Other payment methods (Stripe, Multibanco), AWS S3 file uploads, and email services are ready for integration with your API keys.
