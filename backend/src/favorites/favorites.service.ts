@@ -58,8 +58,8 @@ export class FavoritesService {
         gender: favorite.pet.gender,
         size: favorite.pet.size,
         location: favorite.pet.location,
-        primaryImage: favorite.pet.images?.find(img => img.isPrimary)?.url ||
-                      favorite.pet.images?.[0]?.url || null,
+        primaryImage: favorite.pet.images?.find(img => img.isPrimary)?.imageUrl ||
+                      favorite.pet.images?.[0]?.imageUrl || null,
         ong: {
           id: favorite.pet.ong.id,
           ongName: favorite.pet.ong.ongName,
