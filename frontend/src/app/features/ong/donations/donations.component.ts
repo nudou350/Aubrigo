@@ -2,28 +2,8 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { OngService } from '../../../core/services/ong.service';
+import { OngService, Donation, DonationStatistics } from '../../../core/services/ong.service';
 import { ToastService } from '../../../core/services/toast.service';
-
-interface Donation {
-  id: string;
-  donorName: string;
-  donorEmail: string;
-  amount: number;
-  donationType: string;
-  paymentStatus: string;
-  paymentMethod?: string;
-  createdAt: string;
-}
-
-interface DonationStats {
-  totalAmount: number;
-  totalDonations: number;
-  monthlyRecurring: number;
-  thisMonthAmount: number;
-  lastMonthAmount: number;
-  growthPercentage: number;
-}
 
 @Component({
   selector: 'app-ong-donations',
@@ -52,17 +32,6 @@ interface DonationStats {
               <h3>€{{ stats().totalAmount.toFixed(2) }}</h3>
               <p>Total Recebido</p>
               <span class="subtext">{{ stats().totalDonations }} doações</span>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon monthly">📅</div>
-            <div class="stat-content">
-              <h3>€{{ stats().thisMonthAmount.toFixed(2) }}</h3>
-              <p>Este Mês</p>
-              <span class="subtext" [class.positive]="stats().growthPercentage >= 0" [class.negative]="stats().growthPercentage < 0">
-                {{ stats().growthPercentage >= 0 ? '↑' : '↓' }} {{ Math.abs(stats().growthPercentage).toFixed(1) }}% vs. mês passado
-              </span>
             </div>
           </div>
 
@@ -484,13 +453,10 @@ export class OngDonationsComponent implements OnInit {
   isLoading = signal(true);
   donations = signal<Donation[]>([]);
   filteredDonations = signal<Donation[]>([]);
-  stats = signal<DonationStats>({
+  stats = signal<DonationStatistics>({
     totalAmount: 0,
     totalDonations: 0,
-    monthlyRecurring: 0,
-    thisMonthAmount: 0,
-    lastMonthAmount: 0,
-    growthPercentage: 0
+    monthlyRecurring: 0
   });
 
   searchTerm = '';

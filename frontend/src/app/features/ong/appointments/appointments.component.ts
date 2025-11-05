@@ -53,13 +53,13 @@ import { ToastService } from '../../../core/services/toast.service';
               <div class="pet-info">
                 <img
                   [src]="getPetImage(appointment.pet)"
-                  [alt]="appointment.pet.name"
+                  [alt]="appointment.pet?.name || 'Pet'"
                   class="pet-image"
                   (error)="onImageError($event)"
                 />
                 <div>
-                  <h3>{{ appointment.pet.name }}</h3>
-                  <span class="pet-species">{{ getSpeciesLabel(appointment.pet.species) }}</span>
+                  <h3>{{ appointment.pet?.name || 'Pet' }}</h3>
+                  <span class="pet-species">{{ getSpeciesLabel(appointment.pet?.species || '') }}</span>
                 </div>
               </div>
 
@@ -464,7 +464,7 @@ export class OngAppointmentsComponent implements OnInit {
       filtered = filtered.filter(apt =>
         apt.visitorName.toLowerCase().includes(term) ||
         apt.visitorEmail.toLowerCase().includes(term) ||
-        apt.pet.name.toLowerCase().includes(term)
+        apt.pet?.name?.toLowerCase().includes(term)
       );
     }
 

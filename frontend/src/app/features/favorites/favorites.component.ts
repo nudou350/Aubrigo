@@ -45,7 +45,7 @@ import { ToastService } from '../../core/services/toast.service';
               <div class="pet-card">
                 <div class="pet-image" [routerLink]="['/pets', favorite.petId]">
                   @if (favorite.pet?.primaryImage) {
-                    <img [src]="favorite.pet.primaryImage" [alt]="favorite.pet?.name || 'Pet'">
+                    <img [src]="favorite.pet?.primaryImage" [alt]="favorite.pet?.name || 'Pet'">
                   } @else {
                     <div class="placeholder-image">
                       <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -65,10 +65,10 @@ import { ToastService } from '../../core/services/toast.service';
                       {{ favorite.pet?.location || 'Localização não informada' }}
                     </span>
                     @if (favorite.pet?.breed) {
-                      <span class="detail-item">{{ favorite.pet.breed }}</span>
+                      <span class="detail-item">{{ favorite.pet?.breed }}</span>
                     }
                     @if (favorite.pet?.age !== undefined) {
-                      <span class="detail-item">{{ favorite.pet.age }} anos</span>
+                      <span class="detail-item">{{ favorite.pet?.age }} anos</span>
                     }
                   </div>
                 </div>

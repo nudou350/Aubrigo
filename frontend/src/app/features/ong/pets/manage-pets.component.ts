@@ -6,19 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { OngService } from '../../../core/services/ong.service';
 import { ToastService } from '../../../core/services/toast.service';
-
-interface Pet {
-  id: string;
-  name: string;
-  species: string;
-  breed: string;
-  age: number;
-  gender: string;
-  size: string;
-  status: string;
-  images: { id: string; imageUrl: string; isPrimary: boolean }[];
-  createdAt: string;
-}
+import { Pet } from '../../../core/services/pets.service';
 
 @Component({
   selector: 'app-manage-pets',
@@ -95,9 +83,9 @@ interface Pet {
                   <span class="detail-badge">{{ pet.age }} {{ pet.age === 1 ? 'ano' : 'anos' }}</span>
                 </div>
                 <div class="pet-meta">
-                  <span>{{ getGenderLabel(pet.gender) }}</span>
+                  <span>{{ getGenderLabel(pet.gender || '') }}</span>
                   <span>•</span>
-                  <span>{{ getSizeLabel(pet.size) }}</span>
+                  <span>{{ getSizeLabel(pet.size || '') }}</span>
                 </div>
               </div>
               <div class="pet-actions">
@@ -455,7 +443,7 @@ export class ManagePetsComponent implements OnInit {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(pet =>
         pet.name.toLowerCase().includes(term) ||
-        pet.breed.toLowerCase().includes(term)
+        pet.breed?.toLowerCase().includes(term)
       );
     }
 

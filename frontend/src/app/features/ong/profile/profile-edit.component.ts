@@ -495,7 +495,7 @@ export class ProfileEditComponent implements OnInit {
           location: profile.location,
           instagramHandle: profile.instagramHandle?.replace('@', '')
         });
-        this.currentProfileImage.set(profile.profileImageUrl);
+        this.currentProfileImage.set(profile.profileImageUrl || null);
         this.isLoading.set(false);
       },
       error: (error) => {

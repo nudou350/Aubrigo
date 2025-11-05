@@ -53,6 +53,17 @@ export interface Donation {
   createdAt: string;
 }
 
+export interface DonationStatistics {
+  totalAmount: number;
+  totalDonations: number;
+  monthlyRecurring: number;
+}
+
+export interface DonationsResponse {
+  donations: Donation[];
+  statistics: DonationStatistics;
+}
+
 export interface UpdateOngProfileResponse {
   message: string;
   ong: OngProfile;
@@ -134,8 +145,8 @@ export class OngService {
   /**
    * Get donations received by this ONG
    */
-  getDonations(): Observable<Donation[]> {
-    return this.http.get<Donation[]>(`${this.apiUrl}/donations`);
+  getDonations(): Observable<DonationsResponse> {
+    return this.http.get<DonationsResponse>(`${this.apiUrl}/donations`);
   }
 
   /**
