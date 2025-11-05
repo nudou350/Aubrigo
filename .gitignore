@@ -70,3 +70,6 @@ frontend/.angular/
 frontend/dist/
 frontend/tmp/
 frontend/out-tsc/
+
+# Sensitive information (credentials, passwords)
+SETUP-INFO.md
