@@ -22,7 +22,8 @@
     "migration:generate": "npm run typeorm -- migration:generate",
     "migration:run": "npm run typeorm -- migration:run -d src/config/database.config.ts",
     "migration:revert": "npm run typeorm -- migration:revert -d src/config/database.config.ts",
-    "seed": "ts-node src/database/seeds/seed.ts"
+    "seed": "ts-node src/database/seeds/seed.ts",
+    "seed:multi-role": "ts-node src/database/seeds/multi-role-seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

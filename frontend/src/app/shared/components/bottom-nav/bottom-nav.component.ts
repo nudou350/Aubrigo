@@ -22,21 +22,50 @@ import { AuthService } from '../../../core/services/auth.service';
         <span class="nav-label">HOME</span>
       </a>
 
-      <button
-        (click)="onAddPet()"
-        class="nav-item nav-item-center"
-        [class.active]="isActive('/pets/add')"
-      >
-        <div class="paw-button">
-          <svg class="paw-icon" viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="8" cy="6" r="2"/>
-            <circle cx="16" cy="6" r="2"/>
-            <circle cx="6" cy="12" r="2"/>
-            <circle cx="18" cy="12" r="2"/>
-            <ellipse cx="12" cy="16" rx="4" ry="3"/>
-          </svg>
-        </div>
-      </button>
+      <!-- Only show Add Pet button for ONG users -->
+      @if (authService.isOng()) {
+        <button
+          (click)="onAddPet()"
+          class="nav-item nav-item-center"
+          [class.active]="isActive('/pets/add')"
+        >
+          <div class="paw-button">
+            <svg class="paw-icon" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="8" cy="6" r="2"/>
+              <circle cx="16" cy="6" r="2"/>
+              <circle cx="6" cy="12" r="2"/>
+              <circle cx="18" cy="12" r="2"/>
+              <ellipse cx="12" cy="16" rx="4" ry="3"/>
+            </svg>
+          </div>
+        </button>
+      } @else if (authService.isAdmin()) {
+        <!-- Admin Dashboard button -->
+        <a
+          routerLink="/admin"
+          class="nav-item nav-item-center"
+          [class.active]="isActive('/admin')"
+        >
+          <div class="paw-button">
+            <svg class="paw-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+            </svg>
+          </div>
+        </a>
+      } @else {
+        <!-- Regular user - show donation center button -->
+        <a
+          routerLink="/donate"
+          class="nav-item nav-item-center"
+          [class.active]="isActive('/donate')"
+        >
+          <div class="paw-button">
+            <svg class="paw-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+        </a>
+      }
 
       <a
         routerLink="/donate"
@@ -74,6 +103,26 @@ import { AuthService } from '../../../core/services/auth.service';
             <span>Home</span>
           </a>
 
+          <!-- Admin Dashboard Link -->
+          @if (authService.isAdmin()) {
+            <a routerLink="/admin" class="nav-link" [class.active]="isActive('/admin')">
+              <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+              </svg>
+              <span>Admin</span>
+            </a>
+          }
+
+          <!-- ONG Dashboard Link -->
+          @if (authService.isOng()) {
+            <a routerLink="/ong" class="nav-link" [class.active]="isActive('/ong')">
+              <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+              </svg>
+              <span>Dashboard</span>
+            </a>
+          }
+
           <a routerLink="/donate" class="nav-link" [class.active]="isActive('/donate')">
             <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -82,7 +131,7 @@ import { AuthService } from '../../../core/services/auth.service';
           </a>
 
           @if (authService.isAuthenticated()) {
-            <a routerLink="/perfil" class="nav-link" [class.active]="isActive('/perfil')">
+            <a routerLink="/profile" class="nav-link" [class.active]="isActive('/profile')">
               <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
@@ -93,12 +142,15 @@ import { AuthService } from '../../../core/services/auth.service';
 
         <div class="nav-actions">
           @if (authService.isAuthenticated()) {
-            <button (click)="onAddPet()" class="nav-cta">
-              <svg class="cta-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-              </svg>
-              <span>Adicionar Pet</span>
-            </button>
+            <!-- Only show Add Pet button for ONG users -->
+            @if (authService.isOng()) {
+              <button (click)="onAddPet()" class="nav-cta">
+                <svg class="cta-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                <span>Adicionar Pet</span>
+              </button>
+            }
             <button (click)="onLogout()" class="nav-logout">
               Sair
             </button>
@@ -421,8 +473,11 @@ export class BottomNavComponent {
   }
 
   onAddPet(): void {
-    if (this.authService.isAuthenticated()) {
+    if (this.authService.isOng()) {
       this.routerInstance.navigate(['/pets/add']);
+    } else if (this.authService.isAuthenticated()) {
+      // Already authenticated but not ONG - redirect to home
+      this.routerInstance.navigate(['/home']);
     } else {
       this.routerInstance.navigate(['/login']);
     }

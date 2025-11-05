@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as bcrypt from 'bcrypt';
-import { User } from '../../users/entities/user.entity';
+import { User, UserRole } from '../../users/entities/user.entity';
 import { Pet } from '../../pets/entities/pet.entity';
 import { PetImage } from '../../pets/entities/pet-image.entity';
 import { Appointment } from '../../appointments/entities/appointment.entity';
@@ -18,6 +18,16 @@ const AppDataSource = new DataSource({
   synchronize: false,
   logging: true,
 });
+
+// Admin account
+const adminData = {
+  email: 'admin@petsos.com',
+  password: 'Password123!',
+  ongName: 'Admin',
+  phone: '',
+  instagramHandle: '',
+  location: 'Lisboa',
+};
 
 const ongData = [
   {
@@ -49,6 +59,15 @@ const ongData = [
     location: 'Coimbra',
     latitude: 40.2033,
     longitude: -8.4103,
+  },
+];
+
+// Regular users
+const regularUsers = [
+  {
+    email: 'user@test.com',
+    password: 'Password123!',
+    ongName: '',
   },
 ];
 
@@ -297,20 +316,44 @@ async function seed() {
     await AppDataSource.query('TRUNCATE TABLE "appointments", "favorites", "pet_images", "pets", "users" RESTART IDENTITY CASCADE');
     console.log('Existing data cleared');
 
+    // Create Admin account
+    console.log('Creating Admin account...');
+    const adminHashedPassword = await bcrypt.hash(adminData.password, 10);
+    const admin = userRepository.create({
+      ...adminData,
+      passwordHash: adminHashedPassword,
+      role: UserRole.ADMIN,
+    });
+    await userRepository.save(admin);
+    console.log('✅ Created Admin:', adminData.email);
+
     console.log('Creating ONG accounts...');
     const createdOngs: User[] = [];
-    
+
     for (const ong of ongData) {
       const hashedPassword = await bcrypt.hash(ong.password, 10);
       const user = userRepository.create({
         ...ong,
         passwordHash: hashedPassword,
+        role: UserRole.ONG,
       });
       const savedUser = await userRepository.save(user);
       createdOngs.push(savedUser);
       console.log('Created ONG:', ong.ongName);
     }
     console.log('Created', createdOngs.length, 'ONGs');
+
+    console.log('Creating Regular users...');
+    for (const regularUser of regularUsers) {
+      const hashedPassword = await bcrypt.hash(regularUser.password, 10);
+      const user = userRepository.create({
+        ...regularUser,
+        passwordHash: hashedPassword,
+        role: UserRole.USER,
+      });
+      await userRepository.save(user);
+      console.log('Created User:', regularUser.email);
+    }
 
     console.log('Creating dog listings...');
     let dogCount = 0;
@@ -367,19 +410,33 @@ async function seed() {
     console.log('Created', catCount, 'cats');
 
     console.log('========================================');
-    console.log('Seed completed successfully!');
+    console.log('✅ Seed completed successfully!');
     console.log('========================================');
-    console.log('Summary:');
-    console.log('ONGs:', createdOngs.length);
-    console.log('Dogs:', dogCount);
-    console.log('Cats:', catCount);
-    console.log('Total pets:', dogCount + catCount);
-    console.log('Test Accounts:');
+    console.log('');
+    console.log('📊 Summary:');
+    console.log('  ONGs:', createdOngs.length);
+    console.log('  Dogs:', dogCount);
+    console.log('  Cats:', catCount);
+    console.log('  Total pets:', dogCount + catCount);
+    console.log('');
+    console.log('🔐 Test Accounts (Password for all: Password123!):');
+    console.log('');
+    console.log('👑 ADMIN:');
+    console.log('  Email: admin@petsos.com');
+    console.log('  Password: Password123!');
+    console.log('');
+    console.log('🏠 ONG ACCOUNTS:');
     ongData.forEach((ong) => {
-      console.log('-', ong.ongName);
-      console.log('  Email:', ong.email);
-      console.log('  Password:', ong.password);
+      console.log(`  - ${ong.ongName}`);
+      console.log(`    Email: ${ong.email}`);
+      console.log(`    Password: ${ong.password}`);
     });
+    console.log('');
+    console.log('👤 REGULAR USER:');
+    console.log('  Email: user@test.com');
+    console.log('  Password: Password123!');
+    console.log('');
+    console.log('========================================');
 
     await AppDataSource.destroy();
   } catch (error) {
