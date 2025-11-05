@@ -3,6 +3,8 @@ import { CommonModule } from "@angular/common";
 import { ActivatedRoute, Router } from "@angular/router";
 import { HttpClient } from "@angular/common/http";
 import { BottomNavComponent } from "../../../shared/components/bottom-nav/bottom-nav.component";
+import { FavoritesService } from "../../../core/services/favorites.service";
+import { ToastService } from "../../../core/services/toast.service";
 
 interface PetImage {
   id: string;
@@ -55,6 +57,16 @@ interface Pet {
           </svg>
         </button>
         <h1 class="title">Conhecendo, {{ pet()!.name }}! :)</h1>
+        <button
+          class="favorite-button-header"
+          [class.favorited]="isFavorited()"
+          (click)="toggleFavorite()"
+          title="Adicionar aos favoritos"
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" [attr.fill]="isFavorited() ? 'currentColor' : 'none'" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
       </div>
 
       <!-- Image Carousel -->
@@ -251,6 +263,36 @@ interface Pet {
         color: #4ca8a0;
         margin: 0;
         line-height: 1.3;
+        flex: 1;
+      }
+
+      .favorite-button-header {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(184, 227, 225, 0.3);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+        color: #666666;
+      }
+
+      .favorite-button-header:hover {
+        background: rgba(184, 227, 225, 0.5);
+        transform: scale(1.05);
+      }
+
+      .favorite-button-header.favorited {
+        color: #E74C3C;
+        background: #FFF5F5;
+      }
+
+      .favorite-button-header:active {
+        transform: scale(0.95);
       }
 
       /* Image Carousel */
@@ -512,17 +554,88 @@ export class PetDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private http = inject(HttpClient);
+  private favoritesService = inject(FavoritesService);
+  private toastService = inject(ToastService);
 
   pet = signal<Pet | null>(null);
   loading = signal(true);
   currentImageIndex = signal(0);
   currentImage = signal("");
   imageLoadError = signal(false);
+  favoritedPetId = signal<string | null>(null);
+  visitorEmail: string | null = null;
 
   ngOnInit() {
     const petId = this.route.snapshot.paramMap.get("id");
     if (petId) {
       this.loadPetDetail(petId);
+      this.initFavorites(petId);
+    }
+  }
+
+  initFavorites(petId: string) {
+    // Get or create visitor email
+    this.visitorEmail = this.favoritesService.getVisitorEmail();
+
+    if (!this.visitorEmail) {
+      // Generate a temporary email for anonymous users
+      const tempEmail = `temp-${Date.now()}@petsos.com`;
+      this.favoritesService.setVisitorEmail(tempEmail);
+      this.visitorEmail = tempEmail;
+    }
+
+    // Check if this pet is favorited
+    this.checkIfFavorited(petId);
+  }
+
+  checkIfFavorited(petId: string) {
+    if (!this.visitorEmail) return;
+
+    this.favoritesService.isFavorite(petId, this.visitorEmail).subscribe({
+      next: (response) => {
+        if (response.isFavorite) {
+          this.favoritedPetId.set(petId);
+        }
+      },
+      error: (error) => {
+        console.error('Error checking favorite status:', error);
+      }
+    });
+  }
+
+  isFavorited(): boolean {
+    const pet = this.pet();
+    return pet ? this.favoritedPetId() === pet.id : false;
+  }
+
+  toggleFavorite() {
+    const pet = this.pet();
+    if (!pet || !this.visitorEmail) return;
+
+    if (this.isFavorited()) {
+      // Remove from favorites
+      this.favoritesService.removeFavoriteByPetId(pet.id, this.visitorEmail).subscribe({
+        next: () => {
+          this.favoritedPetId.set(null);
+          this.toastService.success('Removido dos favoritos');
+        },
+        error: (error) => {
+          console.error('Error removing favorite:', error);
+          this.toastService.error('Erro ao remover dos favoritos');
+        }
+      });
+    } else {
+      // Add to favorites
+      this.favoritesService.addToFavorites(pet.id, this.visitorEmail).subscribe({
+        next: () => {
+          this.favoritedPetId.set(pet.id);
+          this.toastService.success('Adicionado aos favoritos');
+        },
+        error: (error) => {
+          console.error('Error adding favorite:', error);
+          this.toastService.error('Erro ao adicionar aos favoritos');
+        }
+      });
     }
   }
 

@@ -79,6 +79,13 @@ export const routes: Routes = [
         (m) => m.DonationComponent
       ),
   },
+  {
+    path: 'favorites',
+    loadComponent: () =>
+      import('./features/favorites/favorites.component').then(
+        (m) => m.FavoritesComponent
+      ),
+  },
 
   // Admin routes (admin role required)
   {

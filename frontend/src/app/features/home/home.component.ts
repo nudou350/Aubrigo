@@ -3,6 +3,8 @@ import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
 import { HttpClient } from "@angular/common/http";
 import { AuthService } from "../../core/services/auth.service";
+import { FavoritesService } from "../../core/services/favorites.service";
+import { ToastService } from "../../core/services/toast.service";
 
 interface Pet {
   id: string;
@@ -132,6 +134,16 @@ interface Pet {
         <div class="pet-card" (click)="viewPetDetail(pet.id)">
           <div class="pet-image-container">
             <img [src]="pet.primaryImage" [alt]="pet.name" class="pet-image" />
+            <button
+              class="favorite-button"
+              [class.favorited]="favoritePetIds().has(pet.id)"
+              (click)="toggleFavorite(pet.id, $event)"
+              title="Adicionar aos favoritos"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" [attr.fill]="favoritePetIds().has(pet.id) ? 'currentColor' : 'none'" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
           </div>
 
           <div class="pet-info">
@@ -512,12 +524,46 @@ interface Pet {
         height: 280px;
         overflow: hidden;
         background: #f0f0f0;
+        position: relative;
       }
 
       .pet-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
+      }
+
+      .favorite-button {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s ease;
+        z-index: 10;
+        color: #666666;
+      }
+
+      .favorite-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .favorite-button.favorited {
+        color: #E74C3C;
+        background: #FFF5F5;
+      }
+
+      .favorite-button:active {
+        transform: scale(0.95);
       }
 
       .pet-info {
@@ -695,11 +741,15 @@ export class HomeComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
   authService = inject(AuthService);
+  private favoritesService = inject(FavoritesService);
+  private toastService = inject(ToastService);
 
   pets = signal<Pet[]>([]);
   loading = signal(true);
   selectedSpecies = signal<string>("dog");
   currentLocation = signal("Lisboa");
+  favoritePetIds = signal<Set<string>>(new Set());
+  visitorEmail: string | null = null;
 
   // Location typeahead
   showLocationDropdown = signal(false);
@@ -708,6 +758,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.loadPets();
+    this.initFavorites();
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
@@ -716,6 +767,77 @@ export class HomeComponent implements OnInit {
         this.showLocationDropdown.set(false);
       }
     });
+  }
+
+  initFavorites() {
+    // Get or prompt for visitor email
+    this.visitorEmail = this.favoritesService.getVisitorEmail();
+
+    if (!this.visitorEmail) {
+      // Generate a temporary email for anonymous users
+      const tempEmail = `temp-${Date.now()}@petsos.com`;
+      this.favoritesService.setVisitorEmail(tempEmail);
+      this.visitorEmail = tempEmail;
+    }
+
+    // Load existing favorites
+    this.loadFavorites();
+  }
+
+  loadFavorites() {
+    if (!this.visitorEmail) return;
+
+    this.favoritesService.getFavorites(this.visitorEmail).subscribe({
+      next: (favorites) => {
+        const petIds = new Set(favorites.map(f => f.petId));
+        this.favoritePetIds.set(petIds);
+      },
+      error: (error) => {
+        console.error('Error loading favorites:', error);
+      }
+    });
+  }
+
+  toggleFavorite(petId: string, event: Event) {
+    event.stopPropagation(); // Prevent navigation to pet detail
+
+    if (!this.visitorEmail) {
+      this.toastService.warning('Por favor, configure seu e-mail primeiro');
+      return;
+    }
+
+    const favorites = this.favoritePetIds();
+    const isFavorited = favorites.has(petId);
+
+    if (isFavorited) {
+      // Remove from favorites
+      this.favoritesService.removeFavoriteByPetId(petId, this.visitorEmail).subscribe({
+        next: () => {
+          const newFavorites = new Set(favorites);
+          newFavorites.delete(petId);
+          this.favoritePetIds.set(newFavorites);
+          this.toastService.success('Removido dos favoritos');
+        },
+        error: (error) => {
+          console.error('Error removing favorite:', error);
+          this.toastService.error('Erro ao remover dos favoritos');
+        }
+      });
+    } else {
+      // Add to favorites
+      this.favoritesService.addToFavorites(petId, this.visitorEmail).subscribe({
+        next: () => {
+          const newFavorites = new Set(favorites);
+          newFavorites.add(petId);
+          this.favoritePetIds.set(newFavorites);
+          this.toastService.success('Adicionado aos favoritos');
+        },
+        error: (error) => {
+          console.error('Error adding favorite:', error);
+          this.toastService.error('Erro ao adicionar aos favoritos');
+        }
+      });
+    }
   }
 
   loadPets() {
