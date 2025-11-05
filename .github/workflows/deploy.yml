@@ -76,7 +76,7 @@ jobs:
         scp deploy.tar.gz $VPS_USER@$VPS_HOST:/tmp/
 
         # Execute deployment commands on VPS
-        ssh $VPS_USER@$VPS_HOST << 'EOF'
+        ssh $VPS_USER@$VPS_HOST bash -l << 'EOF'
           set -e
 
           # Extract deployment package
@@ -109,9 +109,6 @@ jobs:
           # Create logs directory
           cd /var/www/aubrigo/current/backend
           mkdir -p logs
-
-          # Add npm global bin to PATH
-          export PATH=$PATH:$(npm root -g)/../../bin
 
           # Restart backend with PM2
           pm2 delete aubrigo-backend || true
