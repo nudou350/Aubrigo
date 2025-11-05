@@ -8,13 +8,19 @@ import { PetImage } from '../../pets/entities/pet-image.entity';
 import { Appointment } from '../../appointments/entities/appointment.entity';
 import { Favorite } from '../../favorites/entities/favorite.entity';
 import { Donation } from '../../donations/entities/donation.entity';
+import { Article } from '../../articles/entities/article.entity';
+import { Ong } from '../../ongs/entities/ong.entity';
+import { OngOperatingHours } from '../../ongs/entities/ong-operating-hours.entity';
+import { AppointmentSettings } from '../../ongs/entities/appointment-settings.entity';
+import { OngAvailabilityException } from '../../ongs/entities/ong-availability-exception.entity';
+import { PasswordResetToken } from '../../auth/entities/password-reset-token.entity';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  entities: [User, Pet, PetImage, Appointment, Favorite, Donation],
+  entities: [User, Pet, PetImage, Appointment, Favorite, Donation, Article, Ong, OngOperatingHours, AppointmentSettings, OngAvailabilityException, PasswordResetToken],
   synchronize: false,
   logging: true,
 });
