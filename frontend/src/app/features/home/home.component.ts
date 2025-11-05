@@ -1,28 +1,10 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
-import { HttpClient } from "@angular/common/http";
 import { AuthService } from "../../core/services/auth.service";
 import { FavoritesService } from "../../core/services/favorites.service";
 import { ToastService } from "../../core/services/toast.service";
-
-interface Pet {
-  id: string;
-  name: string;
-  species: string;
-  breed: string;
-  age: number;
-  gender: string;
-  size: string;
-  location: string;
-  primaryImage: string;
-  ong: {
-    id: string;
-    ongName: string;
-    location: string;
-  };
-  description: string;
-}
+import { PetsService, Pet, SearchPetsParams } from "../../core/services/pets.service";
 
 @Component({
   selector: "app-home",
@@ -738,7 +720,7 @@ interface Pet {
   ],
 })
 export class HomeComponent implements OnInit {
-  private http = inject(HttpClient);
+  private petsService = inject(PetsService);
   private router = inject(Router);
   authService = inject(AuthService);
   private favoritesService = inject(FavoritesService);
@@ -842,20 +824,28 @@ export class HomeComponent implements OnInit {
 
   loadPets() {
     this.loading.set(true);
-    const species = this.selectedSpecies();
-    const url = species
-      ? `http://localhost:3002/api/pets?species=${species}`
-      : "http://localhost:3002/api/pets";
 
-    this.http.get<any>(url).subscribe({
+    const params: SearchPetsParams = {};
+
+    // Add species filter if selected
+    if (this.selectedSpecies()) {
+      params.species = this.selectedSpecies();
+    }
+
+    // Add location filter if selected
+    if (this.currentLocation()) {
+      params.location = this.currentLocation();
+    }
+
+    this.petsService.searchPets(params).subscribe({
       next: (response) => {
-        this.pets.set(response.data || response);
+        this.pets.set(response.data || []);
         this.loading.set(false);
       },
       error: (error) => {
         console.error("Error loading pets:", error);
+        this.toastService.error('Erro ao carregar pets');
         this.loading.set(false);
-        // For now, set empty array
         this.pets.set([]);
       },
     });
@@ -888,7 +878,7 @@ export class HomeComponent implements OnInit {
   }
 
   goToProfile() {
-    this.router.navigate(["/perfil"]);
+    this.router.navigate(["/profile"]);
   }
 
   goToLogin() {
@@ -911,7 +901,7 @@ export class HomeComponent implements OnInit {
     this.currentLocation.set(location);
     this.showLocationDropdown.set(false);
     this.filteredLocations.set(this.availableLocations);
-    // TODO: Filter pets by location
+    // Reload pets with location filter
     this.loadPets();
   }
 }

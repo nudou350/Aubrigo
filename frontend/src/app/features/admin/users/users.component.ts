@@ -1,20 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { environment } from '../../../../environments/environment';
-
-interface User {
-  id: string;
-  email: string;
-  role: string;
-  firstName?: string;
-  lastName?: string;
-  ongName?: string;
-  phone?: string;
-  location?: string;
-  createdAt: string;
-}
+import { AdminService, User } from '../../../core/services/admin.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-admin-users',
@@ -414,15 +402,14 @@ interface User {
   `]
 })
 export class AdminUsersComponent implements OnInit {
-  private apiUrl = environment.apiUrl;
+  private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
 
   isLoading = signal(true);
   users = signal<User[]>([]);
   filteredUsers = signal<User[]>([]);
   searchTerm = '';
   roleFilter = '';
-
-  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -431,7 +418,7 @@ export class AdminUsersComponent implements OnInit {
   loadUsers() {
     this.isLoading.set(true);
 
-    this.http.get<User[]>(`${this.apiUrl}/admin/users`).subscribe({
+    this.adminService.getUsers().subscribe({
       next: (users) => {
         this.users.set(users);
         this.filteredUsers.set(users);
@@ -440,7 +427,7 @@ export class AdminUsersComponent implements OnInit {
       error: (error) => {
         console.error('Error loading users:', error);
         this.isLoading.set(false);
-        alert('Erro ao carregar usuários: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error('Erro ao carregar usuários: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
   }
@@ -523,7 +510,7 @@ export class AdminUsersComponent implements OnInit {
 
   viewUser(userId: string) {
     // Navigate to user detail page (to be implemented)
-    alert(`Ver detalhes do usuário: ${userId}`);
+    this.toastService.info(`Ver detalhes do usuário: ${userId}`);
   }
 
   deleteUser(userId: string, userName: string) {
@@ -531,14 +518,14 @@ export class AdminUsersComponent implements OnInit {
       return;
     }
 
-    this.http.delete(`${this.apiUrl}/admin/users/${userId}`).subscribe({
+    this.adminService.deleteUser(userId).subscribe({
       next: () => {
-        alert('Usuário excluído com sucesso!');
+        this.toastService.success('Usuário excluído com sucesso!');
         this.loadUsers();
       },
       error: (error) => {
         console.error('Error deleting user:', error);
-        alert('Erro ao excluir usuário: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error('Erro ao excluir usuário: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
   }
