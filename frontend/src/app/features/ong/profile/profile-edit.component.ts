@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 import { OngService } from '../../../core/services/ong.service';
 import { ToastService } from '../../../core/services/toast.service';
 
@@ -446,6 +447,7 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class ProfileEditComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
   private ongService = inject(OngService);
   private toastService = inject(ToastService);
   private router = inject(Router);
@@ -548,7 +550,15 @@ export class ProfileEditComponent implements OnInit {
       if (this.selectedImageFile) {
         await new Promise<void>((resolve, reject) => {
           this.ongService.uploadProfileImage(this.selectedImageFile!).subscribe({
-            next: () => {
+            next: (response) => {
+              // Update AuthService to sync the profile image
+              const currentUser = this.authService.currentUser();
+              if (currentUser) {
+                this.authService.updateCurrentUser({
+                  ...currentUser,
+                  profileImageUrl: response.profileImageUrl
+                });
+              }
               this.toastService.success('Imagem de perfil atualizada');
               resolve();
             },
@@ -574,7 +584,19 @@ export class ProfileEditComponent implements OnInit {
 
       await new Promise<void>((resolve, reject) => {
         this.ongService.updateOngProfile(profileData).subscribe({
-          next: () => {
+          next: (response) => {
+            // Update AuthService to sync the ONG profile across the app
+            const currentUser = this.authService.currentUser();
+            if (currentUser) {
+              this.authService.updateCurrentUser({
+                ...currentUser,
+                ongName: response.ong.ongName,
+                phone: response.ong.phone,
+                instagramHandle: response.ong.instagramHandle,
+                location: response.ong.location,
+                profileImageUrl: response.ong.profileImageUrl,
+              });
+            }
             resolve();
           },
           error: (error) => {

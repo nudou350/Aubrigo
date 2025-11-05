@@ -729,13 +729,13 @@ export class HomeComponent implements OnInit {
   pets = signal<Pet[]>([]);
   loading = signal(true);
   selectedSpecies = signal<string>("dog");
-  currentLocation = signal("Lisboa");
+  currentLocation = signal("Todas as cidades");
   favoritePetIds = signal<Set<string>>(new Set());
   visitorEmail: string | null = null;
 
   // Location typeahead
   showLocationDropdown = signal(false);
-  availableLocations = ["Lisboa", "Porto", "Beja", "Évora"];
+  availableLocations = ["Todas as cidades", "Lisboa", "Porto", "Beja", "Évora"];
   filteredLocations = signal<string[]>(this.availableLocations);
 
   ngOnInit() {
@@ -832,8 +832,8 @@ export class HomeComponent implements OnInit {
       params.species = this.selectedSpecies();
     }
 
-    // Add location filter if selected
-    if (this.currentLocation()) {
+    // Add location filter if selected and not "Todas as cidades"
+    if (this.currentLocation() && this.currentLocation() !== "Todas as cidades") {
       params.location = this.currentLocation();
     }
 
@@ -873,9 +873,17 @@ export class HomeComponent implements OnInit {
   getGreeting(): string {
     const user = this.authService.currentUser();
     if (user) {
-      return `Olá, ${user.ongName}!`;
+      // Check for firstName first (regular users and admins)
+      if (user.firstName) {
+        return `Olá, ${user.firstName}!`;
+      }
+      // Fall back to ongName (for ONG accounts)
+      if (user.ongName) {
+        return `Olá, ${user.ongName}!`;
+      }
     }
-    return "Olá! Bem-vindo ao Pet SOS";
+    // If no name is available, just show greeting
+    return "Olá!";
   }
 
   goToProfile() {

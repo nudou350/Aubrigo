@@ -154,6 +154,12 @@ export class AuthService {
     this.redirectBasedOnRole(response.user.role);
   }
 
+  // Public method to update current user (called after profile updates)
+  updateCurrentUser(user: User): void {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.currentUserSignal.set(user);
+  }
+
   private redirectBasedOnRole(role: UserRole): void {
     switch (role) {
       case 'admin':

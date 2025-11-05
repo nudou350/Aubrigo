@@ -351,6 +351,201 @@ export class EmailService {
     });
   }
 
+  async sendAppointmentAutoConfirmedToVisitor(
+    visitorEmail: string,
+    visitorName: string,
+    petName: string,
+    ongName: string,
+    ongPhone: string,
+    ongLocation: string,
+    scheduledStartTime: Date,
+  ): Promise<boolean> {
+    const dateStr = scheduledStartTime.toLocaleDateString('pt-PT', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+    const timeStr = scheduledStartTime.toLocaleTimeString('pt-PT', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #27ae60;">✅ Visita Confirmada - Pet SOS</h1>
+        <p>Olá <strong>${visitorName}</strong>,</p>
+        <p>Ótimas notícias! Sua visita foi <strong>automaticamente confirmada</strong>!</p>
+        <div style="background: #e7f7f6; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #27ae60;">
+          <h3 style="margin-top: 0; color: #2c2c2c;">📅 Detalhes da Visita:</h3>
+          <p><strong>Pet:</strong> ${petName}</p>
+          <p><strong>ONG:</strong> ${ongName}</p>
+          <p><strong>Data:</strong> ${dateStr}</p>
+          <p><strong>Horário:</strong> ${timeStr}</p>
+          <p><strong>Local:</strong> ${ongLocation}</p>
+          <p><strong>Contato:</strong> ${ongPhone}</p>
+        </div>
+        <div style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+          <p><strong>⚠️ Importante:</strong></p>
+          <ul style="margin: 10px 0; padding-left: 20px;">
+            <li>Chegue com 5-10 minutos de antecedência</li>
+            <li>Traga um documento de identificação</li>
+            <li>Se não puder comparecer, cancele com antecedência</li>
+          </ul>
+        </div>
+        <p>Prepare-se para conhecer ${petName}! 🐾</p>
+        <p>Atenciosamente,<br/>Equipe Pet SOS</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: visitorEmail,
+      subject: `✅ Visita Confirmada - ${petName}`,
+      html,
+    });
+  }
+
+  async sendAppointmentAutoConfirmedToOng(
+    ongEmail: string,
+    ongName: string,
+    visitorName: string,
+    visitorEmail: string,
+    visitorPhone: string,
+    petName: string,
+    scheduledStartTime: Date,
+    notes?: string,
+  ): Promise<boolean> {
+    const dateStr = scheduledStartTime.toLocaleDateString('pt-PT', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+    const timeStr = scheduledStartTime.toLocaleTimeString('pt-PT', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4ca8a0;">📅 Nova Visita Agendada - Pet SOS</h1>
+        <p>Olá <strong>${ongName}</strong>,</p>
+        <p>Uma nova visita foi <strong>automaticamente confirmada</strong> no sistema!</p>
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #2c2c2c;">👤 Informações do Visitante:</h3>
+          <p><strong>Nome:</strong> ${visitorName}</p>
+          <p><strong>Email:</strong> <a href="mailto:${visitorEmail}">${visitorEmail}</a></p>
+          <p><strong>Telefone:</strong> ${visitorPhone}</p>
+          <h3 style="color: #2c2c2c;">📅 Detalhes da Visita:</h3>
+          <p><strong>Pet:</strong> ${petName}</p>
+          <p><strong>Data:</strong> ${dateStr}</p>
+          <p><strong>Horário:</strong> ${timeStr}</p>
+          ${notes ? `<p><strong>Observações:</strong> ${notes}</p>` : ''}
+        </div>
+        <p style="background: #e7f7f6; padding: 15px; border-left: 4px solid #4ca8a0; margin: 20px 0;">
+          <strong>💡 Lembrete:</strong> A visita foi confirmada automaticamente pelo sistema de agendamento inteligente. O visitante já recebeu a confirmação por email.
+        </p>
+        <p>Atenciosamente,<br/>Equipe Pet SOS</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: ongEmail,
+      subject: `📅 Nova Visita Agendada - ${petName}`,
+      html,
+    });
+  }
+
+  async sendAppointmentCancellationToVisitor(
+    visitorEmail: string,
+    visitorName: string,
+    petName: string,
+    ongName: string,
+    scheduledStartTime: Date,
+    reason?: string,
+  ): Promise<boolean> {
+    const dateStr = scheduledStartTime.toLocaleDateString('pt-PT', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+    const timeStr = scheduledStartTime.toLocaleTimeString('pt-PT', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #e74c3c;">❌ Visita Cancelada - Pet SOS</h1>
+        <p>Olá <strong>${visitorName}</strong>,</p>
+        <p>Infelizmente, sua visita foi cancelada.</p>
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #2c2c2c;">Detalhes da Visita Cancelada:</h3>
+          <p><strong>Pet:</strong> ${petName}</p>
+          <p><strong>ONG:</strong> ${ongName}</p>
+          <p><strong>Data:</strong> ${dateStr}</p>
+          <p><strong>Horário:</strong> ${timeStr}</p>
+        </div>
+        ${reason ? `
+          <div style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+            <p><strong>Motivo:</strong> ${reason}</p>
+          </div>
+        ` : ''}
+        <p>Você pode agendar uma nova visita a qualquer momento através da plataforma.</p>
+        <p>Atenciosamente,<br/>Equipe Pet SOS</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: visitorEmail,
+      subject: `Visita Cancelada - ${petName}`,
+      html,
+    });
+  }
+
+  async sendAppointmentCancellationToOng(
+    ongEmail: string,
+    ongName: string,
+    visitorName: string,
+    petName: string,
+    scheduledStartTime: Date,
+  ): Promise<boolean> {
+    const dateStr = scheduledStartTime.toLocaleDateString('pt-PT', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+    const timeStr = scheduledStartTime.toLocaleTimeString('pt-PT', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #e74c3c;">❌ Visita Cancelada - Pet SOS</h1>
+        <p>Olá <strong>${ongName}</strong>,</p>
+        <p>Uma visita foi cancelada:</p>
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #2c2c2c;">Detalhes:</h3>
+          <p><strong>Visitante:</strong> ${visitorName}</p>
+          <p><strong>Pet:</strong> ${petName}</p>
+          <p><strong>Data:</strong> ${dateStr}</p>
+          <p><strong>Horário:</strong> ${timeStr}</p>
+        </div>
+        <p>O horário está novamente disponível para agendamento.</p>
+        <p>Atenciosamente,<br/>Equipe Pet SOS</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: ongEmail,
+      subject: `Visita Cancelada - ${petName}`,
+      html,
+    });
+  }
+
   private stripHtml(html: string): string {
     return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
   }

@@ -10,8 +10,11 @@ export interface Appointment {
   visitorName: string;
   visitorEmail: string;
   visitorPhone?: string;
-  preferredDate: string;
-  preferredTime: string;
+  preferredDate?: string; // Legacy field
+  preferredTime?: string; // Legacy field
+  scheduledStartTime?: string; // New system: ISO 8601
+  scheduledEndTime?: string; // New system: ISO 8601
+  timezone?: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   notes?: string;
   pet?: {
@@ -36,8 +39,11 @@ export interface CreateAppointmentDto {
   visitorName: string;
   visitorEmail: string;
   visitorPhone?: string;
-  preferredDate: string;
-  preferredTime: string;
+  // Legacy system (backward compatible)
+  preferredDate?: string;
+  preferredTime?: string;
+  // New system (auto-confirmed if provided)
+  scheduledStartTime?: string; // ISO 8601: "2025-01-10T10:00:00Z"
   notes?: string;
 }
 
@@ -121,5 +127,12 @@ export class AppointmentsService {
       completed: number;
       cancelled: number;
     }>(`${this.apiUrl}/stats`);
+  }
+
+  /**
+   * Cancel an appointment (new system)
+   */
+  cancelAppointment(id: string, reason?: string): Observable<Appointment> {
+    return this.http.patch<Appointment>(`${this.apiUrl}/${id}/cancel`, { reason });
   }
 }

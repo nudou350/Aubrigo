@@ -80,6 +80,16 @@ import { ToastService } from '../../../core/services/toast.service';
               <h3>Visitas Agendadas</h3>
               <p>Veja e gerencie agendamentos</p>
             </a>
+            <a routerLink="/ong/scheduling-settings" class="action-card">
+              <div class="action-icon">⚙️</div>
+              <h3>Configurações de Agendamento</h3>
+              <p>Defina horários e regras de visitas</p>
+            </a>
+            <a routerLink="/ong/availability-exceptions" class="action-card">
+              <div class="action-icon">🚫</div>
+              <h3>Bloqueios e Férias</h3>
+              <p>Gerencie feriados e indisponibilidades</p>
+            </a>
             <a routerLink="/ong/donations" class="action-card">
               <div class="action-icon">💸</div>
               <h3>Histórico de Doações</h3>

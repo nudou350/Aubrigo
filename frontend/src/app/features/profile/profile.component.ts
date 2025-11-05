@@ -678,7 +678,19 @@ export class ProfileComponent implements OnInit {
       };
 
       this.ongService.updateOngProfile(updateData).subscribe({
-        next: () => {
+        next: (response) => {
+          // Update AuthService to sync the ONG profile across the app
+          const currentUser = this.authService.currentUser();
+          if (currentUser) {
+            this.authService.updateCurrentUser({
+              ...currentUser,
+              ongName: response.ong.ongName,
+              phone: response.ong.phone,
+              instagramHandle: response.ong.instagramHandle,
+              location: response.ong.location,
+              profileImageUrl: response.ong.profileImageUrl,
+            });
+          }
           this.toastService.success('Perfil atualizado com sucesso');
           this.editMode.set(false);
         },
@@ -696,7 +708,15 @@ export class ProfileComponent implements OnInit {
       };
 
       this.usersService.updateUserProfile(updateData).subscribe({
-        next: () => {
+        next: (response) => {
+          // Update AuthService to sync the current user across the app
+          const currentUser = this.authService.currentUser();
+          if (currentUser) {
+            this.authService.updateCurrentUser({
+              ...currentUser,
+              ...response.user
+            });
+          }
           this.toastService.success('Perfil atualizado com sucesso');
           this.editMode.set(false);
         },
@@ -717,6 +737,14 @@ export class ProfileComponent implements OnInit {
         this.ongService.uploadProfileImage(file).subscribe({
           next: (response) => {
             this.profileImageUrl.set(response.profileImageUrl);
+            // Update AuthService to sync the profile image
+            const currentUser = this.authService.currentUser();
+            if (currentUser) {
+              this.authService.updateCurrentUser({
+                ...currentUser,
+                profileImageUrl: response.profileImageUrl
+              });
+            }
             this.toastService.success('Imagem atualizada com sucesso');
           },
           error: (error) => {
@@ -728,6 +756,14 @@ export class ProfileComponent implements OnInit {
         this.usersService.uploadProfileImage(file).subscribe({
           next: (response) => {
             this.profileImageUrl.set(response.profileImageUrl);
+            // Update AuthService to sync the profile image
+            const currentUser = this.authService.currentUser();
+            if (currentUser) {
+              this.authService.updateCurrentUser({
+                ...currentUser,
+                profileImageUrl: response.profileImageUrl
+              });
+            }
             this.toastService.success('Imagem atualizada com sucesso');
           },
           error: (error) => {

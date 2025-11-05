@@ -44,6 +44,15 @@ export class Appointment {
   @Column({ name: 'preferred_time', type: 'time', nullable: true })
   preferredTime: string;
 
+  @Column({ name: 'scheduled_start_time', type: 'timestamp', nullable: true })
+  scheduledStartTime: Date;
+
+  @Column({ name: 'scheduled_end_time', type: 'timestamp', nullable: true })
+  scheduledEndTime: Date;
+
+  @Column({ default: 'Europe/Lisbon' })
+  timezone: string;
+
   @Column({ default: 'pending' })
   status: string; // pending, confirmed, completed, cancelled
 

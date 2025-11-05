@@ -50,6 +50,11 @@ export class AppointmentsController {
     return this.appointmentsService.updateStatus(id, updateStatusDto, req.user.ongId);
   }
 
+  @Patch(':id/cancel')
+  cancel(@Param('id') id: string, @Body('reason') reason?: string) {
+    return this.appointmentsService.cancel(id, reason);
+  }
+
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)

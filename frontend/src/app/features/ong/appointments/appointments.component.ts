@@ -82,14 +82,21 @@ import { ToastService } from '../../../core/services/toast.service';
                     </a>
                   </div>
                 }
-                <div class="detail-row">
-                  <span class="label">📅 Data:</span>
-                  <span class="value">{{ formatDate(appointment.preferredDate) }}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="label">🕒 Horário:</span>
-                  <span class="value">{{ appointment.preferredTime }}</span>
-                </div>
+                @if (appointment.scheduledStartTime) {
+                  <div class="detail-row">
+                    <span class="label">📅 Data/Horário:</span>
+                    <span class="value">{{ formatDateTime(appointment.scheduledStartTime) }}</span>
+                  </div>
+                } @else {
+                  <div class="detail-row">
+                    <span class="label">📅 Data:</span>
+                    <span class="value">{{ appointment.preferredDate ? formatDate(appointment.preferredDate) : 'Não definida' }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">🕒 Horário:</span>
+                    <span class="value">{{ appointment.preferredTime || 'Não definido' }}</span>
+                  </div>
+                }
                 @if (appointment.notes) {
                   <div class="detail-row">
                     <span class="label">💬 Observações:</span>
@@ -541,6 +548,18 @@ export class OngAppointmentsComponent implements OnInit {
       day: '2-digit',
       month: 'long',
       year: 'numeric'
+    });
+  }
+
+  formatDateTime(isoString: string): string {
+    const date = new Date(isoString);
+    return date.toLocaleDateString('pt-PT', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 }

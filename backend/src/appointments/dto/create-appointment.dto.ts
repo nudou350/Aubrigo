@@ -14,11 +14,17 @@ export class CreateAppointmentDto {
   @IsString()
   visitorPhone?: string;
 
+  @IsOptional()
   @IsDateString()
-  preferredDate: string;
+  preferredDate?: string; // Legacy field (kept for backward compatibility)
 
+  @IsOptional()
   @IsString()
-  preferredTime: string;
+  preferredTime?: string; // Legacy field (kept for backward compatibility)
+
+  @IsOptional()
+  @IsDateString()
+  scheduledStartTime?: string; // New field: ISO 8601 datetime
 
   @IsOptional()
   @IsString()

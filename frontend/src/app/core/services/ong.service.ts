@@ -79,7 +79,7 @@ export interface UploadImageResponse {
 })
 export class OngService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/ong`;
+  private apiUrl = `${environment.apiUrl}/ongs`;
 
   // Keep track of current ONG profile
   private currentOngSubject = new BehaviorSubject<OngProfile | null>(null);
@@ -89,7 +89,7 @@ export class OngService {
    * Get current ONG profile
    */
   getOngProfile(): Observable<OngProfile> {
-    return this.http.get<OngProfile>(`${this.apiUrl}/profile`).pipe(
+    return this.http.get<OngProfile>(`${this.apiUrl}/my-ong`).pipe(
       tap((ong) => this.currentOngSubject.next(ong))
     );
   }
@@ -99,7 +99,7 @@ export class OngService {
    */
   updateOngProfile(data: UpdateOngProfileDto): Observable<UpdateOngProfileResponse> {
     return this.http
-      .put<UpdateOngProfileResponse>(`${this.apiUrl}/profile`, data)
+      .put<UpdateOngProfileResponse>(`${this.apiUrl}/my-ong/profile`, data)
       .pipe(tap((response) => this.currentOngSubject.next(response.ong)));
   }
 
@@ -111,7 +111,7 @@ export class OngService {
     formData.append('profileImage', file);
 
     return this.http
-      .post<UploadImageResponse>(`${this.apiUrl}/profile/image`, formData)
+      .post<UploadImageResponse>(`${this.apiUrl}/my-ong/profile-image`, formData)
       .pipe(
         tap((response) => {
           const currentOng = this.currentOngSubject.value;
@@ -130,7 +130,7 @@ export class OngService {
    */
   changePassword(data: ChangePasswordDto): Observable<{ message: string }> {
     return this.http.put<{ message: string }>(
-      `${this.apiUrl}/profile/change-password`,
+      `${this.apiUrl}/my-ong/change-password`,
       data
     );
   }
@@ -139,28 +139,28 @@ export class OngService {
    * Get ONG's own pets
    */
   getMyPets(): Observable<Pet[]> {
-    return this.http.get<Pet[]>(`${this.apiUrl}/my-pets`);
+    return this.http.get<Pet[]>(`${environment.apiUrl}/pets/my-pets`);
   }
 
   /**
    * Get donations received by this ONG
    */
   getDonations(): Observable<DonationsResponse> {
-    return this.http.get<DonationsResponse>(`${this.apiUrl}/donations`);
+    return this.http.get<DonationsResponse>(`${environment.apiUrl}/donations/ong`);
   }
 
   /**
    * Get dashboard statistics
    */
   getDashboardStats(): Observable<OngDashboardStats> {
-    return this.http.get<OngDashboardStats>(`${this.apiUrl}/dashboard/stats`);
+    return this.http.get<OngDashboardStats>(`${this.apiUrl}/my-ong/stats`);
   }
 
   /**
    * Get ONG profile by ID (public endpoint)
    */
   getOngById(id: string): Observable<OngProfile> {
-    return this.http.get<OngProfile>(`${environment.apiUrl}/ong/${id}`);
+    return this.http.get<OngProfile>(`${this.apiUrl}/${id}`);
   }
 
   /**
@@ -181,6 +181,6 @@ export class OngService {
    * Delete ONG account
    */
   deleteAccount(): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(`${this.apiUrl}/profile`);
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/my-ong`);
   }
 }

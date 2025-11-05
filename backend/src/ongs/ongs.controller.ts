@@ -51,6 +51,18 @@ export class OngsController {
     return this.ongsService.getMyOng(user.id);
   }
 
+  @Get('my-ong/stats')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.ONG)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user ONG statistics' })
+  @ApiResponse({ status: 200, description: 'ONG statistics' })
+  @ApiResponse({ status: 404, description: 'ONG not found' })
+  async getMyOngStats(@CurrentUser() user: any) {
+    const ong = await this.ongsService.getMyOng(user.id);
+    return this.ongsService.getOngStats(ong.id, user.id);
+  }
+
   @Get('my-ongs')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)

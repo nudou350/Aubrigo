@@ -175,6 +175,20 @@ export const routes: Routes = [
             (m) => m.ProfileEditComponent
           ),
       },
+      {
+        path: 'scheduling-settings',
+        loadComponent: () =>
+          import('./features/ong/scheduling-settings/scheduling-settings.component').then(
+            (m) => m.SchedulingSettingsComponent
+          ),
+      },
+      {
+        path: 'availability-exceptions',
+        loadComponent: () =>
+          import('./features/ong/availability-exceptions/availability-exceptions.component').then(
+            (m) => m.AvailabilityExceptionsComponent
+          ),
+      },
     ]
   },
 

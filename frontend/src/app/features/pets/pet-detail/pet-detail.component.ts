@@ -1,14 +1,14 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute, Router } from "@angular/router";
-import { HttpClient } from "@angular/common/http";
 import { BottomNavComponent } from "../../../shared/components/bottom-nav/bottom-nav.component";
 import { FavoritesService } from "../../../core/services/favorites.service";
 import { ToastService } from "../../../core/services/toast.service";
+import { PetsService } from "../../../core/services/pets.service";
 
 interface PetImage {
   id: string;
-  url: string;
+  imageUrl: string;
   isPrimary: boolean;
 }
 
@@ -553,7 +553,7 @@ interface Pet {
 export class PetDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private http = inject(HttpClient);
+  private petsService = inject(PetsService);
   private favoritesService = inject(FavoritesService);
   private toastService = inject(ToastService);
 
@@ -641,17 +641,16 @@ export class PetDetailComponent implements OnInit {
 
   loadPetDetail(petId: string) {
     this.loading.set(true);
-    this.http.get<any>(`http://localhost:3002/api/pets/${petId}`).subscribe({
-      next: (response) => {
-        const petData = response.data || response;
-        this.pet.set(petData);
+    this.petsService.getPetById(petId).subscribe({
+      next: (petData) => {
+        this.pet.set(petData as any);
 
         // Set initial image
         if (petData.images && petData.images.length > 0) {
           const primaryImage = petData.images.find(
-            (img: PetImage) => img.isPrimary
+            (img) => img.isPrimary
           );
-          this.currentImage.set(primaryImage?.url || petData.images[0].url);
+          this.currentImage.set(primaryImage?.imageUrl || petData.images[0].imageUrl);
         }
 
         this.loading.set(false);
@@ -670,7 +669,7 @@ export class PetDetailComponent implements OnInit {
 
     const nextIndex = (this.currentImageIndex() + 1) % pet.images.length;
     this.currentImageIndex.set(nextIndex);
-    this.currentImage.set(pet.images[nextIndex].url);
+    this.currentImage.set(pet.images[nextIndex].imageUrl);
     this.imageLoadError.set(false);
   }
 
@@ -683,7 +682,7 @@ export class PetDetailComponent implements OnInit {
         ? pet.images.length - 1
         : this.currentImageIndex() - 1;
     this.currentImageIndex.set(prevIndex);
-    this.currentImage.set(pet.images[prevIndex].url);
+    this.currentImage.set(pet.images[prevIndex].imageUrl);
     this.imageLoadError.set(false);
   }
 
@@ -692,7 +691,7 @@ export class PetDetailComponent implements OnInit {
     if (!pet || !pet.images.length) return;
 
     this.currentImageIndex.set(index);
-    this.currentImage.set(pet.images[index].url);
+    this.currentImage.set(pet.images[index].imageUrl);
     this.imageLoadError.set(false);
   }
 
