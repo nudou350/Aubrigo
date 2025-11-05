@@ -133,6 +133,18 @@ export class AuthService {
     return localStorage.getItem('accessToken');
   }
 
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string, confirmPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/auth/reset-password`, {
+      token,
+      newPassword,
+      confirmPassword
+    });
+  }
+
   private handleAuthSuccess(response: AuthResponse): void {
     localStorage.setItem('accessToken', response.accessToken);
     localStorage.setItem('currentUser', JSON.stringify(response.user));
