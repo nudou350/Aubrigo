@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { ToastService } from '../../../core/services/toast.service';
 import { PORTUGAL_CITIES } from '../../../core/constants/portugal-cities';
+import { normalizeImageUrl } from '../../../core/utils/image-url.util';
 
 interface PetImage {
   id?: string;
@@ -202,12 +203,33 @@ interface PetImage {
           <div class="form-grid">
             <div class="form-group">
               <label for="location">Cidade *</label>
-              <select id="location" formControlName="location" class="form-control">
-                <option value="">Selecione a cidade...</option>
-                @for (city of cities; track city) {
-                  <option [value]="city">{{ city }}</option>
+              <div class="location-typeahead-container" style="position: relative;">
+                <input
+                  id="location"
+                  type="text"
+                  [value]="locationInput()"
+                  (input)="onLocationInput($event)"
+                  (focus)="onLocationFocus()"
+                  (keydown)="onLocationKeydown($event)"
+                  placeholder="Digite uma cidade..."
+                  class="form-control"
+                  autocomplete="off"
+                />
+                @if (showLocationDropdown() && filteredCities().length > 0) {
+                  <div class="typeahead-dropdown">
+                    @for (city of filteredCities(); track $index) {
+                      <button
+                        type="button"
+                        class="typeahead-option"
+                        [class.selected]="selectedLocationIndex() === $index"
+                        (click)="selectLocation(city)"
+                      >
+                        📍 {{ city }}
+                      </button>
+                    }
+                  </div>
                 }
-              </select>
+              </div>
               @if (petForm.get('location')?.invalid && petForm.get('location')?.touched) {
                 <span class="error">Cidade é obrigatória</span>
               }
@@ -216,11 +238,33 @@ interface PetImage {
             @if (isEditMode()) {
               <div class="form-group">
                 <label for="status">Status</label>
-                <select id="status" formControlName="status" class="form-control">
-                  <option value="available">Disponível</option>
-                  <option value="pending">Pendente</option>
-                  <option value="adopted">Adotado</option>
-                </select>
+                <div class="status-typeahead-container" style="position: relative;">
+                  <input
+                    id="status"
+                    type="text"
+                    [value]="statusInput()"
+                    (input)="onStatusInput($event)"
+                    (focus)="onStatusFocus()"
+                    (keydown)="onStatusKeydown($event)"
+                    placeholder="Selecione o status..."
+                    class="form-control"
+                    autocomplete="off"
+                  />
+                  @if (showStatusDropdown() && filteredStatuses().length > 0) {
+                    <div class="typeahead-dropdown">
+                      @for (status of filteredStatuses(); track $index) {
+                        <button
+                          type="button"
+                          class="typeahead-option"
+                          [class.selected]="selectedStatusIndex() === $index"
+                          (click)="selectStatus(status)"
+                        >
+                          {{ status.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
               </div>
             }
           </div>
@@ -507,6 +551,48 @@ interface PetImage {
       to { transform: rotate(360deg); }
     }
 
+    .typeahead-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      overflow: hidden;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .typeahead-option {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: none;
+      background: white;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 14px;
+      color: #2C2C2C;
+
+      &:hover {
+        background: #F0FFFE;
+      }
+
+      &:active {
+        background: #E1F9F7;
+      }
+
+      &.selected {
+        background: #E1F9F7;
+        font-weight: 600;
+      }
+    }
+
     @media (max-width: 768px) {
       .pet-form-page {
         padding: 24px 16px;
@@ -541,8 +627,26 @@ export class PetFormComponent implements OnInit {
   isEditMode = signal(false);
   isSubmitting = signal(false);
   images = signal<PetImage[]>([]);
+  deletedImageIds = signal<string[]>([]);
   petId: string | null = null;
   cities = PORTUGAL_CITIES;
+
+  // Location typeahead
+  showLocationDropdown = signal(false);
+  filteredCities = signal<string[]>([]);
+  locationInput = signal('');
+  selectedLocationIndex = signal(-1);
+
+  // Status typeahead
+  showStatusDropdown = signal(false);
+  filteredStatuses = signal<{value: string, label: string}[]>([]);
+  statusInput = signal('');
+  selectedStatusIndex = signal(-1);
+  availableStatuses = [
+    { value: 'available', label: 'Disponível' },
+    { value: 'pending', label: 'Pendente' },
+    { value: 'adopted', label: 'Adotado' }
+  ];
 
   private toastService = inject(ToastService);
 
@@ -573,6 +677,17 @@ export class PetFormComponent implements OnInit {
       this.isEditMode.set(true);
       this.loadPetData(this.petId);
     }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.location-typeahead-container')) {
+        this.showLocationDropdown.set(false);
+      }
+      if (!target.closest('.status-typeahead-container')) {
+        this.showStatusDropdown.set(false);
+      }
+    });
   }
 
   loadPetData(id: string) {
@@ -592,10 +707,15 @@ export class PetFormComponent implements OnInit {
           status: pet.status
         });
 
+        // Set typeahead inputs
+        this.locationInput.set(pet.location || '');
+        const statusObj = this.availableStatuses.find(s => s.value === pet.status);
+        this.statusInput.set(statusObj?.label || '');
+
         if (pet.images) {
           this.images.set(pet.images.map((img: any) => ({
             id: img.id,
-            imageUrl: img.imageUrl,
+            imageUrl: normalizeImageUrl(img.imageUrl),
             isPrimary: img.isPrimary
           })));
         }
@@ -647,12 +767,155 @@ export class PetFormComponent implements OnInit {
 
   removeImage(index: number) {
     this.images.update(imgs => {
+      const imageToRemove = imgs[index];
+
+      // If it's an existing image (has ID), track it for deletion
+      if (imageToRemove.id) {
+        this.deletedImageIds.update(ids => [...ids, imageToRemove.id!]);
+      }
+
       const newImages = imgs.filter((_, i) => i !== index);
       if (newImages.length > 0 && !newImages.some(img => img.isPrimary)) {
         newImages[0].isPrimary = true;
       }
       return newImages;
     });
+  }
+
+  // Location typeahead methods
+  onLocationFocus() {
+    this.filteredCities.set(this.cities.slice(0, 5));
+    this.showLocationDropdown.set(true);
+    this.selectedLocationIndex.set(-1);
+  }
+
+  onLocationInput(event: Event) {
+    const input = (event.target as HTMLInputElement).value.trim();
+    this.locationInput.set(input);
+
+    if (!input) {
+      this.filteredCities.set(this.cities.slice(0, 5));
+      this.petForm.patchValue({ location: '' });
+    } else {
+      const filtered = this.cities
+        .filter(city => city.toLowerCase().includes(input.toLowerCase()))
+        .slice(0, 5);
+      this.filteredCities.set(filtered);
+    }
+
+    this.showLocationDropdown.set(true);
+    this.selectedLocationIndex.set(-1);
+  }
+
+  onLocationKeydown(event: KeyboardEvent) {
+    const cities = this.filteredCities();
+
+    if (!this.showLocationDropdown() || cities.length === 0) return;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.selectedLocationIndex.update(idx =>
+          idx < cities.length - 1 ? idx + 1 : idx
+        );
+        break;
+
+      case 'ArrowUp':
+        event.preventDefault();
+        this.selectedLocationIndex.update(idx =>
+          idx > 0 ? idx - 1 : -1
+        );
+        break;
+
+      case 'Enter':
+        event.preventDefault();
+        const selectedIdx = this.selectedLocationIndex();
+        if (selectedIdx >= 0 && selectedIdx < cities.length) {
+          this.selectLocation(cities[selectedIdx]);
+        }
+        break;
+
+      case 'Escape':
+        event.preventDefault();
+        this.showLocationDropdown.set(false);
+        this.selectedLocationIndex.set(-1);
+        break;
+    }
+  }
+
+  selectLocation(city: string) {
+    this.locationInput.set(city);
+    this.petForm.patchValue({ location: city });
+    this.showLocationDropdown.set(false);
+    this.selectedLocationIndex.set(-1);
+  }
+
+  // Status typeahead methods
+  onStatusFocus() {
+    this.filteredStatuses.set(this.availableStatuses);
+    this.showStatusDropdown.set(true);
+    this.selectedStatusIndex.set(-1);
+  }
+
+  onStatusInput(event: Event) {
+    const input = (event.target as HTMLInputElement).value.trim();
+    this.statusInput.set(input);
+
+    if (!input) {
+      this.filteredStatuses.set(this.availableStatuses);
+      this.petForm.patchValue({ status: 'available' });
+    } else {
+      const filtered = this.availableStatuses.filter(status =>
+        status.label.toLowerCase().includes(input.toLowerCase())
+      );
+      this.filteredStatuses.set(filtered);
+    }
+
+    this.showStatusDropdown.set(true);
+    this.selectedStatusIndex.set(-1);
+  }
+
+  onStatusKeydown(event: KeyboardEvent) {
+    const statuses = this.filteredStatuses();
+
+    if (!this.showStatusDropdown() || statuses.length === 0) return;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.selectedStatusIndex.update(idx =>
+          idx < statuses.length - 1 ? idx + 1 : idx
+        );
+        break;
+
+      case 'ArrowUp':
+        event.preventDefault();
+        this.selectedStatusIndex.update(idx =>
+          idx > 0 ? idx - 1 : -1
+        );
+        break;
+
+      case 'Enter':
+        event.preventDefault();
+        const selectedIdx = this.selectedStatusIndex();
+        if (selectedIdx >= 0 && selectedIdx < statuses.length) {
+          this.selectStatus(statuses[selectedIdx]);
+        }
+        break;
+
+      case 'Escape':
+        event.preventDefault();
+        this.showStatusDropdown.set(false);
+        this.selectedStatusIndex.set(-1);
+        break;
+    }
+  }
+
+  selectStatus(status: { value: string, label: string }) {
+    this.statusInput.set(status.label);
+    this.petForm.patchValue({ status: status.value });
+    this.showStatusDropdown.set(false);
+    this.selectedStatusIndex.set(-1);
   }
 
   async onSubmit() {
@@ -671,22 +934,41 @@ export class PetFormComponent implements OnInit {
     this.isSubmitting.set(true);
 
     const formData = new FormData();
+
+    // Add form fields, excluding 'status' when creating a new pet
     Object.keys(this.petForm.value).forEach(key => {
       const value = this.petForm.value[key];
+
+      // Skip 'status' field when not in edit mode
+      if (key === 'status' && !this.isEditMode()) {
+        return;
+      }
+
       if (value !== null && value !== '') {
         formData.append(key, value);
       }
     });
 
+    // Add deleted image IDs (for edit mode)
+    if (this.isEditMode() && this.deletedImageIds().length > 0) {
+      formData.append('deletedImageIds', this.deletedImageIds().join(','));
+    }
+
     // Add new images
+    let primaryIndex = -1;
     this.images().forEach((img, index) => {
       if (img.file) {
         formData.append('images', img.file);
         if (img.isPrimary) {
-          formData.append('primaryImageIndex', index.toString());
+          primaryIndex = index;
         }
       }
     });
+
+    // Add primaryImageIndex only when creating a new pet (not editing)
+    if (!this.isEditMode() && primaryIndex >= 0) {
+      formData.append('primaryImageIndex', primaryIndex.toString());
+    }
 
     const request = this.isEditMode()
       ? this.http.put(`${this.apiUrl}/pets/${this.petId}`, formData)

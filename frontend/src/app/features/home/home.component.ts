@@ -45,14 +45,15 @@ import { PetsService, Pet, SearchPetsParams } from "../../core/services/pets.ser
               [value]="getLocationInputValue()"
               (input)="onLocationInput($event)"
               (focus)="onLocationFocus()"
-              (keydown.enter)="onEnterKey()"
+              (keydown)="onLocationKeydown($event)"
               [placeholder]="getLocationPlaceholder()"
             />
             @if (showLocationDropdown() && filteredLocations().length > 0) {
               <div class="location-dropdown">
-                @for (location of filteredLocations(); track location) {
+                @for (location of filteredLocations(); track $index) {
                   <button
                     class="location-option"
+                    [class.selected]="selectedLocationIndex() === $index"
                     (click)="selectLocation(location)"
                   >
                     <svg class="option-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -358,6 +359,11 @@ import { PetsService, Pet, SearchPetsParams } from "../../core/services/pets.ser
 
       .location-option:hover {
         background: rgba(184, 227, 225, 0.2);
+      }
+
+      .location-option.selected {
+        background: rgba(184, 227, 225, 0.5);
+        font-weight: 600;
       }
 
       .option-icon {
@@ -738,6 +744,7 @@ export class HomeComponent implements OnInit {
   showLocationDropdown = signal(false);
   availableLocations: string[] = ["Todas as cidades"];
   filteredLocations = signal<string[]>(this.availableLocations);
+  selectedLocationIndex = signal(-1);
 
   ngOnInit() {
     this.loadCitiesWithPets();
@@ -925,6 +932,7 @@ export class HomeComponent implements OnInit {
     // Show dropdown with first 5 locations when input is focused
     this.filteredLocations.set(this.availableLocations.slice(0, 5));
     this.showLocationDropdown.set(true);
+    this.selectedLocationIndex.set(-1);
   }
 
   onLocationInput(event: Event) {
@@ -935,6 +943,7 @@ export class HomeComponent implements OnInit {
       this.currentLocation.set("Todas as cidades");
       this.filteredLocations.set(this.availableLocations.slice(0, 5));
       this.showLocationDropdown.set(true);
+      this.selectedLocationIndex.set(-1);
       return;
     }
 
@@ -950,11 +959,56 @@ export class HomeComponent implements OnInit {
 
     this.filteredLocations.set(filtered);
     this.showLocationDropdown.set(true);
+    this.selectedLocationIndex.set(-1);
+  }
+
+  onLocationKeydown(event: KeyboardEvent) {
+    const locations = this.filteredLocations();
+
+    if (!this.showLocationDropdown() || locations.length === 0) {
+      if (event.key === 'Enter') {
+        this.onEnterKey();
+      }
+      return;
+    }
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.selectedLocationIndex.update(idx =>
+          idx < locations.length - 1 ? idx + 1 : idx
+        );
+        break;
+
+      case 'ArrowUp':
+        event.preventDefault();
+        this.selectedLocationIndex.update(idx =>
+          idx > 0 ? idx - 1 : -1
+        );
+        break;
+
+      case 'Enter':
+        event.preventDefault();
+        const selectedIdx = this.selectedLocationIndex();
+        if (selectedIdx >= 0 && selectedIdx < locations.length) {
+          this.selectLocation(locations[selectedIdx]);
+        } else {
+          this.onEnterKey();
+        }
+        break;
+
+      case 'Escape':
+        event.preventDefault();
+        this.showLocationDropdown.set(false);
+        this.selectedLocationIndex.set(-1);
+        break;
+    }
   }
 
   onEnterKey() {
     // Close dropdown and search with current location value
     this.showLocationDropdown.set(false);
+    this.selectedLocationIndex.set(-1);
 
     // If input is empty or matches no cities, search with "Todas as cidades"
     const input = this.currentLocation();
@@ -968,6 +1022,7 @@ export class HomeComponent implements OnInit {
   selectLocation(location: string) {
     this.currentLocation.set(location);
     this.showLocationDropdown.set(false);
+    this.selectedLocationIndex.set(-1);
     this.filteredLocations.set(this.availableLocations.slice(0, 5)); // Reset to first 5
     // Reload pets with location filter
     this.loadPets();

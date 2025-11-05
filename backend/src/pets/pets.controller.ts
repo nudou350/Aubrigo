@@ -110,7 +110,15 @@ export class PetsController {
       imageUrls = await this.uploadService.uploadMultipleImages(files, 'pets');
     }
 
-    return this.petsService.update(id, updatePetDto, req.user.userId, imageUrls);
+    // Get deleted image IDs from body (sent as comma-separated string)
+    const deletedImageIds = updatePetDto['deletedImageIds']
+      ? String(updatePetDto['deletedImageIds']).split(',').filter(id => id.trim())
+      : [];
+
+    // Remove deletedImageIds from DTO as it's not a Pet entity property
+    delete updatePetDto['deletedImageIds'];
+
+    return this.petsService.update(id, updatePetDto, req.user.userId, imageUrls, deletedImageIds);
   }
 
   @Delete(':id')

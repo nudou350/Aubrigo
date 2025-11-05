@@ -18,8 +18,8 @@ import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway
 
         @if (!showMBWayQR()) {
           <form [formGroup]="donationForm" (ngSubmit)="onSubmit()" class="donation-form">
-            <!-- Donation Type Toggle -->
-            <div class="form-section">
+            <!-- Donation Type Toggle - HIDDEN -->
+            <!-- <div class="form-section">
               <label class="form-label">Tipo de Doação</label>
               <div class="toggle-group">
                 <button
@@ -39,7 +39,7 @@ import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway
                   MENSAL
                 </button>
               </div>
-            </div>
+            </div> -->
 
             <!-- Payment Method Selection -->
             <div class="form-section">

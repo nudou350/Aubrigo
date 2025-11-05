@@ -123,7 +123,7 @@ export class PetsService {
     return this.findOne(savedPet.id);
   }
 
-  async update(id: string, updatePetDto: UpdatePetDto, userId: string, imageUrls: string[] = []) {
+  async update(id: string, updatePetDto: UpdatePetDto, userId: string, imageUrls: string[] = [], deletedImageIds: string[] = []) {
     const pet = await this.findOne(id);
 
     // Check ownership
@@ -134,9 +134,34 @@ export class PetsService {
     // Update pet
     await this.petRepository.update(id, updatePetDto);
 
+    // Delete removed images
+    if (deletedImageIds.length > 0) {
+      // Filter out empty or invalid IDs
+      const validIds = deletedImageIds.filter(id => id && id.trim() !== '');
+
+      if (validIds.length > 0) {
+        // Get images to delete for cleanup
+        const imagesToDelete = await this.petImageRepository.find({
+          where: {
+            id: require('typeorm').In(validIds),
+            petId: id,
+          },
+        });
+
+        // Delete from database
+        await this.petImageRepository.delete(validIds);
+
+        // TODO: Delete physical files from storage
+        // Uncomment when UploadService has deleteImage method
+        // for (const img of imagesToDelete) {
+        //   await this.uploadService.deleteImage(img.imageUrl);
+        // }
+      }
+    }
+
     // Add new images if provided
     if (imageUrls.length > 0) {
-      // Get current highest display order
+      // Get current images after deletion
       const existingImages = await this.petImageRepository.find({
         where: { petId: id },
         order: { displayOrder: 'DESC' },

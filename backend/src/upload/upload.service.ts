@@ -26,9 +26,8 @@ export class UploadService {
       }
     });
 
-    // Base URL for serving images
-    const port = this.configService.get<number>('PORT', 3002);
-    this.baseUrl = `http://localhost:${port}/uploads`;
+    // Base URL for serving images (use relative path for proxy compatibility)
+    this.baseUrl = `/uploads`;
   }
 
   async uploadImage(
