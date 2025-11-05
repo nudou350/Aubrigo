@@ -1,9 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
 import { FormsModule } from '@angular/forms';
+import { OngService } from '../../../core/services/ong.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface Donation {
   id: string;
@@ -477,7 +477,8 @@ interface DonationStats {
   `]
 })
 export class OngDonationsComponent implements OnInit {
-  private apiUrl = environment.apiUrl;
+  private ongService = inject(OngService);
+  private toastService = inject(ToastService);
   Math = Math;
 
   isLoading = signal(true);
@@ -496,8 +497,6 @@ export class OngDonationsComponent implements OnInit {
   filterType = '';
   filterStatus = '';
 
-  constructor(private http: HttpClient) {}
-
   ngOnInit() {
     this.loadDonations();
   }
@@ -505,27 +504,18 @@ export class OngDonationsComponent implements OnInit {
   loadDonations() {
     this.isLoading.set(true);
 
-    // First get the ONG ID
-    this.http.get<any>(`${this.apiUrl}/ongs/my-ong`).subscribe({
-      next: (ong) => {
-        // Then get donations for this ONG
-        this.http.get<any>(`${this.apiUrl}/donations/ong/${ong.id}`).subscribe({
-          next: (data) => {
-            this.donations.set(data.donations);
-            this.filteredDonations.set(data.donations);
-            if (data.statistics) {
-              this.stats.set(data.statistics);
-            }
-            this.isLoading.set(false);
-          },
-          error: (error) => {
-            console.error('Error loading donations:', error);
-            this.isLoading.set(false);
-          }
-        });
+    this.ongService.getDonations().subscribe({
+      next: (data) => {
+        this.donations.set(data.donations);
+        this.filteredDonations.set(data.donations);
+        if (data.statistics) {
+          this.stats.set(data.statistics);
+        }
+        this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading ONG data:', error);
+        console.error('Error loading donations:', error);
+        this.toastService.error('Erro ao carregar doações');
         this.isLoading.set(false);
       }
     });

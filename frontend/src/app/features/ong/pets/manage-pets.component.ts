@@ -1,9 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { FormsModule } from '@angular/forms';
+import { OngService } from '../../../core/services/ong.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface Pet {
   id: string;
@@ -413,7 +415,9 @@ interface Pet {
   `]
 })
 export class ManagePetsComponent implements OnInit {
-  private apiUrl = environment.apiUrl;
+  private http = inject(HttpClient);
+  private ongService = inject(OngService);
+  private toastService = inject(ToastService);
 
   isLoading = signal(true);
   pets = signal<Pet[]>([]);
@@ -423,15 +427,13 @@ export class ManagePetsComponent implements OnInit {
   filterStatus = '';
   filterSpecies = '';
 
-  constructor(private http: HttpClient) {}
-
   ngOnInit() {
     this.loadPets();
   }
 
   loadPets() {
     this.isLoading.set(true);
-    this.http.get<Pet[]>(`${this.apiUrl}/pets/my-pets`).subscribe({
+    this.ongService.getMyPets().subscribe({
       next: (pets) => {
         this.pets.set(pets);
         this.filteredPets.set(pets);
@@ -439,6 +441,7 @@ export class ManagePetsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading pets:', error);
+        this.toastService.error('Erro ao carregar pets');
         this.isLoading.set(false);
       }
     });
@@ -474,13 +477,15 @@ export class ManagePetsComponent implements OnInit {
       return;
     }
 
-    this.http.delete(`${this.apiUrl}/pets/${id}`).subscribe({
+    this.http.delete(`${environment.apiUrl}/pets/${id}`).subscribe({
       next: () => {
         this.pets.update(list => list.filter(p => p.id !== id));
         this.filterPets();
+        this.toastService.success(`${name} removido com sucesso`);
       },
       error: (error) => {
-        alert('Erro ao remover pet: ' + (error.error?.message || 'Erro desconhecido'));
+        console.error('Error deleting pet:', error);
+        this.toastService.error('Erro ao remover pet: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
   }

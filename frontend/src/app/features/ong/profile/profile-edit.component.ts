@@ -1,9 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
+import { OngService } from '../../../core/services/ong.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-profile-edit',
@@ -445,7 +445,10 @@ import { environment } from '../../../../environments/environment';
   `]
 })
 export class ProfileEditComponent implements OnInit {
-  private apiUrl = environment.apiUrl;
+  private fb = inject(FormBuilder);
+  private ongService = inject(OngService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
 
   profileForm: FormGroup;
   isLoading = signal(true);
@@ -454,11 +457,7 @@ export class ProfileEditComponent implements OnInit {
   currentProfileImage = signal<string | null>(null);
   selectedImageFile: File | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpClient,
-    private router: Router
-  ) {
+  constructor() {
     this.profileForm = this.fb.group({
       ongName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -487,7 +486,7 @@ export class ProfileEditComponent implements OnInit {
 
   loadProfile() {
     this.isLoading.set(true);
-    this.http.get<any>(`${this.apiUrl}/ongs/my-ong`).subscribe({
+    this.ongService.getOngProfile().subscribe({
       next: (profile) => {
         this.profileForm.patchValue({
           ongName: profile.ongName,
@@ -501,7 +500,7 @@ export class ProfileEditComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading profile:', error);
-        alert('Erro ao carregar perfil');
+        this.toastService.error('Erro ao carregar perfil');
         this.isLoading.set(false);
       }
     });
@@ -512,12 +511,12 @@ export class ProfileEditComponent implements OnInit {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione apenas imagens');
+      this.toastService.error('Por favor, selecione apenas imagens');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Imagem muito grande. Tamanho máximo: 5MB');
+      this.toastService.error('Imagem muito grande. Tamanho máximo: 5MB');
       return;
     }
 
@@ -544,40 +543,77 @@ export class ProfileEditComponent implements OnInit {
 
     this.isSubmitting.set(true);
 
-    const formData = new FormData();
-    formData.append('ongName', this.profileForm.value.ongName);
-    formData.append('email', this.profileForm.value.email);
-    if (this.profileForm.value.phone) {
-      formData.append('phone', this.profileForm.value.phone);
-    }
-    if (this.profileForm.value.location) {
-      formData.append('location', this.profileForm.value.location);
-    }
-    if (this.profileForm.value.instagramHandle) {
-      formData.append('instagramHandle', '@' + this.profileForm.value.instagramHandle.replace('@', ''));
-    }
-
-    // Add profile image if selected
-    if (this.selectedImageFile) {
-      formData.append('profileImage', this.selectedImageFile);
-    }
-
-    // Add password fields if provided
-    if (this.profileForm.value.currentPassword && this.profileForm.value.newPassword) {
-      formData.append('currentPassword', this.profileForm.value.currentPassword);
-      formData.append('newPassword', this.profileForm.value.newPassword);
-    }
-
-    this.http.put(`${this.apiUrl}/ongs/my-ong/profile`, formData).subscribe({
-      next: () => {
-        alert('Perfil atualizado com sucesso!');
-        this.router.navigate(['/ong/dashboard']);
-      },
-      error: (error) => {
-        console.error('Error updating profile:', error);
-        alert('Erro ao atualizar perfil: ' + (error.error?.message || 'Erro desconhecido'));
-        this.isSubmitting.set(false);
+    try {
+      // 1. Upload profile image if selected
+      if (this.selectedImageFile) {
+        await new Promise<void>((resolve, reject) => {
+          this.ongService.uploadProfileImage(this.selectedImageFile!).subscribe({
+            next: () => {
+              this.toastService.success('Imagem de perfil atualizada');
+              resolve();
+            },
+            error: (error) => {
+              console.error('Error uploading image:', error);
+              this.toastService.error('Erro ao atualizar imagem de perfil');
+              reject(error);
+            }
+          });
+        });
       }
-    });
+
+      // 2. Update profile data
+      const profileData = {
+        ongName: this.profileForm.value.ongName,
+        email: this.profileForm.value.email,
+        phone: this.profileForm.value.phone || undefined,
+        location: this.profileForm.value.location || undefined,
+        instagramHandle: this.profileForm.value.instagramHandle
+          ? '@' + this.profileForm.value.instagramHandle.replace('@', '')
+          : undefined
+      };
+
+      await new Promise<void>((resolve, reject) => {
+        this.ongService.updateOngProfile(profileData).subscribe({
+          next: () => {
+            resolve();
+          },
+          error: (error) => {
+            console.error('Error updating profile:', error);
+            this.toastService.error('Erro ao atualizar perfil');
+            reject(error);
+          }
+        });
+      });
+
+      // 3. Change password if provided
+      if (this.profileForm.value.currentPassword && this.profileForm.value.newPassword) {
+        await new Promise<void>((resolve, reject) => {
+          this.ongService.changePassword({
+            currentPassword: this.profileForm.value.currentPassword,
+            newPassword: this.profileForm.value.newPassword
+          }).subscribe({
+            next: () => {
+              this.toastService.success('Senha alterada com sucesso');
+              resolve();
+            },
+            error: (error) => {
+              console.error('Error changing password:', error);
+              this.toastService.error('Erro ao alterar senha: ' + (error.error?.message || 'senha atual incorreta'));
+              reject(error);
+            }
+          });
+        });
+      }
+
+      // Success - navigate back
+      this.toastService.success('Perfil atualizado com sucesso!');
+      setTimeout(() => {
+        this.router.navigate(['/ong/dashboard']);
+      }, 1500);
+
+    } catch (error) {
+      console.error('Error in form submission:', error);
+      this.isSubmitting.set(false);
+    }
   }
 }
