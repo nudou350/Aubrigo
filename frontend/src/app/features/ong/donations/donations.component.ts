@@ -505,19 +505,27 @@ export class OngDonationsComponent implements OnInit {
   loadDonations() {
     this.isLoading.set(true);
 
-    // Get current user's ONG ID from auth service or local storage
-    // For now, we'll use a placeholder endpoint
-    this.http.get<any>(`${this.apiUrl}/donations/my-ong`).subscribe({
-      next: (data) => {
-        this.donations.set(data.donations);
-        this.filteredDonations.set(data.donations);
-        if (data.statistics) {
-          this.stats.set(data.statistics);
-        }
-        this.isLoading.set(false);
+    // First get the ONG ID
+    this.http.get<any>(`${this.apiUrl}/ongs/my-ong`).subscribe({
+      next: (ong) => {
+        // Then get donations for this ONG
+        this.http.get<any>(`${this.apiUrl}/donations/ong/${ong.id}`).subscribe({
+          next: (data) => {
+            this.donations.set(data.donations);
+            this.filteredDonations.set(data.donations);
+            if (data.statistics) {
+              this.stats.set(data.statistics);
+            }
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            console.error('Error loading donations:', error);
+            this.isLoading.set(false);
+          }
+        });
       },
       error: (error) => {
-        console.error('Error loading donations:', error);
+        console.error('Error loading ONG data:', error);
         this.isLoading.set(false);
       }
     });

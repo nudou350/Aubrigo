@@ -101,12 +101,12 @@ interface OngDetails {
               <h3>Gerenciar Pets</h3>
               <p>Edite ou remova pets cadastrados</p>
             </a>
-            <a routerLink="/appointments" class="action-card">
+            <a routerLink="/ong/appointments" class="action-card">
               <div class="action-icon">📅</div>
               <h3>Visitas Agendadas</h3>
               <p>Veja e gerencie agendamentos</p>
             </a>
-            <a routerLink="/donations/history" class="action-card">
+            <a routerLink="/ong/donations" class="action-card">
               <div class="action-icon">💸</div>
               <h3>Histórico de Doações</h3>
               <p>Veja todas as doações recebidas</p>
