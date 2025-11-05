@@ -607,8 +607,10 @@ export class PetDetailComponent implements OnInit {
   }
 
   scheduleVisit() {
-    // TODO: Implement schedule visit modal or navigate to schedule page
-    alert("Funcionalidade de agendamento em desenvolvimento!");
+    const pet = this.pet();
+    if (pet) {
+      this.router.navigate(['/pets', pet.id, 'schedule']);
+    }
   }
 
   onImageError(event: Event) {

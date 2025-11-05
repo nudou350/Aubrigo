@@ -8,8 +8,12 @@ import {
   Param,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -17,11 +21,17 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { OngsService } from './ongs.service';
 import { UpdateOngDto } from './dto/update-ong.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { UploadService } from '../upload/upload.service';
 
 @ApiTags('ONGs')
 @Controller('ongs')
 export class OngsController {
-  constructor(private readonly ongsService: OngsService) {}
+  constructor(
+    private readonly ongsService: OngsService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all approved ONGs' })
@@ -96,6 +106,58 @@ export class OngsController {
   @ApiResponse({ status: 404, description: 'ONG not found' })
   async remove(@Param('id') id: string, @CurrentUser() user: any) {
     return this.ongsService.remove(id, user.id);
+  }
+
+  @Put('my-ong/profile')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.ONG)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update current user ONG profile' })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
+  @ApiResponse({ status: 404, description: 'ONG not found' })
+  async updateMyProfile(
+    @CurrentUser() user: any,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.ongsService.updateMyProfile(user.id, updateProfileDto);
+  }
+
+  @Post('my-ong/profile-image')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.ONG)
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('profileImage'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload profile image for current user ONG' })
+  @ApiResponse({ status: 200, description: 'Profile image uploaded successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid file' })
+  @ApiResponse({ status: 404, description: 'ONG not found' })
+  async uploadProfileImage(
+    @CurrentUser() user: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+
+    const imageUrl = await this.uploadService.uploadImage(file, 'profiles');
+    return this.ongsService.updateProfileImage(user.id, imageUrl);
+  }
+
+  @Put('my-ong/change-password')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.ONG)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Change password for current user ONG' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid password' })
+  @ApiResponse({ status: 401, description: 'Current password is incorrect' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async changePassword(
+    @CurrentUser() user: any,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.ongsService.changePassword(user.id, changePasswordDto);
   }
 
   // Member management endpoints removed - not implemented in current architecture

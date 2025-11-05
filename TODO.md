@@ -49,25 +49,36 @@
   - [x] File upload integration for creating/updating pets
   - **Files**: `backend/src/pets/pets.controller.ts:37-45`, `backend/src/pets/pets.service.ts`
 
-- [ ] **ONG Profile Management**
-  - [ ] Create `PUT /api/ongs/my-ong/profile` endpoint
-  - [ ] Support profile image upload
-  - [ ] Support password change with current password verification
-  - [ ] Test with frontend profile-edit component
+- [x] **ONG Profile Management** ✅ COMPLETED (2025-11-05)
+  - [x] Create `PUT /api/ongs/my-ong/profile` endpoint
+  - [x] Support profile image upload via `POST /api/ongs/my-ong/profile-image`
+  - [x] Support password change with current password verification via `PUT /api/ongs/my-ong/change-password`
+  - [x] Created DTOs: `UpdateProfileDto`, `ChangePasswordDto`
+  - [x] Integrated with UploadService for profile images
+  - [ ] Test with frontend profile-edit component (requires backend running)
 
 ### Frontend - User-Facing Features
 
-- [ ] **Appointment Scheduling Component**
-  - [ ] Create `frontend/src/app/features/appointments/schedule-appointment.component.ts`
-  - [ ] Add appointment form (visitor info, date/time picker, notes)
-  - [ ] Integrate with pet detail page
-  - [ ] Show success confirmation
-  - [ ] Add route `/pets/:id/schedule`
+- [x] **Appointment Scheduling Component** ✅ COMPLETED (2025-11-05)
+  - [x] Create `frontend/src/app/features/pets/schedule-appointment/schedule-appointment.component.ts`
+  - [x] Add appointment form (visitor info, date/time picker, notes)
+  - [x] Integrate with pet detail page (button navigates to schedule page)
+  - [x] Show success confirmation (alert + navigation)
+  - [x] Add route `/pets/:id/schedule` to app.routes.ts
+  - [x] Styled component with pet card preview
+  - [x] Form validation and error handling
+  - [x] Minimum date validation (tomorrow onwards)
 
-- [ ] **Integration Testing**
+- [ ] **Integration Testing** ⚠️ REQUIRES SETUP
+  - [ ] Install backend dependencies (`cd backend && npm install`)
+  - [ ] Install frontend dependencies (`cd frontend && npm install`)
+  - [ ] Start backend server (`npm run start:dev`)
+  - [ ] Start frontend server (`npm start`)
   - [ ] Test complete ONG flow: Register → Login → Add Pet → View Appointments
   - [ ] Test pet creation with image upload
   - [ ] Test appointment status updates
+  - [ ] Test new profile management endpoints
+  - [ ] Test appointment scheduling from pet detail page
   - [ ] Fix any discovered bugs
 
 ---
@@ -394,9 +405,9 @@
 ## 📊 Progress Tracking
 
 ### Current Status
-- **Overall Progress**: ~75% (+10% this session)
-- **Backend**: ~80% (+10%)
-- **Frontend**: ~60%
+- **Overall Progress**: ~80% (+5% this session)
+- **Backend**: ~85% (+5%)
+- **Frontend**: ~65% (+5%)
 - **Testing**: ~5%
 - **Documentation**: ~20%
 - **Deployment**: ~0%
@@ -407,9 +418,12 @@
 ✅ My Pets endpoint (GET /api/pets/my-pets)
 ✅ File upload integration in Pets controller
 ✅ Static file serving configuration
+✅ ONG Profile Management API (update profile, upload image, change password)
+✅ Frontend Appointment Scheduling Component with full form
+✅ Integration of appointment scheduling with pet detail page
 
 ### Time Estimates
-- **Phase 1 (Critical)**: ~~2-3 weeks~~ → **1 week remaining** (70% complete)
+- **Phase 1 (Critical)**: ~~2-3 weeks~~ → **~1 week remaining** (80% complete)
 - **Phase 2 (Core)**: 2-3 weeks
 - **Phase 3 (Enhancement)**: 2 weeks
 - **Phase 4 (Testing)**: 2 weeks
@@ -417,17 +431,17 @@
 - **Phase 6 (Deployment)**: 1 week
 - **Phase 7 (Launch)**: 1 week
 
-**Total Estimated Time to Launch**: 10-12 weeks (revised down from 12-14)
+**Total Estimated Time to Launch**: 9-11 weeks (revised down from 10-12)
 
 ---
 
 ## 🎯 Immediate Next Steps (This Week)
 
 1. ✅ ~~Complete critical path items (File Upload, Appointments API, My Pets)~~ **DONE**
-2. ⏭️ Test ONG workflow end-to-end (Register → Login → Add Pet with images → View Appointments)
-3. ⏭️ Implement appointment scheduling component (frontend)
+2. ✅ ~~Implement appointment scheduling component (frontend)~~ **DONE**
+3. ✅ ~~Complete ONG Profile Management endpoints~~ **DONE**
 4. ✅ ~~Add search and pagination to pet listings~~ **ALREADY EXISTED**
-5. ⏭️ Complete ONG Profile Management endpoints
+5. ⏭️ Setup and test ONG workflow end-to-end (requires npm install + servers running)
 6. ⏭️ Begin Phase 2 (Favorites API, Email Service)
 
 ---
@@ -451,6 +465,21 @@
 
 ---
 
-**Last Updated**: 2025-11-05 (Session: Critical path implementation)
-**Current Phase**: Phase 1 (Critical Path) - 70% Complete
-**Status**: Active Development - Backend 80% | Frontend 60%
+**Last Updated**: 2025-11-05 (Session: Profile Management + Appointment Scheduling)
+**Current Phase**: Phase 1 (Critical Path) - 80% Complete
+**Status**: Active Development - Backend 85% | Frontend 65%
+
+---
+
+## 📝 New Endpoints Added (2025-11-05)
+
+### ONG Profile Management
+- `PUT /api/ongs/my-ong/profile` - Update ONG profile information
+- `POST /api/ongs/my-ong/profile-image` - Upload profile image
+- `PUT /api/ongs/my-ong/change-password` - Change password (with current password verification)
+
+### Frontend Components
+- `schedule-appointment.component.ts` - Full appointment scheduling form
+  - Location: `/frontend/src/app/features/pets/schedule-appointment/`
+  - Route: `/pets/:id/schedule`
+  - Features: Form validation, date/time pickers, pet info preview

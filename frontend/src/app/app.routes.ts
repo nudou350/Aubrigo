@@ -52,6 +52,13 @@ export const routes: Routes = [
       import('./features/home/home.component').then((m) => m.HomeComponent),
   },
   {
+    path: 'pets/:id/schedule',
+    loadComponent: () =>
+      import('./features/pets/schedule-appointment/schedule-appointment.component').then(
+        (m) => m.ScheduleAppointmentComponent
+      ),
+  },
+  {
     path: 'pets/:id',
     loadComponent: () =>
       import('./features/pets/pet-detail/pet-detail.component').then(
