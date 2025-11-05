@@ -67,16 +67,30 @@ import { AuthService } from '../../../core/services/auth.service';
         </a>
       }
 
-      <a
-        routerLink="/donate"
-        class="nav-item"
-        [class.active]="isActive('/donate')"
-      >
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-        <span class="nav-label">DOAR</span>
-      </a>
+      <!-- Show Favorites for regular users, Donate for ONG/Admin -->
+      @if (!authService.isOng() && !authService.isAdmin()) {
+        <a
+          routerLink="/favorites"
+          class="nav-item"
+          [class.active]="isActive('/favorites')"
+        >
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+          <span class="nav-label">FAVORITOS</span>
+        </a>
+      } @else {
+        <a
+          routerLink="/donate"
+          class="nav-item"
+          [class.active]="isActive('/donate')"
+        >
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+          <span class="nav-label">DOAR</span>
+        </a>
+      }
     </nav>
 
     <!-- Desktop Top Navigation -->
@@ -120,6 +134,16 @@ import { AuthService } from '../../../core/services/auth.service';
                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
               </svg>
               <span>Dashboard</span>
+            </a>
+          }
+
+          <!-- Show Favorites for regular users -->
+          @if (!authService.isOng() && !authService.isAdmin()) {
+            <a routerLink="/favorites" class="nav-link" [class.active]="isActive('/favorites')">
+              <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <span>Favoritos</span>
             </a>
           }
 

@@ -1,35 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
-
-interface OngStats {
-  totalPets: number;
-  availablePets: number;
-  adoptedPets: number;
-  totalDonations: number;
-  monthlyDonations: number;
-  pendingAppointments: number;
-}
-
-interface OngDetails {
-  id: string;
-  email: string;
-  role: string;
-  firstName?: string;
-  lastName?: string;
-  ongName?: string;
-  profileImageUrl?: string;
-  phone?: string;
-  instagramHandle?: string;
-  location?: string;
-  latitude?: number;
-  longitude?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { OngService, OngDashboardStats, OngProfile } from '../../../core/services/ong.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-ong-dashboard',
@@ -424,10 +398,12 @@ interface OngDetails {
   `]
 })
 export class OngDashboardComponent implements OnInit {
-  private apiUrl = environment.apiUrl;
+  private ongService = inject(OngService);
+  private toastService = inject(ToastService);
+  public authService = inject(AuthService);
 
   isLoading = signal(true);
-  stats = signal<OngStats>({
+  stats = signal<OngDashboardStats>({
     totalPets: 0,
     availablePets: 0,
     adoptedPets: 0,
@@ -435,12 +411,7 @@ export class OngDashboardComponent implements OnInit {
     monthlyDonations: 0,
     pendingAppointments: 0
   });
-  ongDetails = signal<OngDetails | null>(null);
-
-  constructor(
-    private http: HttpClient,
-    public authService: AuthService
-  ) {}
+  ongDetails = signal<OngProfile | null>(null);
 
   ngOnInit() {
     this.loadDashboardData();
@@ -449,26 +420,27 @@ export class OngDashboardComponent implements OnInit {
   loadDashboardData() {
     this.isLoading.set(true);
 
-    const userId = this.authService.currentUser()?.id;
-    if (!userId) return;
-
-    this.http.get<OngDetails>(`${this.apiUrl}/ongs/my-ong`).subscribe({
+    // Load ONG profile
+    this.ongService.getOngProfile().subscribe({
       next: (ong) => {
         this.ongDetails.set(ong);
 
-        this.http.get<OngStats>(`${this.apiUrl}/ongs/${ong.id}/stats`).subscribe({
+        // Load dashboard stats
+        this.ongService.getDashboardStats().subscribe({
           next: (stats) => {
             this.stats.set(stats);
             this.isLoading.set(false);
           },
           error: (error) => {
             console.error('Error loading stats:', error);
+            this.toastService.error('Erro ao carregar estatísticas');
             this.isLoading.set(false);
           }
         });
       },
       error: (error) => {
         console.error('Error loading ONG data:', error);
+        this.toastService.error('Erro ao carregar dados da ONG');
         this.isLoading.set(false);
       }
     });
