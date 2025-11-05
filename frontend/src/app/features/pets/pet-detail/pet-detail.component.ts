@@ -5,6 +5,7 @@ import { BottomNavComponent } from "../../../shared/components/bottom-nav/bottom
 import { FavoritesService } from "../../../core/services/favorites.service";
 import { ToastService } from "../../../core/services/toast.service";
 import { PetsService } from "../../../core/services/pets.service";
+import { ArticlesService, Article } from "../../../core/services/articles.service";
 import { normalizeImageUrl } from "../../../core/utils/image-url.util";
 
 interface PetImage {
@@ -174,6 +175,42 @@ interface Pet {
         <button class="schedule-button" (click)="scheduleVisit()">
           AGENDAR VISITA
         </button>
+        }
+
+        <!-- ONG Articles/Needs Section -->
+        @if (ongArticles().length > 0) {
+        <div class="articles-section">
+          <h3 class="articles-title">🤝 Como Você Pode Ajudar</h3>
+          <div class="articles-list">
+            @for (article of displayedArticles(); track article.id) {
+            <div class="article-item" [class]="'priority-' + article.priority">
+              <div class="article-header">
+                <span class="article-icon">{{ getArticleIcon(article.category) }}</span>
+                <span class="article-title-text">{{ article.title }}</span>
+                @if (article.priority === 'urgent') {
+                <span class="urgent-badge">URGENTE</span>
+                }
+              </div>
+              <p class="article-description">{{ article.description }}</p>
+              @if (article.targetAmount) {
+              <div class="target-amount-badge">
+                Meta: €{{ formatAmount(article.targetAmount) }}
+              </div>
+              }
+            </div>
+            }
+          </div>
+          @if (ongArticles().length > 3 && !showAllArticles()) {
+          <button class="show-more-btn" (click)="toggleShowAllArticles()">
+            Ver mais necessidades ({{ ongArticles().length - 3 }})
+          </button>
+          }
+          @if (showAllArticles() && ongArticles().length > 3) {
+          <button class="show-more-btn" (click)="toggleShowAllArticles()">
+            Ver menos
+          </button>
+          }
+        </div>
         }
       </div>
       } @else {
@@ -520,6 +557,125 @@ interface Pet {
         box-shadow: 0 6px 16px rgba(76, 168, 160, 0.4);
       }
 
+      /* Articles Section */
+      .articles-section {
+        margin-top: 24px;
+        background: rgba(184, 227, 225, 0.15);
+        border-radius: 12px;
+        padding: 20px;
+        border-left: 4px solid #4ca8a0;
+      }
+
+      .articles-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #4ca8a0;
+        margin: 0 0 16px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .articles-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .article-item {
+        background: white;
+        border-radius: 8px;
+        padding: 14px;
+        border-left: 3px solid transparent;
+        transition: all 0.2s ease;
+      }
+
+      .article-item.priority-low {
+        border-left-color: #81C784;
+      }
+
+      .article-item.priority-medium {
+        border-left-color: #FFB74D;
+      }
+
+      .article-item.priority-high {
+        border-left-color: #FF8A65;
+      }
+
+      .article-item.priority-urgent {
+        border-left-color: #E57373;
+        background: #FFEBEE;
+      }
+
+      .article-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+      }
+
+      .article-icon {
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      .article-title-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2c2c2c;
+        flex: 1;
+      }
+
+      .urgent-badge {
+        background: #E57373;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .article-description {
+        font-size: 13px;
+        line-height: 1.5;
+        color: #666666;
+        margin: 0 0 8px 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .target-amount-badge {
+        background: rgba(76, 168, 160, 0.1);
+        color: #4ca8a0;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+      }
+
+      .show-more-btn {
+        width: 100%;
+        background: transparent;
+        color: #4ca8a0;
+        border: 1px solid #4ca8a0;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 12px;
+        transition: all 0.2s ease;
+      }
+
+      .show-more-btn:hover {
+        background: rgba(76, 168, 160, 0.1);
+      }
+
       /* Responsive Design */
       @media (min-width: 768px) {
         .carousel-container {
@@ -560,6 +716,7 @@ export class PetDetailComponent implements OnInit {
   private petsService = inject(PetsService);
   private favoritesService = inject(FavoritesService);
   private toastService = inject(ToastService);
+  private articlesService = inject(ArticlesService);
 
   pet = signal<Pet | null>(null);
   loading = signal(true);
@@ -568,6 +725,8 @@ export class PetDetailComponent implements OnInit {
   imageLoadError = signal(false);
   favoritedPetId = signal<string | null>(null);
   visitorEmail: string | null = null;
+  ongArticles = signal<Article[]>([]);
+  showAllArticles = signal(false);
 
   ngOnInit() {
     const petId = this.route.snapshot.paramMap.get("id");
@@ -658,6 +817,11 @@ export class PetDetailComponent implements OnInit {
           this.currentImage.set(normalizeImageUrl(imageUrl));
         }
 
+        // Load ONG articles
+        if (petData.ong?.id) {
+          this.loadOngArticles(petData.ong.id);
+        }
+
         this.loading.set(false);
       },
       error: (error) => {
@@ -666,6 +830,40 @@ export class PetDetailComponent implements OnInit {
         this.pet.set(null);
       },
     });
+  }
+
+  loadOngArticles(ongId: string) {
+    this.articlesService.findByOng(ongId).subscribe({
+      next: (articles) => {
+        this.ongArticles.set(articles);
+      },
+      error: (error) => {
+        console.error("Error loading ONG articles:", error);
+      },
+    });
+  }
+
+  displayedArticles() {
+    const articles = this.ongArticles();
+    if (this.showAllArticles() || articles.length <= 3) {
+      return articles;
+    }
+    return articles.slice(0, 3);
+  }
+
+  toggleShowAllArticles() {
+    this.showAllArticles.set(!this.showAllArticles());
+  }
+
+  getArticleIcon(category: string): string {
+    const icons: Record<string, string> = {
+      food: '🍖',
+      medicine: '💊',
+      debt: '💰',
+      supplies: '🛠️',
+      other: '📦'
+    };
+    return icons[category] || '📦';
   }
 
   nextImage() {
@@ -737,5 +935,10 @@ export class PetDetailComponent implements OnInit {
 
   onImageLoad() {
     this.imageLoadError.set(false);
+  }
+
+  formatAmount(amount: any): string {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return numAmount ? numAmount.toFixed(2) : '0.00';
   }
 }

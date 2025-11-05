@@ -67,7 +67,7 @@ import { AuthService } from '../../../core/services/auth.service';
         </a>
       }
 
-      <!-- Show Favorites for regular users, Donate for ONG/Admin -->
+      <!-- Show Favorites for regular users, Dashboard for ONG/Admin -->
       @if (!authService.isOng() && !authService.isAdmin()) {
         <a
           routerLink="/favorites"
@@ -79,16 +79,27 @@ import { AuthService } from '../../../core/services/auth.service';
           </svg>
           <span class="nav-label">FAVORITOS</span>
         </a>
-      } @else {
+      } @else if (authService.isOng()) {
         <a
-          routerLink="/donate"
+          routerLink="/ong"
           class="nav-item"
-          [class.active]="isActive('/donate')"
+          [class.active]="isActive('/ong')"
         >
           <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
           </svg>
-          <span class="nav-label">DOAR</span>
+          <span class="nav-label">DASHBOARD</span>
+        </a>
+      } @else {
+        <a
+          routerLink="/admin"
+          class="nav-item"
+          [class.active]="isActive('/admin')"
+        >
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+          </svg>
+          <span class="nav-label">DASHBOARD</span>
         </a>
       }
     </nav>

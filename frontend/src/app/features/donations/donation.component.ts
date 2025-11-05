@@ -1,13 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DonationsService, MBWayPaymentResponse } from '../../core/services/donations.service';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { DonationsService, MBWayPaymentResponse, Ong } from '../../core/services/donations.service';
 import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway-qrcode.component';
 
 @Component({
   selector: 'app-donation',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MbwayQrcodeComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, MbwayQrcodeComponent],
   template: `
     <div class="screen">
       <div class="container">
@@ -16,182 +16,91 @@ import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway
           <p class="subtitle">Ajude-nos a cuidar dos animais 🐾</p>
         </div>
 
-        @if (!showMBWayQR()) {
-          <form [formGroup]="donationForm" (ngSubmit)="onSubmit()" class="donation-form">
-            <!-- Donation Type Toggle - HIDDEN -->
-            <!-- <div class="form-section">
-              <label class="form-label">Tipo de Doação</label>
-              <div class="toggle-group">
-                <button
-                  type="button"
-                  class="toggle-btn"
-                  [class.active]="donationForm.get('donationType')?.value === 'one_time'"
-                  (click)="donationForm.patchValue({ donationType: 'one_time' })"
-                >
-                  ÚNICA
-                </button>
-                <button
-                  type="button"
-                  class="toggle-btn"
-                  [class.active]="donationForm.get('donationType')?.value === 'monthly'"
-                  (click)="donationForm.patchValue({ donationType: 'monthly' })"
-                >
-                  MENSAL
-                </button>
-              </div>
-            </div> -->
+        <div class="donation-form">
+          <!-- ONG Selection -->
+          <div class="form-group">
+            <label class="form-label" for="ongId">Selecione a ONG</label>
+            <select
+              id="ongId"
+              [(ngModel)]="selectedOngId"
+              (ngModelChange)="onOngSelect()"
+              class="form-input"
+            >
+              <option value="">Escolha uma ONG...</option>
+              @for (ong of ongs(); track ong.id) {
+                <option [value]="ong.id">{{ ong.ongName }}</option>
+              }
+            </select>
+          </div>
 
-            <!-- Payment Method Selection -->
+          <!-- Donation Instructions -->
+          @if (selectedOng()) {
+            <div class="donation-instructions">
+              <div class="ong-info-card">
+                <h3>{{ selectedOng()!.ongName }}</h3>
+                @if (selectedOng()!.phone) {
+                  <div class="phone-info">
+                    <span class="icon">📱</span>
+                    <div>
+                      <p class="phone-label">Número MB Way para doações:</p>
+                      <p class="phone-number">{{ selectedOng()!.phone }}</p>
+                    </div>
+                  </div>
+                  <div class="instructions-text">
+                    <p>Para fazer uma doação:</p>
+                    <ol>
+                      <li>Abra o app MB Way no seu telemóvel</li>
+                      <li>Selecione "Transferir" ou "Enviar Dinheiro"</li>
+                      <li>Insira o número acima</li>
+                      <li>Digite o valor que deseja doar</li>
+                      <li>Confirme a transação</li>
+                    </ol>
+                  </div>
+                } @else {
+                  <div class="no-phone-message">
+                    <p>Esta ONG ainda não configurou um número para doações MB Way.</p>
+                    <p>Por favor, entre em contato diretamente com a ONG para outras formas de doação.</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- HIDDEN: Keep code for future implementation -->
+        <div style="display: none;">
+          <form [formGroup]="donationForm" (ngSubmit)="onSubmit()">
             <div class="form-section">
               <label class="form-label">Método de Pagamento</label>
               <div class="payment-methods">
-                <button
-                  type="button"
-                  class="payment-method-btn"
-                  [class.active]="donationForm.get('paymentMethod')?.value === 'mbway'"
-                  (click)="selectPaymentMethod('mbway')"
-                >
+                <button type="button" class="payment-method-btn" [class.active]="donationForm.get('paymentMethod')?.value === 'mbway'" (click)="selectPaymentMethod('mbway')">
                   <span class="payment-icon">📱</span>
                   <span>MB Way</span>
                 </button>
-                <button
-                  type="button"
-                  class="payment-method-btn"
-                  [class.active]="donationForm.get('paymentMethod')?.value === 'stripe'"
-                  (click)="selectPaymentMethod('stripe')"
-                >
+                <button type="button" class="payment-method-btn" [class.active]="donationForm.get('paymentMethod')?.value === 'stripe'" (click)="selectPaymentMethod('stripe')">
                   <span class="payment-icon">💳</span>
                   <span>Cartão</span>
                 </button>
-                <button
-                  type="button"
-                  class="payment-method-btn"
-                  [class.active]="donationForm.get('paymentMethod')?.value === 'multibanco'"
-                  (click)="selectPaymentMethod('multibanco')"
-                >
+                <button type="button" class="payment-method-btn" [class.active]="donationForm.get('paymentMethod')?.value === 'multibanco'" (click)="selectPaymentMethod('multibanco')">
                   <span class="payment-icon">🏦</span>
                   <span>Multibanco</span>
                 </button>
               </div>
             </div>
-
-            <!-- Amount -->
             <div class="form-group">
               <label class="form-label" for="amount">Valor da Contribuição (€)</label>
-              <input
-                id="amount"
-                type="number"
-                formControlName="amount"
-                class="form-input"
-                placeholder="50.00"
-                min="5"
-                step="0.01"
-              />
-              @if (donationForm.get('amount')?.invalid && donationForm.get('amount')?.touched) {
-                <span class="form-error">Valor mínimo: 5€</span>
-              }
+              <input id="amount" type="number" formControlName="amount" class="form-input" placeholder="50.00" min="0.05" step="0.01" />
             </div>
-
-            <!-- Donor Information -->
-            <div class="form-section-title">Informações Pessoais</div>
-
-            <div class="form-group">
-              <label class="form-label" for="donorName">Nome Completo</label>
-              <input
-                id="donorName"
-                type="text"
-                formControlName="donorName"
-                class="form-input"
-                placeholder="Seu nome"
-              />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="donorEmail">Email</label>
-              <input
-                id="donorEmail"
-                type="email"
-                formControlName="donorEmail"
-                class="form-input"
-                placeholder="seu@email.com"
-              />
-            </div>
-
-            <!-- MB Way Phone Number -->
-            @if (donationForm.get('paymentMethod')?.value === 'mbway') {
-              <div class="form-group">
-                <label class="form-label" for="phoneNumber">Número de Telemóvel</label>
-                <input
-                  id="phoneNumber"
-                  type="tel"
-                  formControlName="phoneNumber"
-                  class="form-input"
-                  placeholder="912345678"
-                />
-                <small class="form-hint">Associado à sua conta MB Way</small>
-              </div>
-            }
-
-            <!-- Stripe Card Info (placeholder) -->
-            @if (donationForm.get('paymentMethod')?.value === 'stripe') {
-              <div class="form-group">
-                <label class="form-label" for="cardHolderName">Nome no Cartão</label>
-                <input
-                  id="cardHolderName"
-                  type="text"
-                  formControlName="cardHolderName"
-                  class="form-input"
-                  placeholder="NOME NO CARTÃO"
-                />
-              </div>
-              <div class="info-message">
-                <p>💡 Integração Stripe será implementada em breve</p>
-              </div>
-            }
-
-            <!-- Multibanco Info (placeholder) -->
-            @if (donationForm.get('paymentMethod')?.value === 'multibanco') {
-              <div class="info-message">
-                <p>💡 Integração Multibanco será implementada em breve</p>
-              </div>
-            }
-
-            @if (errorMessage()) {
-              <div class="error-message">{{ errorMessage() }}</div>
-            }
-
-            <button
-              type="submit"
-              class="btn-primary"
-              [disabled]="donationForm.invalid || loading()"
-            >
-              @if (loading()) {
-                <span class="spinner"></span>
-              } @else {
-                CONTINUAR
-              }
-            </button>
+            <app-mbway-qrcode
+              [qrCodeDataUrl]="mbwayResponse()?.mbway?.qrCode"
+              [reference]="mbwayResponse()?.mbway?.reference"
+              [amount]="mbwayResponse()?.donation?.amount"
+              [phoneNumber]="mbwayResponse()?.mbway?.phoneNumber"
+              [expiresAt]="getExpirationDate()"
+              [status]="paymentStatus()"
+            />
           </form>
-        } @else {
-          <!-- MB Way QR Code Display -->
-          <app-mbway-qrcode
-            [qrCodeDataUrl]="mbwayResponse()?.mbway?.qrCode"
-            [reference]="mbwayResponse()?.mbway?.reference"
-            [amount]="mbwayResponse()?.donation?.amount"
-            [phoneNumber]="mbwayResponse()?.mbway?.phoneNumber"
-            [expiresAt]="getExpirationDate()"
-            [status]="paymentStatus()"
-          />
-
-          <div class="action-buttons">
-            <button class="btn-primary" (click)="checkStatus()">
-              Verificar Pagamento
-            </button>
-            <button class="btn-text" (click)="resetForm()">
-              Nova Doação
-            </button>
-          </div>
-        }
+        </div>
       </div>
     </div>
   `,
@@ -322,14 +231,110 @@ import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway
       margin-top: var(--spacing-xl);
     }
 
+    .action-buttons .btn-primary {
+      padding: var(--spacing-md);
+      font-size: var(--font-size-base);
+    }
+
+    .donation-instructions {
+      margin-top: var(--spacing-xl);
+    }
+
+    .ong-info-card {
+      background: var(--color-background);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow-card);
+    }
+
+    .ong-info-card h3 {
+      color: var(--color-primary);
+      margin-bottom: var(--spacing-lg);
+      font-size: var(--font-size-h2);
+    }
+
+    .phone-info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      background: rgba(76, 168, 160, 0.1);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-lg);
+      border: 2px solid var(--color-primary);
+    }
+
+    .phone-info .icon {
+      font-size: 32px;
+    }
+
+    .phone-label {
+      font-size: var(--font-size-small);
+      color: var(--color-text-secondary);
+      margin: 0 0 var(--spacing-xs) 0;
+    }
+
+    .phone-number {
+      font-size: var(--font-size-h2);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+      margin: 0;
+      letter-spacing: 1px;
+    }
+
+    .instructions-text {
+      background: var(--color-background-secondary);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-md);
+    }
+
+    .instructions-text p {
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--spacing-md);
+      color: var(--color-text-primary);
+    }
+
+    .instructions-text ol {
+      margin: 0;
+      padding-left: var(--spacing-xl);
+    }
+
+    .instructions-text li {
+      margin-bottom: var(--spacing-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .no-phone-message {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid #ffc107;
+      border-radius: var(--radius-md);
+      padding: var(--spacing-lg);
+      text-align: center;
+    }
+
+    .no-phone-message p {
+      margin: var(--spacing-sm) 0;
+      color: #f57c00;
+    }
+
     @media (max-width: 480px) {
       .payment-methods {
         grid-template-columns: 1fr;
       }
+
+      .phone-info {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .phone-number {
+        font-size: var(--font-size-h3);
+      }
     }
   `]
 })
-export class DonationComponent {
+export class DonationComponent implements OnInit {
   private donationsService = inject(DonationsService);
 
   loading = signal(false);
@@ -337,6 +342,9 @@ export class DonationComponent {
   showMBWayQR = signal(false);
   mbwayResponse = signal<MBWayPaymentResponse | null>(null);
   paymentStatus = signal<'pending' | 'paid' | 'expired' | 'cancelled'>('pending');
+  ongs = signal<Ong[]>([]);
+  selectedOngId: string = '';
+  selectedOng = signal<Ong | null>(null);
 
   // Helper method to convert expiration date
   getExpirationDate(): Date | undefined {
@@ -345,15 +353,38 @@ export class DonationComponent {
   }
 
   donationForm = new FormGroup({
-    ongId: new FormControl('default-ong-id'), // This should come from route or selection
-    donorName: new FormControl('', [Validators.required]),
-    donorEmail: new FormControl('', [Validators.required, Validators.email]),
-    amount: new FormControl(50, [Validators.required, Validators.min(5)]),
+    ongId: new FormControl('', [Validators.required]),
+    donorName: new FormControl(''),
+    donorEmail: new FormControl(''),
+    amount: new FormControl(50, [Validators.required, Validators.min(0.05)]),
     donationType: new FormControl<'one_time' | 'monthly'>('one_time', [Validators.required]),
     paymentMethod: new FormControl<'mbway' | 'stripe' | 'multibanco'>('mbway', [Validators.required]),
     phoneNumber: new FormControl(''),
     cardHolderName: new FormControl(''),
   });
+
+  ngOnInit() {
+    this.loadOngs();
+    // Set initial validators based on payment method
+    this.selectPaymentMethod('mbway');
+  }
+
+  loadOngs() {
+    this.donationsService.getAllOngs().subscribe({
+      next: (ongs) => {
+        this.ongs.set(ongs);
+      },
+      error: (error) => {
+        console.error('Error loading ONGs:', error);
+        this.errorMessage.set('Erro ao carregar lista de ONGs');
+      },
+    });
+  }
+
+  onOngSelect() {
+    const ong = this.ongs().find(o => o.id === this.selectedOngId);
+    this.selectedOng.set(ong || null);
+  }
 
   selectPaymentMethod(method: 'mbway' | 'stripe' | 'multibanco') {
     this.donationForm.patchValue({ paymentMethod: method });
@@ -361,20 +392,33 @@ export class DonationComponent {
     // Update validators based on payment method
     const phoneControl = this.donationForm.get('phoneNumber');
     const cardControl = this.donationForm.get('cardHolderName');
+    const nameControl = this.donationForm.get('donorName');
+    const emailControl = this.donationForm.get('donorEmail');
 
     if (method === 'mbway') {
+      // MBWay: only phone is required, name and email are optional
       phoneControl?.setValidators([Validators.required]);
       cardControl?.clearValidators();
+      nameControl?.clearValidators();
+      emailControl?.clearValidators();
     } else if (method === 'stripe') {
+      // Stripe: card, name, and email required
       cardControl?.setValidators([Validators.required]);
+      nameControl?.setValidators([Validators.required]);
+      emailControl?.setValidators([Validators.required, Validators.email]);
       phoneControl?.clearValidators();
     } else {
+      // Multibanco: name and email required
       phoneControl?.clearValidators();
       cardControl?.clearValidators();
+      nameControl?.setValidators([Validators.required]);
+      emailControl?.setValidators([Validators.required, Validators.email]);
     }
 
     phoneControl?.updateValueAndValidity();
     cardControl?.updateValueAndValidity();
+    nameControl?.updateValueAndValidity();
+    emailControl?.updateValueAndValidity();
   }
 
   onSubmit(): void {
@@ -388,7 +432,14 @@ export class DonationComponent {
 
     const formValue = this.donationForm.value;
 
-    this.donationsService.createDonation(formValue as any).subscribe({
+    // For MBWay, set default values for optional fields if not provided
+    const donationData = {
+      ...formValue,
+      donorName: formValue.donorName || 'Doador Anônimo',
+      donorEmail: formValue.donorEmail || 'anonimo@petsos.pt',
+    };
+
+    this.donationsService.createDonation(donationData as any).subscribe({
       next: (response) => {
         this.mbwayResponse.set(response);
         this.showMBWayQR.set(true);

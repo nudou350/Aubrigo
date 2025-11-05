@@ -69,4 +69,12 @@ export class UsersService {
 
     return { message: 'Password changed successfully' };
   }
+
+  async findAll(): Promise<Partial<User>[]> {
+    const users = await this.userRepository.find({
+      select: ['id', 'ongName', 'profileImageUrl', 'location', 'phone'],
+      order: { ongName: 'ASC' },
+    });
+    return users;
+  }
 }

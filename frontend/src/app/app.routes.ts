@@ -198,6 +198,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'articles',
+        loadComponent: () =>
+          import('./features/ong/articles/articles.component').then(
+            (m) => m.ArticlesComponent
+          ),
+      },
+      {
         path: 'profile/edit',
         loadComponent: () =>
           import('./features/ong/profile/profile-edit.component').then(

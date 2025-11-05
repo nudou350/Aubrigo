@@ -41,12 +41,25 @@ export interface PaymentStatusResponse {
   mbwayStatus?: 'pending' | 'paid' | 'expired' | 'cancelled';
 }
 
+export interface Ong {
+  id: string;
+  ongName: string;
+  profileImageUrl?: string;
+  location?: string;
+  phone?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class DonationsService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/donations`;
+  private usersUrl = `${environment.apiUrl}/users`;
+
+  getAllOngs(): Observable<Ong[]> {
+    return this.http.get<Ong[]>(this.usersUrl);
+  }
 
   createDonation(donationData: DonationRequest): Observable<MBWayPaymentResponse> {
     return this.http.post<MBWayPaymentResponse>(this.apiUrl, donationData);

@@ -39,7 +39,7 @@ export class CreateDonationDto {
 
   @ApiProperty({ example: 50.0 })
   @IsNumber()
-  @Min(5)
+  @Min(0.05)
   amount: number;
 
   @ApiProperty({ example: 'one_time', enum: ['one_time', 'monthly'] })

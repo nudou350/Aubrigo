@@ -11,6 +11,7 @@ import { Exclude } from 'class-transformer';
 import { Appointment } from '../../appointments/entities/appointment.entity';
 import { Pet } from '../../pets/entities/pet.entity';
 import { Donation } from '../../donations/entities/donation.entity';
+import { Article } from '../../articles/entities/article.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -99,4 +100,7 @@ export class User {
 
   @OneToMany(() => Donation, (donation) => donation.ong)
   donations: Donation[];
+
+  @OneToMany(() => Article, (article) => article.ong)
+  articles: Article[];
 }

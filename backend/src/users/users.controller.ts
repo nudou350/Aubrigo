@@ -26,6 +26,13 @@ export class UsersController {
     private readonly uploadService: UploadService,
   ) {}
 
+  @Get()
+  @ApiOperation({ summary: 'Get all ONGs' })
+  @ApiResponse({ status: 200, description: 'List of all ONGs' })
+  async getAllOngs() {
+    return this.usersService.findAll();
+  }
+
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

@@ -139,6 +139,11 @@ import { ToastService } from '../../../core/services/toast.service';
               <h3>Histórico de Doações</h3>
               <p>Veja todas as doações recebidas</p>
             </a>
+            <a routerLink="/ong/articles" class="action-card">
+              <div class="action-icon">📋</div>
+              <h3>Necessidades da ONG</h3>
+              <p>Gerencie artigos e necessidades</p>
+            </a>
           </div>
         </div>
 
@@ -442,7 +447,7 @@ import { ToastService } from '../../../core/services/toast.service';
     .action-card {
       background: white;
       border-radius: 12px;
-      padding: 24px;
+      padding: 16px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       text-decoration: none;
       transition: all 0.2s;
@@ -467,20 +472,21 @@ import { ToastService } from '../../../core/services/toast.service';
       }
 
       .action-icon {
-        font-size: 40px;
-        margin-bottom: 16px;
+        font-size: 32px;
+        margin-bottom: 12px;
       }
 
       h3 {
-        font-size: 18px;
+        font-size: 16px;
         color: #2C2C2C;
-        margin: 0 0 8px 0;
+        margin: 0 0 6px 0;
       }
 
       p {
         color: #666;
-        font-size: 14px;
+        font-size: 13px;
         margin: 0;
+        line-height: 1.4;
       }
     }
 

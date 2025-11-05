@@ -574,7 +574,6 @@ export class ProfileEditComponent implements OnInit {
       // 2. Update profile data
       const profileData = {
         ongName: this.profileForm.value.ongName,
-        email: this.profileForm.value.email,
         phone: this.profileForm.value.phone || undefined,
         location: this.profileForm.value.location || undefined,
         instagramHandle: this.profileForm.value.instagramHandle

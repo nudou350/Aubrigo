@@ -10,6 +10,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { OngsModule } from './ongs/ongs.module';
 import { AdminModule } from './admin/admin.module';
 import { UploadModule } from './upload/upload.module';
+import { ArticlesModule } from './articles/articles.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { UploadModule } from './upload/upload.module';
     OngsModule,
     AdminModule,
     UploadModule,
+    ArticlesModule,
   ],
 })
 export class AppModule {}
