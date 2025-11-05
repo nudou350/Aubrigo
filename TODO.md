@@ -87,37 +87,44 @@
 
 ### Backend
 
-- [ ] **Favorites/Wishlist API**
-  - [ ] Create `src/favorites/favorites.controller.ts`
-  - [ ] Create `src/favorites/favorites.service.ts`
-  - [ ] Create `src/favorites/dto/create-favorite.dto.ts`
-  - [ ] Implement endpoints:
-    - [ ] `POST /api/favorites` - Add to favorites
-    - [ ] `GET /api/favorites?email=` - Get user favorites
-    - [ ] `DELETE /api/favorites/:id` - Remove from favorites
-  - [ ] Add duplicate prevention
+- [x] **Favorites/Wishlist API** ✅ COMPLETED (2025-11-05)
+  - [x] Create `src/favorites/favorites.controller.ts`
+  - [x] Create `src/favorites/favorites.service.ts`
+  - [x] Create `src/favorites/dto/create-favorite.dto.ts`
+  - [x] Implement endpoints:
+    - [x] `POST /api/favorites` - Add to favorites
+    - [x] `GET /api/favorites?email=` - Get user favorites
+    - [x] `DELETE /api/favorites/:id` - Remove from favorites
+    - [x] `DELETE /api/favorites/pet/:petId` - Remove by pet ID
+  - [x] Add duplicate prevention (unique constraint on visitorEmail + petId)
+  - **Files**: `backend/src/favorites/`
 
-- [ ] **Email Service**
-  - [ ] Choose provider (SendGrid or NodeMailer)
-  - [ ] Install dependencies
-  - [ ] Create `src/email/email.module.ts`
-  - [ ] Create `src/email/email.service.ts`
-  - [ ] Create email templates:
-    - [ ] Welcome email
-    - [ ] Password reset email
-    - [ ] Appointment confirmation (to visitor)
-    - [ ] Appointment notification (to ONG)
-    - [ ] Donation receipt
-  - [ ] Add email configuration to `.env`
-  - [ ] Test email sending
+- [x] **Email Service** ✅ COMPLETED (2025-11-05)
+  - [x] Choose provider → **NodeMailer** (SMTP support)
+  - [x] Create `src/email/email.module.ts`
+  - [x] Create `src/email/email.service.ts`
+  - [x] Create email templates:
+    - [x] Welcome email
+    - [x] Password reset email with link
+    - [x] Appointment confirmation (to visitor)
+    - [x] Appointment notification (to ONG)
+    - [x] Donation receipt
+  - [x] Email configuration via environment variables
+  - [x] HTML email support with plain text fallback
+  - [ ] Test email sending (requires SMTP credentials in .env)
+  - **Files**: `backend/src/email/`
+  - **Environment Variables**: EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD, EMAIL_FROM
 
-- [ ] **Password Reset Flow**
-  - [ ] Generate password reset tokens
-  - [ ] Implement `POST /api/auth/forgot-password`
-  - [ ] Implement `POST /api/auth/reset-password`
-  - [ ] Store tokens with expiration in database
-  - [ ] Send reset email with link
-  - [ ] Test complete flow
+- [x] **Password Reset Flow** ✅ COMPLETED (2025-11-05)
+  - [x] Generate password reset tokens (crypto.randomBytes)
+  - [x] Implement `POST /api/auth/forgot-password`
+  - [x] Implement `POST /api/auth/reset-password`
+  - [x] Store tokens with expiration in database (PasswordResetToken entity)
+  - [x] Send reset email with link (EmailService integration)
+  - [x] Token expiration (1 hour)
+  - [x] Prevent token reuse (used flag)
+  - [ ] Test complete flow (requires backend running + email setup)
+  - **Files**: `backend/src/auth/entities/password-reset-token.entity.ts`, DTOs, updated auth service/controller
 
 - [ ] **Users Profile Management**
   - [ ] Create `src/users/users.controller.ts`
@@ -405,14 +412,19 @@
 ## 📊 Progress Tracking
 
 ### Current Status
-- **Overall Progress**: ~80% (+5% this session)
-- **Backend**: ~85% (+5%)
-- **Frontend**: ~65% (+5%)
+- **Overall Progress**: ~85% (+5% this session)
+- **Backend Core Features**: ~90% (+5%)
+  - Phase 1: 100% ✅
+  - Phase 2: 75% (3/4 complete)
+- **Frontend**: ~65%
+  - Phase 1: 80%
+  - Phase 2: 0% (not started)
 - **Testing**: ~5%
-- **Documentation**: ~20%
+- **Documentation**: ~30% (+10%)
 - **Deployment**: ~0%
 
 ### Recent Completions (2025-11-05)
+**Phase 1 (Morning Session):**
 ✅ Local file upload service with validation and static serving
 ✅ Complete Appointments API (CRUD + authentication)
 ✅ My Pets endpoint (GET /api/pets/my-pets)
@@ -421,6 +433,11 @@
 ✅ ONG Profile Management API (update profile, upload image, change password)
 ✅ Frontend Appointment Scheduling Component with full form
 ✅ Integration of appointment scheduling with pet detail page
+
+**Phase 2 (Current Session):**
+✅ Favorites/Wishlist API (complete CRUD + duplicate prevention)
+✅ Email Service with NodeMailer (all templates implemented)
+✅ Password Reset Flow (tokens, expiration, email integration)
 
 ### Time Estimates
 - **Phase 1 (Critical)**: ~~2-3 weeks~~ → **~1 week remaining** (80% complete)
@@ -465,21 +482,36 @@
 
 ---
 
-**Last Updated**: 2025-11-05 (Session: Profile Management + Appointment Scheduling)
-**Current Phase**: Phase 1 (Critical Path) - 80% Complete
-**Status**: Active Development - Backend 85% | Frontend 65%
+**Last Updated**: 2025-11-05 (Session: Phase 2 Backend - Favorites, Email, Password Reset)
+**Current Phase**: Phase 2 (Core Features) - 75% Complete
+**Status**: Active Development - Backend 90% | Frontend 65%
 
 ---
 
-## 📝 New Endpoints Added (2025-11-05)
+## 📝 New Endpoints & Features Added (2025-11-05)
 
-### ONG Profile Management
+### Phase 1 Completions (Morning)
+**ONG Profile Management:**
 - `PUT /api/ongs/my-ong/profile` - Update ONG profile information
 - `POST /api/ongs/my-ong/profile-image` - Upload profile image
-- `PUT /api/ongs/my-ong/change-password` - Change password (with current password verification)
+- `PUT /api/ongs/my-ong/change-password` - Change password verification
 
-### Frontend Components
+**Frontend:**
 - `schedule-appointment.component.ts` - Full appointment scheduling form
-  - Location: `/frontend/src/app/features/pets/schedule-appointment/`
-  - Route: `/pets/:id/schedule`
-  - Features: Form validation, date/time pickers, pet info preview
+
+### Phase 2 Completions (Current)
+**Favorites API:**
+- `POST /api/favorites` - Add pet to favorites
+- `GET /api/favorites?email=` - Get user favorites
+- `DELETE /api/favorites/:id` - Remove from favorites
+- `DELETE /api/favorites/pet/:petId` - Remove by pet ID
+
+**Authentication:**
+- `POST /api/auth/forgot-password` - Request password reset
+- `POST /api/auth/reset-password` - Reset password with token
+
+**Email Service:**
+- Welcome emails
+- Password reset emails
+- Appointment confirmations
+- Donation receipts
