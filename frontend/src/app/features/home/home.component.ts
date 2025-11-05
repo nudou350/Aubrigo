@@ -201,7 +201,7 @@ import { PetsService, Pet, SearchPetsParams } from "../../core/services/pets.ser
                   d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"
                 />
               </svg>
-              <span>{{ pet.ong.ongName }}</span>
+              <span>{{ pet.ong?.ongName || 'N/A' }}</span>
             </div>
 
             <p class="pet-description">{{ pet.description }}</p>
@@ -856,7 +856,8 @@ export class HomeComponent implements OnInit {
     this.loadPets();
   }
 
-  getSizeLabel(size: string): string {
+  getSizeLabel(size?: string): string {
+    if (!size) return 'N/A';
     const labels: any = {
       small: "Pequeno",
       medium: "Médio",

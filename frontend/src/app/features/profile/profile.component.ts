@@ -80,19 +80,49 @@ import { FavoritesService } from '../../core/services/favorites.service';
 
           <!-- Profile Form -->
           <form [formGroup]="profileForm" class="profile-form">
-            <div class="form-group">
-              <label>{{ isOng ? 'Nome da ONG' : 'Nome Completo' }}</label>
-              @if (editMode()) {
-                <input
-                  type="text"
-                  [formControlName]="isOng ? 'ongName' : 'fullName'"
-                  class="form-control"
-                  [placeholder]="isOng ? 'Digite o nome da ONG' : 'Digite seu nome completo'"
-                >
-              } @else {
-                <div class="form-value">{{ getDisplayName() }}</div>
-              }
-            </div>
+            @if (isOng) {
+              <div class="form-group">
+                <label>Nome da ONG</label>
+                @if (editMode()) {
+                  <input
+                    type="text"
+                    formControlName="ongName"
+                    class="form-control"
+                    placeholder="Digite o nome da ONG"
+                  >
+                } @else {
+                  <div class="form-value">{{ getDisplayName() }}</div>
+                }
+              </div>
+            } @else {
+              <div class="form-group">
+                <label>Nome</label>
+                @if (editMode()) {
+                  <input
+                    type="text"
+                    formControlName="firstName"
+                    class="form-control"
+                    placeholder="Digite seu nome"
+                  >
+                } @else {
+                  <div class="form-value">{{ profileForm.get('firstName')?.value || 'Não informado' }}</div>
+                }
+              </div>
+
+              <div class="form-group">
+                <label>Sobrenome</label>
+                @if (editMode()) {
+                  <input
+                    type="text"
+                    formControlName="lastName"
+                    class="form-control"
+                    placeholder="Digite seu sobrenome"
+                  >
+                } @else {
+                  <div class="form-value">{{ profileForm.get('lastName')?.value || 'Não informado' }}</div>
+                }
+              </div>
+            }
 
             <div class="form-group">
               <label>E-mail</label>
@@ -557,7 +587,8 @@ export class ProfileComponent implements OnInit {
 
   initForms(): void {
     this.profileForm = this.fb.group({
-      fullName: [''],
+      firstName: [''],
+      lastName: [''],
       ongName: [''],
       email: [{ value: '', disabled: true }],
       phone: [''],
@@ -603,7 +634,8 @@ export class ProfileComponent implements OnInit {
       this.usersService.getUserProfile().subscribe({
         next: (user) => {
           this.profileForm.patchValue({
-            fullName: user.fullName || '',
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
             email: user.email,
             phone: user.phone || '',
             location: user.location || '',
@@ -657,7 +689,8 @@ export class ProfileComponent implements OnInit {
       });
     } else {
       const updateData = {
-        fullName: formValue.fullName,
+        firstName: formValue.firstName,
+        lastName: formValue.lastName,
         phone: formValue.phone,
         location: formValue.location,
       };
@@ -757,8 +790,13 @@ export class ProfileComponent implements OnInit {
   }
 
   getDisplayName(): string {
-    return this.isOng
-      ? this.profileForm.get('ongName')?.value || 'Não informado'
-      : this.profileForm.get('fullName')?.value || 'Não informado';
+    if (this.isOng) {
+      return this.profileForm.get('ongName')?.value || 'Não informado';
+    } else {
+      const firstName = this.profileForm.get('firstName')?.value || '';
+      const lastName = this.profileForm.get('lastName')?.value || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+      return fullName || 'Não informado';
+    }
   }
 }

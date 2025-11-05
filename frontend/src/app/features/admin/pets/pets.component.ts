@@ -103,7 +103,7 @@ import { Pet } from '../../../core/services/pets.service';
 
                   <div class="pet-ong">
                     <span class="icon">🏠</span>
-                    <span>{{ pet.ong.ongName }}</span>
+                    <span>{{ pet.ong?.ongName || 'N/A' }}</span>
                   </div>
 
                   @if (pet.location) {
@@ -517,7 +517,7 @@ export class AdminPetsComponent implements OnInit {
         p.name.toLowerCase().includes(this.searchTerm) ||
         p.breed?.toLowerCase().includes(this.searchTerm) ||
         p.location?.toLowerCase().includes(this.searchTerm) ||
-        p.ong.ongName.toLowerCase().includes(this.searchTerm)
+        p.ong?.ongName?.toLowerCase().includes(this.searchTerm)
       );
     }
 
@@ -526,7 +526,7 @@ export class AdminPetsComponent implements OnInit {
 
   getPrimaryImage(pet: Pet): string | null {
     const primaryImage = pet.images?.find(img => img.isPrimary);
-    return primaryImage?.url || pet.images?.[0]?.url || null;
+    return primaryImage?.imageUrl || pet.images?.[0]?.imageUrl || null;
   }
 
   getSpeciesLabel(species: string): string {

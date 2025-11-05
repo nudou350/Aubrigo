@@ -7,7 +7,8 @@ import { environment } from '../../../environments/environment';
 export interface User {
   id: string;
   email: string;
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   phone?: string;
   location?: string;
   profileImageUrl?: string;
@@ -16,7 +17,8 @@ export interface User {
 }
 
 export interface UpdateProfileDto {
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   phone?: string;
   location?: string;
 }
