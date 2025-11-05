@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BottomNavComponent } from '../../../shared/components/bottom-nav/bottom-nav.component';
+import { AppointmentsService, CreateAppointmentDto } from '../../../core/services/appointments.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { environment } from '../../../../environments/environment';
 
 interface Pet {
   id: string;
@@ -441,6 +444,8 @@ export class ScheduleAppointmentComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private http = inject(HttpClient);
+  private appointmentsService = inject(AppointmentsService);
+  private toastService = inject(ToastService);
 
   pet = signal<Pet | null>(null);
   loading = signal(true);
@@ -467,7 +472,7 @@ export class ScheduleAppointmentComponent implements OnInit {
 
   loadPetInfo(petId: string) {
     this.loading.set(true);
-    this.http.get<any>(`http://localhost:3002/api/pets/${petId}`).subscribe({
+    this.http.get<any>(`${environment.apiUrl}/pets/${petId}`).subscribe({
       next: (response) => {
         const petData = response.data || response;
         this.pet.set(petData);
@@ -482,6 +487,7 @@ export class ScheduleAppointmentComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading pet:', error);
+        this.toastService.error('Erro ao carregar informações do pet');
         this.loading.set(false);
         this.pet.set(null);
       }
@@ -505,7 +511,7 @@ export class ScheduleAppointmentComponent implements OnInit {
 
     this.submitting.set(true);
 
-    const appointmentData = {
+    const appointmentData: CreateAppointmentDto = {
       petId: pet.id,
       visitorName: this.formData.visitorName,
       visitorEmail: this.formData.visitorEmail,
@@ -515,12 +521,13 @@ export class ScheduleAppointmentComponent implements OnInit {
       notes: this.formData.notes
     };
 
-    this.http.post('http://localhost:3002/api/appointments', appointmentData).subscribe({
+    this.appointmentsService.createAppointment(appointmentData).subscribe({
       next: (response) => {
         this.submitting.set(false);
-        // Show success message and navigate back
-        alert('Agendamento realizado com sucesso! A ONG entrará em contato em breve.');
-        this.router.navigate(['/pets', pet.id]);
+        this.toastService.success('Agendamento realizado com sucesso! A ONG entrará em contato em breve.');
+        setTimeout(() => {
+          this.router.navigate(['/pets', pet.id]);
+        }, 1500);
       },
       error: (error) => {
         console.error('Error scheduling appointment:', error);
@@ -528,6 +535,7 @@ export class ScheduleAppointmentComponent implements OnInit {
         this.errorMessage.set(
           error.error?.message || 'Erro ao agendar visita. Por favor, tente novamente.'
         );
+        this.toastService.error(this.errorMessage());
       }
     });
   }

@@ -1,27 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
 import { FormsModule } from '@angular/forms';
-
-interface Appointment {
-  id: string;
-  pet: {
-    id: string;
-    name: string;
-    species: string;
-    images: { imageUrl: string; isPrimary: boolean }[];
-  };
-  visitorName: string;
-  visitorEmail: string;
-  visitorPhone: string;
-  preferredDate: string;
-  preferredTime: string;
-  status: string;
-  notes?: string;
-  createdAt: string;
-}
+import { AppointmentsService, Appointment } from '../../../core/services/appointments.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-ong-appointments',
@@ -444,7 +426,8 @@ interface Appointment {
   `]
 })
 export class OngAppointmentsComponent implements OnInit {
-  private apiUrl = environment.apiUrl;
+  private appointmentsService = inject(AppointmentsService);
+  private toastService = inject(ToastService);
 
   isLoading = signal(true);
   appointments = signal<Appointment[]>([]);
@@ -453,15 +436,13 @@ export class OngAppointmentsComponent implements OnInit {
   searchTerm = '';
   filterStatus = '';
 
-  constructor(private http: HttpClient) {}
-
   ngOnInit() {
     this.loadAppointments();
   }
 
   loadAppointments() {
     this.isLoading.set(true);
-    this.http.get<Appointment[]>(`${this.apiUrl}/appointments/ong`).subscribe({
+    this.appointmentsService.getOngAppointments().subscribe({
       next: (appointments) => {
         this.appointments.set(appointments);
         this.filteredAppointments.set(appointments);
@@ -469,6 +450,7 @@ export class OngAppointmentsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading appointments:', error);
+        this.toastService.error('Erro ao carregar agendamentos');
         this.isLoading.set(false);
       }
     });
@@ -493,26 +475,34 @@ export class OngAppointmentsComponent implements OnInit {
     this.filteredAppointments.set(filtered);
   }
 
-  updateStatus(id: string, status: string) {
-    const messages: any = {
+  updateStatus(id: string, status: 'pending' | 'confirmed' | 'completed' | 'cancelled') {
+    const messages: Record<string, string> = {
       confirmed: 'Confirmar esta visita?',
       cancelled: 'Cancelar esta visita?',
       completed: 'Marcar esta visita como concluída?'
+    };
+
+    const successMessages: Record<string, string> = {
+      confirmed: 'Visita confirmada com sucesso!',
+      cancelled: 'Visita cancelada',
+      completed: 'Visita marcada como concluída!'
     };
 
     if (!confirm(messages[status])) {
       return;
     }
 
-    this.http.patch(`${this.apiUrl}/appointments/${id}/status`, { status }).subscribe({
+    this.appointmentsService.updateAppointmentStatus(id, status).subscribe({
       next: () => {
         this.appointments.update(list =>
           list.map(apt => apt.id === id ? { ...apt, status } : apt)
         );
         this.filterAppointments();
+        this.toastService.success(successMessages[status]);
       },
       error: (error) => {
-        alert('Erro ao atualizar status: ' + (error.error?.message || 'Erro desconhecido'));
+        console.error('Error updating appointment status:', error);
+        this.toastService.error('Erro ao atualizar status da visita');
       }
     });
   }
