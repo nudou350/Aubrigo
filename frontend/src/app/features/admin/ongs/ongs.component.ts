@@ -1,18 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { environment } from '../../../../environments/environment';
-
-interface Ong {
-  id: string;
-  email: string;
-  ongName: string;
-  phone?: string;
-  instagramHandle?: string;
-  location?: string;
-  createdAt: string;
-}
+import { AdminService, Ong } from '../../../core/services/admin.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-admin-ongs',
@@ -368,14 +358,13 @@ interface Ong {
   `]
 })
 export class AdminOngsComponent implements OnInit {
-  private apiUrl = environment.apiUrl;
+  private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
 
   isLoading = signal(true);
   ongs = signal<Ong[]>([]);
   filteredOngs = signal<Ong[]>([]);
   searchTerm = '';
-
-  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.loadOngs();
@@ -384,7 +373,7 @@ export class AdminOngsComponent implements OnInit {
   loadOngs() {
     this.isLoading.set(true);
 
-    this.http.get<Ong[]>(`${this.apiUrl}/admin/ongs`).subscribe({
+    this.adminService.getOngs().subscribe({
       next: (ongs) => {
         this.ongs.set(ongs);
         this.filteredOngs.set(ongs);
@@ -393,7 +382,7 @@ export class AdminOngsComponent implements OnInit {
       error: (error) => {
         console.error('Error loading ONGs:', error);
         this.isLoading.set(false);
-        alert('Erro ao carregar ONGs: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error('Erro ao carregar ONGs: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
   }
@@ -438,7 +427,7 @@ export class AdminOngsComponent implements OnInit {
   }
 
   viewOng(ongId: string) {
-    alert(`Ver detalhes da ONG: ${ongId}`);
+    this.toastService.info(`Ver detalhes da ONG: ${ongId}`);
   }
 
   deleteOng(ongId: string, ongName: string) {
@@ -446,14 +435,14 @@ export class AdminOngsComponent implements OnInit {
       return;
     }
 
-    this.http.delete(`${this.apiUrl}/admin/users/${ongId}`).subscribe({
+    this.adminService.deleteOng(ongId).subscribe({
       next: () => {
-        alert('ONG excluída com sucesso!');
+        this.toastService.success('ONG excluída com sucesso!');
         this.loadOngs();
       },
       error: (error) => {
         console.error('Error deleting ONG:', error);
-        alert('Erro ao excluir ONG: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error('Erro ao excluir ONG: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
   }

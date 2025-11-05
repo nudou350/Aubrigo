@@ -1,26 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
-
-interface DashboardStats {
-  totalUsers: number;
-  totalOngs: number;
-  pendingOngs: number;
-  totalPets: number;
-  totalDonations: number;
-}
-
-interface PendingOng {
-  id: string;
-  name: string;
-  city: string;
-  email: string;
-  phone: string;
-  createdAt: string;
-  status: string;
-}
+import { AdminService, DashboardStats, PendingOng } from '../../../core/services/admin.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -494,7 +476,8 @@ interface PendingOng {
   `]
 })
 export class AdminDashboardComponent implements OnInit {
-  private apiUrl = environment.apiUrl;
+  private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
 
   isLoading = signal(true);
   stats = signal<DashboardStats>({
@@ -502,11 +485,10 @@ export class AdminDashboardComponent implements OnInit {
     totalOngs: 0,
     pendingOngs: 0,
     totalPets: 0,
-    totalDonations: 0
+    totalDonations: 0,
+    totalDonationAmount: 0
   });
   pendingOngs = signal<PendingOng[]>([]);
-
-  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.loadDashboardData();
@@ -515,22 +497,24 @@ export class AdminDashboardComponent implements OnInit {
   loadDashboardData() {
     this.isLoading.set(true);
 
-    this.http.get<DashboardStats>(`${this.apiUrl}/admin/dashboard/stats`).subscribe({
+    this.adminService.getDashboardStats().subscribe({
       next: (data) => {
         this.stats.set(data);
       },
       error: (error) => {
         console.error('Error loading stats:', error);
+        this.toastService.error('Erro ao carregar estatísticas');
       }
     });
 
-    this.http.get<PendingOng[]>(`${this.apiUrl}/admin/ongs/pending`).subscribe({
+    this.adminService.getPendingOngs().subscribe({
       next: (data) => {
         this.pendingOngs.set(data);
         this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Error loading pending ONGs:', error);
+        this.toastService.error('Erro ao carregar ONGs pendentes');
         this.isLoading.set(false);
       }
     });
@@ -541,8 +525,9 @@ export class AdminDashboardComponent implements OnInit {
       return;
     }
 
-    this.http.patch(`${this.apiUrl}/admin/ongs/${ongId}/approve`, {}).subscribe({
+    this.adminService.approveOng(ongId).subscribe({
       next: () => {
+        this.toastService.success('ONG aprovada com sucesso!');
         this.pendingOngs.update(list => list.filter(ong => ong.id !== ongId));
         this.stats.update(s => ({
           ...s,
@@ -551,7 +536,7 @@ export class AdminDashboardComponent implements OnInit {
         }));
       },
       error: (error) => {
-        alert('Erro ao aprovar ONG: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error('Erro ao aprovar ONG: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
   }
@@ -560,8 +545,9 @@ export class AdminDashboardComponent implements OnInit {
     const reason = prompt('Motivo da rejeição (opcional):');
     if (reason === null) return;
 
-    this.http.patch(`${this.apiUrl}/admin/ongs/${ongId}/reject`, { reason }).subscribe({
+    this.adminService.rejectOng(ongId, reason || undefined).subscribe({
       next: () => {
+        this.toastService.success('ONG rejeitada');
         this.pendingOngs.update(list => list.filter(ong => ong.id !== ongId));
         this.stats.update(s => ({
           ...s,
@@ -569,7 +555,7 @@ export class AdminDashboardComponent implements OnInit {
         }));
       },
       error: (error) => {
-        alert('Erro ao rejeitar ONG: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error('Erro ao rejeitar ONG: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
   }
