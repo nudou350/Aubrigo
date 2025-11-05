@@ -1,0 +1,136 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: |
+          backend/package-lock.json
+          frontend/package-lock.json
+
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    - name: Build backend
+      working-directory: ./backend
+      run: npm run build
+
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+
+    - name: Build frontend
+      working-directory: ./frontend
+      run: npm run build --configuration production
+
+    - name: Prepare deployment package
+      run: |
+        mkdir -p deploy/backend
+        mkdir -p deploy/frontend
+        cp -r backend/dist deploy/backend/
+        cp -r backend/node_modules deploy/backend/
+        cp backend/package*.json deploy/backend/
+        cp -r frontend/dist/pet-sos/browser deploy/frontend/dist
+        cp -r backend/uploads deploy/backend/ || true
+        tar -czf deploy.tar.gz deploy/
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+    - name: Add VPS to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to VPS
+      env:
+        VPS_USER: ${{ secrets.VPS_USER }}
+        VPS_HOST: ${{ secrets.VPS_HOST }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+        EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+        EMAIL_USER: ${{ secrets.EMAIL_USER }}
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+      run: |
+        # Copy deployment package to VPS
+        scp deploy.tar.gz $VPS_USER@$VPS_HOST:/tmp/
+
+        # Execute deployment commands on VPS
+        ssh $VPS_USER@$VPS_HOST << 'EOF'
+          set -e
+
+          # Extract deployment package
+          cd /var/www/aubrigo
+          tar -xzf /tmp/deploy.tar.gz
+
+          # Backup current version
+          if [ -d "current" ]; then
+            mv current backup-$(date +%Y%m%d%H%M%S)
+          fi
+
+          # Move new version to current
+          mv deploy current
+
+          # Update environment variables
+          cat > current/backend/.env << ENVEOF
+        NODE_ENV=production
+        PORT=3002
+        DATABASE_URL=$DATABASE_URL
+        JWT_SECRET=$JWT_SECRET
+        JWT_EXPIRATION=7d
+        EMAIL_HOST=$EMAIL_HOST
+        EMAIL_PORT=$EMAIL_PORT
+        EMAIL_USER=$EMAIL_USER
+        EMAIL_PASSWORD=$EMAIL_PASSWORD
+        EMAIL_FROM=noreply@petsos.com
+        FRONTEND_URL=$FRONTEND_URL
+        ENVEOF
+
+          # Restart backend with PM2
+          cd /var/www/aubrigo/current/backend
+          pm2 delete pet-sos-backend || true
+          pm2 start dist/main.js --name pet-sos-backend --time
+          pm2 save
+
+          # Update nginx configuration if needed
+          sudo systemctl reload nginx
+
+          # Cleanup
+          rm /tmp/deploy.tar.gz
+
+          # Keep only last 3 backups
+          cd /var/www/aubrigo
+          ls -t | grep backup | tail -n +4 | xargs rm -rf || true
+
+          echo "Deployment completed successfully!"
+        EOF
+
+    - name: Verify Deployment
+      run: |
+        echo "Waiting for service to start..."
+        sleep 10
+        curl -f https://petsos.com/api/health || echo "Health check failed"
+
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "Deployment failed! Check logs."

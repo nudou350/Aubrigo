@@ -6,10 +6,12 @@ import { Donation } from '../donations/entities/donation.entity';
 import { Appointment } from '../appointments/entities/appointment.entity';
 import { OngsService } from './ongs.service';
 import { OngsController } from './ongs.controller';
+import { UploadModule } from '../upload/upload.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Pet, Donation, Appointment]),
+    UploadModule,
   ],
   controllers: [OngsController],
   providers: [OngsService],

@@ -487,12 +487,18 @@ export class ForgotPasswordComponent {
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
-    // TODO: Implement forgotPassword in AuthService
-    // For now, simulate success
-    setTimeout(() => {
-      this.successMessage.set("Email de recuperação enviado com sucesso!");
-      this.forgotPasswordForm.reset();
-      this.loading.set(false);
-    }, 1500);
+    const email = this.forgotPasswordForm.value.email!;
+
+    this.authService.forgotPassword(email).subscribe({
+      next: (response) => {
+        this.successMessage.set(response.message || "Email de recuperação enviado com sucesso! Verifique sua caixa de entrada.");
+        this.forgotPasswordForm.reset();
+        this.loading.set(false);
+      },
+      error: (error) => {
+        this.errorMessage.set(error.error?.message || "Erro ao enviar email de recuperação. Tente novamente.");
+        this.loading.set(false);
+      }
+    });
   }
 }

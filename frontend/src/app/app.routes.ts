@@ -47,9 +47,23 @@ export const routes: Routes = [
       ).then((m) => m.ForgotPasswordComponent),
   },
   {
+    path: 'reset-password',
+    loadComponent: () =>
+      import(
+        './features/auth/reset-password/reset-password.component'
+      ).then((m) => m.ResetPasswordComponent),
+  },
+  {
     path: 'home',
     loadComponent: () =>
       import('./features/home/home.component').then((m) => m.HomeComponent),
+  },
+  {
+    path: 'pets/:id/schedule',
+    loadComponent: () =>
+      import('./features/pets/schedule-appointment/schedule-appointment.component').then(
+        (m) => m.ScheduleAppointmentComponent
+      ),
   },
   {
     path: 'pets/:id',

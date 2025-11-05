@@ -2,14 +2,19 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { User, UserRole } from '../users/entities/user.entity';
 import { Pet } from '../pets/entities/pet.entity';
 import { Donation } from '../donations/entities/donation.entity';
 import { Appointment } from '../appointments/entities/appointment.entity';
 import { UpdateOngDto } from './dto/update-ong.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class OngsService {
@@ -224,5 +229,67 @@ export class OngsService {
     userId: string,
   ) {
     throw new ForbiddenException('Member role management not yet implemented');
+  }
+
+  async updateMyProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const ong = await this.userRepository.findOne({
+      where: { id: userId, role: UserRole.ONG },
+    });
+
+    if (!ong) {
+      throw new NotFoundException('ONG not found');
+    }
+
+    // Update only the provided fields
+    Object.assign(ong, updateProfileDto);
+    const updated = await this.userRepository.save(ong);
+    delete updated.passwordHash;
+    return updated;
+  }
+
+  async updateProfileImage(userId: string, imageUrl: string) {
+    const ong = await this.userRepository.findOne({
+      where: { id: userId, role: UserRole.ONG },
+    });
+
+    if (!ong) {
+      throw new NotFoundException('ONG not found');
+    }
+
+    ong.profileImageUrl = imageUrl;
+    const updated = await this.userRepository.save(ong);
+    delete updated.passwordHash;
+    return updated;
+  }
+
+  async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
+    const { currentPassword, newPassword, confirmPassword } = changePasswordDto;
+
+    // Verify passwords match
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestException('New password and confirm password do not match');
+    }
+
+    // Get user with password
+    const user = await this.userRepository.findOne({
+      where: { id: userId, role: UserRole.ONG },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    // Hash new password
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    user.passwordHash = passwordHash;
+
+    await this.userRepository.save(user);
+    return { message: 'Password changed successfully' };
   }
 }
