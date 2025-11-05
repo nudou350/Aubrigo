@@ -14,19 +14,6 @@ interface OngStats {
   pendingAppointments: number;
 }
 
-interface OngMember {
-  id: string;
-  user: {
-    id: string;
-    email: string;
-    firstName?: string;
-    lastName?: string;
-  };
-  role: string;
-  permissions: string[];
-  joinedAt: string;
-}
-
 interface OngDetails {
   id: string;
   email: string;
@@ -125,50 +112,6 @@ interface OngDetails {
               <p>Veja todas as doações recebidas</p>
             </a>
           </div>
-        </div>
-
-        <div class="team-section">
-          <div class="section-header">
-            <h2>Equipe da ONG</h2>
-            <button class="btn-invite" (click)="inviteMember()">
-              ➕ Convidar Membro
-            </button>
-          </div>
-
-          @if (members().length === 0) {
-            <div class="empty-state">
-              <p>Nenhum membro na equipe ainda</p>
-            </div>
-          } @else {
-            <div class="member-list">
-              @for (member of members(); track member.id) {
-                <div class="member-card">
-                  <div class="member-info">
-                    <div class="member-avatar">
-                      {{ getInitials(member.user) }}
-                    </div>
-                    <div>
-                      <h4>{{ getMemberName(member.user) }}</h4>
-                      <p class="member-email">{{ member.user.email }}</p>
-                      <div class="member-badges">
-                        <span class="role-badge" [class]="member.role">
-                          {{ getRoleLabel(member.role) }}
-                        </span>
-                        @for (permission of member.permissions; track permission) {
-                          <span class="permission-tag">{{ getPermissionLabel(permission) }}</span>
-                        }
-                      </div>
-                    </div>
-                  </div>
-                  @if (member.role !== 'owner') {
-                    <button class="btn-remove" (click)="removeMember(member.id)">
-                      Remover
-                    </button>
-                  }
-                </div>
-              }
-            </div>
-          }
         </div>
 
         <div class="profile-section">
@@ -390,150 +333,12 @@ interface OngDetails {
       }
     }
 
-    .team-section, .profile-section {
+    .profile-section {
       background: white;
       border-radius: 16px;
       padding: 32px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
       margin-bottom: 32px;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-
-      h2 {
-        font-size: 24px;
-        color: #2C2C2C;
-        margin: 0;
-      }
-
-      .btn-invite {
-        background: #5CB5B0;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-
-        &:hover {
-          background: #4A9792;
-          transform: translateY(-1px);
-        }
-      }
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px;
-      color: #999;
-    }
-
-    .member-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .member-card {
-      background: #F9F9F9;
-      border-radius: 12px;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .member-info {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex: 1;
-    }
-
-    .member-avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: #5CB5B0;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 600;
-    }
-
-    .member-info h4 {
-      margin: 0 0 4px 0;
-      color: #2C2C2C;
-      font-size: 16px;
-    }
-
-    .member-email {
-      color: #666;
-      font-size: 14px;
-      margin: 0 0 8px 0;
-    }
-
-    .member-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .role-badge {
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-
-      &.owner {
-        background: #F5A623;
-        color: white;
-      }
-
-      &.admin {
-        background: #5CB5B0;
-        color: white;
-      }
-
-      &.member {
-        background: #E0E0E0;
-        color: #666;
-      }
-    }
-
-    .permission-tag {
-      background: #E3F2FD;
-      color: #1976D2;
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 500;
-    }
-
-    .btn-remove {
-      background: #E74C3C;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:hover {
-        background: #C0392B;
-      }
     }
 
     .profile-section h2 {
@@ -615,21 +420,6 @@ interface OngDetails {
       .action-grid {
         grid-template-columns: 1fr;
       }
-
-      .member-card {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-
-        .btn-invite {
-          width: 100%;
-        }
-      }
     }
   `]
 })
@@ -645,7 +435,6 @@ export class OngDashboardComponent implements OnInit {
     monthlyDonations: 0,
     pendingAppointments: 0
   });
-  members = signal<OngMember[]>([]);
   ongDetails = signal<OngDetails | null>(null);
 
   constructor(
@@ -670,12 +459,10 @@ export class OngDashboardComponent implements OnInit {
         this.http.get<OngStats>(`${this.apiUrl}/ongs/${ong.id}/stats`).subscribe({
           next: (stats) => {
             this.stats.set(stats);
-          }
-        });
-
-        this.http.get<OngMember[]>(`${this.apiUrl}/ongs/${ong.id}/members`).subscribe({
-          next: (members) => {
-            this.members.set(members);
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            console.error('Error loading stats:', error);
             this.isLoading.set(false);
           }
         });
@@ -687,73 +474,4 @@ export class OngDashboardComponent implements OnInit {
     });
   }
 
-  inviteMember() {
-    const email = prompt('Email do membro para convidar:');
-    if (!email) return;
-
-    const ongId = this.ongDetails()?.id;
-    if (!ongId) return;
-
-    this.http.post(`${this.apiUrl}/ongs/${ongId}/invite`, { email }).subscribe({
-      next: () => {
-        alert('Convite enviado com sucesso!');
-      },
-      error: (error) => {
-        alert('Erro ao enviar convite: ' + (error.error?.message || 'Erro desconhecido'));
-      }
-    });
-  }
-
-  removeMember(memberId: string) {
-    if (!confirm('Tem certeza que deseja remover este membro?')) {
-      return;
-    }
-
-    const ongId = this.ongDetails()?.id;
-    if (!ongId) return;
-
-    this.http.delete(`${this.apiUrl}/ongs/${ongId}/members/${memberId}`).subscribe({
-      next: () => {
-        this.members.update(list => list.filter(m => m.id !== memberId));
-      },
-      error: (error) => {
-        alert('Erro ao remover membro: ' + (error.error?.message || 'Erro desconhecido'));
-      }
-    });
-  }
-
-  getInitials(user: any): string {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-    }
-    return user.email[0].toUpperCase();
-  }
-
-  getMemberName(user: any): string {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
-    }
-    return user.email;
-  }
-
-  getRoleLabel(role: string): string {
-    const labels: any = {
-      owner: 'Proprietário',
-      admin: 'Administrador',
-      member: 'Membro'
-    };
-    return labels[role] || role;
-  }
-
-  getPermissionLabel(permission: string): string {
-    const labels: any = {
-      manage_pets: 'Gerenciar Pets',
-      view_pets: 'Ver Pets',
-      manage_appointments: 'Gerenciar Visitas',
-      view_donations: 'Ver Doações',
-      edit_ong_profile: 'Editar Perfil',
-      manage_team: 'Gerenciar Equipe'
-    };
-    return labels[permission] || permission;
-  }
 }

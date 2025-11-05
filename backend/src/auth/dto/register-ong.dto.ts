@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, Matches, IsOptional } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterOngDto {
@@ -14,14 +14,22 @@ export class RegisterOngDto {
   @ApiProperty({ example: 'SecurePass123' })
   @IsString()
   @MinLength(8)
-  @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)/, {
-    message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number',
-  })
   password: string;
 
   @ApiProperty({ example: 'SecurePass123' })
   @IsString()
+  @MinLength(8)
   confirmPassword: string;
+
+  @ApiProperty({ example: 'Lisboa', required: false })
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @ApiProperty({ example: 'Lisboa, Portugal', required: false })
+  @IsOptional()
+  @IsString()
+  location?: string;
 
   @ApiProperty({ example: '912345678', required: false })
   @IsOptional()
@@ -32,11 +40,6 @@ export class RegisterOngDto {
   @IsOptional()
   @IsString()
   instagramHandle?: string;
-
-  @ApiProperty({ example: 'Lisboa, Portugal', required: false })
-  @IsOptional()
-  @IsString()
-  location?: string;
 
   @ApiProperty({ example: 'Uma breve descrição sobre a ONG...', required: false })
   @IsOptional()

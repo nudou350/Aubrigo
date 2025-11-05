@@ -420,7 +420,16 @@ export class OngRegisterComponent {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    const { confirmPassword, ...registerData } = this.registerForm.value;
+    // Map city to location and send all required fields
+    const formValue = this.registerForm.value;
+    const registerData = {
+      ongName: formValue.ongName,
+      email: formValue.email,
+      phone: formValue.phone,
+      password: formValue.password,
+      confirmPassword: formValue.confirmPassword,
+      location: formValue.city, // Map city to location for backend
+    };
 
     this.authService.registerOng(registerData).subscribe({
       next: (response) => {

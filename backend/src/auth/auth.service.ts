@@ -9,8 +9,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User, UserRole } from '../users/entities/user.entity';
-import { Ong } from '../ongs/entities/ong.entity';
-import { OngMember, OngMemberRole } from '../ongs/entities/ong-member.entity';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RegisterOngDto } from './dto/register-ong.dto';
@@ -21,10 +19,6 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    @InjectRepository(Ong)
-    private ongRepository: Repository<Ong>,
-    @InjectRepository(OngMember)
-    private ongMemberRepository: Repository<OngMember>,
     private jwtService: JwtService,
   ) {}
 
@@ -164,10 +158,8 @@ export class AuthService {
       ongName,
       phone,
       instagramHandle,
+      city,
       location,
-      description,
-      registrationNumber,
-      website,
     } = registerOngDto;
 
     // Check if passwords match
@@ -175,60 +167,33 @@ export class AuthService {
       throw new BadRequestException('Passwords do not match');
     }
 
-    // Check if email already exists (in users or ongs)
+    // Check if email already exists
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
 
-    const existingOng = await this.ongRepository.findOne({
-      where: { email },
-    });
-
-    if (existingUser || existingOng) {
+    if (existingUser) {
       throw new ConflictException('Email already registered');
     }
 
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create ONG admin user
+    // Use city if location is not provided
+    const finalLocation = location || city;
+
+    // Create ONG user
     const user = this.userRepository.create({
       email,
       passwordHash,
       role: UserRole.ONG,
-      firstName: ongName.split(' ')[0],
-      lastName: 'Admin',
-      phone,
-      location,
-    });
-
-    const savedUser = await this.userRepository.save(user);
-
-    // Create ONG record
-    const ong = this.ongRepository.create({
-      email,
       ongName,
       phone,
       instagramHandle,
-      location,
-      description,
-      registrationNumber,
-      website,
-      approvalStatus: 'pending', // ONGs need admin approval
+      location: finalLocation,
     });
 
-    const savedOng = await this.ongRepository.save(ong);
-
-    // Create ONG membership (owner role)
-    const membership = this.ongMemberRepository.create({
-      ongId: savedOng.id,
-      userId: savedUser.id,
-      role: OngMemberRole.OWNER,
-      invitationStatus: 'accepted',
-      acceptedAt: new Date(),
-    });
-
-    await this.ongMemberRepository.save(membership);
+    const savedUser = await this.userRepository.save(user);
 
     // Generate token
     const accessToken = this.generateToken(savedUser);
@@ -237,14 +202,8 @@ export class AuthService {
     delete savedUser.passwordHash;
 
     return {
-      message: 'ONG registration successful. Awaiting admin approval.',
+      message: 'ONG registration successful.',
       user: savedUser,
-      ong: {
-        id: savedOng.id,
-        ongName: savedOng.ongName,
-        email: savedOng.email,
-        approvalStatus: savedOng.approvalStatus,
-      },
       accessToken,
     };
   }

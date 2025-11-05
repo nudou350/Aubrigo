@@ -84,6 +84,34 @@ export const routes: Routes = [
             (m) => m.AdminDashboardComponent
           ),
       },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/admin/users/users.component').then(
+            (m) => m.AdminUsersComponent
+          ),
+      },
+      {
+        path: 'ongs',
+        loadComponent: () =>
+          import('./features/admin/ongs/ongs.component').then(
+            (m) => m.AdminOngsComponent
+          ),
+      },
+      {
+        path: 'pets',
+        loadComponent: () =>
+          import('./features/admin/pets/pets.component').then(
+            (m) => m.AdminPetsComponent
+          ),
+      },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./features/admin/reports/reports.component').then(
+            (m) => m.AdminReportsComponent
+          ),
+      },
     ]
   },
 
@@ -105,10 +133,40 @@ export const routes: Routes = [
             (m) => m.OngDashboardComponent
           ),
       },
+      {
+        path: 'appointments',
+        loadComponent: () =>
+          import('./features/ong/appointments/appointments.component').then(
+            (m) => m.OngAppointmentsComponent
+          ),
+      },
+      {
+        path: 'donations',
+        loadComponent: () =>
+          import('./features/ong/donations/donations.component').then(
+            (m) => m.OngDonationsComponent
+          ),
+      },
+      {
+        path: 'profile/edit',
+        loadComponent: () =>
+          import('./features/ong/profile/profile-edit.component').then(
+            (m) => m.ProfileEditComponent
+          ),
+      },
     ]
   },
 
   // Pet management (ong role required)
+  {
+    path: 'pets/manage',
+    loadComponent: () =>
+      import('./features/ong/pets/manage-pets.component').then(
+        (m) => m.ManagePetsComponent
+      ),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ong'] }
+  },
   {
     path: 'pets/add',
     loadComponent: () =>

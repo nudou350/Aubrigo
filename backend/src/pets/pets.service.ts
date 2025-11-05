@@ -123,7 +123,7 @@ export class PetsService {
     return this.findOne(savedPet.id);
   }
 
-  async update(id: string, updatePetDto: UpdatePetDto, userId: string) {
+  async update(id: string, updatePetDto: UpdatePetDto, userId: string, imageUrls: string[] = []) {
     const pet = await this.findOne(id);
 
     // Check ownership
@@ -133,6 +133,28 @@ export class PetsService {
 
     // Update pet
     await this.petRepository.update(id, updatePetDto);
+
+    // Add new images if provided
+    if (imageUrls.length > 0) {
+      // Get current highest display order
+      const existingImages = await this.petImageRepository.find({
+        where: { petId: id },
+        order: { displayOrder: 'DESC' },
+      });
+
+      const maxOrder = existingImages.length > 0 ? existingImages[0].displayOrder : -1;
+
+      const images = imageUrls.map((url, index) =>
+        this.petImageRepository.create({
+          petId: id,
+          imageUrl: url,
+          isPrimary: existingImages.length === 0 && index === 0, // Only set primary if no existing images
+          displayOrder: maxOrder + index + 1,
+        }),
+      );
+
+      await this.petImageRepository.save(images);
+    }
 
     return this.findOne(id);
   }

@@ -17,7 +17,6 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { OngsService } from './ongs.service';
 import { UpdateOngDto } from './dto/update-ong.dto';
-import { InviteMemberDto } from './dto/invite-member.dto';
 
 @ApiTags('ONGs')
 @Controller('ongs')
@@ -99,65 +98,5 @@ export class OngsController {
     return this.ongsService.remove(id, user.id);
   }
 
-  @Get(':id/members')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get ONG members' })
-  @ApiResponse({ status: 200, description: 'List of ONG members' })
-  @ApiResponse({ status: 403, description: 'Permission denied' })
-  async getMembers(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.ongsService.getMembers(id, user.id);
-  }
-
-  @Post(':id/invite')
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(UserRole.ONG, UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Invite a member to the ONG' })
-  @ApiResponse({ status: 201, description: 'Invitation sent successfully' })
-  @ApiResponse({ status: 403, description: 'Permission denied' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async inviteMember(
-    @Param('id') id: string,
-    @Body() inviteMemberDto: InviteMemberDto,
-    @CurrentUser() user: any,
-  ) {
-    return this.ongsService.inviteMember(id, inviteMemberDto, user.id);
-  }
-
-  @Post('invitations/:token/accept')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Accept ONG invitation' })
-  @ApiResponse({ status: 200, description: 'Invitation accepted successfully' })
-  @ApiResponse({ status: 404, description: 'Invitation not found' })
-  async acceptInvitation(@Param('token') token: string, @CurrentUser() user: any) {
-    return this.ongsService.acceptInvitation(token, user.id);
-  }
-
-  @Post('invitations/:token/reject')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Reject ONG invitation' })
-  @ApiResponse({ status: 200, description: 'Invitation rejected successfully' })
-  @ApiResponse({ status: 404, description: 'Invitation not found' })
-  async rejectInvitation(@Param('token') token: string, @CurrentUser() user: any) {
-    return this.ongsService.rejectInvitation(token, user.id);
-  }
-
-  @Delete(':id/members/:memberId')
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(UserRole.ONG, UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Remove a member from the ONG' })
-  @ApiResponse({ status: 200, description: 'Member removed successfully' })
-  @ApiResponse({ status: 403, description: 'Permission denied' })
-  @ApiResponse({ status: 404, description: 'Member not found' })
-  async removeMember(
-    @Param('id') id: string,
-    @Param('memberId') memberId: string,
-    @CurrentUser() user: any,
-  ) {
-    return this.ongsService.removeMember(id, memberId, user.id);
-  }
+  // Member management endpoints removed - not implemented in current architecture
 }

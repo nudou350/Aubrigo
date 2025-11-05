@@ -1,15 +1,27 @@
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { NestExpressApplication } from "@nestjs/platform-express";
+import { join } from "path";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Serve static files from uploads directory
+  app.useStaticAssets(join(__dirname, "..", "uploads"), {
+    prefix: "/uploads/",
+  });
 
   // Enable CORS
+  const isDevelopment = process.env.NODE_ENV === 'development';
   app.enableCors({
-    origin: process.env.FRONTEND_URL || "http://localhost:4200",
+    origin: isDevelopment
+      ? true // Allow all origins in development
+      : (process.env.FRONTEND_URL || "http://localhost:4200").split(','), // Specific origins in production
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
   // Global validation pipe

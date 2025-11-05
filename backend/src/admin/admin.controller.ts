@@ -77,7 +77,7 @@ export class AdminController {
   }
 
   @Get('users/:id')
-  @ApiOperation({ summary: 'Get user details' }}
+  @ApiOperation({ summary: 'Get user details' })
   @ApiResponse({ status: 200, description: 'User details' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async getUserDetails(@Param('id') id: string) {

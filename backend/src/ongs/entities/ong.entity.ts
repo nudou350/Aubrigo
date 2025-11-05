@@ -6,7 +6,6 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { OngMember } from './ong-member.entity';
 import { Pet } from '../../pets/entities/pet.entity';
 import { Donation } from '../../donations/entities/donation.entity';
 import { Appointment } from '../../appointments/entities/appointment.entity';
@@ -66,9 +65,6 @@ export class Ong {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  @OneToMany(() => OngMember, (member) => member.ong, { cascade: true })
-  members: OngMember[];
 
   @OneToMany(() => Pet, (pet) => pet.ong)
   pets: Pet[];
