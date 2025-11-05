@@ -76,12 +76,12 @@ jobs:
         scp deploy.tar.gz $VPS_USER@$VPS_HOST:/tmp/
 
         # Execute deployment commands on VPS
-        ssh $VPS_USER@$VPS_HOST bash -l << 'EOF'
+        ssh $VPS_USER@$VPS_HOST bash -l << EOF
           set -e
 
           # Load NVM
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          export NVM_DIR="\$HOME/.nvm"
+          [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
 
           # Extract deployment package
           cd /var/www/aubrigo
@@ -89,26 +89,26 @@ jobs:
 
           # Backup current version
           if [ -d "current" ]; then
-            mv current backup-$(date +%Y%m%d%H%M%S)
+            mv current backup-\$(date +%Y%m%d%H%M%S)
           fi
 
           # Move new version to current
           mv deploy current
 
           # Update environment variables
-          cat > current/backend/.env << ENVEOF
-        NODE_ENV=production
-        PORT=3002
-        DATABASE_URL=$DATABASE_URL
-        JWT_SECRET=$JWT_SECRET
-        JWT_EXPIRATION=7d
-        EMAIL_HOST=$EMAIL_HOST
-        EMAIL_PORT=$EMAIL_PORT
-        EMAIL_USER=$EMAIL_USER
-        EMAIL_PASSWORD=$EMAIL_PASSWORD
-        EMAIL_FROM=noreply@aubrigo.pt
-        FRONTEND_URL=$FRONTEND_URL
-        ENVEOF
+          cat > current/backend/.env << 'ENVEOF'
+NODE_ENV=production
+PORT=3002
+DATABASE_URL=$DATABASE_URL
+JWT_SECRET=$JWT_SECRET
+JWT_EXPIRATION=7d
+EMAIL_HOST=$EMAIL_HOST
+EMAIL_PORT=$EMAIL_PORT
+EMAIL_USER=$EMAIL_USER
+EMAIL_PASSWORD=$EMAIL_PASSWORD
+EMAIL_FROM=noreply@aubrigo.pt
+FRONTEND_URL=$FRONTEND_URL
+ENVEOF
 
           # Create logs directory
           cd /var/www/aubrigo/current/backend
