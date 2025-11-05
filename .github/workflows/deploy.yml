@@ -96,19 +96,17 @@ jobs:
           mv deploy current
 
           # Update environment variables
-          cat > current/backend/.env << ENVEOF
-NODE_ENV=production
-PORT=3002
-DATABASE_URL=$DATABASE_URL
-JWT_SECRET=$JWT_SECRET
-JWT_EXPIRATION=7d
-EMAIL_HOST=$EMAIL_HOST
-EMAIL_PORT=$EMAIL_PORT
-EMAIL_USER=$EMAIL_USER
-EMAIL_PASSWORD=$EMAIL_PASSWORD
-EMAIL_FROM=noreply@aubrigo.pt
-FRONTEND_URL=$FRONTEND_URL
-ENVEOF
+          echo "NODE_ENV=production" > current/backend/.env
+          echo "PORT=3002" >> current/backend/.env
+          echo "DATABASE_URL=$DATABASE_URL" >> current/backend/.env
+          echo "JWT_SECRET=$JWT_SECRET" >> current/backend/.env
+          echo "JWT_EXPIRATION=7d" >> current/backend/.env
+          echo "EMAIL_HOST=$EMAIL_HOST" >> current/backend/.env
+          echo "EMAIL_PORT=$EMAIL_PORT" >> current/backend/.env
+          echo "EMAIL_USER=$EMAIL_USER" >> current/backend/.env
+          echo "EMAIL_PASSWORD=$EMAIL_PASSWORD" >> current/backend/.env
+          echo "EMAIL_FROM=noreply@aubrigo.pt" >> current/backend/.env
+          echo "FRONTEND_URL=$FRONTEND_URL" >> current/backend/.env
 
           # Create logs directory
           cd /var/www/aubrigo/current/backend
