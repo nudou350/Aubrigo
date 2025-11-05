@@ -18,6 +18,12 @@ export enum UserRole {
   USER = 'user',
 }
 
+export enum OngStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -64,6 +70,14 @@ export class User {
 
   @Column({ name: 'instagram_handle', nullable: true })
   instagramHandle: string;
+
+  @Column({
+    type: 'enum',
+    enum: OngStatus,
+    default: OngStatus.APPROVED,
+    name: 'ong_status',
+  })
+  ongStatus: OngStatus;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
