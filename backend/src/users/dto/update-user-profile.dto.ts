@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEmail, MinLength } from 'class-validator';
+import { IsString, IsOptional, IsEmail, MinLength, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserProfileDto {
@@ -23,4 +23,9 @@ export class UpdateUserProfileDto {
   @IsOptional()
   @IsString()
   location?: string;
+
+  @ApiProperty({ example: true, required: false, description: 'Allow appointment scheduling for this ONG' })
+  @IsOptional()
+  @IsBoolean()
+  allowAppointments?: boolean;
 }

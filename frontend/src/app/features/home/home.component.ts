@@ -42,10 +42,11 @@ import { PetsService, Pet, SearchPetsParams } from "../../core/services/pets.ser
             <input
               type="text"
               class="location-input"
-              [value]="currentLocation()"
+              [value]="getLocationInputValue()"
               (input)="onLocationInput($event)"
-              (focus)="showLocationDropdown.set(true)"
-              placeholder="Digite uma cidade..."
+              (focus)="onLocationFocus()"
+              (keydown.enter)="onEnterKey()"
+              [placeholder]="getLocationPlaceholder()"
             />
             @if (showLocationDropdown() && filteredLocations().length > 0) {
               <div class="location-dropdown">
@@ -735,10 +736,11 @@ export class HomeComponent implements OnInit {
 
   // Location typeahead
   showLocationDropdown = signal(false);
-  availableLocations = ["Todas as cidades", "Lisboa", "Porto", "Beja", "Évora"];
+  availableLocations: string[] = ["Todas as cidades"];
   filteredLocations = signal<string[]>(this.availableLocations);
 
   ngOnInit() {
+    this.loadCitiesWithPets();
     this.loadPets();
     this.initFavorites();
 
@@ -894,22 +896,79 @@ export class HomeComponent implements OnInit {
     this.router.navigate(["/login"]);
   }
 
+  loadCitiesWithPets() {
+    this.petsService.getCitiesWithPets().subscribe({
+      next: (cities) => {
+        this.availableLocations = ["Todas as cidades", ...cities];
+        this.filteredLocations.set(this.availableLocations.slice(0, 5));
+      },
+      error: (error) => {
+        console.error('Error loading cities:', error);
+        // Keep default if error
+      }
+    });
+  }
+
+  getLocationInputValue(): string {
+    // If "Todas as cidades" is selected, return empty string (placeholder will show)
+    const location = this.currentLocation();
+    return location === "Todas as cidades" ? "" : location;
+  }
+
+  getLocationPlaceholder(): string {
+    // Show current location as placeholder if "Todas as cidades" is selected
+    const location = this.currentLocation();
+    return location === "Todas as cidades" ? "Todas as cidades" : "Digite uma cidade...";
+  }
+
+  onLocationFocus() {
+    // Show dropdown with first 5 locations when input is focused
+    this.filteredLocations.set(this.availableLocations.slice(0, 5));
+    this.showLocationDropdown.set(true);
+  }
+
   onLocationInput(event: Event) {
-    const input = (event.target as HTMLInputElement).value;
+    const input = (event.target as HTMLInputElement).value.trim();
+
+    // If empty, reset to "Todas as cidades"
+    if (!input) {
+      this.currentLocation.set("Todas as cidades");
+      this.filteredLocations.set(this.availableLocations.slice(0, 5));
+      this.showLocationDropdown.set(true);
+      return;
+    }
+
+    // Update current location with typed value
     this.currentLocation.set(input);
 
-    // Filter locations based on input
-    const filtered = this.availableLocations.filter(location =>
-      location.toLowerCase().includes(input.toLowerCase())
-    );
+    // Filter locations based on input (limit to 5 results)
+    const filtered = this.availableLocations
+      .filter(location =>
+        location.toLowerCase().includes(input.toLowerCase())
+      )
+      .slice(0, 5); // Limit to 5 cities
+
     this.filteredLocations.set(filtered);
     this.showLocationDropdown.set(true);
+  }
+
+  onEnterKey() {
+    // Close dropdown and search with current location value
+    this.showLocationDropdown.set(false);
+
+    // If input is empty or matches no cities, search with "Todas as cidades"
+    const input = this.currentLocation();
+    if (!input || input === "Todas as cidades") {
+      this.currentLocation.set("Todas as cidades");
+    }
+
+    this.loadPets();
   }
 
   selectLocation(location: string) {
     this.currentLocation.set(location);
     this.showLocationDropdown.set(false);
-    this.filteredLocations.set(this.availableLocations);
+    this.filteredLocations.set(this.availableLocations.slice(0, 5)); // Reset to first 5
     // Reload pets with location filter
     this.loadPets();
   }

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SchedulingService, OngOperatingHours, AppointmentSettings } from '../../../core/services/scheduling.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { OngService } from '../../../core/services/ong.service';
 
 interface DaySchedule {
   dayOfWeek: number;
@@ -122,6 +123,25 @@ interface DaySchedule {
             <div class="section-header">
               <h2 class="section-title">Configurações de Visitas</h2>
               <p class="section-subtitle">Defina as regras para agendamento de visitas</p>
+            </div>
+
+            <!-- Allow Appointments Toggle -->
+            <div class="allow-appointments-toggle">
+              <div class="toggle-content">
+                <div class="toggle-info">
+                  <h3>Permitir Agendamentos</h3>
+                  <p>Quando desativado, visitantes não poderão agendar visitas aos seus animais</p>
+                </div>
+                <label class="main-toggle">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="allowAppointments"
+                    [checked]="allowAppointments()"
+                    (change)="allowAppointments.set($any($event.target).checked)"
+                  />
+                  <span class="main-toggle-slider"></span>
+                </label>
+              </div>
             </div>
 
             <div class="settings-grid">
@@ -311,6 +331,85 @@ interface DaySchedule {
       font-size: 14px;
       color: #666666;
       margin: 0;
+    }
+
+    /* Allow Appointments Toggle */
+    .allow-appointments-toggle {
+      background: linear-gradient(135deg, #B8E3E1 0%, #5CB5B0 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .toggle-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .toggle-info h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c2c2c;
+      margin: 0 0 6px 0;
+    }
+
+    .toggle-info p {
+      font-size: 13px;
+      color: #444;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* Main Toggle Switch (larger) */
+    .main-toggle {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    .main-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .main-toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.5);
+      transition: 0.3s;
+      border-radius: 32px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .main-toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 24px;
+      width: 24px;
+      left: 3px;
+      bottom: 2px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked + .main-toggle-slider {
+      background-color: #2C2C2C;
+      border-color: #2C2C2C;
+    }
+
+    input:checked + .main-toggle-slider:before {
+      transform: translateX(28px);
     }
 
     /* Days List */
@@ -572,6 +671,7 @@ interface DaySchedule {
 })
 export class SchedulingSettingsComponent implements OnInit {
   private schedulingService = inject(SchedulingService);
+  private ongService = inject(OngService);
   private toastService = inject(ToastService);
   private router = inject(Router);
 
@@ -589,6 +689,8 @@ export class SchedulingSettingsComponent implements OnInit {
     { dayOfWeek: 6, dayName: 'Sábado', isOpen: false, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: false },
   ]);
 
+  allowAppointments = signal(true);
+
   appointmentSettings = {
     visitDurationMinutes: 60,
     maxConcurrentVisits: 2,
@@ -605,11 +707,12 @@ export class SchedulingSettingsComponent implements OnInit {
   loadExistingSettings() {
     this.loading.set(true);
 
-    // Load operating hours and settings in parallel
+    // Load operating hours, settings, and ONG profile in parallel
     Promise.all([
       this.schedulingService.getMyOperatingHours().toPromise(),
-      this.schedulingService.getMyAppointmentSettings().toPromise()
-    ]).then(([hours, settings]) => {
+      this.schedulingService.getMyAppointmentSettings().toPromise(),
+      this.ongService.getOngProfile().toPromise()
+    ]).then(([hours, settings, profile]) => {
       // Apply loaded operating hours to weekDays
       if (hours && hours.length > 0) {
         const days = this.weekDays();
@@ -630,6 +733,11 @@ export class SchedulingSettingsComponent implements OnInit {
       // Apply loaded appointment settings
       if (settings) {
         this.appointmentSettings = { ...settings };
+      }
+
+      // Apply allowAppointments from profile
+      if (profile) {
+        this.allowAppointments.set(profile.allowAppointments ?? true);
       }
 
       this.loading.set(false);
@@ -668,10 +776,11 @@ export class SchedulingSettingsComponent implements OnInit {
       allowWeekendBookings: this.appointmentSettings.allowWeekendBookings,
     };
 
-    // Save both operating hours and appointment settings
+    // Save operating hours, appointment settings, and allowAppointments
     Promise.all([
       this.schedulingService.bulkUpdateOperatingHours({ operatingHours: operatingHoursPayload }).toPromise(),
-      this.schedulingService.updateAppointmentSettings(appointmentSettingsPayload).toPromise()
+      this.schedulingService.updateAppointmentSettings(appointmentSettingsPayload).toPromise(),
+      this.ongService.updateOngProfile({ allowAppointments: this.allowAppointments() }).toPromise()
     ]).then(() => {
       this.toastService.success('Configurações salvas com sucesso!');
       this.saving.set(false);

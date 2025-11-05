@@ -33,6 +33,7 @@ interface Pet {
     location: string;
     distance?: string;
     rating?: number;
+    allowAppointments?: boolean;
   };
 }
 
@@ -168,9 +169,11 @@ interface Pet {
         </div>
 
         <!-- Schedule Visit Button -->
+        @if (pet()!.ong.allowAppointments !== false) {
         <button class="schedule-button" (click)="scheduleVisit()">
           AGENDAR VISITA
         </button>
+        }
       </div>
       } @else {
       <div class="error-container">

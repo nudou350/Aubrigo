@@ -15,23 +15,28 @@ export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private readonly fromEmail: string;
   private readonly adminEmail: string;
+  private readonly frontendUrl: string;
 
   constructor(private configService: ConfigService) {
-    this.fromEmail = this.configService.get<string>('EMAIL_FROM', 'noreply@petsos.com');
+    this.fromEmail = this.configService.get<string>('SMTP_FROM_EMAIL', 'noreply@petsos.com');
     this.adminEmail = this.configService.get<string>('ADMIN_EMAIL', 'admin@petsos.com');
 
-    // Create transporter
-    const emailHost = this.configService.get<string>('EMAIL_HOST', 'smtp.gmail.com');
-    const emailPort = this.configService.get<number>('EMAIL_PORT', 587);
-    const emailUser = this.configService.get<string>('EMAIL_USER');
-    const emailPassword = this.configService.get<string>('EMAIL_PASSWORD');
+    // Get first URL from FRONTEND_URL (it might be a comma-separated list)
+    const frontendUrls = this.configService.get<string>('FRONTEND_URL', 'http://localhost:4200');
+    this.frontendUrl = frontendUrls.split(',')[0].trim();
+
+    // Create transporter (using SMTP_* env variables for Gmail)
+    const emailHost = this.configService.get<string>('SMTP_HOST', 'smtp.gmail.com');
+    const emailPort = this.configService.get<number>('SMTP_PORT', 587);
+    const emailUser = this.configService.get<string>('SMTP_USER');
+    const emailPassword = this.configService.get<string>('SMTP_PASS');
 
     if (!emailUser || !emailPassword) {
       this.logger.warn('Email credentials not configured. Email sending will be disabled.');
       return;
     }
 
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: emailHost,
       port: emailPort,
       secure: emailPort === 465,
@@ -293,7 +298,6 @@ export class EmailService {
     ongEmail: string,
     ongName: string,
   ): Promise<boolean> {
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:4200');
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #27ae60;">🎉 Conta Aprovada - Pet SOS</h1>
@@ -307,7 +311,7 @@ export class EmailService {
           <li>✅ Acompanhar estatísticas</li>
         </ul>
         <p style="text-align: center; margin: 30px 0;">
-          <a href="${frontendUrl}/login" style="background: #4ca8a0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+          <a href="${this.frontendUrl}/login" style="background: #4ca8a0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
             Acessar Plataforma
           </a>
         </p>

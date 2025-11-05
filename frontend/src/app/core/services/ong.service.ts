@@ -16,6 +16,7 @@ export interface OngProfile {
   latitude?: number;
   longitude?: number;
   rating?: number;
+  allowAppointments?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,6 +28,7 @@ export interface UpdateOngProfileDto {
   location?: string;
   latitude?: number;
   longitude?: number;
+  allowAppointments?: boolean;
 }
 
 export interface ChangePasswordDto {

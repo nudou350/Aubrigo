@@ -17,6 +17,7 @@ export interface User {
   phone?: string;
   instagramHandle?: string;
   location?: string;
+  ongStatus?: 'pending' | 'approved' | 'rejected';
 }
 
 export interface AuthResponse {

@@ -59,20 +59,6 @@ export const routes: Routes = [
       import('./features/home/home.component').then((m) => m.HomeComponent),
   },
   {
-    path: 'pets/:id/schedule',
-    loadComponent: () =>
-      import('./features/pets/schedule-appointment/schedule-appointment.component').then(
-        (m) => m.ScheduleAppointmentComponent
-      ),
-  },
-  {
-    path: 'pets/:id',
-    loadComponent: () =>
-      import('./features/pets/pet-detail/pet-detail.component').then(
-        (m) => m.PetDetailComponent
-      ),
-  },
-  {
     path: 'donate',
     loadComponent: () =>
       import('./features/donations/donation.component').then(
@@ -84,6 +70,49 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/favorites/favorites.component').then(
         (m) => m.FavoritesComponent
+      ),
+  },
+
+  // Pet management routes (specific routes must come before parameterized routes)
+  {
+    path: 'pets/manage',
+    loadComponent: () =>
+      import('./features/ong/pets/manage-pets.component').then(
+        (m) => m.ManagePetsComponent
+      ),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ong'] }
+  },
+  {
+    path: 'pets/add',
+    loadComponent: () =>
+      import('./features/pets/pet-form/pet-form.component').then(
+        (m) => m.PetFormComponent
+      ),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ong'] }
+  },
+  {
+    path: 'pets/edit/:id',
+    loadComponent: () =>
+      import('./features/pets/pet-form/pet-form.component').then(
+        (m) => m.PetFormComponent
+      ),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ong'] }
+  },
+  {
+    path: 'pets/:id/schedule',
+    loadComponent: () =>
+      import('./features/pets/schedule-appointment/schedule-appointment.component').then(
+        (m) => m.ScheduleAppointmentComponent
+      ),
+  },
+  {
+    path: 'pets/:id',
+    loadComponent: () =>
+      import('./features/pets/pet-detail/pet-detail.component').then(
+        (m) => m.PetDetailComponent
       ),
   },
 
@@ -190,35 +219,6 @@ export const routes: Routes = [
           ),
       },
     ]
-  },
-
-  // Pet management (ong role required)
-  {
-    path: 'pets/manage',
-    loadComponent: () =>
-      import('./features/ong/pets/manage-pets.component').then(
-        (m) => m.ManagePetsComponent
-      ),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['ong'] }
-  },
-  {
-    path: 'pets/add',
-    loadComponent: () =>
-      import('./features/pets/pet-form/pet-form.component').then(
-        (m) => m.PetFormComponent
-      ),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['ong'] }
-  },
-  {
-    path: 'pets/edit/:id',
-    loadComponent: () =>
-      import('./features/pets/pet-form/pet-form.component').then(
-        (m) => m.PetFormComponent
-      ),
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['ong'] }
   },
 
   // User profile (any authenticated user)

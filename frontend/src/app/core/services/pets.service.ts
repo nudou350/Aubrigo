@@ -96,4 +96,8 @@ export class PetsService {
   deletePet(id: string): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`);
   }
+
+  getCitiesWithPets(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/cities`);
+  }
 }

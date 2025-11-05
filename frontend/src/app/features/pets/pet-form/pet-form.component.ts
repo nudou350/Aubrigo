@@ -5,6 +5,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { ToastService } from '../../../core/services/toast.service';
+import { PORTUGAL_CITIES } from '../../../core/constants/portugal-cities';
 
 interface PetImage {
   id?: string;
@@ -200,14 +201,16 @@ interface PetImage {
           <h2>📍 Localização e Status</h2>
           <div class="form-grid">
             <div class="form-group">
-              <label for="location">Localização</label>
-              <input
-                id="location"
-                type="text"
-                formControlName="location"
-                placeholder="Ex: Lisboa, Portugal"
-                class="form-control"
-              />
+              <label for="location">Cidade *</label>
+              <select id="location" formControlName="location" class="form-control">
+                <option value="">Selecione a cidade...</option>
+                @for (city of cities; track city) {
+                  <option [value]="city">{{ city }}</option>
+                }
+              </select>
+              @if (petForm.get('location')?.invalid && petForm.get('location')?.touched) {
+                <span class="error">Cidade é obrigatória</span>
+              }
             </div>
 
             @if (isEditMode()) {
@@ -539,6 +542,7 @@ export class PetFormComponent implements OnInit {
   isSubmitting = signal(false);
   images = signal<PetImage[]>([]);
   petId: string | null = null;
+  cities = PORTUGAL_CITIES;
 
   private toastService = inject(ToastService);
 
@@ -558,7 +562,7 @@ export class PetFormComponent implements OnInit {
       color: [''],
       weight: [''],
       description: ['', Validators.maxLength(1000)],
-      location: [''],
+      location: ['', Validators.required],
       status: ['available']
     });
   }

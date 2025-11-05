@@ -42,6 +42,13 @@ export class PetsController {
     return this.petsService.search(searchDto);
   }
 
+  @Get('cities')
+  @ApiOperation({ summary: 'Get cities with available pets' })
+  @ApiResponse({ status: 200, description: 'Returns list of cities that have pets' })
+  async getCitiesWithPets() {
+    return this.petsService.getCitiesWithPets();
+  }
+
   @Get('my-pets')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

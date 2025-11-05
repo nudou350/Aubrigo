@@ -79,6 +79,9 @@ export class User {
   })
   ongStatus: OngStatus;
 
+  @Column({ name: 'allow_appointments', default: true })
+  allowAppointments: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

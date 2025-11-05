@@ -14,25 +14,34 @@ export class OperatingHoursService {
   ) {}
 
   async create(ongId: string, dto: CreateOperatingHoursDto): Promise<OngOperatingHours> {
+    // Normalize time formats (remove seconds if present)
+    const normalizedDto = {
+      ...dto,
+      openTime: this.normalizeTime(dto.openTime),
+      closeTime: this.normalizeTime(dto.closeTime),
+      lunchBreakStart: dto.lunchBreakStart ? this.normalizeTime(dto.lunchBreakStart) : undefined,
+      lunchBreakEnd: dto.lunchBreakEnd ? this.normalizeTime(dto.lunchBreakEnd) : undefined,
+    };
+
     // Validate time format
-    this.validateTimeFormat(dto.openTime);
-    this.validateTimeFormat(dto.closeTime);
-    if (dto.lunchBreakStart) this.validateTimeFormat(dto.lunchBreakStart);
-    if (dto.lunchBreakEnd) this.validateTimeFormat(dto.lunchBreakEnd);
+    this.validateTimeFormat(normalizedDto.openTime);
+    this.validateTimeFormat(normalizedDto.closeTime);
+    if (normalizedDto.lunchBreakStart) this.validateTimeFormat(normalizedDto.lunchBreakStart);
+    if (normalizedDto.lunchBreakEnd) this.validateTimeFormat(normalizedDto.lunchBreakEnd);
 
     // Validate time logic
-    if (dto.isOpen) {
-      this.validateTimeOrder(dto.openTime, dto.closeTime, 'Open time must be before close time');
+    if (normalizedDto.isOpen) {
+      this.validateTimeOrder(normalizedDto.openTime, normalizedDto.closeTime, 'Open time must be before close time');
 
-      if (dto.lunchBreakStart && dto.lunchBreakEnd) {
-        this.validateTimeOrder(dto.lunchBreakStart, dto.lunchBreakEnd, 'Lunch break start must be before end');
-        this.validateTimeOrder(dto.openTime, dto.lunchBreakStart, 'Lunch break must be within operating hours');
-        this.validateTimeOrder(dto.lunchBreakEnd, dto.closeTime, 'Lunch break must be within operating hours');
+      if (normalizedDto.lunchBreakStart && normalizedDto.lunchBreakEnd) {
+        this.validateTimeOrder(normalizedDto.lunchBreakStart, normalizedDto.lunchBreakEnd, 'Lunch break start must be before end');
+        this.validateTimeOrder(normalizedDto.openTime, normalizedDto.lunchBreakStart, 'Lunch break must be within operating hours');
+        this.validateTimeOrder(normalizedDto.lunchBreakEnd, normalizedDto.closeTime, 'Lunch break must be within operating hours');
       }
     }
 
     const operatingHours = this.operatingHoursRepository.create({
-      ...dto,
+      ...normalizedDto,
       ongId,
     });
 
@@ -106,6 +115,14 @@ export class OperatingHoursService {
   }
 
   // Helper methods
+  private normalizeTime(time: string): string {
+    // Remove seconds if present (e.g., "09:00:00" -> "09:00")
+    if (time.length === 8 && time.split(':').length === 3) {
+      return time.substring(0, 5);
+    }
+    return time;
+  }
+
   private validateTimeFormat(time: string): void {
     const timeRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
     if (!timeRegex.test(time)) {
@@ -123,7 +140,10 @@ export class OperatingHoursService {
   }
 
   private timeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(':').map(Number);
+    // Handle both "HH:mm" and "HH:mm:ss" formats
+    const parts = time.split(':').map(Number);
+    const hours = parts[0];
+    const minutes = parts[1];
     return hours * 60 + minutes;
   }
 }

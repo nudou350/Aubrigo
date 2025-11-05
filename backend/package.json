@@ -23,7 +23,8 @@
     "migration:run": "npm run typeorm -- migration:run -d src/data-source.ts",
     "migration:revert": "npm run typeorm -- migration:revert -d src/data-source.ts",
     "seed": "ts-node src/database/seeds/seed.ts",
-    "seed:multi-role": "ts-node src/database/seeds/multi-role-seed.ts"
+    "seed:multi-role": "ts-node src/database/seeds/multi-role-seed.ts",
+    "seed:reset-admin": "ts-node src/database/seeds/reset-admin.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -64,6 +65,7 @@
     "@types/jest": "^29.5.2",
     "@types/multer": "^1.4.13",
     "@types/node": "^20.3.1",
+    "@types/nodemailer": "^7.0.3",
     "@types/passport-jwt": "^3.0.13",
     "@types/passport-local": "^1.0.38",
     "@types/qrcode": "^1.5.5",

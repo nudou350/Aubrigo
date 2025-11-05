@@ -2,29 +2,35 @@ import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class AddOngStatusField1730900000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Create enum type for ong_status
-    await queryRunner.query(`
-      CREATE TYPE "ong_status_enum" AS ENUM ('pending', 'approved', 'rejected')
-    `);
+    // Check if column already exists
+    const table = await queryRunner.getTable('users');
+    const column = table?.findColumnByName('ong_status');
 
-    // Add ong_status column to users table
-    await queryRunner.addColumn(
-      'users',
-      new TableColumn({
-        name: 'ong_status',
-        type: 'enum',
-        enum: ['pending', 'approved', 'rejected'],
-        default: "'approved'",
-        isNullable: false,
-      }),
-    );
+    if (!column) {
+      // Create enum type for ong_status
+      await queryRunner.query(`
+        CREATE TYPE "ong_status_enum" AS ENUM ('pending', 'approved', 'rejected')
+      `);
 
-    // Update existing ONG users to have approved status by default
-    await queryRunner.query(`
-      UPDATE users
-      SET ong_status = 'approved'
-      WHERE role = 'ong'
-    `);
+      // Add ong_status column to users table
+      await queryRunner.addColumn(
+        'users',
+        new TableColumn({
+          name: 'ong_status',
+          type: 'enum',
+          enum: ['pending', 'approved', 'rejected'],
+          default: "'approved'",
+          isNullable: false,
+        }),
+      );
+
+      // Update existing ONG users to have approved status by default
+      await queryRunner.query(`
+        UPDATE users
+        SET ong_status = 'approved'
+        WHERE role = 'ong'
+      `);
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

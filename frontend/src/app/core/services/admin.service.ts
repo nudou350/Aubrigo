@@ -129,14 +129,14 @@ export class AdminService {
    * Approve ONG
    */
   approveOng(ongId: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/ongs/${ongId}/approve`, {});
+    return this.http.patch<{ message: string }>(`${this.apiUrl}/ongs/${ongId}/approve`, {});
   }
 
   /**
    * Reject ONG
    */
   rejectOng(ongId: string, reason?: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/ongs/${ongId}/reject`, { reason });
+    return this.http.patch<{ message: string }>(`${this.apiUrl}/ongs/${ongId}/reject`, { reason });
   }
 
   /**

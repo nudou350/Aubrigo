@@ -179,4 +179,17 @@ export class PetsService {
       order: { createdAt: 'DESC' },
     });
   }
+
+  async getCitiesWithPets() {
+    const result = await this.petRepository
+      .createQueryBuilder('pet')
+      .select('DISTINCT pet.location', 'location')
+      .where('pet.status = :status', { status: 'available' })
+      .andWhere('pet.location IS NOT NULL')
+      .andWhere("pet.location != ''")
+      .orderBy('pet.location', 'ASC')
+      .getRawMany();
+
+    return result.map(row => row.location);
+  }
 }

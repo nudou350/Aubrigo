@@ -11,19 +11,63 @@ import { ToastService } from '../../../core/services/toast.service';
   imports: [CommonModule, RouterLink],
   template: `
     <div class="ong-dashboard">
-      <header class="dashboard-header">
-        <div class="header-content">
-          <h1>{{ ongDetails()?.ongName || 'Painel ONG' }}</h1>
-        </div>
-        <p>Gerencie sua organização e ajude animais a encontrarem um lar</p>
-      </header>
-
-      @if (isLoading()) {
-        <div class="loading">
-          <div class="spinner"></div>
-          <p>Carregando dados...</p>
+      @if (isPendingApproval()) {
+        <!-- Pending Approval Screen -->
+        <div class="pending-approval">
+          <div class="pending-card">
+            <div class="pending-icon">⏳</div>
+            <h1>Aguardando Aprovação</h1>
+            <p class="pending-message">
+              Olá, <strong>{{ authService.currentUser()?.ongName }}</strong>!
+            </p>
+            <p class="pending-description">
+              Sua conta foi criada com sucesso e está aguardando aprovação do nosso time administrativo.
+              Este processo geralmente leva até 24 horas.
+            </p>
+            <div class="pending-info">
+              <div class="info-item">
+                <span class="info-icon">📧</span>
+                <div class="info-text">
+                  <strong>Email cadastrado:</strong>
+                  <p>{{ authService.currentUser()?.email }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <span class="info-icon">🏢</span>
+                <div class="info-text">
+                  <strong>Nome da ONG:</strong>
+                  <p>{{ authService.currentUser()?.ongName }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="pending-steps">
+              <h3>O que acontece agora?</h3>
+              <ol>
+                <li>Nossa equipe irá revisar suas informações</li>
+                <li>Você receberá um email assim que sua conta for aprovada</li>
+                <li>Após a aprovação, você terá acesso completo ao painel</li>
+              </ol>
+            </div>
+            <p class="pending-footer">
+              Você receberá um email em <strong>{{ authService.currentUser()?.email }}</strong> assim que sua conta for aprovada.
+            </p>
+          </div>
         </div>
       } @else {
+        <!-- Normal Dashboard -->
+        <header class="dashboard-header">
+          <div class="header-content">
+            <h1>{{ ongDetails()?.ongName || 'Painel ONG' }}</h1>
+          </div>
+          <p>Gerencie sua organização e ajude animais a encontrarem um lar</p>
+        </header>
+
+        @if (isLoading()) {
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Carregando dados...</p>
+          </div>
+        } @else {
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-icon pets">🐾</div>
@@ -130,6 +174,7 @@ import { ToastService } from '../../../core/services/toast.service';
             </a>
           </div>
         </div>
+        }
       }
     </div>
   `,
@@ -139,6 +184,128 @@ import { ToastService } from '../../../core/services/toast.service';
       margin: 0 auto;
       padding: 40px 24px;
       padding-bottom: 100px;
+    }
+
+    /* Pending Approval Screen */
+    .pending-approval {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .pending-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 48px;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .pending-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .pending-card h1 {
+      color: #2C2C2C;
+      font-size: 32px;
+      margin: 0 0 16px 0;
+    }
+
+    .pending-message {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .pending-description {
+      font-size: 16px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .pending-info {
+      background: #F5F9F9;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+
+    .info-item {
+      display: flex;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid #E0E0E0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .info-icon {
+      font-size: 24px;
+    }
+
+    .info-text {
+      flex: 1;
+
+      strong {
+        display: block;
+        color: #2C2C2C;
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+
+      p {
+        color: #666;
+        margin: 0;
+        font-size: 14px;
+      }
+    }
+
+    .pending-steps {
+      background: #FFF9E6;
+      border-left: 4px solid #FFC107;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      text-align: left;
+
+      h3 {
+        color: #2C2C2C;
+        font-size: 16px;
+        margin: 0 0 16px 0;
+      }
+
+      ol {
+        margin: 0;
+        padding-left: 20px;
+        color: #666;
+        line-height: 1.8;
+      }
+
+      li {
+        margin-bottom: 8px;
+      }
+    }
+
+    .pending-footer {
+      color: #5CB5B0;
+      font-size: 14px;
+      margin: 0;
+      padding-top: 16px;
+      border-top: 1px solid #E0E0E0;
     }
 
     .dashboard-header {
@@ -424,7 +591,17 @@ export class OngDashboardComponent implements OnInit {
   ongDetails = signal<OngProfile | null>(null);
 
   ngOnInit() {
-    this.loadDashboardData();
+    // Only load dashboard data if ONG is approved
+    if (!this.isPendingApproval()) {
+      this.loadDashboardData();
+    } else {
+      this.isLoading.set(false);
+    }
+  }
+
+  isPendingApproval(): boolean {
+    const user = this.authService.currentUser();
+    return user?.role === 'ong' && user?.ongStatus === 'pending';
   }
 
   loadDashboardData() {
