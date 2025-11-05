@@ -96,7 +96,7 @@ jobs:
           mv deploy current
 
           # Update environment variables
-          cat > current/backend/.env << 'ENVEOF'
+          cat > current/backend/.env << ENVEOF
 NODE_ENV=production
 PORT=3002
 DATABASE_URL=$DATABASE_URL
