@@ -11,7 +11,7 @@ import { Repository, MoreThan } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User, UserRole } from '../users/entities/user.entity';
+import { User, UserRole, OngStatus } from '../users/entities/user.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -193,7 +193,7 @@ export class AuthService {
     // Use city if location is not provided
     const finalLocation = location || city;
 
-    // Create ONG user
+    // Create ONG user (set status to PENDING for admin approval)
     const user = this.userRepository.create({
       email,
       passwordHash,
@@ -202,9 +202,25 @@ export class AuthService {
       phone,
       instagramHandle,
       location: finalLocation,
+      ongStatus: OngStatus.PENDING,
     });
 
     const savedUser = await this.userRepository.save(user);
+
+    // Send welcome email to ONG
+    await this.emailService.sendWelcomeEmailToOng(
+      savedUser.email,
+      savedUser.ongName,
+    );
+
+    // Send notification to admin
+    await this.emailService.sendOngRegistrationNotificationToAdmin(
+      savedUser.ongName,
+      savedUser.email,
+      savedUser.phone,
+      savedUser.location,
+      savedUser.instagramHandle,
+    );
 
     // Generate token
     const accessToken = this.generateToken(savedUser);

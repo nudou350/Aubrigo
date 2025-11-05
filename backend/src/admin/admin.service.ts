@@ -5,9 +5,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, UserRole } from '../users/entities/user.entity';
+import { User, UserRole, OngStatus } from '../users/entities/user.entity';
 import { Pet } from '../pets/entities/pet.entity';
 import { Donation } from '../donations/entities/donation.entity';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AdminService {
@@ -18,17 +19,20 @@ export class AdminService {
     private petRepository: Repository<Pet>,
     @InjectRepository(Donation)
     private donationRepository: Repository<Donation>,
+    private emailService: EmailService,
   ) {}
 
   async getDashboardStats() {
     const [
       totalUsers,
       totalOngs,
+      pendingOngs,
       totalPets,
       availablePets,
     ] = await Promise.all([
       this.userRepository.count({ where: { role: UserRole.USER } }),
       this.userRepository.count({ where: { role: UserRole.ONG } }),
+      this.userRepository.count({ where: { role: UserRole.ONG, ongStatus: OngStatus.PENDING } }),
       this.petRepository.count(),
       this.petRepository.count({ where: { status: 'available' } }),
     ]);
@@ -44,15 +48,18 @@ export class AdminService {
     return {
       totalUsers,
       totalOngs,
-      pendingOngs: 0, // No approval system currently
+      pendingOngs,
       totalPets,
       totalDonations: totalDonationAmount,
     };
   }
 
   async getPendingONGs() {
-    // Currently no approval system, return empty array
-    return [];
+    return this.userRepository.find({
+      where: { role: UserRole.ONG, ongStatus: OngStatus.PENDING },
+      select: ['id', 'email', 'ongName', 'phone', 'location', 'instagramHandle', 'createdAt'],
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async getAllONGs() {
@@ -64,13 +71,65 @@ export class AdminService {
   }
 
   async approveOng(ongId: string) {
-    // Currently no approval system
-    throw new BadRequestException('ONG approval system not yet implemented');
+    const ong = await this.userRepository.findOne({
+      where: { id: ongId, role: UserRole.ONG },
+    });
+
+    if (!ong) {
+      throw new NotFoundException('ONG not found');
+    }
+
+    if (ong.ongStatus === OngStatus.APPROVED) {
+      throw new BadRequestException('ONG is already approved');
+    }
+
+    // Update status to approved
+    ong.ongStatus = OngStatus.APPROVED;
+    await this.userRepository.save(ong);
+
+    // Send approval email
+    await this.emailService.sendOngApprovalEmail(ong.email, ong.ongName);
+
+    return {
+      message: 'ONG approved successfully',
+      ong: {
+        id: ong.id,
+        ongName: ong.ongName,
+        email: ong.email,
+        status: ong.ongStatus,
+      },
+    };
   }
 
   async rejectOng(ongId: string, reason?: string) {
-    // Currently no approval system
-    throw new BadRequestException('ONG rejection system not yet implemented');
+    const ong = await this.userRepository.findOne({
+      where: { id: ongId, role: UserRole.ONG },
+    });
+
+    if (!ong) {
+      throw new NotFoundException('ONG not found');
+    }
+
+    if (ong.ongStatus === OngStatus.REJECTED) {
+      throw new BadRequestException('ONG is already rejected');
+    }
+
+    // Update status to rejected
+    ong.ongStatus = OngStatus.REJECTED;
+    await this.userRepository.save(ong);
+
+    // Send rejection email
+    await this.emailService.sendOngRejectionEmail(ong.email, ong.ongName, reason);
+
+    return {
+      message: 'ONG rejected successfully',
+      ong: {
+        id: ong.id,
+        ongName: ong.ongName,
+        email: ong.email,
+        status: ong.ongStatus,
+      },
+    };
   }
 
   async getAllUsers() {

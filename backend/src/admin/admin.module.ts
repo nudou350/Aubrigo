@@ -5,10 +5,12 @@ import { Pet } from '../pets/entities/pet.entity';
 import { Donation } from '../donations/entities/donation.entity';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Pet, Donation]),
+    EmailModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

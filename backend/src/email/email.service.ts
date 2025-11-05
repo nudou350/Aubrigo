@@ -14,9 +14,11 @@ export class EmailService {
   private transporter: nodemailer.Transporter;
   private readonly logger = new Logger(EmailService.name);
   private readonly fromEmail: string;
+  private readonly adminEmail: string;
 
   constructor(private configService: ConfigService) {
     this.fromEmail = this.configService.get<string>('EMAIL_FROM', 'noreply@petsos.com');
+    this.adminEmail = this.configService.get<string>('ADMIN_EMAIL', 'admin@petsos.com');
 
     // Create transporter
     const emailHost = this.configService.get<string>('EMAIL_HOST', 'smtp.gmail.com');
@@ -217,6 +219,134 @@ export class EmailService {
     return this.sendEmail({
       to: donorEmail,
       subject: 'Recibo de Doação - Pet SOS',
+      html,
+    });
+  }
+
+  async sendOngRegistrationNotificationToAdmin(
+    ongName: string,
+    ongEmail: string,
+    phone: string,
+    location: string,
+    instagramHandle?: string,
+  ): Promise<boolean> {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4ca8a0;">Nova ONG Registrada - Pet SOS</h1>
+        <p>Olá Administrador,</p>
+        <p>Uma nova ONG se registrou na plataforma Pet SOS e aguarda aprovação.</p>
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #2c2c2c;">Informações da ONG:</h3>
+          <p><strong>Nome da ONG:</strong> ${ongName}</p>
+          <p><strong>Email:</strong> ${ongEmail}</p>
+          <p><strong>Telefone:</strong> ${phone || 'Não informado'}</p>
+          <p><strong>Localização:</strong> ${location || 'Não informada'}</p>
+          ${instagramHandle ? `<p><strong>Instagram:</strong> @${instagramHandle}</p>` : ''}
+        </div>
+        <p style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+          <strong>⚠️ Ação Necessária:</strong> Acesse o painel administrativo para revisar e aprovar esta ONG.
+        </p>
+        <p>Atenciosamente,<br/>Sistema Pet SOS</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: this.adminEmail,
+      subject: `Nova ONG Registrada: ${ongName}`,
+      html,
+    });
+  }
+
+  async sendWelcomeEmailToOng(
+    ongEmail: string,
+    ongName: string,
+  ): Promise<boolean> {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4ca8a0;">Bem-vindo ao Pet SOS!</h1>
+        <p>Olá <strong>${ongName}</strong>,</p>
+        <p>Obrigado por se registrar no Pet SOS! Estamos felizes em tê-los conosco.</p>
+        <p>Sua conta foi criada com sucesso e está aguardando aprovação do administrador. Assim que sua conta for aprovada, você poderá:</p>
+        <ul style="line-height: 1.8;">
+          <li>📝 Adicionar pets para adoção</li>
+          <li>📅 Gerenciar agendamentos de visitas</li>
+          <li>💰 Receber doações</li>
+          <li>📊 Acompanhar estatísticas da sua ONG</li>
+        </ul>
+        <p style="background: #e7f7f6; padding: 15px; border-left: 4px solid #4ca8a0; margin: 20px 0;">
+          <strong>💡 Próximos Passos:</strong> Aguarde a aprovação do seu cadastro. Você receberá um email assim que sua conta for ativada.
+        </p>
+        <p>Nossa missão é conectar animais abandonados com famílias amorosas. Juntos, podemos fazer a diferença!</p>
+        <p>Se tiver alguma dúvida, não hesite em nos contatar.</p>
+        <p>Atenciosamente,<br/>Equipe Pet SOS</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: ongEmail,
+      subject: 'Bem-vindo ao Pet SOS!',
+      html,
+    });
+  }
+
+  async sendOngApprovalEmail(
+    ongEmail: string,
+    ongName: string,
+  ): Promise<boolean> {
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:4200');
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #27ae60;">🎉 Conta Aprovada - Pet SOS</h1>
+        <p>Olá <strong>${ongName}</strong>,</p>
+        <p>Ótimas notícias! Sua conta foi aprovada pelo nosso time administrativo.</p>
+        <p>Você já pode começar a usar todos os recursos da plataforma Pet SOS:</p>
+        <ul style="line-height: 1.8;">
+          <li>✅ Adicionar pets para adoção</li>
+          <li>✅ Gerenciar agendamentos de visitas</li>
+          <li>✅ Receber doações</li>
+          <li>✅ Acompanhar estatísticas</li>
+        </ul>
+        <p style="text-align: center; margin: 30px 0;">
+          <a href="${frontendUrl}/login" style="background: #4ca8a0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+            Acessar Plataforma
+          </a>
+        </p>
+        <p>Juntos vamos ajudar mais animais a encontrarem um lar!</p>
+        <p>Atenciosamente,<br/>Equipe Pet SOS</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: ongEmail,
+      subject: 'Conta Aprovada - Pet SOS',
+      html,
+    });
+  }
+
+  async sendOngRejectionEmail(
+    ongEmail: string,
+    ongName: string,
+    reason?: string,
+  ): Promise<boolean> {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #e74c3c;">Atualização sobre sua Conta - Pet SOS</h1>
+        <p>Olá <strong>${ongName}</strong>,</p>
+        <p>Agradecemos seu interesse em fazer parte da plataforma Pet SOS.</p>
+        <p>Infelizmente, não pudemos aprovar seu cadastro neste momento.</p>
+        ${reason ? `
+          <div style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+            <p><strong>Motivo:</strong> ${reason}</p>
+          </div>
+        ` : ''}
+        <p>Se você acredita que houve um erro ou gostaria de mais informações, por favor entre em contato conosco.</p>
+        <p>Atenciosamente,<br/>Equipe Pet SOS</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: ongEmail,
+      subject: 'Atualização sobre sua Conta - Pet SOS',
       html,
     });
   }
