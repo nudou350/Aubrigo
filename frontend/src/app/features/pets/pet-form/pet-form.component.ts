@@ -1,9 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface PetImage {
   id?: string;
@@ -539,6 +540,8 @@ export class PetFormComponent implements OnInit {
   images = signal<PetImage[]>([]);
   petId: string | null = null;
 
+  private toastService = inject(ToastService);
+
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -595,7 +598,7 @@ export class PetFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading pet:', error);
-        alert('Erro ao carregar dados do pet');
+        this.toastService.error('Erro ao carregar dados do pet');
         this.router.navigate(['/pets/manage']);
       }
     });
@@ -607,12 +610,12 @@ export class PetFormComponent implements OnInit {
 
     const file = files[0];
     if (!file.type.startsWith('image/')) {
-      alert('Por favor, selecione apenas imagens');
+      this.toastService.warning('Por favor, selecione apenas imagens');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Imagem muito grande. Tamanho máximo: 5MB');
+      this.toastService.warning('Imagem muito grande. Tamanho máximo: 5MB');
       return;
     }
 
@@ -657,7 +660,7 @@ export class PetFormComponent implements OnInit {
     }
 
     if (this.images().length === 0) {
-      alert('Por favor, adicione pelo menos uma foto do pet');
+      this.toastService.warning('Por favor, adicione pelo menos uma foto do pet');
       return;
     }
 
@@ -687,12 +690,12 @@ export class PetFormComponent implements OnInit {
 
     request.subscribe({
       next: () => {
-        alert(this.isEditMode() ? 'Pet atualizado com sucesso!' : 'Pet cadastrado com sucesso!');
+        this.toastService.success(this.isEditMode() ? 'Pet atualizado com sucesso!' : 'Pet cadastrado com sucesso!');
         this.router.navigate(['/pets/manage']);
       },
       error: (error) => {
         console.error('Error saving pet:', error);
-        alert('Erro ao salvar pet: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error('Erro ao salvar pet: ' + (error.error?.message || 'Erro desconhecido'));
         this.isSubmitting.set(false);
       }
     });

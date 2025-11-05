@@ -1,26 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { environment } from '../../../../environments/environment';
-
-interface Pet {
-  id: string;
-  name: string;
-  species: string;
-  breed?: string;
-  age?: number;
-  gender?: string;
-  size?: string;
-  location?: string;
-  status: string;
-  ong: {
-    id: string;
-    ongName: string;
-  };
-  images?: Array<{ url: string; isPrimary: boolean }>;
-  createdAt: string;
-}
+import { AdminService } from '../../../core/services/admin.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { Pet } from '../../../core/services/pets.service';
 
 @Component({
   selector: 'app-admin-pets',
@@ -461,7 +444,8 @@ interface Pet {
   `]
 })
 export class AdminPetsComponent implements OnInit {
-  private apiUrl = environment.apiUrl;
+  private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
 
   isLoading = signal(true);
   pets = signal<Pet[]>([]);
@@ -470,8 +454,6 @@ export class AdminPetsComponent implements OnInit {
   speciesFilter = '';
   statusFilter = '';
 
-  constructor(private http: HttpClient) {}
-
   ngOnInit() {
     this.loadPets();
   }
@@ -479,7 +461,7 @@ export class AdminPetsComponent implements OnInit {
   loadPets() {
     this.isLoading.set(true);
 
-    this.http.get<Pet[]>(`${this.apiUrl}/admin/pets`).subscribe({
+    this.adminService.getPets().subscribe({
       next: (pets) => {
         this.pets.set(pets);
         this.filteredPets.set(pets);
@@ -488,7 +470,7 @@ export class AdminPetsComponent implements OnInit {
       error: (error) => {
         console.error('Error loading pets:', error);
         this.isLoading.set(false);
-        alert('Erro ao carregar pets: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error('Erro ao carregar pets: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
   }
@@ -584,14 +566,14 @@ export class AdminPetsComponent implements OnInit {
       return;
     }
 
-    this.http.delete(`${this.apiUrl}/admin/pets/${petId}`).subscribe({
+    this.adminService.deletePet(petId).subscribe({
       next: () => {
-        alert('Pet excluído com sucesso!');
+        this.toastService.success('Pet excluído com sucesso!');
         this.loadPets();
       },
       error: (error) => {
         console.error('Error deleting pet:', error);
-        alert('Erro ao excluir pet: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error('Erro ao excluir pet: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
   }
