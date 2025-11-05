@@ -79,8 +79,11 @@ jobs:
         ssh $VPS_USER@$VPS_HOST << 'EOF'
           set -e
 
+          # Create directory structure if not exists
+          mkdir -p ~/aubrigo
+
           # Extract deployment package
-          cd /var/www/aubrigo
+          cd ~/aubrigo
           tar -xzf /tmp/deploy.tar.gz
 
           # Backup current version
@@ -107,7 +110,7 @@ jobs:
         ENVEOF
 
           # Create logs directory
-          cd /var/www/aubrigo/current/backend
+          cd ~/aubrigo/current/backend
           mkdir -p logs
 
           # Restart backend with PM2
@@ -115,14 +118,11 @@ jobs:
           pm2 start ecosystem.config.js
           pm2 save
 
-          # Update nginx configuration if needed
-          sudo systemctl reload nginx
-
           # Cleanup
           rm /tmp/deploy.tar.gz
 
           # Keep only last 3 backups
-          cd /var/www/aubrigo
+          cd ~/aubrigo
           ls -t | grep backup | tail -n +4 | xargs rm -rf || true
 
           echo "Deployment completed successfully!"
