@@ -36,7 +36,7 @@ jobs:
 
     - name: Build frontend
       working-directory: ./frontend
-      run: npm run build --configuration production
+      run: npm run build:prod
 
     - name: Prepare deployment package
       run: |
@@ -45,7 +45,8 @@ jobs:
         cp -r backend/dist deploy/backend/
         cp -r backend/node_modules deploy/backend/
         cp backend/package*.json deploy/backend/
-        cp -r frontend/dist/pet-sos/browser deploy/frontend/dist
+        cp backend/ecosystem.config.js deploy/backend/
+        cp -r frontend/dist/pet-sos-frontend/browser/* deploy/frontend/
         cp -r backend/uploads deploy/backend/ || true
         tar -czf deploy.tar.gz deploy/
 
@@ -101,14 +102,17 @@ jobs:
         EMAIL_PORT=$EMAIL_PORT
         EMAIL_USER=$EMAIL_USER
         EMAIL_PASSWORD=$EMAIL_PASSWORD
-        EMAIL_FROM=noreply@petsos.com
+        EMAIL_FROM=noreply@aubrigo.pt
         FRONTEND_URL=$FRONTEND_URL
         ENVEOF
 
-          # Restart backend with PM2
+          # Create logs directory
           cd /var/www/aubrigo/current/backend
-          pm2 delete pet-sos-backend || true
-          pm2 start dist/main.js --name pet-sos-backend --time
+          mkdir -p logs
+
+          # Restart backend with PM2
+          pm2 delete aubrigo-backend || true
+          pm2 start ecosystem.config.js
           pm2 save
 
           # Update nginx configuration if needed
@@ -128,7 +132,7 @@ jobs:
       run: |
         echo "Waiting for service to start..."
         sleep 10
-        curl -f https://petsos.com/api/health || echo "Health check failed"
+        curl -f https://aubrigo.pt/api/health || echo "Health check failed"
 
     - name: Notify on failure
       if: failure()
