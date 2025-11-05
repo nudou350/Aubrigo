@@ -1,0 +1,21 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with brand color -->
+  <rect width="512" height="512" fill="#4ca8a0" rx="80"/>
+
+  <!-- Paw print icon -->
+  <g fill="#FFFFFF">
+    <!-- Main pad -->
+    <ellipse cx="256" cy="280" rx="60" ry="70"/>
+
+    <!-- Toe pads -->
+    <ellipse cx="190" cy="200" rx="35" ry="45" transform="rotate(-20 190 200)"/>
+    <ellipse cx="240" cy="180" rx="35" ry="45" transform="rotate(-5 240 180)"/>
+    <ellipse cx="272" cy="180" rx="35" ry="45" transform="rotate(5 272 180)"/>
+    <ellipse cx="322" cy="200" rx="35" ry="45" transform="rotate(20 322 200)"/>
+  </g>
+
+  <!-- Text -->
+  <text x="256" y="400" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
+    Pet SOS
+  </text>
+</svg>
