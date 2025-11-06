@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
+import { UpdateNotificationComponent } from './shared/components/update-notification/update-notification.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, BottomNavComponent, ToastComponent],
+  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent],
   template: `
     <div class="app-container">
       <main class="main-content">
@@ -30,6 +31,7 @@ import { ToastComponent } from './shared/components/toast/toast.component';
           </p>
         </div>
       </footer>
+      <app-update-notification></app-update-notification>
       <app-toast></app-toast>
     </div>
   `,
