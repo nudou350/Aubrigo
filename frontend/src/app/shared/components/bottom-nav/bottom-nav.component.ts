@@ -11,7 +11,7 @@ import { PwaService } from "../../../core/services/pwa.service";
   imports: [CommonModule, RouterLink],
   template: `
     <!-- Install PWA button - floating bottom right (mobile only) -->
-    @if (shouldShowNav() && !authService.isOng() && !authService.isAdmin()) {
+    @if (shouldShowNav() && !authService.isOng() && !authService.isAdmin() && !pwaService.isInstalled()) {
     <button
       (click)="onInstallClick()"
       class="install-float-button"
@@ -588,7 +588,7 @@ export class BottomNavComponent {
   private router = Router;
   currentRoute = signal<string>("");
   authService = inject(AuthService);
-  private pwaService = inject(PwaService);
+  pwaService = inject(PwaService);
 
   constructor(private routerInstance: Router) {
     // Track current route
