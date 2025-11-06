@@ -12,6 +12,9 @@ import { ToastService } from '../../../core/services/toast.service';
   template: `
     <div class="donations-page">
       <header class="page-header">
+        <a routerLink="/ong/dashboard" class="back-link">
+          ← Voltar
+        </a>
         <div>
           <h1>Doações Recebidas</h1>
           <p>Acompanhe o histórico de doações da sua ONG</p>
@@ -138,6 +141,20 @@ import { ToastService } from '../../../core/services/toast.service';
 
     .page-header {
       margin-bottom: 32px;
+
+      .back-link {
+        color: #5CB5B0;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
 
       h1 {
         font-size: 32px;

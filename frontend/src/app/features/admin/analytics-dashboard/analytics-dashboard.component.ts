@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
@@ -31,9 +32,12 @@ interface AnalyticsStats {
 @Component({
   selector: 'app-analytics-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule],
   template: `
     <div class="analytics-dashboard">
+      <a routerLink="/ong/dashboard" class="back-link">
+        ← Voltar
+      </a>
       <div class="dashboard-header">
         <h1>📊 Estatísticas da sua ONG</h1>
         <div class="period-selector">
@@ -183,6 +187,20 @@ interface AnalyticsStats {
       padding: 24px;
       max-width: 1400px;
       margin: 0 auto;
+    }
+
+    .back-link {
+      color: #5CB5B0;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
 
     .dashboard-header {
