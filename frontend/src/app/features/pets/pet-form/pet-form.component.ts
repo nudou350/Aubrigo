@@ -303,7 +303,9 @@ interface PetImage {
         text-decoration: none;
         font-weight: 600;
         margin-bottom: 16px;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
 
         &:hover {
           text-decoration: underline;
