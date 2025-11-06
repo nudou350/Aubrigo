@@ -100,19 +100,23 @@ html, body {
 }
 
 /* Color scheme support - always default to light, only dark when user toggles */
+:root {
+  color-scheme: light !important;
+}
+
 html {
-  color-scheme: light only;
+  color-scheme: light !important;
 }
 
 html.dark-theme {
-  color-scheme: dark;
+  color-scheme: dark !important;
 }
 
 body {
   font-family: var(--font-primary);
   font-size: var(--font-size-base);
-  color: var(--color-text-primary);
-  background-color: var(--color-background);
+  color: var(--color-text-primary) !important;
+  background-color: var(--color-background) !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;

@@ -48,15 +48,23 @@ export class ThemeService {
     if (theme === 'dark') {
       root.classList.add('dark-theme');
       root.classList.remove('light-theme');
+      root.style.colorScheme = 'dark';
     } else {
       root.classList.add('light-theme');
       root.classList.remove('dark-theme');
+      root.style.colorScheme = 'light';
     }
 
     // Update meta theme-color for PWA
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
       metaThemeColor.setAttribute('content', theme === 'dark' ? '#1a1a1a' : '#4ca8a0');
+    }
+
+    // Update color-scheme meta tag
+    const metaColorScheme = document.querySelector('meta[name="color-scheme"]');
+    if (metaColorScheme) {
+      metaColorScheme.setAttribute('content', theme === 'dark' ? 'dark' : 'light');
     }
   }
 

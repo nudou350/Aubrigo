@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Plataforma para conectar animais abandonados com famílias amorosas">
     <meta name="theme-color" content="#4ca8a0">
+    <meta name="color-scheme" content="light">
 
     <!-- PWA Meta Tags -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -64,21 +65,25 @@
     <link rel="apple-touch-startup-image" href="assets/icons/apple-splash-1136-640.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   </head>
   <body>
-    <!-- Apply theme immediately to prevent flash -->
+    <!-- Apply theme immediately to prevent flash and force light mode by default -->
     <script>
       (function() {
+        // ALWAYS start with light theme by default
+        document.documentElement.classList.add('light-theme');
+        document.documentElement.classList.remove('dark-theme');
+        document.documentElement.style.colorScheme = 'light';
+
         try {
+          // Only switch to dark if explicitly saved by user
           const theme = localStorage.getItem('petsos-theme');
           if (theme === 'dark') {
-            document.documentElement.classList.add('dark-theme');
             document.documentElement.classList.remove('light-theme');
-          } else {
-            document.documentElement.classList.add('light-theme');
-            document.documentElement.classList.remove('dark-theme');
+            document.documentElement.classList.add('dark-theme');
+            document.documentElement.style.colorScheme = 'dark';
           }
         } catch (e) {
-          // localStorage not available, default to light theme
-          document.documentElement.classList.add('light-theme');
+          // localStorage not available, already defaulted to light theme above
+          console.warn('localStorage not available, using light theme');
         }
       })();
     </script>
