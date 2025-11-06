@@ -44,6 +44,12 @@ export class EmailService {
         user: emailUser,
         pass: emailPassword,
       },
+      tls: {
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2',
+      },
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000, // 10 seconds
     });
 
     this.logger.log('Email service initialized');
