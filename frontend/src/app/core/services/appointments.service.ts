@@ -91,7 +91,7 @@ export class AppointmentsService {
     id: string,
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
   ): Observable<AppointmentResponse> {
-    return this.http.put<AppointmentResponse>(`${this.apiUrl}/${id}/status`, {
+    return this.http.patch<AppointmentResponse>(`${this.apiUrl}/${id}/status`, {
       status,
     });
   }
