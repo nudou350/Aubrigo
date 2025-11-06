@@ -18,18 +18,18 @@ export class EmailService {
   private readonly frontendUrl: string;
 
   constructor(private configService: ConfigService) {
-    this.fromEmail = this.configService.get<string>('SMTP_FROM_EMAIL', 'noreply@petsos.com');
-    this.adminEmail = this.configService.get<string>('ADMIN_EMAIL', 'admin@petsos.com');
+    this.fromEmail = this.configService.get<string>('EMAIL_FROM', 'noreply@aubrigo.pt');
+    this.adminEmail = this.configService.get<string>('ADMIN_EMAIL', 'admin@aubrigo.pt');
 
     // Get first URL from FRONTEND_URL (it might be a comma-separated list)
     const frontendUrls = this.configService.get<string>('FRONTEND_URL', 'http://localhost:4200');
     this.frontendUrl = frontendUrls.split(',')[0].trim();
 
-    // Create transporter (using SMTP_* env variables for Gmail)
-    const emailHost = this.configService.get<string>('SMTP_HOST', 'smtp.gmail.com');
-    const emailPort = this.configService.get<number>('SMTP_PORT', 587);
-    const emailUser = this.configService.get<string>('SMTP_USER');
-    const emailPassword = this.configService.get<string>('SMTP_PASS');
+    // Create transporter (using EMAIL_* env variables)
+    const emailHost = this.configService.get<string>('EMAIL_HOST', 'smtp.gmail.com');
+    const emailPort = this.configService.get<number>('EMAIL_PORT', 587);
+    const emailUser = this.configService.get<string>('EMAIL_USER');
+    const emailPassword = this.configService.get<string>('EMAIL_PASSWORD');
 
     if (!emailUser || !emailPassword) {
       this.logger.warn('Email credentials not configured. Email sending will be disabled.');
