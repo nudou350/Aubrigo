@@ -114,12 +114,14 @@
         }
 
         <!-- Urgency Badge -->
+        @if (ong.urgencyCategory) {
         <div
           class="urgency-badge"
           [style.background]="getUrgencyColor(ong.urgencyLevel)"
         >
           <span>{{ getCategoryLabel(ong.urgencyCategory) }}</span>
         </div>
+        }
       </div>
 
       <div class="ong-info">

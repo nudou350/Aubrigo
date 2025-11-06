@@ -205,9 +205,7 @@ export class OngsComponent implements OnInit {
     this.router.navigate(['/ongs', ongId]);
   }
 
-  getCategoryLabel(category?: string): string {
-    if (!category) return 'Sem Necessidades';
-
+  getCategoryLabel(category: string): string {
     const labels: any = {
       food: 'Alimentos',
       medicine: 'Medicamentos',
@@ -227,11 +225,6 @@ export class OngsComponent implements OnInit {
       urgent: '#e74c3c',
     };
     return colors[urgencyLevel || 'none'];
-  }
-
-  hasUrgency(urgencyLevel?: string): boolean {
-    // Always show badge
-    return true;
   }
 
   getGreeting(): string {
