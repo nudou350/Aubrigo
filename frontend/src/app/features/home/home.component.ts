@@ -21,7 +21,7 @@ import { PwaService } from "../../core/services/pwa.service";
             @if (pwaService.isInstallable() && !pwaService.isInstalled()) {
               <button class="pwa-install-button" (click)="installPwa()" title="Instalar aplicativo">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
                 </svg>
               </button>
             }
@@ -165,7 +165,7 @@ import { PwaService } from "../../core/services/pwa.service";
                 >
                   @if (pet.gender === 'male') {
                   <path
-                    d="M9 9c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3zm12 4h-3v3h-3v3h-3v-6H9v6H6v-3H3v-3H0v-2h3V7h3V4h3V1h3v6h3V4h3v3h3z"
+                    d="M9 9c1.29 0 2.42.59 3.16 1.51L17.34 5.3l-2.83-.01.01-2 6.99.01.01 7h-2l-.01-2.83-5.22 5.21A4.5 4.5 0 1 1 9 9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"
                   />
                   } @else {
                   <path
@@ -197,10 +197,8 @@ import { PwaService } from "../../core/services/pwa.service";
                   viewBox="0 0 24 24"
                   fill="currentColor"
                 >
-                  <circle cx="15.5" cy="9.5" r="1.5" />
-                  <circle cx="8.5" cy="9.5" r="1.5" />
                   <path
-                    d="M12 17.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                    d="M12 6c1.11 0 2-.9 2-2 0-.38-.1-.73-.29-1.03L12 0l-1.71 2.97c-.19.3-.29.65-.29 1.03 0 1.1.9 2 2 2zm4.6 9.99l-1.07-1.07-1.08 1.07c-1.3 1.3-3.58 1.31-4.89 0l-1.07-1.07-1.09 1.07C6.75 16.64 5.88 17 4.96 17c-.73 0-1.4-.23-1.96-.61V21c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-4.61c-.56.38-1.23.61-1.96.61-.92 0-1.79-.36-2.44-1.01zM18 9h-5V7h-2v2H6c-1.66 0-3 1.34-3 3v1.54c0 1.08.88 1.96 1.96 1.96.52 0 1.02-.2 1.38-.57l2.14-2.13 2.13 2.13c.74.74 2.03.74 2.77 0l2.14-2.13 2.13 2.13c.37.37.86.57 1.38.57 1.08 0 1.96-.88 1.96-1.96V12C21 10.34 19.66 9 18 9z"
                   />
                 </svg>
                 <span>{{ pet.age }} anos</span>
@@ -234,7 +232,7 @@ import { PwaService } from "../../core/services/pwa.service";
           <div class="modal-header">
             <span class="icon">
               <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
               </svg>
             </span>
             <h2>Instalar Aubrigo</h2>
