@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from "@angular/core";
+import { Component, OnInit, inject, signal, computed } from "@angular/core";
 import { CommonModule, NgOptimizedImage } from "@angular/common";
 import { ActivatedRoute, Router } from "@angular/router";
 import { BottomNavComponent } from "../../../shared/components/bottom-nav/bottom-nav.component";
+import { ShareButtonComponent } from "../../../shared/components/share-button/share-button.component";
 import { FavoritesService } from "../../../core/services/favorites.service";
 import { ToastService } from "../../../core/services/toast.service";
 import { PetsService } from "../../../core/services/pets.service";
@@ -43,7 +44,7 @@ interface Pet {
 @Component({
   selector: "app-pet-detail",
   standalone: true,
-  imports: [CommonModule, BottomNavComponent, NgOptimizedImage],
+  imports: [CommonModule, BottomNavComponent, NgOptimizedImage, ShareButtonComponent],
   template: `
     <div class="pet-detail-screen">
       @if (loading()) {
@@ -71,6 +72,15 @@ interface Pet {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
+        <!-- Share Button -->
+        <app-share-button
+          [shareData]="shareData()"
+          [compact]="true"
+          [buttonText]="''"
+          [ariaLabel]="'Compartilhar ' + pet()!.name"
+          (shareSuccess)="onShare($event)"
+          class="share-button-header">
+        </app-share-button>
       </div>
 
       <!-- Image Carousel -->
@@ -337,6 +347,34 @@ interface Pet {
       }
 
       .favorite-button-header:active {
+        transform: scale(0.95);
+      }
+
+      .share-button-header {
+        width: 44px;
+        height: 44px;
+      }
+
+      .share-button-header ::ng-deep .share-btn {
+        width: 44px;
+        height: 44px;
+        padding: 10px;
+        border-radius: 50%;
+        background: rgba(184, 227, 225, 0.3);
+        border: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4ca8a0;
+      }
+
+      .share-button-header ::ng-deep .share-btn:hover {
+        background: rgba(184, 227, 225, 0.5);
+        border-color: #4ca8a0;
+        transform: scale(1.05);
+      }
+
+      .share-button-header ::ng-deep .share-btn:active {
         transform: scale(0.95);
       }
 
@@ -735,6 +773,18 @@ export class PetDetailComponent implements OnInit {
   ongArticles = signal<Article[]>([]);
   showAllArticles = signal(false);
 
+  shareData = computed(() => {
+    const currentPet = this.pet();
+    if (!currentPet) return undefined;
+
+    const petUrl = `${window.location.origin}/pets/${currentPet.id}`;
+    return {
+      title: `Conheça ${currentPet.name}!`,
+      text: `${currentPet.name} está esperando por uma família no Aubrigo. ${currentPet.breed}, ${currentPet.age} anos. Veja mais detalhes!`,
+      url: petUrl
+    };
+  });
+
   ngOnInit() {
     const petId = this.route.snapshot.paramMap.get("id");
     if (petId) {
@@ -883,6 +933,26 @@ export class PetDetailComponent implements OnInit {
 
   toggleShowAllArticles() {
     this.showAllArticles.set(!this.showAllArticles());
+  }
+
+  onShare(platform: string) {
+    const pet = this.pet();
+    if (!pet) return;
+
+    console.log('📤 Pet shared via:', platform);
+
+    // Track share analytics
+    this.analyticsService.track(EventType.PET_SHARE, {
+      petId: pet.id,
+      ongId: pet.ong?.id,
+      metadata: {
+        platform,
+        species: pet.species,
+        breed: pet.breed
+      }
+    });
+
+    this.toastService.success('Pet compartilhado!');
   }
 
   getArticleIcon(category: string): string {

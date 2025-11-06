@@ -10,6 +10,7 @@ import {
   SearchPetsParams,
 } from "../../core/services/pets.service";
 import { PwaService } from "../../core/services/pwa.service";
+import { AnalyticsService, EventType } from "../../core/services/analytics.service";
 
 @Component({
   selector: "app-home",
@@ -1072,6 +1073,7 @@ export class HomeComponent implements OnInit {
   private favoritesService = inject(FavoritesService);
   private toastService = inject(ToastService);
   pwaService = inject(PwaService);
+  private analytics = inject(AnalyticsService);
 
   pets = signal<Pet[]>([]);
   loading = signal(true);
@@ -1194,8 +1196,18 @@ export class HomeComponent implements OnInit {
 
     this.petsService.searchPets(params).subscribe({
       next: (response) => {
-        this.pets.set(response.data || []);
+        const results = response.data || [];
+        this.pets.set(results);
         this.loading.set(false);
+
+        // Track search/filter usage
+        this.analytics.track(EventType.SEARCH, {
+          metadata: {
+            species: params.species || 'all',
+            location: params.location || 'all',
+            resultsCount: results.length
+          }
+        });
       },
       error: (error) => {
         console.error("Error loading pets:", error);
@@ -1208,6 +1220,15 @@ export class HomeComponent implements OnInit {
 
   filterBySpecies(species: string) {
     this.selectedSpecies.set(species);
+
+    // Track filter application
+    this.analytics.track(EventType.FILTER_APPLY, {
+      metadata: {
+        filterType: 'species',
+        value: species
+      }
+    });
+
     this.loadPets();
   }
 
@@ -1394,6 +1415,15 @@ export class HomeComponent implements OnInit {
     this.showLocationDropdown.set(false);
     this.selectedLocationIndex.set(-1);
     this.filteredLocations.set(this.availableLocations.slice(0, 5)); // Reset to first 5
+
+    // Track filter application
+    this.analytics.track(EventType.FILTER_APPLY, {
+      metadata: {
+        filterType: 'location',
+        value: location
+      }
+    });
+
     // Reload pets with location filter
     this.loadPets();
   }

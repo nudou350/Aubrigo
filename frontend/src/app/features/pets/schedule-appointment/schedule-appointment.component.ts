@@ -996,13 +996,18 @@ export class ScheduleAppointmentComponent implements OnInit {
   formatSelectedDate(): string {
     const date = this.selectedDate();
     if (!date) return '';
-    const d = new Date(date + 'T00:00:00');
+    // Parse date string (YYYY-MM-DD) as local date
+    const [year, month, day] = date.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
     return d.toLocaleDateString('pt-PT', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
   }
 
   formatTime(isoString: string): string {
+    // Parse ISO string and format time in local timezone
     const date = new Date(isoString);
-    return date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 
   goBack() {

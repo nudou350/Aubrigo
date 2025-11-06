@@ -30,7 +30,7 @@ export class AppointmentsController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
   findAllForOng(@Request() req) {
-    return this.appointmentsService.findAllForOng(req.user.ongId);
+    return this.appointmentsService.findAllForOng(req.user.id);
   }
 
   @Get(':id')
@@ -47,7 +47,7 @@ export class AppointmentsController {
     @Body() updateStatusDto: UpdateAppointmentStatusDto,
     @Request() req,
   ) {
-    return this.appointmentsService.updateStatus(id, updateStatusDto, req.user.ongId);
+    return this.appointmentsService.updateStatus(id, updateStatusDto, req.user.id);
   }
 
   @Patch(':id/cancel')
@@ -59,6 +59,6 @@ export class AppointmentsController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
   delete(@Param('id') id: string, @Request() req) {
-    return this.appointmentsService.delete(id, req.user.ongId);
+    return this.appointmentsService.delete(id, req.user.id);
   }
 }

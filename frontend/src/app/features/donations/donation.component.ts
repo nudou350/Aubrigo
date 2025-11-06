@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { DonationsService, MBWayPaymentResponse, Ong } from '../../core/services/donations.service';
 import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway-qrcode.component';
+import { AnalyticsService, EventType } from '../../core/services/analytics.service';
 
 @Component({
   selector: 'app-donation',
@@ -336,6 +337,7 @@ import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway
 })
 export class DonationComponent implements OnInit {
   private donationsService = inject(DonationsService);
+  private analytics = inject(AnalyticsService);
 
   loading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -444,6 +446,16 @@ export class DonationComponent implements OnInit {
         this.mbwayResponse.set(response);
         this.showMBWayQR.set(true);
         this.loading.set(false);
+
+        // Track donation start
+        this.analytics.track(EventType.DONATION_START, {
+          ongId: formValue.ongId || undefined,
+          metadata: {
+            amount: formValue.amount,
+            donationType: formValue.donationType,
+            paymentMethod: formValue.paymentMethod
+          }
+        });
       },
       error: (error) => {
         this.errorMessage.set(error.error?.message || 'Erro ao processar doação');
@@ -462,6 +474,18 @@ export class DonationComponent implements OnInit {
           this.paymentStatus.set(status.mbwayStatus);
         }
         if (status.paymentStatus === 'completed') {
+          const formValue = this.donationForm.value;
+
+          // Track donation complete
+          this.analytics.track(EventType.DONATION_COMPLETE, {
+            ongId: formValue.ongId || undefined,
+            metadata: {
+              amount: this.mbwayResponse()?.donation?.amount,
+              paymentMethod: this.mbwayResponse()?.donation?.paymentMethod,
+              donationId: this.mbwayResponse()?.donation?.id
+            }
+          });
+
           // Payment successful - show success message or redirect
           alert('Pagamento confirmado! Obrigado pela sua doação! 🎉');
         }

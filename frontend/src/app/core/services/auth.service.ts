@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AnalyticsService, EventType } from './analytics.service';
 
 export type UserRole = 'admin' | 'ong' | 'user';
 
@@ -72,6 +73,7 @@ export interface LoginDto {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private analytics = inject(AnalyticsService);
   private apiUrl = environment.apiUrl;
 
   private currentUserSignal = signal<User | null>(null);
@@ -91,19 +93,47 @@ export class AuthService {
   registerUser(data: RegisterUserDto): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/auth/register/user`, data)
-      .pipe(tap((response) => this.handleAuthSuccess(response)));
+      .pipe(tap((response) => {
+        this.handleAuthSuccess(response);
+        // Track user registration
+        this.analytics.track(EventType.USER_REGISTER, {
+          metadata: {
+            role: response.user.role,
+            accountType: 'user'
+          }
+        });
+      }));
   }
 
   registerOng(data: RegisterOngDto): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/auth/register/ong`, data)
-      .pipe(tap((response) => this.handleAuthSuccess(response)));
+      .pipe(tap((response) => {
+        this.handleAuthSuccess(response);
+        // Track ONG registration
+        this.analytics.track(EventType.USER_REGISTER, {
+          metadata: {
+            role: response.user.role,
+            accountType: 'ong',
+            ongName: response.user.ongName
+          }
+        });
+      }));
   }
 
   login(credentials: LoginDto): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials)
-      .pipe(tap((response) => this.handleAuthSuccess(response)));
+      .pipe(tap((response) => {
+        this.handleAuthSuccess(response);
+        // Track user login
+        this.analytics.track(EventType.USER_LOGIN, {
+          metadata: {
+            role: response.user.role,
+            accountType: response.user.role === 'ong' ? 'ong' : 'user'
+          }
+        });
+      }));
   }
 
   // Role checks
@@ -124,6 +154,18 @@ export class AuthService {
   }
 
   logout(): void {
+    const currentUser = this.currentUser();
+
+    // Track logout before clearing user data
+    if (currentUser) {
+      this.analytics.track(EventType.USER_LOGOUT, {
+        metadata: {
+          role: currentUser.role,
+          accountType: currentUser.role === 'ong' ? 'ong' : 'user'
+        }
+      });
+    }
+
     localStorage.removeItem('accessToken');
     localStorage.removeItem('currentUser');
     this.currentUserSignal.set(null);

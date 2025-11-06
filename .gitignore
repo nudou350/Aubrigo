@@ -73,3 +73,9 @@ frontend/out-tsc/
 
 # Sensitive information (credentials, passwords)
 SETUP-INFO.md
+.gitignore
+docker-compose.yml
+nul
+DATABASE.md
+docker-start.bat
+database/init.sql

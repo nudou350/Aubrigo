@@ -103,33 +103,44 @@ export class AnalyticsService {
    * Initialize IndexedDB
    */
   private async initDatabase(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+    try {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 
-      request.onerror = () => {
-        console.error('❌ Failed to open analytics DB:', request.error);
-        reject(request.error);
-      };
+        request.onerror = () => {
+          console.error('❌ Failed to open analytics DB:', request.error);
+          // Don't reject - allow app to work without analytics
+          resolve();
+        };
 
-      request.onsuccess = () => {
-        this.db = request.result;
-        console.log('✅ Analytics DB opened successfully');
-        resolve();
-      };
+        request.onsuccess = () => {
+          this.db = request.result;
+          console.log('✅ Analytics DB opened successfully');
+          resolve();
+        };
 
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
+        request.onupgradeneeded = (event) => {
+          try {
+            const db = (event.target as IDBOpenDBRequest).result;
 
-        if (!db.objectStoreNames.contains(this.STORE_NAME)) {
-          const objectStore = db.createObjectStore(this.STORE_NAME, { keyPath: 'id' });
-          objectStore.createIndex('sent', 'sent', { unique: false });
-          objectStore.createIndex('timestamp', 'timestamp', { unique: false });
-          objectStore.createIndex('type', 'type', { unique: false });
-          objectStore.createIndex('sessionId', 'sessionId', { unique: false });
-          console.log('📊 Analytics object store created');
-        }
-      };
-    });
+            if (!db.objectStoreNames.contains(this.STORE_NAME)) {
+              const objectStore = db.createObjectStore(this.STORE_NAME, { keyPath: 'id' });
+              objectStore.createIndex('sent', 'sent', { unique: false });
+              objectStore.createIndex('timestamp', 'timestamp', { unique: false });
+              objectStore.createIndex('type', 'type', { unique: false });
+              objectStore.createIndex('sessionId', 'sessionId', { unique: false });
+              console.log('📊 Analytics object store created');
+            }
+          } catch (error) {
+            console.error('❌ Error in onupgradeneeded:', error);
+            resolve();
+          }
+        };
+      });
+    } catch (error) {
+      console.error('❌ Failed to initialize analytics DB:', error);
+      // Don't throw - allow app to work without analytics
+    }
   }
 
   /**
@@ -143,29 +154,34 @@ export class AnalyticsService {
       metadata?: Record<string, any>;
     }
   ): Promise<void> {
-    const event: AnalyticsEvent = {
-      id: this.generateId(),
-      type,
-      category: this.getCategoryForEvent(type),
-      petId: data?.petId,
-      ongId: data?.ongId,
-      metadata: data?.metadata || {},
-      sessionId: this.sessionId,
-      timestamp: Date.now(),
-      offline: !this.networkStatus.isOnline(),
-      sent: false
-    };
+    try {
+      const event: AnalyticsEvent = {
+        id: this.generateId(),
+        type,
+        category: this.getCategoryForEvent(type),
+        petId: data?.petId,
+        ongId: data?.ongId,
+        metadata: data?.metadata || {},
+        sessionId: this.sessionId,
+        timestamp: Date.now(),
+        offline: !this.networkStatus.isOnline(),
+        sent: false
+      };
 
-    // Always save locally first
-    await this.saveEvent(event);
+      // Always save locally first
+      await this.saveEvent(event);
 
-    console.log('📊 Event tracked:', type, data);
+      console.log('📊 Event tracked:', type, data);
 
-    // Try to sync if online
-    if (this.networkStatus.isOnline() && !this.syncInProgress) {
-      this.syncEvents().catch(err => {
-        console.error('Failed to sync events:', err);
-      });
+      // Try to sync if online
+      if (this.networkStatus.isOnline() && !this.syncInProgress) {
+        this.syncEvents().catch(err => {
+          console.error('Failed to sync events:', err);
+        });
+      }
+    } catch (error) {
+      console.error('❌ Failed to track event:', type, error);
+      // Fail silently to not break the app
     }
   }
 
@@ -212,16 +228,29 @@ export class AnalyticsService {
       return;
     }
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const request = store.add(event);
+    // Ensure 'sent' property is always defined as boolean
+    const validatedEvent = {
+      ...event,
+      sent: event.sent === true ? true : false
+    };
 
-      request.onsuccess = () => resolve();
-      request.onerror = () => {
-        console.error('❌ Failed to save event:', request.error);
-        reject(request.error);
-      };
+    return new Promise((resolve, reject) => {
+      try {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.add(validatedEvent);
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => {
+          console.error('❌ Failed to save event:', request.error);
+          // Don't reject to prevent app crashes - just log and resolve
+          resolve();
+        };
+      } catch (error) {
+        console.error('❌ Exception in saveEvent:', error);
+        // Fail silently to not break the app
+        resolve();
+      }
     });
   }
 
@@ -232,16 +261,28 @@ export class AnalyticsService {
     if (!this.db) return [];
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const index = store.index('sent');
-      const request = index.getAll(IDBKeyRange.only(false));
+      try {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.getAll();
 
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => {
-        console.error('❌ Failed to get pending events:', request.error);
-        reject(request.error);
-      };
+        request.onsuccess = () => {
+          // Filter events manually to avoid IDBKeyRange.only() issues with boolean values
+          const allEvents = request.result || [];
+          const pendingEvents = allEvents.filter(event => event.sent === false);
+          resolve(pendingEvents);
+        };
+
+        request.onerror = () => {
+          console.error('❌ Failed to get pending events:', request.error);
+          // Don't reject, just return empty array to prevent app crashes
+          resolve([]);
+        };
+      } catch (error) {
+        console.error('❌ Exception in getPendingEvents:', error);
+        // Return empty array on any error
+        resolve([]);
+      }
     });
   }
 
@@ -252,23 +293,35 @@ export class AnalyticsService {
     if (!this.db) return;
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const getRequest = store.get(eventId);
+      try {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const getRequest = store.get(eventId);
 
-      getRequest.onsuccess = () => {
-        const event = getRequest.result;
-        if (event) {
-          event.sent = true;
-          const updateRequest = store.put(event);
-          updateRequest.onsuccess = () => resolve();
-          updateRequest.onerror = () => reject(updateRequest.error);
-        } else {
-          resolve();
-        }
-      };
+        getRequest.onsuccess = () => {
+          const event = getRequest.result;
+          if (event) {
+            // Ensure 'sent' is explicitly set to boolean true
+            event.sent = true;
+            const updateRequest = store.put(event);
+            updateRequest.onsuccess = () => resolve();
+            updateRequest.onerror = () => {
+              console.error('❌ Failed to update event:', updateRequest.error);
+              resolve(); // Don't reject to prevent app crashes
+            };
+          } else {
+            resolve();
+          }
+        };
 
-      getRequest.onerror = () => reject(getRequest.error);
+        getRequest.onerror = () => {
+          console.error('❌ Failed to get event for update:', getRequest.error);
+          resolve(); // Don't reject to prevent app crashes
+        };
+      } catch (error) {
+        console.error('❌ Exception in markAsSent:', error);
+        resolve(); // Fail silently
+      }
     });
   }
 
@@ -309,7 +362,6 @@ export class AnalyticsService {
 
       if (pendingEvents.length === 0) {
         console.log('ℹ️ No pending analytics events');
-        this.syncInProgress = false;
         return;
       }
 
@@ -324,7 +376,12 @@ export class AnalyticsService {
 
           // Mark as sent
           for (const event of batch) {
-            await this.markAsSent(event.id);
+            try {
+              await this.markAsSent(event.id);
+            } catch (error) {
+              console.error('❌ Failed to mark event as sent:', event.id, error);
+              // Continue with next event
+            }
           }
 
           console.log(`✅ Batch of ${batch.length} events synced`);
@@ -335,9 +392,17 @@ export class AnalyticsService {
       }
 
       // Clean up old sent events (older than 30 days)
-      await this.cleanupOldEvents();
+      try {
+        await this.cleanupOldEvents();
+      } catch (error) {
+        console.error('❌ Failed to cleanup old events:', error);
+        // Non-critical, continue
+      }
 
       console.log('✅ Analytics sync completed');
+    } catch (error) {
+      console.error('❌ Failed to sync events:', error);
+      // Fail silently to not break the app
     } finally {
       this.syncInProgress = false;
     }
@@ -409,7 +474,7 @@ export class AnalyticsService {
    * Sync using sendBeacon (for page unload)
    */
   private async syncWithBeacon(): Promise<void> {
-    if (!navigator.sendBeacon) return;
+    if (!navigator.sendBeacon || !this.db) return;
 
     try {
       const pendingEvents = await this.getPendingEvents();
@@ -422,6 +487,7 @@ export class AnalyticsService {
       navigator.sendBeacon(`${this.API_URL}/track`, blob);
     } catch (error) {
       console.error('Failed to sync with beacon:', error);
+      // Fail silently - page is unloading anyway
     }
   }
 
@@ -437,31 +503,44 @@ export class AnalyticsService {
       return { totalEvents: 0, pendingEvents: 0, eventsByType: {} };
     }
 
-    return new Promise((resolve) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const getAllRequest = store.getAll();
+    try {
+      return new Promise((resolve) => {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const getAllRequest = store.getAll();
 
-      getAllRequest.onsuccess = () => {
-        const events = getAllRequest.result;
-        const pending = events.filter(e => !e.sent);
+        getAllRequest.onsuccess = () => {
+          try {
+            const events = getAllRequest.result || [];
+            const pending = events.filter(e => e.sent === false);
 
-        const eventsByType: Record<string, number> = {};
-        events.forEach(event => {
-          eventsByType[event.type] = (eventsByType[event.type] || 0) + 1;
-        });
+            const eventsByType: Record<string, number> = {};
+            events.forEach(event => {
+              if (event.type) {
+                eventsByType[event.type] = (eventsByType[event.type] || 0) + 1;
+              }
+            });
 
-        resolve({
-          totalEvents: events.length,
-          pendingEvents: pending.length,
-          eventsByType
-        });
-      };
+            resolve({
+              totalEvents: events.length,
+              pendingEvents: pending.length,
+              eventsByType
+            });
+          } catch (error) {
+            console.error('❌ Error processing local stats:', error);
+            resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
+          }
+        };
 
-      getAllRequest.onerror = () => {
-        resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
-      };
-    });
+        getAllRequest.onerror = () => {
+          console.error('❌ Failed to get local stats:', getAllRequest.error);
+          resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
+        };
+      });
+    } catch (error) {
+      console.error('❌ Exception in getLocalStats:', error);
+      return { totalEvents: 0, pendingEvents: 0, eventsByType: {} };
+    }
   }
 
   /**

@@ -155,7 +155,7 @@ export class AppointmentsService {
 
     // Double-check for race conditions by counting concurrent appointments
     const settings = await this.settingsService.findByOng(ongId);
-    const endTime = new Date(startTime.getTime() + settings.visitDurationMinutes * 60 * 60 * 1000);
+    const endTime = new Date(startTime.getTime() + settings.visitDurationMinutes * 60 * 1000);
 
     const concurrentCount = await this.appointmentsRepository.count({
       where: {
