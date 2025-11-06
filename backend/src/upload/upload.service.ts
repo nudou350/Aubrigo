@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class UploadService {
@@ -37,13 +38,18 @@ export class UploadService {
     // Validate file
     this.validateImageFile(file);
 
-    // Generate unique filename
-    const fileExt = path.extname(file.originalname);
-    const fileName = `${uuidv4()}${fileExt}`;
+    // Generate unique filename with .webp extension
+    const fileName = `${uuidv4()}.webp`;
     const filePath = path.join(this.uploadPath, folder, fileName);
 
-    // Save file
-    fs.writeFileSync(filePath, file.buffer);
+    // Convert image to WebP format using sharp
+    try {
+      await sharp(file.buffer)
+        .webp({ quality: 85 }) // High quality WebP conversion
+        .toFile(filePath);
+    } catch (error) {
+      throw new Error(`Failed to process image: ${error.message}`);
+    }
 
     // Return URL
     return `${this.baseUrl}/${folder}/${fileName}`;
@@ -86,12 +92,12 @@ export class UploadService {
   }
 
   validateImageFile(file: Express.Multer.File): void {
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
     const maxSize = 5 * 1024 * 1024; // 5MB
 
     if (!allowedMimeTypes.includes(file.mimetype)) {
       throw new Error(
-        'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.',
+        'Invalid file type. Only JPEG, PNG, and WebP are allowed. Images will be converted to WebP format.',
       );
     }
 

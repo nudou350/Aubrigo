@@ -48,7 +48,7 @@ import { ToastService } from '../../../core/services/toast.service';
                   />
                   📷 Alterar Foto
                 </label>
-                <p class="hint">JPG, PNG ou GIF (máx. 5MB)</p>
+                <p class="hint">JPG, PNG ou WebP (máx. 5MB, será convertido para WebP)</p>
               </div>
             </div>
           </div>
@@ -512,8 +512,10 @@ export class ProfileEditComponent implements OnInit {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      this.toastService.error('Por favor, selecione apenas imagens');
+    // Validate image type (PNG, JPEG, WebP)
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      this.toastService.error('Por favor, selecione apenas imagens PNG, JPG ou WebP');
       return;
     }
 

@@ -733,8 +733,11 @@ export class PetFormComponent implements OnInit {
     if (!files || files.length === 0) return;
 
     const file = files[0];
-    if (!file.type.startsWith('image/')) {
-      this.toastService.warning('Por favor, selecione apenas imagens');
+
+    // Validate image type (PNG, JPEG, WebP)
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
+      this.toastService.warning('Por favor, selecione apenas imagens PNG, JPG ou WebP');
       return;
     }
 
