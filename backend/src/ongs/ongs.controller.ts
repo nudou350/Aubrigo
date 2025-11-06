@@ -131,7 +131,12 @@ export class OngsController {
     @CurrentUser() user: any,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    return this.ongsService.updateMyProfile(user.id, updateProfileDto);
+    const updatedOng = await this.ongsService.updateMyProfile(user.id, updateProfileDto);
+
+    return {
+      message: 'Profile updated successfully',
+      ong: updatedOng,
+    };
   }
 
   @Post('my-ong/profile-image')
@@ -153,7 +158,12 @@ export class OngsController {
     }
 
     const imageUrl = await this.uploadService.uploadImage(file, 'profiles');
-    return this.ongsService.updateProfileImage(user.id, imageUrl);
+    const updatedOng = await this.ongsService.updateProfileImage(user.id, imageUrl);
+
+    return {
+      message: 'Profile image uploaded successfully',
+      profileImageUrl: updatedOng.profileImageUrl,
+    };
   }
 
   @Put('my-ong/change-password')
