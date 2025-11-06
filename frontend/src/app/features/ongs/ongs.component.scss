@@ -335,6 +335,9 @@
 /* ONG Info */
 .ong-info {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
 }
 
 .ong-name {
@@ -372,35 +375,8 @@
   object-fit: contain;
 }
 
-/* Urgency Description */
-.urgency-description {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  background: rgba(255, 193, 7, 0.1);
-  border-left: 4px solid #f39c12;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-.urgency-desc-icon {
-  width: 22px;
-  height: 22px;
-  color: #f39c12;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.urgency-description p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #666666;
-  font-weight: 500;
-}
-
 .learn-more-button {
+  margin-top: auto;
   width: 100%;
   background: #4ca8a0;
   color: #ffffff;
