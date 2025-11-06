@@ -76,7 +76,12 @@ export class UsersController {
     }
 
     const imageUrl = await this.uploadService.uploadImage(file, 'profiles');
-    return this.usersService.updateProfileImage(user.id, imageUrl);
+    const updatedUser = await this.usersService.updateProfileImage(user.id, imageUrl);
+
+    return {
+      message: 'Profile image uploaded successfully',
+      profileImageUrl: updatedUser.profileImageUrl,
+    };
   }
 
   @Put('profile/password')
