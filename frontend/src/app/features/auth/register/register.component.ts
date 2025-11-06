@@ -567,7 +567,7 @@ export class RegisterComponent {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    const { confirmPassword, ...registerData } = this.registerForm.value;
+    const registerData = this.registerForm.value;
 
     this.authService.register(registerData as any).subscribe({
       next: () => {
