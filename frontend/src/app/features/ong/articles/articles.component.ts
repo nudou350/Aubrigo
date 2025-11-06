@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   ArticlesService,
@@ -14,9 +15,12 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-ong-articles',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
   template: `
     <div class="articles-page">
+      <a routerLink="/ong/dashboard" class="back-link">
+        ← Voltar
+      </a>
       <header class="page-header">
         <div>
           <h1>Necessidades da ONG</h1>
@@ -200,6 +204,20 @@ import { ToastService } from '../../../core/services/toast.service';
       padding: var(--spacing-lg);
       max-width: 1200px;
       margin: 0 auto;
+    }
+
+    .back-link {
+      color: #5CB5B0;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
 
     .page-header {
