@@ -35,7 +35,7 @@
           placeholder="Pesquisar ONG..."
           [value]="searchQuery()"
           (input)="onSearchInput($event)"
-          (keydown.enter)="onSearchEnter()"
+          (keydown.enter)="onSearchEnter($event)"
         />
       </div>
 

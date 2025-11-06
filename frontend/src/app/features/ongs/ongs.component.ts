@@ -94,7 +94,12 @@ export class OngsComponent implements OnInit {
     this.searchQuery.set(input);
   }
 
-  onSearchEnter() {
+  onSearchEnter(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      // Close mobile keyboard
+      (event.target as HTMLInputElement).blur();
+    }
     this.loadOngs();
   }
 
