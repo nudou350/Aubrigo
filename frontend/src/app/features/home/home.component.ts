@@ -1116,7 +1116,8 @@ import { UsersService, ONG } from "../../core/services/users.service";
       .species-tab {
         flex: 1;
         max-width: 80px;
-        height: 64px;
+        width: 80px;
+        height: 80px;
         border-radius: 16px;
         background: #ffffff;
         border: none;
