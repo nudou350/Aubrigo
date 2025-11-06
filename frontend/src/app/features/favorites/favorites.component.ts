@@ -1,23 +1,20 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { BackButtonComponent } from '../../shared/components/back-button/back-button.component';
 import { FavoritesService, Favorite } from '../../core/services/favorites.service';
 import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, BackButtonComponent],
   template: `
+    <app-back-button [fallbackRoute]="'/home'"></app-back-button>
+
     <div class="favorites-container">
       <header class="favorites-header">
-        <button class="back-button" (click)="goBack()">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
         <h1>Meus Favoritos</h1>
-        <div class="spacer"></div>
       </header>
 
       @if (loading()) {
@@ -95,44 +92,23 @@ import { ToastService } from '../../core/services/toast.service';
     }
 
     .favorites-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px;
+      padding: 80px 20px 20px 20px;
       background: white;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .back-button {
-      background: none;
-      border: none;
-      padding: 8px;
-      cursor: pointer;
-      color: #2C2C2C;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      transition: background 0.2s ease;
-    }
-
-    .back-button:hover {
-      background: #F5F5F5;
     }
 
     .favorites-header h1 {
-      flex: 1;
       margin: 0;
       font-size: 24px;
       font-weight: 600;
       color: #2C2C2C;
     }
 
-    .spacer {
-      width: 40px;
+    /* Desktop adjustments */
+    @media (min-width: 1024px) {
+      .favorites-header {
+        padding: 120px 20px 20px 20px;
+      }
     }
 
     .loading-container {

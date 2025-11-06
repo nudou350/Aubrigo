@@ -1,8 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { ShareButtonComponent } from '../../../shared/components/share-button/share-button.component';
 import { ToastService } from '../../../core/services/toast.service';
+import { GeolocationService } from '../../../core/services/geolocation.service';
 import { environment } from '../../../../environments/environment';
 
 export interface Need {
@@ -21,6 +23,8 @@ export interface OngDetail {
   email: string;
   profileImageUrl?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   phone?: string;
   instagramHandle?: string;
   allowAppointments: boolean;
@@ -32,7 +36,7 @@ export interface OngDetail {
 @Component({
   selector: 'app-ong-detail',
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage],
+  imports: [CommonModule, NgOptimizedImage, ShareButtonComponent],
   templateUrl: './ong-detail.component.html',
   styleUrl: './ong-detail.component.scss',
 })
@@ -41,9 +45,22 @@ export class OngDetailComponent implements OnInit {
   private router = inject(Router);
   private http = inject(HttpClient);
   private toastService = inject(ToastService);
+  geoService = inject(GeolocationService);
 
   ong = signal<OngDetail | null>(null);
   loading = signal(true);
+  distance = signal<number | null>(null);
+
+  shareData = computed(() => {
+    const currentOng = this.ong();
+    if (!currentOng) return undefined;
+
+    return {
+      title: currentOng.ongName,
+      text: `Conheça a ${currentOng.ongName} - ${currentOng.petCount} pets disponíveis para adoção!`,
+      url: window.location.href
+    };
+  });
 
   ngOnInit() {
     const ongId = this.route.snapshot.paramMap.get('id');
@@ -57,9 +74,21 @@ export class OngDetailComponent implements OnInit {
     this.http
       .get<OngDetail>(`${environment.apiUrl}/users/${id}`)
       .subscribe({
-        next: (ong) => {
+        next: async (ong) => {
           this.ong.set(ong);
           this.loading.set(false);
+
+          // Calculate distance if ONG has coordinates
+          if (ong.latitude && ong.longitude) {
+            const userCoords = await this.geoService.requestLocation();
+            if (userCoords) {
+              const dist = this.geoService.calculateDistance(
+                userCoords,
+                { latitude: ong.latitude, longitude: ong.longitude }
+              );
+              this.distance.set(dist);
+            }
+          }
         },
         error: (error) => {
           console.error('Error loading ONG details:', error);
@@ -144,6 +173,20 @@ export class OngDetailComponent implements OnInit {
           );
         }
         break;
+    }
+  }
+
+  onShare(method: string) {
+    const ong = this.ong();
+    if (ong) {
+      // TODO: Track share event when analytics service supports it
+      // this.analyticsService.trackEvent(EventType.SHARE, {
+      //   itemType: 'ong',
+      //   itemId: ong.id,
+      //   itemName: ong.ongName,
+      //   shareMethod: method
+      // });
+      this.toastService.success('Link compartilhado!');
     }
   }
 }

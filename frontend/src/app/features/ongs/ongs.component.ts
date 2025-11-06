@@ -21,6 +21,7 @@ export class OngsComponent implements OnInit {
   authService = inject(AuthService);
 
   ongs = signal<ONG[]>([]);
+  allOngs = signal<ONG[]>([]); // Store all ONGs for search typeahead
   loading = signal(true);
   searchQuery = signal('');
   currentLocation = signal('Todas as cidades');
@@ -31,16 +32,37 @@ export class OngsComponent implements OnInit {
   filteredLocations = signal<string[]>(this.availableLocations);
   selectedLocationIndex = signal(-1);
 
+  // ONG search typeahead
+  showOngDropdown = signal(false);
+  filteredOngs = signal<ONG[]>([]);
+  selectedOngIndex = signal(-1);
+
   ngOnInit() {
     this.loadCitiesWithPets();
+    this.loadAllOngsForTypeahead();
     this.loadOngs();
 
-    // Close dropdown when clicking outside
+    // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       if (!target.closest('.location-search-container')) {
         this.showLocationDropdown.set(false);
       }
+      if (!target.closest('.search-container')) {
+        this.showOngDropdown.set(false);
+      }
+    });
+  }
+
+  loadAllOngsForTypeahead() {
+    // Load all ONGs without filters for typeahead
+    this.usersService.getAllOngs().subscribe({
+      next: (ongs) => {
+        this.allOngs.set(ongs);
+      },
+      error: (error) => {
+        console.error('Error loading ONGs for typeahead:', error);
+      },
     });
   }
 
@@ -92,6 +114,94 @@ export class OngsComponent implements OnInit {
   onSearchInput(event: Event) {
     const input = (event.target as HTMLInputElement).value.trim();
     this.searchQuery.set(input);
+
+    // Clear location filter when searching by ONG name
+    if (input) {
+      this.currentLocation.set('Todas as cidades');
+    }
+
+    if (!input) {
+      this.showOngDropdown.set(false);
+      this.filteredOngs.set([]);
+      this.selectedOngIndex.set(-1);
+      return;
+    }
+
+    // Filter ONGs by name OR location for typeahead
+    const filtered = this.allOngs()
+      .filter((ong) => {
+        const nameMatch = ong.ongName.toLowerCase().includes(input.toLowerCase());
+        const locationMatch = ong.location?.toLowerCase().includes(input.toLowerCase());
+        return nameMatch || locationMatch;
+      })
+      .slice(0, 5);
+
+    this.filteredOngs.set(filtered);
+    this.showOngDropdown.set(true);
+    this.selectedOngIndex.set(-1);
+  }
+
+  onSearchFocus() {
+    const query = this.searchQuery();
+    if (query) {
+      const filtered = this.allOngs()
+        .filter((ong) => {
+          const nameMatch = ong.ongName.toLowerCase().includes(query.toLowerCase());
+          const locationMatch = ong.location?.toLowerCase().includes(query.toLowerCase());
+          return nameMatch || locationMatch;
+        })
+        .slice(0, 5);
+      this.filteredOngs.set(filtered);
+      this.showOngDropdown.set(true);
+    }
+  }
+
+  onSearchKeydown(event: KeyboardEvent) {
+    const ongs = this.filteredOngs();
+
+    if (!this.showOngDropdown() || ongs.length === 0) {
+      if (event.key === 'Enter') {
+        this.onSearchEnter(event);
+      }
+      return;
+    }
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.selectedOngIndex.update((idx) =>
+          idx < ongs.length - 1 ? idx + 1 : idx
+        );
+        break;
+
+      case 'ArrowUp':
+        event.preventDefault();
+        this.selectedOngIndex.update((idx) => (idx > 0 ? idx - 1 : -1));
+        break;
+
+      case 'Enter':
+        event.preventDefault();
+        const selectedIdx = this.selectedOngIndex();
+        if (selectedIdx >= 0 && selectedIdx < ongs.length) {
+          this.selectOng(ongs[selectedIdx]);
+        } else {
+          this.onSearchEnter(event);
+        }
+        break;
+
+      case 'Escape':
+        event.preventDefault();
+        this.showOngDropdown.set(false);
+        this.selectedOngIndex.set(-1);
+        break;
+    }
+  }
+
+  selectOng(ong: ONG) {
+    this.searchQuery.set(ong.ongName);
+    this.showOngDropdown.set(false);
+    this.selectedOngIndex.set(-1);
+    this.loadOngs();
   }
 
   onSearchEnter(event?: Event) {
@@ -100,6 +210,7 @@ export class OngsComponent implements OnInit {
       // Close mobile keyboard
       (event.target as HTMLInputElement).blur();
     }
+    this.showOngDropdown.set(false);
     this.loadOngs();
   }
 
@@ -123,6 +234,11 @@ export class OngsComponent implements OnInit {
 
   onLocationInput(event: Event) {
     const input = (event.target as HTMLInputElement).value.trim();
+
+    // Clear ONG search filter when selecting location
+    if (input) {
+      this.searchQuery.set('');
+    }
 
     if (!input) {
       this.currentLocation.set('Todas as cidades');

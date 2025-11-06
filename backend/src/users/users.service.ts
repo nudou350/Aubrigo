@@ -203,6 +203,8 @@ export class UsersService {
       email: user.email,
       profileImageUrl: user.profileImageUrl,
       location: user.location,
+      latitude: user.latitude,
+      longitude: user.longitude,
       phone: user.phone,
       instagramHandle: user.instagramHandle,
       allowAppointments: user.allowAppointments,

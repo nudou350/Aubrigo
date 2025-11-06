@@ -115,6 +115,68 @@
   font-weight: 400;
 }
 
+.ong-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.ong-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-align: left;
+}
+
+.ong-option:hover {
+  background: rgba(184, 227, 225, 0.2);
+}
+
+.ong-option.selected {
+  background: rgba(184, 227, 225, 0.5);
+}
+
+.ong-info-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.ong-name-dropdown {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c2c2c;
+}
+
+.ong-location-dropdown {
+  font-size: 13px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.ong-location-dropdown::before {
+  content: "📍";
+  font-size: 11px;
+}
+
 .location-search-container {
   width: 100%;
   position: relative;

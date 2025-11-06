@@ -137,10 +137,12 @@ import { UsersService, ONG } from "../../core/services/users.service";
                     d="M16.5 12c1.38 0 2.49-1.12 2.49-2.5S17.88 7 16.5 7C15.12 7 14 8.12 14 9.5s1.12 2.5 2.5 2.5zM9 11c1.66 0 2.99-1.34 2.99-3S10.66 5 9 5C7.34 5 6 6.34 6 8s1.34 3 3 3zm7.5 3c-1.83 0-5.5.92-5.5 2.75V19h11v-2.25c0-1.83-3.67-2.75-5.5-2.75zM9 13c-2.33 0-7 1.17-7 3.5V19h7v-2.25c0-.85.33-2.34 2.37-3.47C10.5 13.1 9.66 13 9 13z"
                   />
                 </svg>
-                {{ ong.ongName }}
-                @if (ong.location) {
-                <span class="ong-location">- {{ ong.location }}</span>
-                }
+                <div class="ong-info-dropdown">
+                  <span class="ong-name-dropdown">{{ ong.ongName }}</span>
+                  @if (ong.location) {
+                  <span class="ong-location-dropdown">{{ ong.location }}</span>
+                  }
+                </div>
               </button>
               }
             </div>
@@ -860,6 +862,33 @@ import { UsersService, ONG } from "../../core/services/users.service";
         color: #666;
         font-weight: 400;
         margin-left: auto;
+      }
+
+      .ong-info-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+      }
+
+      .ong-name-dropdown {
+        font-size: 15px;
+        font-weight: 600;
+        color: #2c2c2c;
+      }
+
+      .ong-location-dropdown {
+        font-size: 13px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: auto;
+      }
+
+      .ong-location-dropdown::before {
+        content: "📍";
+        font-size: 11px;
       }
 
       /* Filters Row */
@@ -1951,6 +1980,12 @@ export class HomeComponent implements OnInit {
   onLocationInput(event: Event) {
     const input = (event.target as HTMLInputElement).value.trim();
 
+    // Clear ONG filter when selecting location (exclusive filters)
+    if (input) {
+      this.currentOng.set(null);
+      this.ongInput.set('');
+    }
+
     // If empty, reset to "Todas as cidades"
     if (!input) {
       this.currentLocation.set("Todas as cidades");
@@ -2083,6 +2118,11 @@ export class HomeComponent implements OnInit {
     const input = (event.target as HTMLInputElement).value.trim();
     this.ongInput.set(input);
 
+    // Clear location filter when searching by ONG (exclusive filters)
+    if (input) {
+      this.currentLocation.set('Todas as cidades');
+    }
+
     if (!input) {
       this.currentOng.set(null);
       this.filteredOngs.set(this.availableOngs().slice(0, 5));
@@ -2091,8 +2131,13 @@ export class HomeComponent implements OnInit {
       return;
     }
 
+    // Filter ONGs by name OR location for typeahead
     const filtered = this.availableOngs()
-      .filter((ong) => ong.ongName.toLowerCase().includes(input.toLowerCase()))
+      .filter((ong) => {
+        const nameMatch = ong.ongName.toLowerCase().includes(input.toLowerCase());
+        const locationMatch = ong.location?.toLowerCase().includes(input.toLowerCase());
+        return nameMatch || locationMatch;
+      })
       .slice(0, 5);
 
     this.filteredOngs.set(filtered);

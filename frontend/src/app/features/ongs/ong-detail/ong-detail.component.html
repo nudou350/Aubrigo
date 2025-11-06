@@ -9,17 +9,29 @@
   </div>
   } @else if (ong()) {
 
-  <!-- Back Button -->
-  <button class="back-button" (click)="goBack()">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-    </svg>
-    Voltar
-  </button>
+  <!-- Header with Back Button and Share -->
+  <div class="header">
+    <button class="back-button" (click)="goBack()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+      </svg>
+    </button>
+    <h1 class="title">{{ ong()!.ongName }}</h1>
+    <!-- Share Button -->
+    <app-share-button
+      [shareData]="shareData()"
+      [compact]="true"
+      [buttonText]="''"
+      [ariaLabel]="'Compartilhar ' + ong()!.ongName"
+      (shareSuccess)="onShare($event)"
+      class="share-button-header">
+    </app-share-button>
+  </div>
 
   <!-- Header with Image -->
   <div class="ong-header">
     <div class="ong-image-container">
+
       @if (ong()!.profileImageUrl) {
       <img
         [ngSrc]="ong()!.profileImageUrl!"
@@ -51,6 +63,9 @@
           />
         </svg>
         <span>{{ ong()!.location }}</span>
+        @if (distance()) {
+        <span class="distance-badge">{{ geoService.formatDistance(distance()!) }}</span>
+        }
       </div>
       }
 
