@@ -24,10 +24,15 @@ export class ThemeService {
    * Get initial theme from localStorage (defaults to light mode)
    */
   private getInitialTheme(): Theme {
-    // Check localStorage first
-    const savedTheme = localStorage.getItem(this.THEME_KEY) as Theme | null;
-    if (savedTheme) {
-      return savedTheme;
+    try {
+      // Check localStorage first
+      const savedTheme = localStorage.getItem(this.THEME_KEY) as Theme | null;
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        return savedTheme;
+      }
+    } catch (error) {
+      // localStorage might not be available (private mode, PWA issues, etc.)
+      console.warn('Could not access localStorage for theme:', error);
     }
 
     // Always default to light mode (ignore system preference)
@@ -59,7 +64,12 @@ export class ThemeService {
    * Save theme preference to localStorage
    */
   private saveTheme(theme: Theme): void {
-    localStorage.setItem(this.THEME_KEY, theme);
+    try {
+      localStorage.setItem(this.THEME_KEY, theme);
+    } catch (error) {
+      // localStorage might not be available (private mode, PWA issues, etc.)
+      console.warn('Could not save theme to localStorage:', error);
+    }
   }
 
   /**

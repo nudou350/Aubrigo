@@ -64,6 +64,24 @@
     <link rel="apple-touch-startup-image" href="assets/icons/apple-splash-1136-640.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
   </head>
   <body>
+    <!-- Apply theme immediately to prevent flash -->
+    <script>
+      (function() {
+        try {
+          const theme = localStorage.getItem('petsos-theme');
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+            document.documentElement.classList.remove('light-theme');
+          } else {
+            document.documentElement.classList.add('light-theme');
+            document.documentElement.classList.remove('dark-theme');
+          }
+        } catch (e) {
+          // localStorage not available, default to light theme
+          document.documentElement.classList.add('light-theme');
+        }
+      })();
+    </script>
     <app-root></app-root>
     <noscript>Please enable JavaScript to continue using this application.</noscript>
   </body>

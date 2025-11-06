@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { UpdateNotificationComponent } from './shared/components/update-notification/update-notification.component';
@@ -7,6 +8,7 @@ import { InstallPromptComponent } from './shared/components/install-prompt/insta
 import { NetworkStatusComponent } from './shared/components/network-status/network-status.component';
 import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badge/offline-sync-badge.component';
 import { ThemeToggleComponent } from './shared/components/theme-toggle/theme-toggle.component';
+import { AnalyticsService, EventType } from './core/services/analytics.service';
 
 @Component({
   selector: 'app-root',
@@ -53,13 +55,13 @@ import { ThemeToggleComponent } from './shared/components/theme-toggle/theme-tog
     .main-content {
       flex: 1;
       padding-bottom: 68px; /* Height of bottom navigation on mobile */
-      background: #ffffff;
+      background: var(--color-background);
     }
 
     /* Footer - Visible on all devices */
     .web-footer {
-      background: #f9f9f9;
-      border-top: 1px solid #e0e0e0;
+      background: var(--color-background-secondary);
+      border-top: 1px solid var(--color-border);
       padding: 20px 16px;
       margin-top: 40px;
       margin-bottom: 68px; /* Space for bottom navigation on mobile */
@@ -78,7 +80,7 @@ import { ThemeToggleComponent } from './shared/components/theme-toggle/theme-tog
     .footer-content p {
       margin: 0;
       font-size: 12px;
-      color: #666;
+      color: var(--color-text-secondary);
       display: flex;
       align-items: center;
       gap: 4px;
@@ -87,19 +89,20 @@ import { ThemeToggleComponent } from './shared/components/theme-toggle/theme-tog
     }
 
     .footer-content a {
-      color: #4ca8a0;
+      color: var(--color-primary);
       text-decoration: none;
       font-weight: 600;
       transition: all 0.2s;
     }
 
     .footer-content a:hover {
-      color: #3a8d86;
+      color: var(--color-primary);
       text-decoration: underline;
+      opacity: 0.8;
     }
 
     .separator {
-      color: #ccc;
+      color: var(--color-border);
       font-size: 12px;
     }
 
@@ -131,6 +134,19 @@ import { ThemeToggleComponent } from './shared/components/theme-toggle/theme-tog
     }
   `],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Aubrigo';
+  private router = inject(Router);
+  private analytics = inject(AnalyticsService);
+
+  ngOnInit() {
+    // Track page views on navigation
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        if (event instanceof NavigationEnd) {
+          this.analytics.trackPageView(event.urlAfterRedirects, document.title);
+        }
+      });
+  }
 }

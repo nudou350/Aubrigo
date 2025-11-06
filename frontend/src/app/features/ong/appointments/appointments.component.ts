@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AppointmentsService, Appointment } from '../../../core/services/appointments.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { AnalyticsService, EventType } from '../../../core/services/analytics.service';
 
 @Component({
   selector: 'app-ong-appointments',
@@ -435,6 +436,7 @@ import { ToastService } from '../../../core/services/toast.service';
 export class OngAppointmentsComponent implements OnInit {
   private appointmentsService = inject(AppointmentsService);
   private toastService = inject(ToastService);
+  private analytics = inject(AnalyticsService);
 
   isLoading = signal(true);
   appointments = signal<Appointment[]>([]);
@@ -501,11 +503,25 @@ export class OngAppointmentsComponent implements OnInit {
 
     this.appointmentsService.updateAppointmentStatus(id, status).subscribe({
       next: () => {
+        const appointment = this.appointments().find(apt => apt.id === id);
+
         this.appointments.update(list =>
           list.map(apt => apt.id === id ? { ...apt, status } : apt)
         );
         this.filterAppointments();
         this.toastService.success(successMessages[status]);
+
+        // Track appointment cancellation
+        if (status === 'cancelled' && appointment) {
+          this.analytics.track(EventType.APPOINTMENT_CANCEL, {
+            petId: appointment.petId,
+            ongId: appointment.ongId,
+            metadata: {
+              appointmentId: appointment.id,
+              cancelledAt: new Date().toISOString()
+            }
+          });
+        }
       },
       error: (error) => {
         console.error('Error updating appointment status:', error);
