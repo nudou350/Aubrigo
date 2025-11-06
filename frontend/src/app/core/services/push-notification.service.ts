@@ -1,16 +1,16 @@
-import { Injectable, inject } from '@angular/core';
-import { SwPush } from '@angular/service-worker';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from "@angular/core";
+import { SwPush } from "@angular/service-worker";
+import { HttpClient } from "@angular/common/http";
 
 /**
  * Push Notification Types
  */
 export enum PushNotificationType {
-  NEW_PET_IN_AREA = 'NEW_PET_IN_AREA',
-  APPOINTMENT_CONFIRMED = 'APPOINTMENT_CONFIRMED',
-  APPOINTMENT_REMINDER = 'APPOINTMENT_REMINDER',
-  FAVORITE_PET_UPDATED = 'FAVORITE_PET_UPDATED',
-  DONATION_CAMPAIGN = 'DONATION_CAMPAIGN'
+  NEW_PET_IN_AREA = "NEW_PET_IN_AREA",
+  APPOINTMENT_CONFIRMED = "APPOINTMENT_CONFIRMED",
+  APPOINTMENT_REMINDER = "APPOINTMENT_REMINDER",
+  FAVORITE_PET_UPDATED = "FAVORITE_PET_UPDATED",
+  DONATION_CAMPAIGN = "DONATION_CAMPAIGN",
 }
 
 /**
@@ -42,7 +42,7 @@ export interface PushNotificationPayload {
  * 3. Add private key to backend .env
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class PushNotificationService {
   private swPush = inject(SwPush);
@@ -50,13 +50,13 @@ export class PushNotificationService {
 
   // IMPORTANT: Replace with your actual VAPID public key
   // Generate with: npx web-push generate-vapid-keys
-  private readonly VAPID_PUBLIC_KEY = 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY';
+  private readonly VAPID_PUBLIC_KEY = "REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY";
 
-  private readonly API_URL = '/api/push-notifications';
+  private readonly API_URL = "/api/push-notifications";
 
   constructor() {
     this.initPushNotifications();
-    console.log('🔔 Push Notification Service initialized');
+    console.log("🔔 Push Notification Service initialized");
   }
 
   /**
@@ -65,30 +65,32 @@ export class PushNotificationService {
   private initPushNotifications(): void {
     // Check if push notifications are supported
     if (!this.swPush.isEnabled) {
-      console.warn('⚠️ Push notifications are not enabled (Service Worker not active or not supported)');
+      console.warn(
+        "⚠️ Push notifications are not enabled (Service Worker not active or not supported)"
+      );
       return;
     }
 
-    console.log('✅ Push notifications are supported');
+    console.log("✅ Push notifications are supported");
 
     // Check if already subscribed
-    this.swPush.subscription.subscribe(subscription => {
+    this.swPush.subscription.subscribe((subscription) => {
       if (subscription) {
-        console.log('✅ Already subscribed to push notifications');
+        console.log("✅ Already subscribed to push notifications");
       } else {
-        console.log('ℹ️ Not subscribed to push notifications yet');
+        console.log("ℹ️ Not subscribed to push notifications yet");
       }
     });
 
     // Listen for push notification messages
     this.swPush.messages.subscribe((message: any) => {
-      console.log('📬 Push notification received:', message);
+      console.log("📬 Push notification received:", message);
       this.handleNotification(message);
     });
 
     // Listen for notification clicks
     this.swPush.notificationClicks.subscribe(({ action, notification }) => {
-      console.log('🖱️ Notification clicked:', action, notification);
+      console.log("🖱️ Notification clicked:", action, notification);
       this.handleNotificationClick(action, notification);
     });
   }
@@ -98,7 +100,7 @@ export class PushNotificationService {
    */
   async subscribe(userEmail?: string): Promise<boolean> {
     if (!this.swPush.isEnabled) {
-      console.warn('⚠️ Cannot subscribe: Push notifications not enabled');
+      console.warn("⚠️ Cannot subscribe: Push notifications not enabled");
       return false;
     }
 
@@ -106,33 +108,33 @@ export class PushNotificationService {
       // Check if already subscribed
       const existingSubscription = await this.swPush.subscription.toPromise();
       if (existingSubscription) {
-        console.log('ℹ️ Already subscribed, returning existing subscription');
+        console.log("ℹ️ Already subscribed, returning existing subscription");
         return true;
       }
 
       // Request permission
       const permission = await Notification.requestPermission();
 
-      if (permission !== 'granted') {
-        console.warn('⚠️ Notification permission denied');
+      if (permission !== "granted") {
+        console.warn("⚠️ Notification permission denied");
         return false;
       }
 
-      console.log('✅ Notification permission granted');
+      console.log("✅ Notification permission granted");
 
       // Subscribe to push notifications
       const subscription = await this.swPush.requestSubscription({
-        serverPublicKey: this.VAPID_PUBLIC_KEY
+        serverPublicKey: this.VAPID_PUBLIC_KEY,
       });
 
-      console.log('✅ Push subscription created:', subscription);
+      console.log("✅ Push subscription created:", subscription);
 
       // Send subscription to backend
       await this.sendSubscriptionToBackend(subscription, userEmail);
 
       return true;
     } catch (error) {
-      console.error('❌ Failed to subscribe to push notifications:', error);
+      console.error("❌ Failed to subscribe to push notifications:", error);
       return false;
     }
   }
@@ -149,20 +151,20 @@ export class PushNotificationService {
       const subscription = await this.swPush.subscription.toPromise();
 
       if (!subscription) {
-        console.log('ℹ️ Not subscribed, nothing to unsubscribe');
+        console.log("ℹ️ Not subscribed, nothing to unsubscribe");
         return true;
       }
 
       // Unsubscribe
       await this.swPush.unsubscribe();
-      console.log('✅ Unsubscribed from push notifications');
+      console.log("✅ Unsubscribed from push notifications");
 
       // Notify backend
       await this.removeSubscriptionFromBackend(subscription);
 
       return true;
     } catch (error) {
-      console.error('❌ Failed to unsubscribe from push notifications:', error);
+      console.error("❌ Failed to unsubscribe from push notifications:", error);
       return false;
     }
   }
@@ -201,7 +203,7 @@ export class PushNotificationService {
    * Check if notifications are supported
    */
   isSupported(): boolean {
-    return this.swPush.isEnabled && 'Notification' in window;
+    return this.swPush.isEnabled && "Notification" in window;
   }
 
   /**
@@ -216,13 +218,13 @@ export class PushNotificationService {
         subscription: subscription.toJSON(),
         userEmail,
         userAgent: navigator.userAgent,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       await this.http.post(`${this.API_URL}/subscribe`, payload).toPromise();
-      console.log('✅ Subscription sent to backend');
+      console.log("✅ Subscription sent to backend");
     } catch (error) {
-      console.error('❌ Failed to send subscription to backend:', error);
+      console.error("❌ Failed to send subscription to backend:", error);
       // Don't throw - subscription is still valid locally
     }
   }
@@ -230,15 +232,19 @@ export class PushNotificationService {
   /**
    * Remove subscription from backend
    */
-  private async removeSubscriptionFromBackend(subscription: PushSubscription): Promise<void> {
+  private async removeSubscriptionFromBackend(
+    subscription: PushSubscription
+  ): Promise<void> {
     try {
       const endpoint = subscription.endpoint;
-      await this.http.delete(`${this.API_URL}/unsubscribe`, {
-        body: { endpoint }
-      }).toPromise();
-      console.log('✅ Subscription removed from backend');
+      await this.http
+        .delete(`${this.API_URL}/unsubscribe`, {
+          body: { endpoint },
+        })
+        .toPromise();
+      console.log("✅ Subscription removed from backend");
     } catch (error) {
-      console.error('❌ Failed to remove subscription from backend:', error);
+      console.error("❌ Failed to remove subscription from backend:", error);
     }
   }
 
@@ -251,27 +257,27 @@ export class PushNotificationService {
 
     switch (type) {
       case PushNotificationType.NEW_PET_IN_AREA:
-        console.log('🐶 New pet in your area:', data);
+        console.log("🐶 New pet in your area:", data);
         break;
 
       case PushNotificationType.APPOINTMENT_CONFIRMED:
-        console.log('✅ Appointment confirmed:', data);
+        console.log("✅ Appointment confirmed:", data);
         break;
 
       case PushNotificationType.APPOINTMENT_REMINDER:
-        console.log('⏰ Appointment reminder:', data);
+        console.log("⏰ Appointment reminder:", data);
         break;
 
       case PushNotificationType.FAVORITE_PET_UPDATED:
-        console.log('❤️ Favorite pet updated:', data);
+        console.log("❤️ Favorite pet updated:", data);
         break;
 
       case PushNotificationType.DONATION_CAMPAIGN:
-        console.log('💰 Donation campaign:', data);
+        console.log("💰 Donation campaign:", data);
         break;
 
       default:
-        console.log('📬 Unknown notification type:', type);
+        console.log("📬 Unknown notification type:", type);
     }
   }
 
@@ -279,25 +285,25 @@ export class PushNotificationService {
    * Handle notification click
    */
   private handleNotificationClick(action: string, notification: any): void {
-    console.log('🖱️ Handling notification action:', action);
+    console.log("🖱️ Handling notification action:", action);
 
     // Navigate to appropriate page based on action
     switch (action) {
-      case 'view_pet':
+      case "view_pet":
         window.location.href = `/pets/${notification.data?.petId}`;
         break;
 
-      case 'view_appointment':
+      case "view_appointment":
         window.location.href = `/appointments/${notification.data?.appointmentId}`;
         break;
 
-      case 'donate':
+      case "donate":
         window.location.href = `/donate/${notification.data?.ongId}`;
         break;
 
       default:
         // Default action: open the app
-        window.location.href = '/';
+        window.location.href = "/";
     }
   }
 
@@ -306,12 +312,12 @@ export class PushNotificationService {
    */
   async sendTestNotification(): Promise<void> {
     if (!this.isSupported()) {
-      console.warn('⚠️ Notifications not supported');
+      console.warn("⚠️ Notifications not supported");
       return;
     }
 
-    if (Notification.permission !== 'granted') {
-      console.warn('⚠️ Notification permission not granted');
+    if (Notification.permission !== "granted") {
+      console.warn("⚠️ Notification permission not granted");
       return;
     }
 
@@ -319,29 +325,29 @@ export class PushNotificationService {
     // For testing, we can show a local notification
     const registration = await navigator.serviceWorker.ready;
 
-    await registration.showNotification('Aubrigo - Teste', {
-      body: 'Esta é uma notificação de teste!',
-      icon: '/assets/icons/icon-192x192.png',
-      badge: '/assets/icons/icon-72x72.png',
+    await registration.showNotification("Aubrigo - Teste", {
+      body: "Esta é uma notificação de teste!",
+      icon: "/assets/icons/icon/apple-icon-180.png",
+      badge: "/assets/icons/icon-72x72.png",
       vibrate: [200, 100, 200],
       data: {
         dateOfArrival: Date.now(),
-        primaryKey: 1
+        primaryKey: 1,
       },
       actions: [
         {
-          action: 'explore',
-          title: 'Ver Pets',
-          icon: '/assets/icons/checkmark.png'
+          action: "explore",
+          title: "Ver Pets",
+          icon: "/assets/icons/checkmark.png",
         },
         {
-          action: 'close',
-          title: 'Fechar',
-          icon: '/assets/icons/close.png'
-        }
-      ]
+          action: "close",
+          title: "Fechar",
+          icon: "/assets/icons/close.png",
+        },
+      ],
     });
 
-    console.log('✅ Test notification sent');
+    console.log("✅ Test notification sent");
   }
 }

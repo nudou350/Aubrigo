@@ -16,6 +16,14 @@ export interface User {
   updatedAt: string;
 }
 
+export interface ONG {
+  id: string;
+  ongName: string;
+  profileImageUrl?: string;
+  location?: string;
+  phone?: string;
+}
+
 export interface UpdateProfileDto {
   firstName?: string;
   lastName?: string;
@@ -122,5 +130,12 @@ export class UsersService {
    */
   clearCurrentUser(): void {
     this.currentUserSubject.next(null);
+  }
+
+  /**
+   * Get all ONGs
+   */
+  getAllOngs(): Observable<ONG[]> {
+    return this.http.get<ONG[]>(this.apiUrl);
   }
 }

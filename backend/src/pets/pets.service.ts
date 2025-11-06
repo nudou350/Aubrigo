@@ -31,6 +31,10 @@ export class PetsService {
       .where('pet.status = :status', { status: 'available' });
 
     // Apply filters
+    if (filters.ongId) {
+      query.andWhere('pet.ongId = :ongId', { ongId: filters.ongId });
+    }
+
     if (filters.species) {
       query.andWhere('pet.species = :species', { species: filters.species });
     }

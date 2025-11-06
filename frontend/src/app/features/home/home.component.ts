@@ -10,7 +10,11 @@ import {
   SearchPetsParams,
 } from "../../core/services/pets.service";
 import { PwaService } from "../../core/services/pwa.service";
-import { AnalyticsService, EventType } from "../../core/services/analytics.service";
+import {
+  AnalyticsService,
+  EventType,
+} from "../../core/services/analytics.service";
+import { UsersService, ONG } from "../../core/services/users.service";
 
 @Component({
   selector: "app-home",
@@ -90,6 +94,59 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
             }
           </div>
 
+          <!-- ONG Filter -->
+          <div class="ong-search-container">
+            <img
+              ngSrc="assets/ong.webp"
+              alt="ONG"
+              width="18"
+              height="18"
+              class="ong-filter-icon"
+            />
+            <input
+              type="text"
+              class="ong-input"
+              [value]="getOngInputValue()"
+              (input)="onOngInput($event)"
+              (focus)="onOngFocus()"
+              (keydown)="onOngKeydown($event)"
+              [placeholder]="getOngPlaceholder()"
+            />
+            @if (currentOng()) {
+            <button
+              class="clear-ong-button"
+              (click)="clearOngFilter()"
+              title="Limpar filtro"
+            >
+              ✕
+            </button>
+            } @if (showOngDropdown() && filteredOngs().length > 0) {
+            <div class="ong-dropdown">
+              @for (ong of filteredOngs(); track $index) {
+              <button
+                class="ong-option"
+                [class.selected]="selectedOngIndex() === $index"
+                (click)="selectOng(ong)"
+              >
+                <svg
+                  class="option-icon"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M16.5 12c1.38 0 2.49-1.12 2.49-2.5S17.88 7 16.5 7C15.12 7 14 8.12 14 9.5s1.12 2.5 2.5 2.5zM9 11c1.66 0 2.99-1.34 2.99-3S10.66 5 9 5C7.34 5 6 6.34 6 8s1.34 3 3 3zm7.5 3c-1.83 0-5.5.92-5.5 2.75V19h11v-2.25c0-1.83-3.67-2.75-5.5-2.75zM9 13c-2.33 0-7 1.17-7 3.5V19h7v-2.25c0-.85.33-2.34 2.37-3.47C10.5 13.1 9.66 13 9 13z"
+                  />
+                </svg>
+                {{ ong.ongName }}
+                @if (ong.location) {
+                <span class="ong-location">- {{ ong.location }}</span>
+                }
+              </button>
+              }
+            </div>
+            }
+          </div>
+
           <!-- Species Filter Tabs -->
           <div class="species-tabs">
             <button
@@ -97,21 +154,42 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
               [class.active]="selectedSpecies() === 'dog'"
               (click)="filterBySpecies('dog')"
             >
-              <img ngSrc="assets/dog_home.webp" alt="Dog" width="36" height="36" class="tab-icon" priority />
+              <img
+                ngSrc="assets/dog_home.webp"
+                alt="Dog"
+                width="48"
+                height="48"
+                class="tab-icon"
+                priority
+              />
             </button>
             <button
               class="species-tab"
               [class.active]="selectedSpecies() === 'cat'"
               (click)="filterBySpecies('cat')"
             >
-              <img ngSrc="assets/cat_home.webp" alt="Cat" width="36" height="36" class="tab-icon" priority />
+              <img
+                ngSrc="assets/cat_home.webp"
+                alt="Cat"
+                width="48"
+                height="48"
+                class="tab-icon"
+                priority
+              />
             </button>
             <button
               class="species-tab"
               [class.active]="selectedSpecies() === 'fish'"
               (click)="filterBySpecies('fish')"
             >
-              <img ngSrc="assets/fish_home.webp" alt="Fish" width="36" height="36" class="tab-icon" priority />
+              <img
+                ngSrc="assets/fish_home.webp"
+                alt="Fish"
+                width="48"
+                height="48"
+                class="tab-icon"
+                priority
+              />
             </button>
             <button
               class="species-tab"
@@ -121,8 +199,8 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
               <img
                 ngSrc="assets/hamster_home.webp"
                 alt="Hamster"
-                width="36"
-                height="36"
+                width="48"
+                height="48"
                 class="tab-icon"
                 priority
               />
@@ -149,7 +227,14 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
         <div class="pet-card" (click)="viewPetDetail(pet.id)">
           <div class="pet-image-container">
             @if (pet.primaryImage) {
-            <img [ngSrc]="pet.primaryImage" [alt]="pet.name" fill class="pet-image" loading="lazy" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+            <img
+              [ngSrc]="pet.primaryImage"
+              [alt]="pet.name"
+              fill
+              class="pet-image"
+              loading="lazy"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
             } @else {
             <div class="placeholder-image">{{ pet.name }}</div>
             }
@@ -215,7 +300,13 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
               </div>
 
               <div class="detail-item">
-                <img ngSrc="assets/size.webp" alt="Size" width="18" height="18" class="detail-icon" />
+                <img
+                  ngSrc="assets/size.webp"
+                  alt="Size"
+                  width="18"
+                  height="18"
+                  class="detail-icon"
+                />
                 <span>{{ getSizeLabel(pet.size) }}</span>
               </div>
 
@@ -234,7 +325,13 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
             </div>
 
             <div class="ong-info">
-              <img ngSrc="assets/ong.webp" alt="ONG" width="20" height="20" class="ong-icon" />
+              <img
+                ngSrc="assets/ong.webp"
+                alt="ONG"
+                width="20"
+                height="20"
+                class="ong-icon"
+              />
               <span>{{ pet.ong?.ongName || "N/A" }}</span>
             </div>
 
@@ -444,12 +541,12 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
       .filter-bar {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 12px;
         margin-bottom: 20px;
       }
 
       .location-search-container {
-        flex: 1;
+        width: 100%;
         position: relative;
         display: flex;
         align-items: center;
@@ -526,6 +623,107 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
         flex-shrink: 0;
       }
 
+      /* ONG Filter */
+      .ong-search-container {
+        width: 100%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(184, 227, 225, 0.3);
+        padding: 12px 16px;
+        border-radius: 12px;
+      }
+
+      .ong-filter-icon {
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+
+      .ong-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 15px;
+        color: #2c2c2c;
+        font-weight: 500;
+        outline: none;
+      }
+
+      .ong-input::placeholder {
+        color: #999999;
+        font-weight: 400;
+      }
+
+      .clear-ong-button {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.1);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #666;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+      }
+
+      .clear-ong-button:hover {
+        background: rgba(0, 0, 0, 0.2);
+        color: #2c2c2c;
+      }
+
+      .ong-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        overflow: hidden;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .ong-option {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border: none;
+        background: white;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        text-align: left;
+        font-size: 15px;
+        color: #2c2c2c;
+      }
+
+      .ong-option:hover {
+        background: rgba(184, 227, 225, 0.2);
+      }
+
+      .ong-option.selected {
+        background: rgba(184, 227, 225, 0.5);
+        font-weight: 600;
+      }
+
+      .ong-location {
+        font-size: 13px;
+        color: #666;
+        font-weight: 400;
+        margin-left: auto;
+      }
+
       .search-button {
         width: 48px;
         height: 48px;
@@ -580,8 +778,8 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
       }
 
       .tab-icon {
-        width: 36px;
-        height: 36px;
+        width: 45px;
+        height: 45px;
         object-fit: contain;
         border-radius: 8px;
       }
@@ -757,8 +955,8 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
         flex-shrink: 0;
       }
 
-      .detail-icon[src*="location.png"] {
-        width: 14px;
+      .detail-icon[src*="location.webp"] {
+        width: 18px;
         height: 18px;
         object-fit: contain;
       }
@@ -857,12 +1055,11 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
         .filter-bar {
           flex-direction: row;
           align-items: center;
-          justify-content: center;
-          gap: 24px;
+          gap: 16px;
         }
 
         .location-search-container {
-          max-width: 500px;
+          flex: 1;
           padding: 16px 20px;
         }
 
@@ -872,6 +1069,20 @@ import { AnalyticsService, EventType } from "../../core/services/analytics.servi
         }
 
         .location-input {
+          font-size: 17px;
+        }
+
+        .ong-search-container {
+          flex: 1;
+          padding: 16px 20px;
+        }
+
+        .ong-filter-icon {
+          width: 22px;
+          height: 22px;
+        }
+
+        .ong-input {
           font-size: 17px;
         }
 
@@ -1074,6 +1285,7 @@ export class HomeComponent implements OnInit {
   private toastService = inject(ToastService);
   pwaService = inject(PwaService);
   private analytics = inject(AnalyticsService);
+  private usersService = inject(UsersService);
 
   pets = signal<Pet[]>([]);
   loading = signal(true);
@@ -1089,8 +1301,17 @@ export class HomeComponent implements OnInit {
   filteredLocations = signal<string[]>(this.availableLocations);
   selectedLocationIndex = signal(-1);
 
+  // ONG filter
+  currentOng = signal<string | null>(null);
+  showOngDropdown = signal(false);
+  availableOngs = signal<ONG[]>([]);
+  filteredOngs = signal<ONG[]>([]);
+  selectedOngIndex = signal(-1);
+  ongInput = signal("");
+
   ngOnInit() {
     this.loadCitiesWithPets();
+    this.loadOngs();
     this.loadPets();
     this.initFavorites();
 
@@ -1099,6 +1320,9 @@ export class HomeComponent implements OnInit {
       const target = e.target as HTMLElement;
       if (!target.closest(".location-search-container")) {
         this.showLocationDropdown.set(false);
+      }
+      if (!target.closest(".ong-search-container")) {
+        this.showOngDropdown.set(false);
       }
     });
   }
@@ -1181,6 +1405,11 @@ export class HomeComponent implements OnInit {
 
     const params: SearchPetsParams = {};
 
+    // Add ONG filter if selected
+    if (this.currentOng()) {
+      params.ongId = this.currentOng()!;
+    }
+
     // Add species filter if selected
     if (this.selectedSpecies()) {
       params.species = this.selectedSpecies();
@@ -1203,10 +1432,10 @@ export class HomeComponent implements OnInit {
         // Track search/filter usage
         this.analytics.track(EventType.SEARCH, {
           metadata: {
-            species: params.species || 'all',
-            location: params.location || 'all',
-            resultsCount: results.length
-          }
+            species: params.species || "all",
+            location: params.location || "all",
+            resultsCount: results.length,
+          },
         });
       },
       error: (error) => {
@@ -1224,9 +1453,9 @@ export class HomeComponent implements OnInit {
     // Track filter application
     this.analytics.track(EventType.FILTER_APPLY, {
       metadata: {
-        filterType: 'species',
-        value: species
-      }
+        filterType: "species",
+        value: species,
+      },
     });
 
     this.loadPets();
@@ -1419,12 +1648,136 @@ export class HomeComponent implements OnInit {
     // Track filter application
     this.analytics.track(EventType.FILTER_APPLY, {
       metadata: {
-        filterType: 'location',
-        value: location
-      }
+        filterType: "location",
+        value: location,
+      },
     });
 
     // Reload pets with location filter
+    this.loadPets();
+  }
+
+  // ONG filter methods
+  loadOngs() {
+    this.usersService.getAllOngs().subscribe({
+      next: (ongs) => {
+        this.availableOngs.set(ongs);
+        this.filteredOngs.set(ongs.slice(0, 5));
+      },
+      error: (error) => {
+        console.error("Error loading ONGs:", error);
+      },
+    });
+  }
+
+  getOngInputValue(): string {
+    const ongId = this.currentOng();
+    if (!ongId) return "";
+
+    const ong = this.availableOngs().find((o) => o.id === ongId);
+    return ong?.ongName || "";
+  }
+
+  getOngPlaceholder(): string {
+    return this.currentOng() ? "Digite o nome da ONG..." : "Todas as ONGs";
+  }
+
+  onOngFocus() {
+    this.filteredOngs.set(this.availableOngs().slice(0, 5));
+    this.showOngDropdown.set(true);
+    this.selectedOngIndex.set(-1);
+  }
+
+  onOngInput(event: Event) {
+    const input = (event.target as HTMLInputElement).value.trim();
+    this.ongInput.set(input);
+
+    if (!input) {
+      this.currentOng.set(null);
+      this.filteredOngs.set(this.availableOngs().slice(0, 5));
+      this.showOngDropdown.set(true);
+      this.selectedOngIndex.set(-1);
+      return;
+    }
+
+    const filtered = this.availableOngs()
+      .filter((ong) => ong.ongName.toLowerCase().includes(input.toLowerCase()))
+      .slice(0, 5);
+
+    this.filteredOngs.set(filtered);
+    this.showOngDropdown.set(true);
+    this.selectedOngIndex.set(-1);
+  }
+
+  onOngKeydown(event: KeyboardEvent) {
+    const ongs = this.filteredOngs();
+
+    if (!this.showOngDropdown() || ongs.length === 0) {
+      if (event.key === "Enter") {
+        this.onOngEnterKey();
+      }
+      return;
+    }
+
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        this.selectedOngIndex.update((idx) =>
+          idx < ongs.length - 1 ? idx + 1 : idx
+        );
+        break;
+
+      case "ArrowUp":
+        event.preventDefault();
+        this.selectedOngIndex.update((idx) => (idx > 0 ? idx - 1 : -1));
+        break;
+
+      case "Enter":
+        event.preventDefault();
+        const selectedIdx = this.selectedOngIndex();
+        if (selectedIdx >= 0 && selectedIdx < ongs.length) {
+          this.selectOng(ongs[selectedIdx]);
+        } else {
+          this.onOngEnterKey();
+        }
+        break;
+
+      case "Escape":
+        event.preventDefault();
+        this.showOngDropdown.set(false);
+        this.selectedOngIndex.set(-1);
+        break;
+    }
+  }
+
+  onOngEnterKey() {
+    this.showOngDropdown.set(false);
+    this.selectedOngIndex.set(-1);
+    this.loadPets();
+  }
+
+  selectOng(ong: ONG) {
+    this.currentOng.set(ong.id);
+    this.ongInput.set(ong.ongName);
+    this.showOngDropdown.set(false);
+    this.selectedOngIndex.set(-1);
+    this.filteredOngs.set(this.availableOngs().slice(0, 5));
+
+    // Track filter application
+    this.analytics.track(EventType.FILTER_APPLY, {
+      metadata: {
+        filterType: "ong",
+        value: ong.ongName,
+      },
+    });
+
+    this.loadPets();
+  }
+
+  clearOngFilter() {
+    this.currentOng.set(null);
+    this.ongInput.set("");
+    this.filteredOngs.set(this.availableOngs().slice(0, 5));
     this.loadPets();
   }
 }

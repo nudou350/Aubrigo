@@ -42,6 +42,7 @@ export interface ONG {
 
 export interface SearchPetsParams {
   location?: string;
+  ongId?: string;
   species?: string;
   size?: string;
   gender?: string;

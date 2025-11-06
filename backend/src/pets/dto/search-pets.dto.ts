@@ -8,6 +8,11 @@ export class SearchPetsDto {
   @IsString()
   location?: string;
 
+  @ApiProperty({ required: false, example: 'uuid-of-ong' })
+  @IsOptional()
+  @IsString()
+  ongId?: string;
+
   @ApiProperty({
     required: false,
     enum: ['dog', 'cat', 'fish', 'hamster'],
