@@ -99,13 +99,13 @@ html, body {
   height: 100%;
 }
 
-/* Color scheme support - always default to light, only dark when user toggles */
-html {
+/* Force light mode - disable automatic dark mode from system */
+:root {
   color-scheme: light only;
 }
 
-html.dark-theme {
-  color-scheme: dark;
+html {
+  color-scheme: light only;
 }
 
 body {
