@@ -15,17 +15,49 @@ export class ThemeService {
     // Effect to apply theme changes to document
     effect(() => {
       const theme = this.currentTheme();
-      this.applyTheme(theme);
+      // Force light mode on desktop/tablet (screens >= 768px)
+      if (this.isDesktopOrTablet()) {
+        this.applyTheme('light');
+      } else {
+        this.applyTheme(theme);
+      }
       this.saveTheme(theme);
     });
+
+    // Listen for window resize to force light mode on desktop
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => {
+        if (this.isDesktopOrTablet()) {
+          this.applyTheme('light');
+        } else {
+          this.applyTheme(this.currentTheme());
+        }
+      });
+    }
+  }
+
+  /**
+   * Check if current device is desktop or tablet (screen >= 768px)
+   */
+  private isDesktopOrTablet(): boolean {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 768;
+    }
+    return false;
   }
 
   /**
    * Get initial theme from localStorage (defaults to light mode)
+   * Desktop/tablet always get light mode
    */
   private getInitialTheme(): Theme {
+    // Desktop/tablet always get light mode
+    if (this.isDesktopOrTablet()) {
+      return 'light';
+    }
+
     try {
-      // Check localStorage first
+      // Check localStorage first (only for mobile)
       const savedTheme = localStorage.getItem(this.THEME_KEY) as Theme | null;
       if (savedTheme === 'light' || savedTheme === 'dark') {
         return savedTheme;

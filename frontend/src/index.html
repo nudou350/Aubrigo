@@ -68,23 +68,30 @@
     <!-- Apply theme immediately to prevent flash and force light mode by default -->
     <script>
       (function() {
+        // Check if mobile device (screen width < 768px)
+        var isMobile = window.innerWidth < 768;
+
         // ALWAYS start with light theme by default
         document.documentElement.classList.add('light-theme');
         document.documentElement.classList.remove('dark-theme');
         document.documentElement.style.colorScheme = 'light';
 
-        try {
-          // Only switch to dark if explicitly saved by user
-          const theme = localStorage.getItem('petsos-theme');
-          if (theme === 'dark') {
-            document.documentElement.classList.remove('light-theme');
-            document.documentElement.classList.add('dark-theme');
-            document.documentElement.style.colorScheme = 'dark';
+        // Only apply dark mode on mobile devices
+        if (isMobile) {
+          try {
+            // Only switch to dark if explicitly saved by user
+            const theme = localStorage.getItem('petsos-theme');
+            if (theme === 'dark') {
+              document.documentElement.classList.remove('light-theme');
+              document.documentElement.classList.add('dark-theme');
+              document.documentElement.style.colorScheme = 'dark';
+            }
+          } catch (e) {
+            // localStorage not available, already defaulted to light theme above
+            console.warn('localStorage not available, using light theme');
           }
-        } catch (e) {
-          // localStorage not available, already defaulted to light theme above
-          console.warn('localStorage not available, using light theme');
         }
+        // Desktop/tablet always use light mode (no dark mode support)
       })();
     </script>
     <app-root></app-root>

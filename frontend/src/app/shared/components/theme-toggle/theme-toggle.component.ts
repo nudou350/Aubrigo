@@ -174,13 +174,17 @@ import { ThemeService } from '../../../core/services/theme.service';
       }
     }
 
-    /* Desktop */
+    /* Desktop - Hide theme toggle on large screens */
     @media (min-width: 1024px) {
       .theme-toggle {
-        bottom: 32px;
-        right: 32px;
-        width: 60px;
-        height: 60px;
+        display: none;
+      }
+    }
+
+    /* Tablet - Hide theme toggle on medium screens too */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .theme-toggle {
+        display: none;
       }
     }
   `]
