@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   template: `
     <div class="account-type-container">
       <div class="content">
-        <img src="assets/logo.png" alt="Pet SOS" class="logo" *ngIf="false">
+        <img src="assets/logo.png" alt="Aubrigo" class="logo" *ngIf="false">
         <h1>Criar Conta</h1>
         <p class="subtitle">Escolha o tipo de conta que deseja criar</p>
 

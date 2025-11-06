@@ -39,5 +39,5 @@ import { ToastComponent } from './shared/components/toast/toast.component';
   `],
 })
 export class AppComponent {
-  title = 'Pet SOS';
+  title = 'Aubrigo';
 }

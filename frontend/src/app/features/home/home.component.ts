@@ -953,7 +953,7 @@ export class HomeComponent implements OnInit {
     if (installed) {
       this.toastService.success('App instalado! Acesse pelo ícone na tela inicial');
     } else {
-      this.toastService.info('Adicione o Pet SOS à sua tela inicial para acesso rápido!');
+      this.toastService.info('Adicione o Aubrigo à sua tela inicial para acesso rápido!');
     }
   }
 
