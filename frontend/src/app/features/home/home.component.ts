@@ -5,6 +5,7 @@ import { AuthService } from "../../core/services/auth.service";
 import { FavoritesService } from "../../core/services/favorites.service";
 import { ToastService } from "../../core/services/toast.service";
 import { PetsService, Pet, SearchPetsParams } from "../../core/services/pets.service";
+import { PwaService } from "../../core/services/pwa.service";
 
 @Component({
   selector: "app-home",
@@ -16,19 +17,26 @@ import { PetsService, Pet, SearchPetsParams } from "../../core/services/pets.ser
       <div class="header-section">
         <div class="greeting">
           <h1 class="greeting-text">{{ getGreeting() }}</h1>
-          @if (authService.isAuthenticated()) {
-          <button class="profile-button" (click)="goToProfile()">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-              />
-            </svg>
-          </button>
-          } @else {
-          <button class="login-button" (click)="goToLogin()">
-            Login / Registrar
-          </button>
-          }
+          <div class="header-actions">
+            @if (pwaService.isInstallable() && !pwaService.isInstalled()) {
+              <button class="pwa-install-button" (click)="installPwa()" title="Instalar aplicativo">
+                📱
+              </button>
+            }
+            @if (authService.isAuthenticated()) {
+            <button class="profile-button" (click)="goToProfile()">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                />
+              </svg>
+            </button>
+            } @else {
+            <button class="login-button" (click)="goToLogin()">
+              Login / Registrar
+            </button>
+            }
+          </div>
         </div>
 
         <!-- Location & Species Filter Bar -->
@@ -244,6 +252,42 @@ import { PetsService, Pet, SearchPetsParams } from "../../core/services/pets.ser
         font-weight: 500;
         color: #4ca8a0;
         margin: 0;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .pwa-install-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(184, 227, 225, 0.3);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 20px;
+      }
+
+      .pwa-install-button:hover {
+        background: rgba(76, 168, 160, 0.2);
+        transform: scale(1.05);
+      }
+
+      .pwa-install-button:active {
+        transform: scale(0.95);
+      }
+
+      /* Hide PWA install button on desktop */
+      @media (min-width: 1024px) {
+        .pwa-install-button {
+          display: none;
+        }
       }
 
       .profile-button {
@@ -732,6 +776,7 @@ export class HomeComponent implements OnInit {
   authService = inject(AuthService);
   private favoritesService = inject(FavoritesService);
   private toastService = inject(ToastService);
+  pwaService = inject(PwaService);
 
   pets = signal<Pet[]>([]);
   loading = signal(true);
@@ -901,6 +946,15 @@ export class HomeComponent implements OnInit {
 
   goToLogin() {
     this.router.navigate(["/login"]);
+  }
+
+  async installPwa() {
+    const installed = await this.pwaService.promptInstall();
+    if (installed) {
+      this.toastService.success('App instalado! Acesse pelo ícone na tela inicial');
+    } else {
+      this.toastService.info('Adicione o Pet SOS à sua tela inicial para acesso rápido!');
+    }
   }
 
   loadCitiesWithPets() {

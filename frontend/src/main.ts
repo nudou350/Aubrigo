@@ -14,7 +14,7 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
+      enabled: true, // Temporariamente ativo para testar PWA em dev
       registrationStrategy: 'registerWhenStable:30000',
     }),
   ],
