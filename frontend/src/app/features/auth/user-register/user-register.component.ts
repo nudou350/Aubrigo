@@ -329,7 +329,7 @@ export class UserRegisterComponent {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    const { confirmPassword, ...registerData } = this.registerForm.value;
+    const registerData = this.registerForm.value;
 
     this.authService.registerUser(registerData).subscribe({
       next: () => {
