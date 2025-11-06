@@ -957,20 +957,25 @@ export class PetFormComponent implements OnInit {
       formData.append('deletedImageIds', this.deletedImageIds().join(','));
     }
 
-    // Add new images
-    let primaryIndex = -1;
-    this.images().forEach((img, index) => {
-      if (img.file) {
-        formData.append('images', img.file);
-        if (img.isPrimary) {
-          primaryIndex = index;
-        }
-      }
-    });
+    // Add new images (reorganize so primary is first for create mode)
+    const newImages = this.images().filter(img => img.file);
 
-    // Add primaryImageIndex only when creating a new pet (not editing)
-    if (!this.isEditMode() && primaryIndex >= 0) {
-      formData.append('primaryImageIndex', primaryIndex.toString());
+    if (!this.isEditMode() && newImages.length > 0) {
+      // For create mode: sort images so primary is first
+      const sortedImages = [...newImages].sort((a, b) => {
+        if (a.isPrimary) return -1;
+        if (b.isPrimary) return 1;
+        return 0;
+      });
+
+      sortedImages.forEach(img => {
+        formData.append('images', img.file!);
+      });
+    } else {
+      // For edit mode: just add images in order
+      newImages.forEach(img => {
+        formData.append('images', img.file!);
+      });
     }
 
     const request = this.isEditMode()
