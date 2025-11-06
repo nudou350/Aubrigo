@@ -1,0 +1,502 @@
+.ong-detail-screen {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding-bottom: 100px;
+}
+
+/* Loading */
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-content {
+  background: #ffffff;
+  padding: 32px 48px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #b8e3e1;
+  border-top-color: #4ca8a0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  color: #2c2c2c;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Back Button */
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: none;
+  padding: 12px 20px;
+  margin: 16px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #4ca8a0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.back-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.back-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Header */
+.ong-header {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
+
+.ong-image-container {
+  width: 100%;
+  height: 300px;
+  position: relative;
+  background: linear-gradient(135deg, #f5fafa 0%, #e8f5f4 50%, #b8e3e1 100%);
+  overflow: hidden;
+}
+
+.ong-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+}
+
+.placeholder-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+}
+
+.placeholder-icon {
+  width: 100px;
+  height: 100px;
+  color: #4ca8a0;
+}
+
+.ong-header-info {
+  padding: 24px 20px;
+}
+
+.ong-name {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin: 0 0 16px 0;
+}
+
+.ong-location {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.ong-location svg {
+  width: 22px;
+  height: 22px;
+  color: #4ca8a0;
+}
+
+.pet-count {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(184, 227, 225, 0.2);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #4ca8a0;
+}
+
+.pet-count svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Contact Section */
+.contact-section {
+  padding: 0 20px;
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0 0 16px 0;
+}
+
+.section-title.highlight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #e74c3c;
+}
+
+.section-title.highlight svg {
+  width: 28px;
+  height: 28px;
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+.contact-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #2c2c2c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.contact-button svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.contact-button.phone {
+  border-color: #4ca8a0;
+}
+
+.contact-button.phone svg {
+  color: #4ca8a0;
+}
+
+.contact-button.phone:hover {
+  background: #4ca8a0;
+  color: white;
+}
+
+.contact-button.phone:hover svg {
+  color: white;
+}
+
+.contact-button.email {
+  border-color: #3498db;
+}
+
+.contact-button.email svg {
+  color: #3498db;
+}
+
+.contact-button.email:hover {
+  background: #3498db;
+  color: white;
+}
+
+.contact-button.email:hover svg {
+  color: white;
+}
+
+.contact-button.instagram {
+  border-color: #e1306c;
+}
+
+.contact-button.instagram svg {
+  color: #e1306c;
+}
+
+.contact-button.instagram:hover {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.contact-button.instagram:hover svg {
+  color: white;
+}
+
+/* Needs Section */
+.needs-section {
+  padding: 0 20px;
+  margin-bottom: 32px;
+}
+
+.needs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.need-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 5px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.need-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.need-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.need-category {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.category-icon {
+  font-size: 20px;
+}
+
+.need-priority {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+}
+
+.need-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c2c2c;
+  margin: 0 0 12px 0;
+}
+
+.need-description {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #666;
+  margin: 0 0 16px 0;
+}
+
+.need-amount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(76, 168, 160, 0.1);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4ca8a0;
+}
+
+.need-amount svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* No Needs */
+.no-needs {
+  background: white;
+  padding: 48px 20px;
+  margin: 0 20px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.no-needs svg {
+  width: 64px;
+  height: 64px;
+  color: #27ae60;
+  margin-bottom: 16px;
+}
+
+.no-needs p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+/* View Pets Button */
+.view-pets-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: calc(100% - 40px);
+  margin: 0 20px;
+  padding: 18px;
+  background: #4ca8a0;
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(76, 168, 160, 0.3);
+  transition: all 0.2s ease;
+}
+
+.view-pets-button svg {
+  width: 28px;
+  height: 28px;
+}
+
+.view-pets-button:hover {
+  background: #3d9690;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 168, 160, 0.4);
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .ong-detail-screen {
+    padding-bottom: 32px;
+  }
+
+  .back-button {
+    margin: 24px 32px;
+  }
+
+  .ong-image-container {
+    height: 380px;
+  }
+
+  .ong-header-info {
+    padding: 32px;
+  }
+
+  .contact-section,
+  .needs-section {
+    padding: 0 32px;
+  }
+
+  .contact-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .contact-button {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .needs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .view-pets-button {
+    width: calc(100% - 64px);
+    margin: 0 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ong-detail-screen {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  .back-button {
+    margin: 32px 48px;
+  }
+
+  .ong-image-container {
+    height: 450px;
+  }
+
+  .ong-header-info {
+    padding: 40px 48px;
+  }
+
+  .ong-name {
+    font-size: 40px;
+  }
+
+  .contact-section,
+  .needs-section {
+    padding: 0 48px;
+  }
+
+  .needs-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .view-pets-button {
+    width: calc(100% - 96px);
+    margin: 0 48px;
+  }
+}

@@ -64,6 +64,13 @@ export const routes: Routes = [
       import('./features/ongs/ongs.component').then((m) => m.OngsComponent),
   },
   {
+    path: 'ongs/:id',
+    loadComponent: () =>
+      import('./features/ongs/ong-detail/ong-detail.component').then(
+        (m) => m.OngDetailComponent
+      ),
+  },
+  {
     path: 'donate',
     loadComponent: () =>
       import('./features/donations/donation.component').then(

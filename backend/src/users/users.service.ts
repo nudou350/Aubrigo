@@ -157,4 +157,66 @@ export class UsersService {
 
     return result;
   }
+
+  async findOngById(id: string): Promise<any> {
+    const user = await this.userRepository.findOne({
+      where: { id, role: 'ong' as any, ongStatus: 'approved' as any },
+    });
+
+    if (!user) {
+      throw new NotFoundException('ONG not found');
+    }
+
+    // Get all active articles for this ONG
+    const articles = await this.userRepository.manager
+      .createQueryBuilder()
+      .select('article')
+      .from('articles', 'article')
+      .where('article.ong_id = :ongId', { ongId: user.id })
+      .andWhere('article.status = :status', { status: 'active' })
+      .orderBy(
+        `CASE
+          WHEN article.priority = 'urgent' THEN 1
+          WHEN article.priority = 'high' THEN 2
+          WHEN article.priority = 'medium' THEN 3
+          WHEN article.priority = 'low' THEN 4
+          ELSE 5
+        END`,
+        'ASC',
+      )
+      .getRawMany();
+
+    // Get pet count
+    const petCount = await this.userRepository.manager
+      .createQueryBuilder()
+      .select('COUNT(*)', 'count')
+      .from('pets', 'pet')
+      .where('pet.ong_id = :ongId', { ongId: user.id })
+      .andWhere('pet.status = :status', { status: 'available' })
+      .getRawOne();
+
+    delete user.passwordHash;
+
+    return {
+      id: user.id,
+      ongName: user.ongName,
+      email: user.email,
+      profileImageUrl: user.profileImageUrl,
+      location: user.location,
+      phone: user.phone,
+      instagramHandle: user.instagramHandle,
+      allowAppointments: user.allowAppointments,
+      createdAt: user.createdAt,
+      petCount: parseInt(petCount?.count || '0'),
+      needs: articles.map((article) => ({
+        id: article.article_id,
+        title: article.article_title,
+        description: article.article_description,
+        category: article.article_category,
+        priority: article.article_priority,
+        targetAmount: article.article_target_amount,
+        createdAt: article.article_created_at,
+      })),
+    };
+  }
 }

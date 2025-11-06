@@ -9,6 +9,7 @@ import {
   UploadedFile,
   BadRequestException,
   Query,
+  Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
@@ -35,6 +36,14 @@ export class UsersController {
     @Query('location') location?: string,
   ) {
     return this.usersService.findAll({ search, location });
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get ONG details by ID' })
+  @ApiResponse({ status: 200, description: 'ONG details retrieved' })
+  @ApiResponse({ status: 404, description: 'ONG not found' })
+  async getOngById(@Param('id') id: string) {
+    return this.usersService.findOngById(id);
   }
 
   @Get('profile')

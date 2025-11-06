@@ -202,9 +202,7 @@ export class OngsComponent implements OnInit {
   }
 
   viewOngDetail(ongId: string) {
-    // TODO: Navigate to ONG detail page when created
-    console.log('View ONG detail:', ongId);
-    this.toastService.info('Página de detalhes da ONG em breve!');
+    this.router.navigate(['/ongs', ongId]);
   }
 
   getCategoryLabel(category?: string): string {

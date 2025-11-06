@@ -214,6 +214,11 @@ import { PwaService } from "../../../core/services/pwa.service";
             <span>Adicionar Pet</span>
           </button>
           }
+          <button class="nav-profile" (click)="goToProfile()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </button>
           <button (click)="onLogout()" class="nav-logout">Sair</button>
           } @else {
           <button (click)="goToLogin()" class="nav-login">
@@ -541,6 +546,34 @@ import { PwaService } from "../../../core/services/pwa.service";
           width: 22px;
           height: 20px;
         }
+
+        .nav-profile {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: rgba(184, 227, 225, 0.3);
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .nav-profile svg {
+          width: 24px;
+          height: 24px;
+          color: var(--color-primary);
+        }
+
+        .nav-profile:hover {
+          background: rgba(184, 227, 225, 0.5);
+          transform: scale(1.05);
+        }
+
+        .nav-profile:active {
+          transform: scale(0.95);
+        }
       }
 
       @media (max-width: 414px) {
@@ -593,6 +626,10 @@ export class BottomNavComponent {
 
   goToLogin(): void {
     this.routerInstance.navigate(["/login"]);
+  }
+
+  goToProfile(): void {
+    this.routerInstance.navigate(["/profile"]);
   }
 
   onLogout(): void {
