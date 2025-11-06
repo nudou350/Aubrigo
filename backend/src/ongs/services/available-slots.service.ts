@@ -248,9 +248,15 @@ export class AvailableSlotsService {
   }
 
   private minutesToDateTime(date: Date, minutes: number): Date {
-    const result = new Date(date);
-    result.setHours(0, 0, 0, 0);
-    result.setMinutes(minutes);
+    // Create date in local timezone (Europe/Lisbon)
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    // Create new date with explicit components to avoid timezone issues
+    const result = new Date(year, month, day, hours, mins, 0, 0);
     return result;
   }
 
