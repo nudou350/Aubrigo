@@ -50,6 +50,24 @@ export class SearchPetsDto {
   @Min(0)
   ageMax?: number;
 
+  @ApiProperty({
+    required: false,
+    enum: ['0-1', '2-3', '4-6', '7-10', '10+'],
+    example: '0-1',
+  })
+  @IsOptional()
+  @IsEnum(['0-1', '2-3', '4-6', '7-10', '10+'])
+  ageRange?: string;
+
+  @ApiProperty({
+    required: false,
+    enum: ['urgent', 'oldest'],
+    example: 'urgent',
+  })
+  @IsOptional()
+  @IsEnum(['urgent', 'oldest'])
+  sortBy?: string;
+
   @ApiProperty({ required: false, example: 1 })
   @IsOptional()
   @Type(() => Number)

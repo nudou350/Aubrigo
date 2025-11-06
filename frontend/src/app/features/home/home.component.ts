@@ -147,6 +147,152 @@ import { UsersService, ONG } from "../../core/services/users.service";
             }
           </div>
 
+          <!-- Filters - Mobile View -->
+          <div class="filters-row mobile-filters">
+            <!-- Sort Filter -->
+            <select
+              class="filter-select"
+              [value]="sortBy()"
+              (change)="onSortChange($event)"
+            >
+              <option value="urgent">Urgência</option>
+              <option value="oldest">Mais antigos</option>
+              <option value="">Mais recentes</option>
+            </select>
+
+            <!-- Gender Filter -->
+            <select
+              class="filter-select"
+              [value]="selectedGender()"
+              (change)="onGenderChange($event)"
+            >
+              <option value="">Gênero</option>
+              <option value="male">Macho</option>
+              <option value="female">Fêmea</option>
+            </select>
+
+            <!-- Size Filter -->
+            <select
+              class="filter-select"
+              [value]="selectedSize()"
+              (change)="onSizeChange($event)"
+            >
+              <option value="">Porte</option>
+              <option value="small">Pequeno</option>
+              <option value="medium">Médio</option>
+              <option value="large">Grande</option>
+            </select>
+
+            <!-- Age Range Filter -->
+            <select
+              class="filter-select"
+              [value]="selectedAgeRange()"
+              (change)="onAgeRangeChange($event)"
+            >
+              <option value="">Idade</option>
+              <option value="0-1">0-1 anos</option>
+              <option value="2-3">2-3 anos</option>
+              <option value="4-6">4-6 anos</option>
+              <option value="7-10">7-10 anos</option>
+              <option value="10+">10+ anos</option>
+            </select>
+          </div>
+
+          <!-- Filters - Desktop View -->
+          <div class="filters-desktop-container">
+            <button
+              class="filters-toggle-button"
+              (click)="toggleFiltersDropdown(); $event.stopPropagation()"
+            >
+              <svg class="filter-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"
+                />
+              </svg>
+              Filtros
+              <svg
+                class="chevron-icon"
+                [class.rotated]="showFiltersDropdown()"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+              </svg>
+              @if (hasActiveFilters()) {
+              <span class="active-filters-badge">{{ getActiveFiltersCount() }}</span>
+              }
+            </button>
+
+            @if (showFiltersDropdown()) {
+            <div class="filters-backdrop" (click)="closeFiltersDropdown()"></div>
+            <div class="filters-dropdown" (click)="$event.stopPropagation()">
+              <div class="filters-dropdown-content">
+                <div class="filter-group">
+                  <label class="filter-label">Ordenar por</label>
+                  <select
+                    class="filter-select-dropdown"
+                    [value]="sortBy()"
+                    (change)="onSortChange($event)"
+                  >
+                    <option value="urgent">Urgência</option>
+                    <option value="oldest">Mais antigos</option>
+                    <option value="">Mais recentes</option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label class="filter-label">Gênero</label>
+                  <select
+                    class="filter-select-dropdown"
+                    [value]="selectedGender()"
+                    (change)="onGenderChange($event)"
+                  >
+                    <option value="">Todos</option>
+                    <option value="male">Macho</option>
+                    <option value="female">Fêmea</option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label class="filter-label">Porte</label>
+                  <select
+                    class="filter-select-dropdown"
+                    [value]="selectedSize()"
+                    (change)="onSizeChange($event)"
+                  >
+                    <option value="">Todos</option>
+                    <option value="small">Pequeno</option>
+                    <option value="medium">Médio</option>
+                    <option value="large">Grande</option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label class="filter-label">Idade</label>
+                  <select
+                    class="filter-select-dropdown"
+                    [value]="selectedAgeRange()"
+                    (change)="onAgeRangeChange($event)"
+                  >
+                    <option value="">Todas</option>
+                    <option value="0-1">0-1 anos</option>
+                    <option value="2-3">2-3 anos</option>
+                    <option value="4-6">4-6 anos</option>
+                    <option value="7-10">7-10 anos</option>
+                    <option value="10+">10+ anos</option>
+                  </select>
+                </div>
+
+                @if (hasActiveFilters()) {
+                <button class="clear-filters-button" (click)="clearAllFilters(); $event.stopPropagation()">
+                  Limpar filtros
+                </button>
+                }
+              </div>
+            </div>
+            }
+          </div>
+
           <!-- Species Filter Tabs -->
           <div class="species-tabs">
             <button
@@ -724,6 +870,217 @@ import { UsersService, ONG } from "../../core/services/users.service";
         margin-left: auto;
       }
 
+      /* Filters Row */
+      .filters-row {
+        display: flex;
+        gap: 12px;
+        padding: 8px 0;
+        flex-wrap: wrap;
+      }
+
+      .filter-select {
+        flex: 1;
+        min-width: 140px;
+        padding: 10px 16px;
+        background: rgba(184, 227, 225, 0.3);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        font-size: 14px;
+        color: #2c2c2c;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        outline: none;
+      }
+
+      .filter-select:hover {
+        background: rgba(184, 227, 225, 0.5);
+      }
+
+      .filter-select:focus {
+        border-color: #4ca8a0;
+        background: white;
+      }
+
+      .filter-select option:first-child {
+        color: #666;
+      }
+
+      /* Hide mobile inline filters */
+      .mobile-filters {
+        display: none;
+      }
+
+      /* Filters dropdown for all devices */
+      .filters-desktop-container {
+        display: block;
+        position: relative;
+      }
+
+      .filters-toggle-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 20px;
+        background: #4ca8a0;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(76, 168, 160, 0.3);
+        transition: all 0.2s ease;
+        position: relative;
+        width: 100%;
+      }
+
+      .filters-toggle-button:hover {
+        background: #3d9690;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(76, 168, 160, 0.4);
+      }
+
+      .filter-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .chevron-icon {
+        width: 20px;
+        height: 20px;
+        transition: transform 0.3s ease;
+      }
+
+      .chevron-icon.rotated {
+        transform: rotate(180deg);
+      }
+
+      .active-filters-badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: #e74c3c;
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 6px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .filters-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 999;
+        animation: fadeIn 0.2s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .filters-dropdown {
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        z-index: 1000;
+        animation: slideDown 0.3s ease;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .filters-dropdown-content {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .filter-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .filter-select-dropdown {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(184, 227, 225, 0.2);
+        border: 2px solid transparent;
+        border-radius: 10px;
+        font-size: 15px;
+        color: #2c2c2c;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        outline: none;
+      }
+
+      .filter-select-dropdown:hover {
+        background: rgba(184, 227, 225, 0.4);
+      }
+
+      .filter-select-dropdown:focus {
+        border-color: #4ca8a0;
+        background: white;
+      }
+
+      .clear-filters-button {
+        width: 100%;
+        padding: 12px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 8px;
+      }
+
+      .clear-filters-button:hover {
+        background: #c0392b;
+        transform: translateY(-1px);
+      }
+
       .search-button {
         width: 48px;
         height: 48px;
@@ -1086,6 +1443,18 @@ import { UsersService, ONG } from "../../core/services/users.service";
           font-size: 17px;
         }
 
+        /* Desktop adjustments for dropdown */
+        .filters-toggle-button {
+          width: auto;
+          min-width: 160px;
+        }
+
+        .filters-dropdown {
+          left: auto;
+          right: 0;
+          min-width: 340px;
+        }
+
         .species-tabs {
           gap: 16px;
         }
@@ -1290,6 +1659,11 @@ export class HomeComponent implements OnInit {
   pets = signal<Pet[]>([]);
   loading = signal(true);
   selectedSpecies = signal<string>("dog");
+  sortBy = signal<string>("urgent");
+  selectedGender = signal<string>("");
+  selectedSize = signal<string>("");
+  selectedAgeRange = signal<string>("");
+  showFiltersDropdown = signal(false);
   showIosInstructions = signal(false);
   currentLocation = signal("Todas as cidades");
   favoritePetIds = signal<Set<string>>(new Set());
@@ -1421,6 +1795,26 @@ export class HomeComponent implements OnInit {
       this.currentLocation() !== "Todas as cidades"
     ) {
       params.location = this.currentLocation();
+    }
+
+    // Add sort parameter if selected
+    if (this.sortBy()) {
+      params.sortBy = this.sortBy();
+    }
+
+    // Add gender filter if selected
+    if (this.selectedGender()) {
+      params.gender = this.selectedGender();
+    }
+
+    // Add size filter if selected
+    if (this.selectedSize()) {
+      params.size = this.selectedSize();
+    }
+
+    // Add age range filter if selected
+    if (this.selectedAgeRange()) {
+      params.ageRange = this.selectedAgeRange();
     }
 
     this.petsService.searchPets(params).subscribe({
@@ -1778,6 +2172,99 @@ export class HomeComponent implements OnInit {
     this.currentOng.set(null);
     this.ongInput.set("");
     this.filteredOngs.set(this.availableOngs().slice(0, 5));
+    this.loadPets();
+  }
+
+  // Sort methods
+  onSortChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.sortBy.set(value);
+
+    // Track sort change
+    this.analytics.track(EventType.FILTER_APPLY, {
+      metadata: {
+        filterType: "sort",
+        value: value || "default",
+      },
+    });
+
+    this.loadPets();
+  }
+
+  onGenderChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.selectedGender.set(value);
+
+    // Track filter change
+    this.analytics.track(EventType.FILTER_APPLY, {
+      metadata: {
+        filterType: "gender",
+        value: value || "all",
+      },
+    });
+
+    this.loadPets();
+  }
+
+  onSizeChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.selectedSize.set(value);
+
+    // Track filter change
+    this.analytics.track(EventType.FILTER_APPLY, {
+      metadata: {
+        filterType: "size",
+        value: value || "all",
+      },
+    });
+
+    this.loadPets();
+  }
+
+  onAgeRangeChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.selectedAgeRange.set(value);
+
+    // Track filter change
+    this.analytics.track(EventType.FILTER_APPLY, {
+      metadata: {
+        filterType: "ageRange",
+        value: value || "all",
+      },
+    });
+
+    this.loadPets();
+  }
+
+  // Filters dropdown methods
+  toggleFiltersDropdown() {
+    this.showFiltersDropdown.update(val => !val);
+  }
+
+  closeFiltersDropdown() {
+    this.showFiltersDropdown.set(false);
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(
+      this.selectedGender() ||
+      this.selectedSize() ||
+      this.selectedAgeRange()
+    );
+  }
+
+  getActiveFiltersCount(): number {
+    let count = 0;
+    if (this.selectedGender()) count++;
+    if (this.selectedSize()) count++;
+    if (this.selectedAgeRange()) count++;
+    return count;
+  }
+
+  clearAllFilters() {
+    this.selectedGender.set("");
+    this.selectedSize.set("");
+    this.selectedAgeRange.set("");
     this.loadPets();
   }
 }

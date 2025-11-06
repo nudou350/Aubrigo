@@ -48,6 +48,8 @@ export interface SearchPetsParams {
   gender?: string;
   ageMin?: number;
   ageMax?: number;
+  ageRange?: string;
+  sortBy?: string;
   page?: number;
   limit?: number;
 }

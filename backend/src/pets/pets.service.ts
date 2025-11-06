@@ -47,12 +47,34 @@ export class PetsService {
       query.andWhere('pet.gender = :gender', { gender: filters.gender });
     }
 
-    if (filters.ageMin !== undefined) {
-      query.andWhere('pet.age >= :ageMin', { ageMin: filters.ageMin });
-    }
+    // Process age range
+    if (filters.ageRange) {
+      switch (filters.ageRange) {
+        case '0-1':
+          query.andWhere('pet.age >= 0 AND pet.age <= 1');
+          break;
+        case '2-3':
+          query.andWhere('pet.age >= 2 AND pet.age <= 3');
+          break;
+        case '4-6':
+          query.andWhere('pet.age >= 4 AND pet.age <= 6');
+          break;
+        case '7-10':
+          query.andWhere('pet.age >= 7 AND pet.age <= 10');
+          break;
+        case '10+':
+          query.andWhere('pet.age > 10');
+          break;
+      }
+    } else {
+      // Fallback to ageMin/ageMax if ageRange not provided
+      if (filters.ageMin !== undefined) {
+        query.andWhere('pet.age >= :ageMin', { ageMin: filters.ageMin });
+      }
 
-    if (filters.ageMax !== undefined) {
-      query.andWhere('pet.age <= :ageMax', { ageMax: filters.ageMax });
+      if (filters.ageMax !== undefined) {
+        query.andWhere('pet.age <= :ageMax', { ageMax: filters.ageMax });
+      }
     }
 
     if (filters.location) {
@@ -64,9 +86,26 @@ export class PetsService {
     // Get total count
     const total = await query.getCount();
 
+    // Apply sorting
+    if (filters.sortBy) {
+      switch (filters.sortBy) {
+        case 'urgent':
+          // TODO: When urgent needs field is added, implement proper sorting
+          // For now, sort by creation date (newest first)
+          query.orderBy('pet.createdAt', 'DESC');
+          break;
+        case 'oldest':
+          query.orderBy('pet.createdAt', 'ASC');
+          break;
+        default:
+          query.orderBy('pet.createdAt', 'DESC');
+      }
+    } else {
+      query.orderBy('pet.createdAt', 'DESC');
+    }
+
     // Apply pagination
     const pets = await query
-      .orderBy('pet.createdAt', 'DESC')
       .skip(skip)
       .take(limit)
       .getMany();
