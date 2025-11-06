@@ -36,7 +36,7 @@ jobs:
 
     - name: Build frontend
       working-directory: ./frontend
-      run: npm run build:prod
+      run: npm run build:prod  # Automatically runs prebuild script to update PWA version
 
     - name: Prepare deployment package
       run: |

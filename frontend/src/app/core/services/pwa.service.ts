@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { ApplicationRef, Injectable, inject, signal } from '@angular/core';
+import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
+import { filter, concat, interval, first } from 'rxjs';
 
 // Extend the Window interface to include the beforeinstallprompt event
 interface BeforeInstallPromptEvent extends Event {
@@ -16,6 +18,9 @@ declare global {
   providedIn: 'root'
 })
 export class PwaService {
+  private swUpdate = inject(SwUpdate);
+  private appRef = inject(ApplicationRef);
+
   private deferredPrompt: BeforeInstallPromptEvent | null = null;
 
   // Enable debug mode to always show install button (for development)
@@ -27,9 +32,16 @@ export class PwaService {
   // Signal to track if the app is already installed
   public isInstalled = signal(false);
 
+  // Signal to track if an update is available
+  public updateAvailable = signal(false);
+
+  // Signal to track current PWA version
+  public currentVersion = signal<string>('');
+
   constructor() {
     this.initPwaPrompt();
     this.checkIfInstalled();
+    this.initServiceWorkerUpdate();
 
     // In debug mode or iOS, force installable to true for showing the button
     if (this.DEBUG_MODE && !this.isInstalled()) {
@@ -134,5 +146,126 @@ export class PwaService {
    */
   isIOS(): boolean {
     return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  }
+
+  /**
+   * Initialize Service Worker update detection
+   */
+  private initServiceWorkerUpdate() {
+    if (!this.swUpdate.isEnabled) {
+      console.log('⚠️ PWA: Service Worker updates are not enabled (not running in production or HTTPS)');
+      return;
+    }
+
+    console.log('✅ PWA: Service Worker update detection enabled');
+
+    // Subscribe to version updates
+    this.swUpdate.versionUpdates
+      .pipe(
+        filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY')
+      )
+      .subscribe(event => {
+        console.log('🔄 PWA: New version available!');
+        console.log('   Current version:', event.currentVersion);
+        console.log('   New version:', event.latestVersion);
+
+        this.updateAvailable.set(true);
+        this.currentVersion.set(
+          (event.latestVersion.appData as any)?.version || 'unknown'
+        );
+      });
+
+    // Check for updates periodically (every 6 hours)
+    this.checkForUpdatesRegularly();
+
+    // Check for updates immediately on startup (after app stabilizes)
+    this.appRef.isStable
+      .pipe(first(stable => stable))
+      .subscribe(() => {
+        console.log('🔍 PWA: Checking for updates on startup...');
+        this.checkForUpdate();
+      });
+  }
+
+  /**
+   * Check for updates regularly (every 6 hours)
+   */
+  private checkForUpdatesRegularly() {
+    const appIsStable$ = this.appRef.isStable.pipe(
+      first(isStable => isStable)
+    );
+
+    // Check every 6 hours after app stabilizes
+    const everySixHours$ = interval(6 * 60 * 60 * 1000);
+
+    concat(appIsStable$, everySixHours$).subscribe(() => {
+      console.log('🔍 PWA: Periodic update check...');
+      this.checkForUpdate();
+    });
+  }
+
+  /**
+   * Manually check for updates
+   */
+  async checkForUpdate(): Promise<boolean> {
+    if (!this.swUpdate.isEnabled) {
+      console.warn('⚠️ PWA: Service Worker is not enabled, cannot check for updates');
+      return false;
+    }
+
+    try {
+      const updateFound = await this.swUpdate.checkForUpdate();
+      if (updateFound) {
+        console.log('✅ PWA: Update found and will be downloaded');
+      } else {
+        console.log('ℹ️ PWA: Already on the latest version');
+      }
+      return updateFound;
+    } catch (error) {
+      console.error('❌ PWA: Error checking for updates:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Apply the available update and reload the app
+   */
+  async applyUpdate(): Promise<void> {
+    if (!this.swUpdate.isEnabled) {
+      console.warn('⚠️ PWA: Service Worker is not enabled, cannot apply update');
+      return;
+    }
+
+    try {
+      console.log('🔄 PWA: Activating new version...');
+      await this.swUpdate.activateUpdate();
+      console.log('✅ PWA: Update activated, reloading...');
+
+      // Reload the page to show the new version
+      document.location.reload();
+    } catch (error) {
+      console.error('❌ PWA: Error applying update:', error);
+    }
+  }
+
+  /**
+   * Get the current app version from service worker
+   */
+  async getCurrentVersion(): Promise<string | null> {
+    if (!this.swUpdate.isEnabled) {
+      return null;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration?.active) {
+        // The version is in the ngsw.json manifest
+        return this.currentVersion() || null;
+      }
+    } catch (error) {
+      console.error('❌ PWA: Error getting current version:', error);
+    }
+
+    return null;
   }
 }
