@@ -27,14 +27,14 @@ import { UsersService, ONG } from "../../core/services/users.service";
         <div class="greeting">
           <h1 class="greeting-text">{{ getGreeting() }}</h1>
           <div class="header-actions">
-            @if (pwaService.isInstallable() && !pwaService.isInstalled()) {
+            @if (!authService.isOng() && !authService.isAdmin()) {
             <button
-              class="pwa-install-button"
-              (click)="installPwa()"
-              title="Instalar aplicativo"
+              class="donate-button"
+              (click)="goToDonate()"
+              title="Doar"
             >
               <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
             </button>
             } @if (authService.isAuthenticated()) {
@@ -606,7 +606,7 @@ import { UsersService, ONG } from "../../core/services/users.service";
         gap: 8px;
       }
 
-      .pwa-install-button {
+      .donate-button {
         width: 40px;
         height: 40px;
         border-radius: 50%;
@@ -617,29 +617,21 @@ import { UsersService, ONG } from "../../core/services/users.service";
         justify-content: center;
         cursor: pointer;
         transition: all 0.2s ease;
-        font-size: 20px;
       }
 
-      .pwa-install-button svg {
+      .donate-button svg {
         width: 24px;
         height: 24px;
         color: #5cb5b0;
       }
 
-      .pwa-install-button:hover {
+      .donate-button:hover {
         background: rgba(76, 168, 160, 0.2);
         transform: scale(1.05);
       }
 
-      .pwa-install-button:active {
+      .donate-button:active {
         transform: scale(0.95);
-      }
-
-      /* Hide PWA install button on desktop */
-      @media (min-width: 1024px) {
-        .pwa-install-button {
-          display: none;
-        }
       }
 
       .profile-button {
@@ -1892,6 +1884,10 @@ export class HomeComponent implements OnInit {
 
   goToLogin() {
     this.router.navigate(["/login"]);
+  }
+
+  goToDonate() {
+    this.router.navigate(["/donate"]);
   }
 
   async installPwa() {

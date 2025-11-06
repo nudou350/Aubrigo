@@ -3,35 +3,28 @@ import { CommonModule } from "@angular/common";
 import { Router, RouterLink, NavigationEnd } from "@angular/router";
 import { filter } from "rxjs/operators";
 import { AuthService } from "../../../core/services/auth.service";
+import { PwaService } from "../../../core/services/pwa.service";
 
 @Component({
   selector: "app-bottom-nav",
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
+    <!-- Install PWA button - floating bottom right (mobile only) -->
+    @if (shouldShowNav() && !authService.isOng() && !authService.isAdmin()) {
+    <button
+      (click)="onInstallClick()"
+      class="install-float-button"
+      title="Instalar App"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+      </svg>
+    </button>
+    }
+
     <!-- Mobile Bottom Navigation -->
     <nav class="bottom-nav mobile-nav" *ngIf="shouldShowNav()">
-      <!-- Donate button - discreto no topo -->
-      @if (!authService.isOng() && !authService.isAdmin()) {
-      <a
-        routerLink="/donate"
-        class="donate-top-button"
-        [class.active]="isActive('/donate')"
-        title="Doar"
-      >
-        <svg class="donate-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-          />
-        </svg>
-        <svg class="donate-icon-money" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"
-          />
-        </svg>
-      </a>
-      }
-
       <a routerLink="/home" class="nav-item" [class.active]="isActive('/home')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
@@ -39,58 +32,26 @@ import { AuthService } from "../../../core/services/auth.service";
         <span class="nav-label">HOME</span>
       </a>
 
-      <!-- Central button changes based on current route and user role -->
-      @if (authService.isOng()) {
-      <!-- ONG users: Add Pet button -->
-      <button
-        (click)="onAddPet()"
-        class="nav-item nav-item-center"
-        [class.active]="isActive('/pets/add')"
-      >
-        <div class="paw-button">
-          <svg class="paw-icon" viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="8" cy="6" r="2" />
-            <circle cx="16" cy="6" r="2" />
-            <circle cx="6" cy="12" r="2" />
-            <circle cx="18" cy="12" r="2" />
-            <ellipse cx="12" cy="16" rx="4" ry="3" />
-          </svg>
-        </div>
-      </button>
-      } @else if (authService.isAdmin()) {
-      <!-- Admin: Dashboard button -->
-      <a
-        routerLink="/admin"
-        class="nav-item nav-item-center"
-        [class.active]="isActive('/admin')"
-      >
-        <div class="paw-button">
-          <svg class="paw-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"
-            />
-          </svg>
-        </div>
-      </a>
-      } @else {
-      <!-- Regular users: Toggle between ONGs and Pets -->
+      <!-- Central button: Toggle between ONGs and Pets -->
       @if (isActive('/ongs')) {
       <!-- Show Pets button when on ONGs page -->
       <a routerLink="/home" class="nav-item nav-item-center">
         <div class="paw-button">
           <img src="assets/paw_home.webp" alt="Pets" class="paw-image" />
         </div>
+        <span class="nav-label">PETS</span>
       </a>
       } @else {
-      <!-- Show ONGs button when on home -->
-      <a routerLink="/ongs" class="nav-item nav-item-center">
+      <!-- Show ONGs button when NOT on ONGs page -->
+      <a routerLink="/ongs" class="nav-item nav-item-center" [class.active]="isActive('/ongs')">
         <div class="paw-button">
           <svg class="paw-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
           </svg>
         </div>
+        <span class="nav-label">ONGS</span>
       </a>
-      } }
+      }
 
       <!-- Show Favorites for regular users, Dashboard for ONG/Admin -->
       @if (!authService.isOng() && !authService.isAdmin()) {
@@ -279,7 +240,7 @@ import { AuthService } from "../../../core/services/auth.service";
         bottom: 0;
         left: 0;
         right: 0;
-        height: 68px;
+        height: 80px;
         background: #b8e3e1;
         display: flex;
         justify-content: space-around;
@@ -330,7 +291,7 @@ import { AuthService } from "../../../core/services/auth.service";
 
       .nav-item-center {
         position: relative;
-        margin-top: -30px;
+        margin-bottom: 25px;
       }
 
       .paw-button {
@@ -366,48 +327,38 @@ import { AuthService } from "../../../core/services/auth.service";
         object-fit: contain;
       }
 
-      /* Donate Top Button - Small and discrete */
-      .donate-top-button {
-        position: absolute;
-        top: 8px;
-        right: 16px;
+      /* Install PWA Floating Button - Bottom right */
+      .install-float-button {
+        position: fixed;
+        bottom: 100px; /* Above bottom nav with spacing */
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #5CB5B0 0%, #4A9D98 100%);
+        border-radius: 50%;
+        border: none;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
-        background: rgba(76, 168, 160, 0.15);
-        border-radius: 50%;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        z-index: 10;
+        box-shadow: 0 4px 16px rgba(76, 168, 160, 0.4);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 999;
       }
 
-      .donate-top-button:hover {
-        background: rgba(76, 168, 160, 0.25);
-        transform: scale(1.05);
+      .install-float-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 168, 160, 0.5);
       }
 
-      .donate-top-button.active {
-        background: rgba(76, 168, 160, 0.3);
+      .install-float-button:active {
+        transform: translateY(0);
       }
 
-      .donate-icon {
-        width: 20px;
-        height: 20px;
-        color: #4ca8a0;
-        position: absolute;
-        top: 10px;
-        left: 10px;
-      }
-
-      .donate-icon-money {
-        width: 14px;
-        height: 14px;
-        color: #4ca8a0;
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
+      .install-float-button svg {
+        width: 28px;
+        height: 28px;
+        color: #ffffff;
       }
 
       /* Desktop Top Navigation */
@@ -418,6 +369,10 @@ import { AuthService } from "../../../core/services/auth.service";
 
         .desktop-nav {
           display: block;
+        }
+
+        .install-float-button {
+          display: none;
         }
 
         .top-nav {
@@ -600,6 +555,7 @@ export class BottomNavComponent {
   private router = Router;
   currentRoute = signal<string>("");
   authService = inject(AuthService);
+  private pwaService = inject(PwaService);
 
   constructor(private routerInstance: Router) {
     // Track current route
@@ -641,5 +597,9 @@ export class BottomNavComponent {
 
   onLogout(): void {
     this.authService.logout();
+  }
+
+  async onInstallClick(): Promise<void> {
+    await this.pwaService.promptInstall();
   }
 }

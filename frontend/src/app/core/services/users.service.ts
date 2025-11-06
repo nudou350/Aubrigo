@@ -23,6 +23,9 @@ export interface ONG {
   location?: string;
   phone?: string;
   instagramHandle?: string;
+  urgencyLevel?: string;
+  urgencyCategory?: string;
+  urgencyDescription?: string;
 }
 
 export interface UpdateProfileDto {
@@ -134,9 +137,24 @@ export class UsersService {
   }
 
   /**
-   * Get all ONGs
+   * Get all ONGs with optional filters
    */
-  getAllOngs(): Observable<ONG[]> {
-    return this.http.get<ONG[]>(this.apiUrl);
+  getAllOngs(filters?: { search?: string; location?: string }): Observable<ONG[]> {
+    let url = this.apiUrl;
+    const params = new URLSearchParams();
+
+    if (filters?.search) {
+      params.append('search', filters.search);
+    }
+
+    if (filters?.location) {
+      params.append('location', filters.location);
+    }
+
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+
+    return this.http.get<ONG[]>(url);
   }
 }

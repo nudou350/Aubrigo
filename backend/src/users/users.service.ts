@@ -70,11 +70,91 @@ export class UsersService {
     return { message: 'Password changed successfully' };
   }
 
-  async findAll(): Promise<Partial<User>[]> {
-    const users = await this.userRepository.find({
-      select: ['id', 'ongName', 'profileImageUrl', 'location', 'phone'],
-      order: { ongName: 'ASC' },
+  async findAll(filters?: {
+    search?: string;
+    location?: string;
+  }): Promise<any[]> {
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.ongName',
+        'user.profileImageUrl',
+        'user.location',
+        'user.phone',
+        'user.instagramHandle',
+      ])
+      // Only return ONGs with role='ong' and status='approved'
+      .where('user.role = :role', { role: 'ong' })
+      .andWhere('user.ongStatus = :status', { status: 'approved' });
+
+    // Filter by search (ONG name)
+    if (filters?.search) {
+      queryBuilder.andWhere('LOWER(user.ongName) LIKE LOWER(:search)', {
+        search: `%${filters.search}%`,
+      });
+    }
+
+    // Filter by location
+    if (filters?.location) {
+      queryBuilder.andWhere('LOWER(user.location) LIKE LOWER(:location)', {
+        location: `%${filters.location}%`,
+      });
+    }
+
+    const users = await queryBuilder.getMany();
+
+    // Map results to include urgency info from articles
+    const result = await Promise.all(
+      users.map(async (user) => {
+        // Get most urgent active article for this ONG
+        const mostUrgentArticle = await this.userRepository.manager
+          .createQueryBuilder()
+          .select('article')
+          .from('articles', 'article')
+          .where('article.ong_id = :ongId', { ongId: user.id })
+          .andWhere('article.status = :status', { status: 'active' })
+          .orderBy(
+            `CASE
+              WHEN article.priority = 'urgent' THEN 1
+              WHEN article.priority = 'high' THEN 2
+              WHEN article.priority = 'medium' THEN 3
+              WHEN article.priority = 'low' THEN 4
+              ELSE 5
+            END`,
+            'ASC',
+          )
+          .limit(1)
+          .getRawOne();
+
+        return {
+          id: user.id,
+          ongName: user.ongName,
+          profileImageUrl: user.profileImageUrl,
+          location: user.location,
+          phone: user.phone,
+          instagramHandle: user.instagramHandle,
+          urgencyLevel: mostUrgentArticle?.article_priority || 'none',
+          urgencyCategory: mostUrgentArticle?.article_category || null,
+          urgencyDescription: mostUrgentArticle?.article_title || null,
+        };
+      }),
+    );
+
+    // Sort by urgency level (urgent first)
+    result.sort((a, b) => {
+      const priorityOrder = { urgent: 1, high: 2, medium: 3, low: 4, none: 5 };
+      const aPriority = priorityOrder[a.urgencyLevel] || 5;
+      const bPriority = priorityOrder[b.urgencyLevel] || 5;
+
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+
+      // Secondary sort by name
+      return a.ongName.localeCompare(b.ongName);
     });
-    return users;
+
+    return result;
   }
 }

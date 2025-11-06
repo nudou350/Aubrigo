@@ -1,1 +1,178 @@
-<p>ongs works!</p>
+<div class="ongs-screen">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="greeting">
+      <h1 class="greeting-text">{{ getGreeting() }}</h1>
+      <div class="header-actions">
+        @if (authService.isAuthenticated()) {
+        <button class="profile-button" (click)="goToProfile()">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+            />
+          </svg>
+        </button>
+        } @else {
+        <button class="login-button" (click)="goToLogin()">
+          Login / Registrar
+        </button>
+        }
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <!-- Search Input -->
+      <div class="search-container">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+          />
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Pesquisar ONG..."
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)"
+          (keydown.enter)="onSearchEnter()"
+        />
+      </div>
+
+      <!-- Location Filter -->
+      <div class="location-search-container">
+        <svg class="location-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+          />
+        </svg>
+        <input
+          type="text"
+          class="location-input"
+          [value]="getLocationInputValue()"
+          (input)="onLocationInput($event)"
+          (focus)="onLocationFocus()"
+          (keydown)="onLocationKeydown($event)"
+          [placeholder]="getLocationPlaceholder()"
+        />
+        @if (showLocationDropdown() && filteredLocations().length > 0) {
+        <div class="location-dropdown">
+          @for (location of filteredLocations(); track $index) {
+          <button
+            class="location-option"
+            [class.selected]="selectedLocationIndex() === $index"
+            (click)="selectLocation(location)"
+          >
+            <svg class="option-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+              />
+            </svg>
+            {{ location }}
+          </button>
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  @if (loading()) {
+  <div class="loading">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <span class="loading-text">Carregando ONGs...</span>
+    </div>
+  </div>
+  }
+
+  <!-- ONGs List -->
+  <div class="ongs-list">
+    @if (ongs().length === 0 && !loading()) {
+    <div class="no-ongs">Nenhuma ONG encontrada</div>
+    } @else { @for (ong of ongs(); track ong.id) {
+    <div class="ong-card" (click)="viewOngDetail(ong.id)">
+      <div class="ong-image-container">
+        @if (ong.profileImageUrl) {
+        <img
+          [ngSrc]="ong.profileImageUrl"
+          [alt]="ong.ongName"
+          fill
+          class="ong-image"
+          loading="lazy"
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        />
+        } @else {
+        <div class="placeholder-image">
+          <svg class="placeholder-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M16.5 12c1.38 0 2.49-1.12 2.49-2.5S17.88 7 16.5 7C15.12 7 14 8.12 14 9.5s1.12 2.5 2.5 2.5zM9 11c1.66 0 2.99-1.34 2.99-3S10.66 5 9 5C7.34 5 6 6.34 6 8s1.34 3 3 3zm7.5 3c-1.83 0-5.5.92-5.5 2.75V19h11v-2.25c0-1.83-3.67-2.75-5.5-2.75zM9 13c-2.33 0-7 1.17-7 3.5V19h7v-2.25c0-.85.33-2.34 2.37-3.47C10.5 13.1 9.66 13 9 13z"
+            />
+          </svg>
+        </div>
+        }
+
+        <!-- Urgency Badge -->
+        <div
+          class="urgency-badge"
+          [style.background]="getUrgencyColor(ong.urgencyLevel)"
+        >
+          <span>{{ getCategoryLabel(ong.urgencyCategory) }}</span>
+        </div>
+      </div>
+
+      <div class="ong-info">
+        <h3 class="ong-name">{{ ong.ongName }}</h3>
+
+        <div class="ong-details">
+          @if (ong.location) {
+          <div class="detail-item">
+            <img
+              ngSrc="assets/location.webp"
+              alt="Location"
+              width="14"
+              height="18"
+              class="detail-icon"
+            />
+            <span>{{ ong.location }}</span>
+          </div>
+          } @if (ong.phone) {
+          <div class="detail-item">
+            <svg class="detail-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+              />
+            </svg>
+            <span>{{ ong.phone }}</span>
+          </div>
+          } @if (ong.instagramHandle) {
+          <div class="detail-item">
+            <svg class="detail-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"
+              />
+            </svg>
+            <span>{{ ong.instagramHandle }}</span>
+          </div>
+          }
+        </div>
+
+        <!-- Urgency Description -->
+        @if (ong.urgencyDescription) {
+        <div class="urgency-description">
+          <svg class="urgency-desc-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+            />
+          </svg>
+          <p>{{ ong.urgencyDescription }}</p>
+        </div>
+        }
+
+        <button class="learn-more-button">SABER MAIS</button>
+      </div>
+    </div>
+    } }
+  </div>
+</div>

@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
@@ -27,10 +28,13 @@ export class UsersController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all ONGs' })
+  @ApiOperation({ summary: 'Get all ONGs with optional filters' })
   @ApiResponse({ status: 200, description: 'List of all ONGs' })
-  async getAllOngs() {
-    return this.usersService.findAll();
+  async getAllOngs(
+    @Query('search') search?: string,
+    @Query('location') location?: string,
+  ) {
+    return this.usersService.findAll({ search, location });
   }
 
   @Get('profile')
