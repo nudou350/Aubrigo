@@ -11,6 +11,27 @@ import { AuthService } from "../../../core/services/auth.service";
   template: `
     <!-- Mobile Bottom Navigation -->
     <nav class="bottom-nav mobile-nav" *ngIf="shouldShowNav()">
+      <!-- Donate button - discreto no topo -->
+      @if (!authService.isOng() && !authService.isAdmin()) {
+      <a
+        routerLink="/donate"
+        class="donate-top-button"
+        [class.active]="isActive('/donate')"
+        title="Doar"
+      >
+        <svg class="donate-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+          />
+        </svg>
+        <svg class="donate-icon-money" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"
+          />
+        </svg>
+      </a>
+      }
+
       <a routerLink="/home" class="nav-item" [class.active]="isActive('/home')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
@@ -18,8 +39,9 @@ import { AuthService } from "../../../core/services/auth.service";
         <span class="nav-label">HOME</span>
       </a>
 
-      <!-- Only show Add Pet button for ONG users -->
+      <!-- Central button changes based on current route and user role -->
       @if (authService.isOng()) {
+      <!-- ONG users: Add Pet button -->
       <button
         (click)="onAddPet()"
         class="nav-item nav-item-center"
@@ -36,7 +58,7 @@ import { AuthService } from "../../../core/services/auth.service";
         </div>
       </button>
       } @else if (authService.isAdmin()) {
-      <!-- Admin Dashboard button -->
+      <!-- Admin: Dashboard button -->
       <a
         routerLink="/admin"
         class="nav-item nav-item-center"
@@ -51,21 +73,24 @@ import { AuthService } from "../../../core/services/auth.service";
         </div>
       </a>
       } @else {
-      <!-- Regular user - show donation center button -->
-      <a
-        routerLink="/donate"
-        class="nav-item nav-item-center"
-        [class.active]="isActive('/donate')"
-      >
+      <!-- Regular users: Toggle between ONGs and Pets -->
+      @if (isActive('/ongs')) {
+      <!-- Show Pets button when on ONGs page -->
+      <a routerLink="/home" class="nav-item nav-item-center">
+        <div class="paw-button">
+          <img src="assets/paw_home.webp" alt="Pets" class="paw-image" />
+        </div>
+      </a>
+      } @else {
+      <!-- Show ONGs button when on home -->
+      <a routerLink="/ongs" class="nav-item nav-item-center">
         <div class="paw-button">
           <svg class="paw-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-            />
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
           </svg>
         </div>
       </a>
-      }
+      } }
 
       <!-- Show Favorites for regular users, Dashboard for ONG/Admin -->
       @if (!authService.isOng() && !authService.isAdmin()) {
@@ -132,6 +157,18 @@ import { AuthService } from "../../../core/services/auth.service";
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
             <span>Home</span>
+          </a>
+
+          <!-- ONGs Link -->
+          <a
+            routerLink="/ongs"
+            class="nav-link"
+            [class.active]="isActive('/ongs')"
+          >
+            <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+            <span>ONGs</span>
           </a>
 
           <!-- Admin Dashboard Link -->
@@ -321,6 +358,56 @@ import { AuthService } from "../../../core/services/auth.service";
         width: 30px;
         height: 30px;
         color: #ffffff;
+      }
+
+      .paw-image {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+      }
+
+      /* Donate Top Button - Small and discrete */
+      .donate-top-button {
+        position: absolute;
+        top: 8px;
+        right: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgba(76, 168, 160, 0.15);
+        border-radius: 50%;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        z-index: 10;
+      }
+
+      .donate-top-button:hover {
+        background: rgba(76, 168, 160, 0.25);
+        transform: scale(1.05);
+      }
+
+      .donate-top-button.active {
+        background: rgba(76, 168, 160, 0.3);
+      }
+
+      .donate-icon {
+        width: 20px;
+        height: 20px;
+        color: #4ca8a0;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+      }
+
+      .donate-icon-money {
+        width: 14px;
+        height: 14px;
+        color: #4ca8a0;
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
       }
 
       /* Desktop Top Navigation */

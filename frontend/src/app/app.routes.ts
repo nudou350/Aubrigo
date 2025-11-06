@@ -59,6 +59,11 @@ export const routes: Routes = [
       import('./features/home/home.component').then((m) => m.HomeComponent),
   },
   {
+    path: 'ongs',
+    loadComponent: () =>
+      import('./features/ongs/ongs.component').then((m) => m.OngsComponent),
+  },
+  {
     path: 'donate',
     loadComponent: () =>
       import('./features/donations/donation.component').then(

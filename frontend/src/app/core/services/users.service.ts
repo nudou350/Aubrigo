@@ -22,6 +22,7 @@ export interface ONG {
   profileImageUrl?: string;
   location?: string;
   phone?: string;
+  instagramHandle?: string;
 }
 
 export interface UpdateProfileDto {

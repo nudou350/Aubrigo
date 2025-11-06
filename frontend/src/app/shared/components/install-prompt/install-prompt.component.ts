@@ -30,7 +30,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 
           <!-- App icon -->
           <div class="app-icon">
-            <img src="/assets/icons/icon-192x192.png" alt="Aubrigo" />
+            <img src="assets/icons/icon-192x192.png" alt="Aubrigo" />
           </div>
 
           <!-- Title and description -->
@@ -178,7 +178,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 
     .benefits li {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 12px;
       padding: 12px 0;
       color: #2C2C2C;
@@ -188,7 +188,6 @@ import { trigger, transition, style, animate } from '@angular/animations';
     .benefits li svg {
       flex-shrink: 0;
       color: #5CB5B0;
-      margin-top: 2px;
     }
 
     .ios-instructions {
