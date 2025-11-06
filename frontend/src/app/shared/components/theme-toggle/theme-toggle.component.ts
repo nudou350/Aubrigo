@@ -13,23 +13,104 @@ import { ThemeService } from '../../../core/services/theme.service';
       [attr.aria-label]="isDark() ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
       [title]="isDark() ? 'Modo claro' : 'Modo escuro'"
     >
+      <!-- Light Mode: Morning Scene (fundo branco = dia) -->
       <svg
         *ngIf="!isDark()"
-        class="icon"
+        class="scene-icon"
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
+        viewBox="0 0 60 60"
       >
-        <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z"/>
+        <!-- Sun (right side - BIGGER) -->
+        <g class="sun">
+          <circle cx="48" cy="12" r="7" fill="#fbbf24">
+            <animate attributeName="r" values="7;7.8;7" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Sun rays -->
+          <line x1="48" y1="3" x2="48" y2="0" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          <line x1="48" y1="24" x2="48" y2="27" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          <line x1="58" y1="12" x2="61" y2="12" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          <line x1="38" y1="12" x2="35" y2="12" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          <line x1="55" y1="5" x2="57" y2="3" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          <line x1="41" y1="19" x2="39" y2="21" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          <line x1="55" y1="19" x2="57" y2="21" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          <line x1="41" y1="5" x2="39" y2="3" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+        </g>
+
+        <!-- Cloud (near sun - BIGGER and more to the left) -->
+        <g class="cloud">
+          <ellipse cx="33" cy="20" rx="4" ry="2.8" fill="#60a5fa" opacity="0.7">
+            <animate attributeName="cx" values="33;35;33" dur="4s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="37" cy="20" rx="4.5" ry="3.2" fill="#60a5fa" opacity="0.7">
+            <animate attributeName="cx" values="37;39;37" dur="4s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="41" cy="20" rx="4" ry="2.8" fill="#60a5fa" opacity="0.7">
+            <animate attributeName="cx" values="41;43;41" dur="4s" repeatCount="indefinite"/>
+          </ellipse>
+        </g>
+
+        <!-- Dog House (LOWER) -->
+        <g class="house">
+          <!-- House roof -->
+          <path d="M 20 45 L 30 35 L 40 45 Z" fill="#ef4444"/>
+          <!-- House body -->
+          <rect x="22" y="45" width="16" height="12" fill="#d97706" rx="1"/>
+          <!-- House entrance (arch) -->
+          <path d="M 26 57 Q 26 50, 30 50 Q 34 50, 34 57 Z" fill="#1a1a1a"/>
+          <!-- House details -->
+          <line x1="30" y1="45" x2="30" y2="40" stroke="#d97706" stroke-width="0.5"/>
+        </g>
+
+        <!-- Ground -->
+        <rect x="15" y="57" width="30" height="2" fill="#4ade80" opacity="0.7" rx="1"/>
       </svg>
+
+      <!-- Dark Mode: Night Scene (fundo preto = noite) -->
       <svg
         *ngIf="isDark()"
-        class="icon"
+        class="scene-icon"
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
+        viewBox="0 0 60 60"
       >
-        <path d="M12,17a5,5,0,1,1,5-5A5,5,0,0,1,12,17Zm0-8a3,3,0,1,0,3,3A3,3,0,0,0,12,9ZM12,5V3a1,1,0,0,0-2,0V5a1,1,0,0,0,2,0Zm0,18V21a1,1,0,0,0-2,0v2a1,1,0,0,0,2,0ZM23,11H21a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2ZM3,11H1a1,1,0,0,0,0,2H3a1,1,0,0,0,0-2ZM19.07,4.93a1,1,0,0,0-1.41,0l-1.42,1.42a1,1,0,0,0,1.42,1.41l1.41-1.42A1,1,0,0,0,19.07,4.93ZM7.76,17.24a1,1,0,0,0-1.42,0l-1.41,1.41a1,1,0,1,0,1.42,1.42l1.41-1.42A1,1,0,0,0,7.76,17.24ZM4.93,4.93a1,1,0,0,0,0,1.41L6.34,7.76A1,1,0,1,0,7.76,6.34L6.34,4.93A1,1,0,0,0,4.93,4.93ZM17.24,16.24,18.66,17.66a1,1,0,0,0,1.41-1.42l-1.41-1.41a1,1,0,0,0-1.42,1.41Z"/>
+        <!-- Stars (fewer but BIGGER) -->
+        <g class="stars">
+          <circle cx="10" cy="12" r="2" fill="#fbbf24" class="star">
+            <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="18" cy="8" r="1.8" fill="#fbbf24" class="star">
+            <animate attributeName="opacity" values="0.4;1;0.4" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="28" cy="10" r="2.2" fill="#fbbf24" class="star">
+            <animate attributeName="opacity" values="1;0.5;1" dur="2.8s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="38" cy="6" r="1.9" fill="#fbbf24" class="star">
+            <animate attributeName="opacity" values="0.5;1;0.5" dur="2.3s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="52" cy="8" r="2.1" fill="#fbbf24" class="star">
+            <animate attributeName="opacity" values="1;0.3;1" dur="2.6s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+
+        <!-- Moon (right side - BIGGER crescent moon) -->
+        <g class="moon">
+          <circle cx="48" cy="14" r="7" fill="#fbbf24"/>
+          <circle cx="51" cy="13" r="6" fill="var(--color-background)"/>
+        </g>
+
+        <!-- Dog House (LOWER) -->
+        <g class="house">
+          <!-- House roof -->
+          <path d="M 20 45 L 30 35 L 40 45 Z" fill="#ef4444"/>
+          <!-- House body -->
+          <rect x="22" y="45" width="16" height="12" fill="#8B4513" rx="1"/>
+          <!-- House entrance (arch) -->
+          <path d="M 26 57 Q 26 50, 30 50 Q 34 50, 34 57 Z" fill="#2a2a2a"/>
+          <!-- House details -->
+          <line x1="30" y1="45" x2="30" y2="40" stroke="#8B4513" stroke-width="0.5"/>
+        </g>
+
+        <!-- Ground -->
+        <rect x="15" y="57" width="30" height="2" fill="#27AE60" opacity="0.6" rx="1"/>
       </svg>
     </button>
   `,
@@ -39,38 +120,47 @@ import { ThemeService } from '../../../core/services/theme.service';
       bottom: 24px;
       right: 24px;
       z-index: 1000;
-      width: 40px;
-      height: 40px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       background: var(--color-background-secondary);
-      border: 1px solid var(--color-border);
+      border: 2px solid var(--color-border);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: var(--shadow-light);
+      box-shadow: var(--shadow-card);
+      padding: 8px;
     }
 
     .theme-toggle:hover {
-      background: var(--color-primary-light);
+      background: var(--color-primary-lighter);
       border-color: var(--color-primary);
-      transform: scale(1.1);
+      transform: scale(1.08);
+      box-shadow: var(--shadow-button);
     }
 
     .theme-toggle:active {
       transform: scale(0.95);
     }
 
-    .icon {
-      width: 20px;
-      height: 20px;
-      color: var(--color-text-primary);
+    .scene-icon {
+      width: 100%;
+      height: 100%;
+      transition: all 0.4s ease;
+    }
+
+    /* Animation effects */
+    .stars circle,
+    .moon circle,
+    .sun circle,
+    .cloud ellipse {
       transition: all 0.3s ease;
     }
 
-    .theme-toggle:hover .icon {
-      color: var(--color-primary);
+    .theme-toggle:hover .scene-icon {
+      transform: rotate(-5deg);
     }
 
     /* Responsive adjustments */
@@ -78,13 +168,9 @@ import { ThemeService } from '../../../core/services/theme.service';
       .theme-toggle {
         bottom: 84px; /* Acima da bottom nav (68px) + espaçamento */
         right: 16px;
-        width: 36px;
-        height: 36px;
-      }
-
-      .icon {
-        width: 18px;
-        height: 18px;
+        width: 52px;
+        height: 52px;
+        padding: 6px;
       }
     }
 
@@ -93,6 +179,8 @@ import { ThemeService } from '../../../core/services/theme.service';
       .theme-toggle {
         bottom: 32px;
         right: 32px;
+        width: 60px;
+        height: 60px;
       }
     }
   `]
