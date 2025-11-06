@@ -20,7 +20,9 @@ import { PwaService } from "../../core/services/pwa.service";
           <div class="header-actions">
             @if (pwaService.isInstallable() && !pwaService.isInstalled()) {
               <button class="pwa-install-button" (click)="installPwa()" title="Instalar aplicativo">
-                📱
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+                </svg>
               </button>
             }
             @if (authService.isAuthenticated()) {
@@ -230,7 +232,11 @@ import { PwaService } from "../../core/services/pwa.service";
           <button class="close-btn" (click)="closeIosInstructions()">✕</button>
 
           <div class="modal-header">
-            <span class="icon">📱</span>
+            <span class="icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M5 20h14v-2H5v2zm7-18l-7 7h4v6h6v-6h4l-7-7z"/>
+              </svg>
+            </span>
             <h2>Instalar Aubrigo</h2>
             <p>Siga os passos abaixo para adicionar o app à sua tela inicial</p>
           </div>
@@ -329,6 +335,12 @@ import { PwaService } from "../../core/services/pwa.service";
         cursor: pointer;
         transition: all 0.2s ease;
         font-size: 20px;
+      }
+
+      .pwa-install-button svg {
+        width: 24px;
+        height: 24px;
+        color: #5CB5B0;
       }
 
       .pwa-install-button:hover {
@@ -898,6 +910,12 @@ import { PwaService } from "../../core/services/pwa.service";
         font-size: 48px;
         display: block;
         margin-bottom: 16px;
+      }
+
+      .modal-header .icon svg {
+        width: 48px;
+        height: 48px;
+        color: #5CB5B0;
       }
 
       .modal-header h2 {
