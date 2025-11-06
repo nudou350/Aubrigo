@@ -20,10 +20,10 @@ import { AuthService } from '../../../core/services/auth.service';
           <!-- Logo with Paw Print and Dogs -->
           <div class="logo-section">
             <div class="paw-background">
-              <img src="assets/background_login.png" alt="Paw print" class="paw-print" />
+              <img src="assets/background_login.webp" alt="Paw print" class="paw-print" />
             </div>
             <div class="dogs-overlay">
-              <img src="assets/dogs_login.png" alt="Dogs" class="dogs-image" />
+              <img src="assets/dogs_login.webp" alt="Dogs" class="dogs-image" />
             </div>
           </div>
 

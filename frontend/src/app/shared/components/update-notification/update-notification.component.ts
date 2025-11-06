@@ -199,13 +199,22 @@ export class UpdateNotificationComponent implements OnInit {
   }
 
   private watchForUpdates(): void {
-    // Create an effect to watch the updateAvailable signal
-    setInterval(() => {
+    // Only check for updates in production
+    if (!this.pwaService.isSwUpdateEnabled) {
+      console.log('⚠️ PWA updates disabled in development mode');
+      return;
+    }
+
+    // Check immediately and then every 5 seconds (instead of 1 second)
+    const checkUpdate = () => {
       if (this.pwaService.updateAvailable() && !this.showNotification()) {
         this.showNotification.set(true);
         console.log('📢 Update notification shown to user');
       }
-    }, 1000);
+    };
+
+    checkUpdate();
+    setInterval(checkUpdate, 5000);
   }
 
   /**

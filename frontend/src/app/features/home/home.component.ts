@@ -4,7 +4,11 @@ import { Router } from "@angular/router";
 import { AuthService } from "../../core/services/auth.service";
 import { FavoritesService } from "../../core/services/favorites.service";
 import { ToastService } from "../../core/services/toast.service";
-import { PetsService, Pet, SearchPetsParams } from "../../core/services/pets.service";
+import {
+  PetsService,
+  Pet,
+  SearchPetsParams,
+} from "../../core/services/pets.service";
 import { PwaService } from "../../core/services/pwa.service";
 
 @Component({
@@ -19,13 +23,16 @@ import { PwaService } from "../../core/services/pwa.service";
           <h1 class="greeting-text">{{ getGreeting() }}</h1>
           <div class="header-actions">
             @if (pwaService.isInstallable() && !pwaService.isInstalled()) {
-              <button class="pwa-install-button" (click)="installPwa()" title="Instalar aplicativo">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-              </button>
-            }
-            @if (authService.isAuthenticated()) {
+            <button
+              class="pwa-install-button"
+              (click)="installPwa()"
+              title="Instalar aplicativo"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+              </svg>
+            </button>
+            } @if (authService.isAuthenticated()) {
             <button class="profile-button" (click)="goToProfile()">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path
@@ -59,53 +66,63 @@ import { PwaService } from "../../core/services/pwa.service";
               [placeholder]="getLocationPlaceholder()"
             />
             @if (showLocationDropdown() && filteredLocations().length > 0) {
-              <div class="location-dropdown">
-                @for (location of filteredLocations(); track $index) {
-                  <button
-                    class="location-option"
-                    [class.selected]="selectedLocationIndex() === $index"
-                    (click)="selectLocation(location)"
-                  >
-                    <svg class="option-icon" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                    </svg>
-                    {{ location }}
-                  </button>
-                }
-              </div>
+            <div class="location-dropdown">
+              @for (location of filteredLocations(); track $index) {
+              <button
+                class="location-option"
+                [class.selected]="selectedLocationIndex() === $index"
+                (click)="selectLocation(location)"
+              >
+                <svg
+                  class="option-icon"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                  />
+                </svg>
+                {{ location }}
+              </button>
+              }
+            </div>
             }
           </div>
 
           <!-- Species Filter Tabs -->
           <div class="species-tabs">
-          <button
-            class="species-tab"
-            [class.active]="selectedSpecies() === 'dog'"
-            (click)="filterBySpecies('dog')"
-          >
-            <div class="tab-icon">🐕</div>
-          </button>
-          <button
-            class="species-tab"
-            [class.active]="selectedSpecies() === 'cat'"
-            (click)="filterBySpecies('cat')"
-          >
-            <div class="tab-icon">🐈</div>
-          </button>
-          <button
-            class="species-tab"
-            [class.active]="selectedSpecies() === 'fish'"
-            (click)="filterBySpecies('fish')"
-          >
-            <div class="tab-icon">🐠</div>
-          </button>
-          <button
-            class="species-tab"
-            [class.active]="selectedSpecies() === 'hamster'"
-            (click)="filterBySpecies('hamster')"
-          >
-            <div class="tab-icon">🐹</div>
-          </button>
+            <button
+              class="species-tab"
+              [class.active]="selectedSpecies() === 'dog'"
+              (click)="filterBySpecies('dog')"
+            >
+              <img src="assets/dog_home.webp" alt="Dog" class="tab-icon" />
+            </button>
+            <button
+              class="species-tab"
+              [class.active]="selectedSpecies() === 'cat'"
+              (click)="filterBySpecies('cat')"
+            >
+              <img src="assets/cat_home.webp" alt="Cat" class="tab-icon" />
+            </button>
+            <button
+              class="species-tab"
+              [class.active]="selectedSpecies() === 'fish'"
+              (click)="filterBySpecies('fish')"
+            >
+              <img src="assets/fish_home.webp" alt="Fish" class="tab-icon" />
+            </button>
+            <button
+              class="species-tab"
+              [class.active]="selectedSpecies() === 'hamster'"
+              (click)="filterBySpecies('hamster')"
+            >
+              <img
+                src="assets/hamster_home.webp"
+                alt="Hamster"
+                class="tab-icon"
+              />
+            </button>
           </div>
         </div>
       </div>
@@ -134,8 +151,21 @@ import { PwaService } from "../../core/services/pwa.service";
               (click)="toggleFavorite(pet.id, $event)"
               title="Adicionar aos favoritos"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" [attr.fill]="favoritePetIds().has(pet.id) ? 'currentColor' : 'none'" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                [attr.fill]="
+                  favoritePetIds().has(pet.id) ? 'currentColor' : 'none'
+                "
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
               </svg>
             </button>
           </div>
@@ -145,15 +175,11 @@ import { PwaService } from "../../core/services/pwa.service";
 
             <div class="pet-details">
               <div class="detail-item">
-                <svg
+                <img
+                  src="assets/location.webp"
+                  alt="Location"
                   class="detail-icon"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-                  />
-                </svg>
+                />
                 <span>{{ pet.location }}</span>
               </div>
 
@@ -179,15 +205,7 @@ import { PwaService } from "../../core/services/pwa.service";
               </div>
 
               <div class="detail-item">
-                <svg
-                  class="detail-icon"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
-                  />
-                </svg>
+                <img src="assets/size.webp" alt="Size" class="detail-icon" />
                 <span>{{ getSizeLabel(pet.size) }}</span>
               </div>
 
@@ -206,12 +224,8 @@ import { PwaService } from "../../core/services/pwa.service";
             </div>
 
             <div class="ong-info">
-              <svg class="ong-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path
-                  d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"
-                />
-              </svg>
-              <span>{{ pet.ong?.ongName || 'N/A' }}</span>
+              <img src="assets/ong.webp" alt="ONG" class="ong-icon" />
+              <span>{{ pet.ong?.ongName || "N/A" }}</span>
             </div>
 
             <p class="pet-description">{{ pet.description }}</p>
@@ -225,63 +239,81 @@ import { PwaService } from "../../core/services/pwa.service";
 
     <!-- iOS Install Instructions Modal -->
     @if (showIosInstructions()) {
-      <div class="ios-modal-overlay" (click)="closeIosInstructions()">
-        <div class="ios-modal" (click)="$event.stopPropagation()">
-          <button class="close-btn" (click)="closeIosInstructions()">✕</button>
+    <div class="ios-modal-overlay" (click)="closeIosInstructions()">
+      <div class="ios-modal" (click)="$event.stopPropagation()">
+        <button class="close-btn" (click)="closeIosInstructions()">✕</button>
 
-          <div class="modal-header">
-            <span class="icon">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-              </svg>
-            </span>
-            <h2>Instalar Aubrigo</h2>
-            <p>Siga os passos abaixo para adicionar o app à sua tela inicial</p>
-          </div>
+        <div class="modal-header">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+            </svg>
+          </span>
+          <h2>Instalar Aubrigo</h2>
+          <p>Siga os passos abaixo para adicionar o app à sua tela inicial</p>
+        </div>
 
-          <div class="instructions">
-            <div class="step">
-              <div class="step-number">1</div>
-              <div class="step-content">
-                <h3>Toque no botão Compartilhar</h3>
-                <p>Procure pelo ícone <strong>
-                  <svg width="16" height="20" viewBox="0 0 16 20" fill="currentColor" style="display: inline; vertical-align: middle;">
-                    <path d="M8 0L6.59 1.41L12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8-8-8z" transform="rotate(-90 8 8)"/>
+        <div class="instructions">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>Toque no botão Compartilhar</h3>
+              <p>
+                Procure pelo ícone
+                <strong>
+                  <svg
+                    width="16"
+                    height="20"
+                    viewBox="0 0 16 20"
+                    fill="currentColor"
+                    style="display: inline; vertical-align: middle;"
+                  >
+                    <path
+                      d="M8 0L6.59 1.41L12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8-8-8z"
+                      transform="rotate(-90 8 8)"
+                    />
                   </svg>
-                </strong> na parte inferior da tela</p>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="step-number">2</div>
-              <div class="step-content">
-                <h3>Role para baixo</h3>
-                <p>No menu que aparecer, role até encontrar a opção</p>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="step-number">3</div>
-              <div class="step-content">
-                <h3>Adicionar à Tela de Início</h3>
-                <p>Toque em <strong>"Adicionar à Tela de Início"</strong> ou <strong>"Add to Home Screen"</strong></p>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="step-number">4</div>
-              <div class="step-content">
-                <h3>Confirme</h3>
-                <p>Toque em <strong>"Adicionar"</strong> no canto superior direito</p>
-              </div>
+                </strong>
+                na parte inferior da tela
+              </p>
             </div>
           </div>
 
-          <div class="modal-footer">
-            <p>✨ Pronto! O ícone do Aubrigo estará na sua tela inicial</p>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3>Role para baixo</h3>
+              <p>No menu que aparecer, role até encontrar a opção</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3>Adicionar à Tela de Início</h3>
+              <p>
+                Toque em <strong>"Adicionar à Tela de Início"</strong> ou
+                <strong>"Add to Home Screen"</strong>
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h3>Confirme</h3>
+              <p>
+                Toque em <strong>"Adicionar"</strong> no canto superior direito
+              </p>
+            </div>
           </div>
         </div>
+
+        <div class="modal-footer">
+          <p>✨ Pronto! O ícone do Aubrigo estará na sua tela inicial</p>
+        </div>
       </div>
+    </div>
     }
   `,
   styles: [
@@ -338,7 +370,7 @@ import { PwaService } from "../../core/services/pwa.service";
       .pwa-install-button svg {
         width: 24px;
         height: 24px;
-        color: #5CB5B0;
+        color: #5cb5b0;
       }
 
       .pwa-install-button:hover {
@@ -513,11 +545,12 @@ import { PwaService } from "../../core/services/pwa.service";
       .species-tabs {
         display: flex;
         gap: 12px;
-        justify-content: center;
+        justify-content: space-between;
       }
 
       .species-tab {
-        width: 64px;
+        flex: 1;
+        max-width: 80px;
         height: 64px;
         border-radius: 16px;
         background: #ffffff;
@@ -537,7 +570,10 @@ import { PwaService } from "../../core/services/pwa.service";
       }
 
       .tab-icon {
-        font-size: 32px;
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+        border-radius: 8px;
       }
 
       .species-tab:hover:not(.active) {
@@ -658,8 +694,8 @@ import { PwaService } from "../../core/services/pwa.service";
       }
 
       .favorite-button.favorited {
-        color: #E74C3C;
-        background: #FFF5F5;
+        color: #e74c3c;
+        background: #fff5f5;
       }
 
       .favorite-button:active {
@@ -697,6 +733,16 @@ import { PwaService } from "../../core/services/pwa.service";
         height: 18px;
         color: #4ca8a0;
         flex-shrink: 0;
+      }
+
+      .detail-icon[src*="location.png"] {
+        width: 14px;
+        height: 18px;
+        object-fit: contain;
+      }
+
+      .detail-icon[src*="size.png"] {
+        object-fit: contain;
       }
 
       .ong-info {
@@ -913,13 +959,13 @@ import { PwaService } from "../../core/services/pwa.service";
       .modal-header .icon svg {
         width: 48px;
         height: 48px;
-        color: #5CB5B0;
+        color: #5cb5b0;
       }
 
       .modal-header h2 {
         font-size: 24px;
         font-weight: 700;
-        color: #2C2C2C;
+        color: #2c2c2c;
         margin: 0 0 8px 0;
       }
 
@@ -964,7 +1010,7 @@ import { PwaService } from "../../core/services/pwa.service";
       .step-content h3 {
         font-size: 16px;
         font-weight: 600;
-        color: #2C2C2C;
+        color: #2c2c2c;
         margin: 0 0 6px 0;
       }
 
@@ -1026,9 +1072,9 @@ export class HomeComponent implements OnInit {
     this.initFavorites();
 
     // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
+    document.addEventListener("click", (e) => {
       const target = e.target as HTMLElement;
-      if (!target.closest('.location-search-container')) {
+      if (!target.closest(".location-search-container")) {
         this.showLocationDropdown.set(false);
       }
     });
@@ -1054,12 +1100,12 @@ export class HomeComponent implements OnInit {
 
     this.favoritesService.getFavorites(this.visitorEmail).subscribe({
       next: (favorites) => {
-        const petIds = new Set(favorites.map(f => f.petId));
+        const petIds = new Set(favorites.map((f) => f.petId));
         this.favoritePetIds.set(petIds);
       },
       error: (error) => {
-        console.error('Error loading favorites:', error);
-      }
+        console.error("Error loading favorites:", error);
+      },
     });
   }
 
@@ -1067,7 +1113,7 @@ export class HomeComponent implements OnInit {
     event.stopPropagation(); // Prevent navigation to pet detail
 
     if (!this.visitorEmail) {
-      this.toastService.warning('Por favor, configure seu e-mail primeiro');
+      this.toastService.warning("Por favor, configure seu e-mail primeiro");
       return;
     }
 
@@ -1076,18 +1122,20 @@ export class HomeComponent implements OnInit {
 
     if (isFavorited) {
       // Remove from favorites
-      this.favoritesService.removeFavoriteByPetId(petId, this.visitorEmail).subscribe({
-        next: () => {
-          const newFavorites = new Set(favorites);
-          newFavorites.delete(petId);
-          this.favoritePetIds.set(newFavorites);
-          this.toastService.success('Removido dos favoritos');
-        },
-        error: (error) => {
-          console.error('Error removing favorite:', error);
-          this.toastService.error('Erro ao remover dos favoritos');
-        }
-      });
+      this.favoritesService
+        .removeFavoriteByPetId(petId, this.visitorEmail)
+        .subscribe({
+          next: () => {
+            const newFavorites = new Set(favorites);
+            newFavorites.delete(petId);
+            this.favoritePetIds.set(newFavorites);
+            this.toastService.success("Removido dos favoritos");
+          },
+          error: (error) => {
+            console.error("Error removing favorite:", error);
+            this.toastService.error("Erro ao remover dos favoritos");
+          },
+        });
     } else {
       // Add to favorites
       this.favoritesService.addToFavorites(petId, this.visitorEmail).subscribe({
@@ -1095,12 +1143,12 @@ export class HomeComponent implements OnInit {
           const newFavorites = new Set(favorites);
           newFavorites.add(petId);
           this.favoritePetIds.set(newFavorites);
-          this.toastService.success('Adicionado aos favoritos');
+          this.toastService.success("Adicionado aos favoritos");
         },
         error: (error) => {
-          console.error('Error adding favorite:', error);
-          this.toastService.error('Erro ao adicionar aos favoritos');
-        }
+          console.error("Error adding favorite:", error);
+          this.toastService.error("Erro ao adicionar aos favoritos");
+        },
       });
     }
   }
@@ -1116,7 +1164,10 @@ export class HomeComponent implements OnInit {
     }
 
     // Add location filter if selected and not "Todas as cidades"
-    if (this.currentLocation() && this.currentLocation() !== "Todas as cidades") {
+    if (
+      this.currentLocation() &&
+      this.currentLocation() !== "Todas as cidades"
+    ) {
       params.location = this.currentLocation();
     }
 
@@ -1127,7 +1178,7 @@ export class HomeComponent implements OnInit {
       },
       error: (error) => {
         console.error("Error loading pets:", error);
-        this.toastService.error('Erro ao carregar pets');
+        this.toastService.error("Erro ao carregar pets");
         this.loading.set(false);
         this.pets.set([]);
       },
@@ -1140,7 +1191,7 @@ export class HomeComponent implements OnInit {
   }
 
   getSizeLabel(size?: string): string {
-    if (!size) return 'N/A';
+    if (!size) return "N/A";
     const labels: any = {
       small: "Pequeno",
       medium: "Médio",
@@ -1187,9 +1238,13 @@ export class HomeComponent implements OnInit {
     // Android/Chrome - use native prompt
     const installed = await this.pwaService.promptInstall();
     if (installed) {
-      this.toastService.success('App instalado! Acesse pelo ícone na tela inicial');
+      this.toastService.success(
+        "App instalado! Acesse pelo ícone na tela inicial"
+      );
     } else {
-      this.toastService.info('Adicione o Aubrigo à sua tela inicial para acesso rápido!');
+      this.toastService.info(
+        "Adicione o Aubrigo à sua tela inicial para acesso rápido!"
+      );
     }
   }
 
@@ -1204,9 +1259,9 @@ export class HomeComponent implements OnInit {
         this.filteredLocations.set(this.availableLocations.slice(0, 5));
       },
       error: (error) => {
-        console.error('Error loading cities:', error);
+        console.error("Error loading cities:", error);
         // Keep default if error
-      }
+      },
     });
   }
 
@@ -1219,7 +1274,9 @@ export class HomeComponent implements OnInit {
   getLocationPlaceholder(): string {
     // Show current location as placeholder if "Todas as cidades" is selected
     const location = this.currentLocation();
-    return location === "Todas as cidades" ? "Todas as cidades" : "Digite uma cidade...";
+    return location === "Todas as cidades"
+      ? "Todas as cidades"
+      : "Digite uma cidade...";
   }
 
   onLocationFocus() {
@@ -1246,7 +1303,7 @@ export class HomeComponent implements OnInit {
 
     // Filter locations based on input (limit to 5 results)
     const filtered = this.availableLocations
-      .filter(location =>
+      .filter((location) =>
         location.toLowerCase().includes(input.toLowerCase())
       )
       .slice(0, 5); // Limit to 5 cities
@@ -1260,28 +1317,26 @@ export class HomeComponent implements OnInit {
     const locations = this.filteredLocations();
 
     if (!this.showLocationDropdown() || locations.length === 0) {
-      if (event.key === 'Enter') {
+      if (event.key === "Enter") {
         this.onEnterKey();
       }
       return;
     }
 
     switch (event.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         event.preventDefault();
-        this.selectedLocationIndex.update(idx =>
+        this.selectedLocationIndex.update((idx) =>
           idx < locations.length - 1 ? idx + 1 : idx
         );
         break;
 
-      case 'ArrowUp':
+      case "ArrowUp":
         event.preventDefault();
-        this.selectedLocationIndex.update(idx =>
-          idx > 0 ? idx - 1 : -1
-        );
+        this.selectedLocationIndex.update((idx) => (idx > 0 ? idx - 1 : -1));
         break;
 
-      case 'Enter':
+      case "Enter":
         event.preventDefault();
         const selectedIdx = this.selectedLocationIndex();
         if (selectedIdx >= 0 && selectedIdx < locations.length) {
@@ -1291,7 +1346,7 @@ export class HomeComponent implements OnInit {
         }
         break;
 
-      case 'Escape':
+      case "Escape":
         event.preventDefault();
         this.showLocationDropdown.set(false);
         this.selectedLocationIndex.set(-1);

@@ -26,22 +26,22 @@ import { AuthService } from "../../../core/services/auth.service";
           <!-- Paw Steps Background -->
           <div class="paw-steps">
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-1"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-2"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-3"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-4"
             />

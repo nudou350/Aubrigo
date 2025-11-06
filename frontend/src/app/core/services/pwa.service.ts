@@ -149,6 +149,13 @@ export class PwaService {
   }
 
   /**
+   * Check if Service Worker updates are enabled
+   */
+  get isSwUpdateEnabled(): boolean {
+    return this.swUpdate.isEnabled;
+  }
+
+  /**
    * Initialize Service Worker update detection
    */
   private initServiceWorkerUpdate() {

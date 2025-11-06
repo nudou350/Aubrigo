@@ -25,42 +25,42 @@ import { AuthService } from "../../../core/services/auth.service";
           <!-- Paw Steps Background - S-curve pattern -->
           <div class="paw-steps">
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-1"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-2"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-3"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-4"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-5"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-6"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-7"
             />
             <img
-              src="assets/paw_register.png"
+              src="assets/paw_register.webp"
               alt="Paw step"
               class="paw-step paw-8"
             />
