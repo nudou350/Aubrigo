@@ -28,7 +28,7 @@ import { ArticlesModule } from './articles/articles.module';
         url: configService.get('DATABASE_URL'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true, // TODO: Change to migrations after initial setup
-        logging: configService.get('NODE_ENV') === 'development',
+        logging: ['error'],
         ssl: configService.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
       }),
     }),

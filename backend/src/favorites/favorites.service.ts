@@ -95,4 +95,12 @@ export class FavoritesService {
     await this.favoriteRepository.remove(favorite);
     return { message: 'Favorite removed successfully' };
   }
+
+  async checkIsFavorite(petId: string, email: string) {
+    const favorite = await this.favoriteRepository.findOne({
+      where: { petId, visitorEmail: email },
+    });
+
+    return { isFavorite: !!favorite };
+  }
 }

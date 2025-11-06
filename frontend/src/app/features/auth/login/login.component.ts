@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -7,7 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage],
   template: `
     <div class="login-screen">
       <div class="login-content">
@@ -20,10 +20,10 @@ import { AuthService } from '../../../core/services/auth.service';
           <!-- Logo with Paw Print and Dogs -->
           <div class="logo-section">
             <div class="paw-background">
-              <img src="assets/background_login.webp" alt="Paw print" class="paw-print" />
+              <img ngSrc="assets/background_login.webp" alt="Paw print" fill class="paw-print" priority />
             </div>
             <div class="dogs-overlay">
-              <img src="assets/dogs_login.webp" alt="Dogs" class="dogs-image" />
+              <img ngSrc="assets/dogs_login.webp" alt="Dogs" width="220" height="165" class="dogs-image" priority />
             </div>
           </div>
 

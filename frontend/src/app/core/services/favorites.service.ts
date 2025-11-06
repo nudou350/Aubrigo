@@ -6,9 +6,7 @@ import { environment } from '../../../environments/environment';
 
 export interface Favorite {
   id: string;
-  visitorEmail: string;
-  petId: string;
-  pet?: {
+  pet: {
     id: string;
     name: string;
     primaryImage?: string;
@@ -16,8 +14,15 @@ export interface Favorite {
     age?: number;
     species: string;
     location?: string;
+    gender?: string;
+    size?: string;
+    ong?: {
+      id: string;
+      ongName: string;
+      location?: string;
+    };
   };
-  createdAt: string;
+  addedAt: string;
 }
 
 export interface FavoriteResponse {

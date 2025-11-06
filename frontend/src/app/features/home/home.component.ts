@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { CommonModule, NgOptimizedImage } from "@angular/common";
 import { Router } from "@angular/router";
 import { AuthService } from "../../core/services/auth.service";
 import { FavoritesService } from "../../core/services/favorites.service";
@@ -14,7 +14,7 @@ import { PwaService } from "../../core/services/pwa.service";
 @Component({
   selector: "app-home",
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NgOptimizedImage],
   template: `
     <div class="home-screen">
       <!-- Header Section -->
@@ -96,21 +96,21 @@ import { PwaService } from "../../core/services/pwa.service";
               [class.active]="selectedSpecies() === 'dog'"
               (click)="filterBySpecies('dog')"
             >
-              <img src="assets/dog_home.webp" alt="Dog" class="tab-icon" />
+              <img ngSrc="assets/dog_home.webp" alt="Dog" width="36" height="36" class="tab-icon" priority />
             </button>
             <button
               class="species-tab"
               [class.active]="selectedSpecies() === 'cat'"
               (click)="filterBySpecies('cat')"
             >
-              <img src="assets/cat_home.webp" alt="Cat" class="tab-icon" />
+              <img ngSrc="assets/cat_home.webp" alt="Cat" width="36" height="36" class="tab-icon" priority />
             </button>
             <button
               class="species-tab"
               [class.active]="selectedSpecies() === 'fish'"
               (click)="filterBySpecies('fish')"
             >
-              <img src="assets/fish_home.webp" alt="Fish" class="tab-icon" />
+              <img ngSrc="assets/fish_home.webp" alt="Fish" width="36" height="36" class="tab-icon" priority />
             </button>
             <button
               class="species-tab"
@@ -118,9 +118,12 @@ import { PwaService } from "../../core/services/pwa.service";
               (click)="filterBySpecies('hamster')"
             >
               <img
-                src="assets/hamster_home.webp"
+                ngSrc="assets/hamster_home.webp"
                 alt="Hamster"
+                width="36"
+                height="36"
                 class="tab-icon"
+                priority
               />
             </button>
           </div>
@@ -144,7 +147,11 @@ import { PwaService } from "../../core/services/pwa.service";
         } @else { @for (pet of pets(); track pet.id) {
         <div class="pet-card" (click)="viewPetDetail(pet.id)">
           <div class="pet-image-container">
-            <img [src]="pet.primaryImage" [alt]="pet.name" class="pet-image" />
+            @if (pet.primaryImage) {
+            <img [ngSrc]="pet.primaryImage" [alt]="pet.name" fill class="pet-image" loading="lazy" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+            } @else {
+            <div class="placeholder-image">{{ pet.name }}</div>
+            }
             <button
               class="favorite-button"
               [class.favorited]="favoritePetIds().has(pet.id)"
@@ -176,8 +183,10 @@ import { PwaService } from "../../core/services/pwa.service";
             <div class="pet-details">
               <div class="detail-item">
                 <img
-                  src="assets/location.webp"
+                  ngSrc="assets/location.webp"
                   alt="Location"
+                  width="14"
+                  height="18"
                   class="detail-icon"
                 />
                 <span>{{ pet.location }}</span>
@@ -205,7 +214,7 @@ import { PwaService } from "../../core/services/pwa.service";
               </div>
 
               <div class="detail-item">
-                <img src="assets/size.webp" alt="Size" class="detail-icon" />
+                <img ngSrc="assets/size.webp" alt="Size" width="18" height="18" class="detail-icon" />
                 <span>{{ getSizeLabel(pet.size) }}</span>
               </div>
 
@@ -224,7 +233,7 @@ import { PwaService } from "../../core/services/pwa.service";
             </div>
 
             <div class="ong-info">
-              <img src="assets/ong.webp" alt="ONG" class="ong-icon" />
+              <img ngSrc="assets/ong.webp" alt="ONG" width="20" height="20" class="ong-icon" />
               <span>{{ pet.ong?.ongName || "N/A" }}</span>
             </div>
 
@@ -669,6 +678,18 @@ import { PwaService } from "../../core/services/pwa.service";
         object-fit: cover;
       }
 
+      .placeholder-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+        color: #4ca8a0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+
       .favorite-button {
         position: absolute;
         top: 12px;
@@ -1100,7 +1121,7 @@ export class HomeComponent implements OnInit {
 
     this.favoritesService.getFavorites(this.visitorEmail).subscribe({
       next: (favorites) => {
-        const petIds = new Set(favorites.map((f) => f.petId));
+        const petIds = new Set(favorites.map((f) => f.pet.id));
         this.favoritePetIds.set(petIds);
       },
       error: (error) => {

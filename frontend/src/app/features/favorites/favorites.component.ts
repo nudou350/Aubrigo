@@ -43,7 +43,7 @@ import { ToastService } from '../../core/services/toast.service';
           <div class="favorites-grid">
             @for (favorite of favorites(); track favorite.id) {
               <div class="pet-card">
-                <div class="pet-image" [routerLink]="['/pets', favorite.petId]">
+                <div class="pet-image" [routerLink]="['/pets', favorite.pet?.id]">
                   @if (favorite.pet?.primaryImage) {
                     <img [src]="favorite.pet?.primaryImage" [alt]="favorite.pet?.name || 'Pet'">
                   } @else {
@@ -54,7 +54,7 @@ import { ToastService } from '../../core/services/toast.service';
                     </div>
                   }
                 </div>
-                <div class="pet-info" [routerLink]="['/pets', favorite.petId]">
+                <div class="pet-info" [routerLink]="['/pets', favorite.pet?.id]">
                   <h3 class="pet-name">{{ favorite.pet?.name || 'Pet' }}</h3>
                   <div class="pet-details">
                     <span class="detail-item">
@@ -227,7 +227,7 @@ import { ToastService } from '../../core/services/toast.service';
 
     .pet-image {
       width: 100%;
-      height: 200px;
+      height: 280px;
       overflow: hidden;
       cursor: pointer;
       background: #F5F5F5;

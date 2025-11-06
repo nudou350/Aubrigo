@@ -1,315 +1,366 @@
-# 📋 Sistema de Agendamento Inteligente - TODO
+# PWA Optimization TODO List
 
-## ✅ FASE 1 MVP - COMPLETO (Backend)
+## High Priority
 
-### Database & Entities
-- [x] Entity `OngOperatingHours` - Horários de funcionamento por dia da semana
-- [x] Entity `AppointmentSettings` - Configurações de agendamento (duração, slots, etc)
-- [x] Entity `OngAvailabilityException` - Bloqueios e exceções (férias, feriados)
-- [x] Atualizar entity `Appointment` com campos `scheduledStartTime`, `scheduledEndTime`, `timezone`
-- [x] Migration automática criada e executada
+### 1. Background Sync (Visitas Offline) ✅
+- [x] ~~Install Workbox and configure background sync module~~ (Using native IndexedDB)
+- [x] Create IndexedDB schema for offline appointment queue
+  - [x] Define structure: { id, type, payload, timestamp, retryCount, status }
+  - [x] Add indexes for efficient queries (status, timestamp)
+- [x] Implement appointment service with offline detection
+  - [x] Check navigator.onLine status via NetworkStatusService
+  - [x] Queue appointments locally when offline via OfflineQueueService
+  - [x] Add visual indicator for queued items (OfflineSyncBadgeComponent)
+- [x] Configure Service Worker sync registration
+  - [x] Register sync event listener via automatic network detection
+  - [x] Implement retry logic with max 3 retries
+- [x] Create sync handler to process queued appointments
+  - [x] Retrieve pending items from IndexedDB
+  - [x] Process actions when online (ready for API integration)
+  - [x] Update local status and remove from queue on success
+  - [x] Handle conflicts with retry counter
+- [x] Add UI feedback for sync status
+  - [x] Toast notification for online/offline status
+  - [x] Badge count for pending items with manual sync button
+  - [x] Created usage guide (BACKGROUND_SYNC_USAGE.md)
+- [ ] Test scenarios:
+  - [ ] Submit while offline, go online, verify sync
+  - [ ] Multiple queued items sync order
+  - [ ] Conflict resolution for duplicate submissions
 
-### Services
-- [x] `OperatingHoursService` - CRUD horários de funcionamento
-- [x] `AppointmentSettingsService` - CRUD configurações
-- [x] `AvailableSlotsService` - **Cálculo inteligente de slots disponíveis**
-- [x] `AvailabilityExceptionsService` - Gerenciamento de bloqueios
-- [x] Atualizar `AppointmentsService` com validações automáticas
+### 2. Offline Mode Aprimorado ✅
+- [x] Audit current caching strategy
+  - [x] Review ngsw-config.json cache groups
+  - [x] Identify critical assets vs. nice-to-have
+- [x] Implement runtime caching for API responses
+  - [x] Cache pet listings with TTL (6 hours) - freshness strategy
+  - [x] Cache NGO profiles (12 hours) - performance strategy
+  - [x] Cache favorites (30 min) - freshness strategy
+  - [x] Cache pet images (7 days) - performance strategy for CDNs
+- [x] Add offline indicators throughout the app
+  - [x] Global toast notification when going offline/online
+  - [x] Persistent offline badge at bottom right
+  - [x] Network status tracking via NetworkStatusService
+- [x] Create offline storage infrastructure
+  - [x] IndexedDB for offline queue (via OfflineQueueService)
+  - [x] Ready for favorites offline sync
+  - [x] Ready for conflict resolution
+- [x] Implement image caching strategy
+  - [x] Added Cloudinary, AWS S3, Google Storage to cache config
+  - [x] Max 200 images, 7 day expiration
+  - [x] Performance strategy for fast loading
+- [ ] Add offline search functionality
+  - [ ] Index cached pets in IndexedDB
+  - [ ] Client-side filtering and search
+  - [ ] Display "Limited to cached results" message
+- [ ] Create offline diagnostics page
+  - [ ] Show cached assets count
+  - [ ] Display cache size usage
+  - [ ] Clear cache button
+  - [ ] Test connection button
 
-### Controllers & Endpoints
-- [x] `OperatingHoursController` - 15+ endpoints criados
-- [x] Endpoints de configuração de horários
-- [x] Endpoints de configuração de settings
-- [x] Endpoints de slots disponíveis (público)
-- [x] Endpoints de datas disponíveis (público)
-- [x] Endpoints de exceções/bloqueios
+### 3. Update Notifications ✅
+- [x] Implement version detection mechanism
+  - [x] Version in ngsw-config.json appData
+  - [x] Include version in service worker
+- [x] Subscribe to SwUpdate service in Angular
+  - [x] Inject SwUpdate in PwaService
+  - [x] Listen to versionUpdates observable
+- [x] Create update notification component
+  - [x] Custom banner with gradient styling (top of screen)
+  - [x] "Nova versão disponível!" message
+  - [x] "Atualizar" and "Depois" buttons
+  - [x] Animated slide down transition
+- [x] Implement update logic
+  - [x] Call SwUpdate.activateUpdate() on user action
+  - [x] Reload page after activation (document.location.reload)
+  - [x] Dismiss functionality implemented
+- [x] Configure update check interval
+  - [x] Check for updates every 6 hours
+  - [x] Check on app startup (after stabilization)
+  - [x] Periodic checks with concat observable
+- [x] Responsive design
+  - [x] Mobile-first layout
+  - [x] Desktop optimized
+- [ ] Add version display in footer
+  - [ ] Show current version number
+  - [ ] Check for updates button
 
-### DTOs
-- [x] `CreateOperatingHoursDto` + `UpdateOperatingHoursDto` + `BulkOperatingHoursDto`
-- [x] `CreateAppointmentSettingsDto` + `UpdateAppointmentSettingsDto`
-- [x] `CreateAvailabilityExceptionDto`
-- [x] `AvailableSlotDto` + `AvailableSlotsResponseDto` + `AvailableDatesResponseDto`
-- [x] Atualizar `CreateAppointmentDto` com campo `scheduledStartTime` (opcional)
+### 4. Install Prompt Customizado ✅
+- [x] Detect PWA install capability
+  - [x] Listen to beforeinstallprompt event in PwaService
+  - [x] Store prompt event for later use
+  - [x] Check if already installed (standalone mode)
+- [x] Create custom install banner component
+  - [x] Modal dialog with backdrop blur
+  - [x] Include benefits list (3 key features)
+  - [x] App icon display
+  - [x] Animated transitions (fadeIn + slideUp)
+- [x] Implement smart prompt timing
+  - [x] Show after 3 user interactions (scrolls/clicks)
+  - [x] Never show if already installed
+  - [x] Respect user dismissal (7-day cooldown in localStorage)
+  - [x] Debug mode for development testing
+- [x] iOS special handling
+  - [x] Detect iOS devices
+  - [x] Show manual installation instructions
+  - [x] Step-by-step guide with share icon
+- [x] Responsive design
+  - [x] Mobile-optimized layout
+  - [x] Desktop-friendly modal
+- [ ] Add manual install button
+  - [ ] Persistent button in navigation menu
+  - [ ] Show only when installable
+  - [ ] Hide when already installed
+- [ ] Track install prompt metrics
+- [ ] Handle install success
+  - [ ] Listen to appinstalled event
+  - [ ] Show thank you message
+  - [ ] Track in analytics
+- [ ] Add platform-specific instructions
+- [ ] Test on multiple platforms
+
+
+## Medium Priority
+
+### 5. Push Notifications ✅
+- [x] Set up backend notification service
+  - [x] Complete guide created (PUSH_NOTIFICATIONS_SETUP.md)
+  - [x] Generate VAPID keys instructions
+  - [x] Backend example code (NestJS)
+- [x] Create subscription endpoint
+  - [x] POST /api/notifications/subscribe
+  - [x] DELETE /api/notifications/unsubscribe
+  - [x] Store subscription objects example
+- [x] Implement notification triggers
+  - [x] Defined notification types enum
+  - [x] Example triggers for appointments, pets, donations
+- [x] Frontend: Request notification permission
+  - [x] Check Notification.permission status
+  - [x] PushNotificationService created
+  - [x] Handle denial gracefully
+- [x] Frontend: Subscribe to push service
+  - [x] Get service worker registration
+  - [x] Send subscription to backend
+  - [x] Unsubscribe functionality
+- [x] Service Worker: Handle push events
+  - [x] Listen to push event via SwPush
+  - [x] Parse notification data
+  - [x] Show notification with custom handler
+- [x] Service Worker: Handle notification clicks
+  - [x] Route to specific pages based on action
+  - [x] Action handlers implemented
+- [x] Add notification preferences page
+  - [x] NotificationSettingsComponent created
+  - [x] Toggle for each notification type (4 types)
+  - [x] Test notification button
+  - [x] Unsubscribe option
+  - [x] Beautiful UI with animations
+- [x] Documentation
+  - [x] Complete setup guide
+  - [x] Usage examples
+  - [x] Backend integration guide
+- [ ] Test notification delivery (requires backend setup)
+
+### 6. Share Target API ✅
+- [x] Configure Web Share Target in manifest
+  - [x] Added share_target configuration to manifest.webmanifest
+  - [x] Defined POST action to /share
+  - [x] Accept images and text via multipart/form-data
+- [x] Create share handler route in Angular
+  - [x] ShareComponent created at /share
+  - [x] Parse incoming query params
+  - [x] Display shared content beautifully
+  - [x] Handle files/images
+- [x] Implement receive share logic
+  - [x] Display shared title, text, URL
+  - [x] Handle URL sharing with pet detection
+  - [x] Redirect to pet page if pet URL shared
+- [x] Add share buttons throughout app
+  - [x] ShareButtonComponent created (reusable)
+  - [x] Native share + social media fallbacks
+  - [x] WhatsApp, Facebook, Twitter, Email, Copy link
+  - [x] Beautiful dropdown menu with animations
+- [x] ShareService created
+  - [x] Check navigator.share support
+  - [x] sharePet() helper method
+  - [x] shareOng() helper method
+  - [x] shareApp() helper method
+  - [x] Platform-specific share links
+  - [x] Clipboard copy with fallback
+- [x] Documentation
+  - [x] Complete usage guide (SHARE_API_GUIDE.md)
+  - [x] Component usage examples
+  - [x] Service examples
+- [ ] Test share target (requires PWA installation)
+- [ ] Add share analytics tracking
+
+### 7. Offline Fallback Page Melhorada ✅
+- [x] Design custom offline page
+  - [x] Beautiful gradient background with animations
+  - [x] Floating cloud icon with pulse animation
+  - [x] Clear "Você está offline" message
+  - [x] List 4 available offline features
+- [x] Create offline-specific functionality
+  - [x] Display available offline features
+  - [x] Show what user can still do offline
+  - [x] Educational content about offline mode
+- [x] Add connection retry mechanism
+  - [x] "Tentar Novamente" button
+  - [x] Auto-check every 5 seconds
+  - [x] Real-time connection status indicator
+  - [x] Auto-redirect when back online
+- [x] Connection status monitoring
+  - [x] Listen to online/offline events
+  - [x] Visual status badge (offline/online)
+  - [x] Spinner animation while checking
+  - [x] Success message when reconnected
+- [x] Configure fallback in service worker
+  - [x] navigationFallback added to ngsw-config.json
+  - [x] Serve offline.html on network failure
+  - [x] Freshness strategy for navigation
+- [x] Preload offline page assets
+  - [x] offline.html added to assets in angular.json
+  - [x] Prefetched in service worker config
+- [x] Responsive design
+  - [x] Mobile-optimized
+  - [x] Desktop-friendly
+  - [x] Smooth animations
+- [ ] Implement offline game/easter egg
+  - [ ] Simple memory game (future enhancement)
+  - [ ] Pet care tips carousel
+
+
+## Low Priority
+
+### 8. Analytics Offline
+- [ ] Implement analytics queue system
+  - [ ] Store events in IndexedDB when offline
+  - [ ] Schema: { event, timestamp, data, sent }
+- [ ] Create analytics service wrapper
+  - [ ] Intercept Google Analytics calls
+  - [ ] Queue offline events
+  - [ ] Send when connection restored
+- [ ] Add PWA-specific events
+  - [ ] Track install/uninstall
+  - [ ] Track offline usage duration
+  - [ ] Track background sync success/failure
+  - [ ] Track service worker updates
+- [ ] Implement event batching
+  - [ ] Send max 50 events per batch
+  - [ ] Deduplicate events
+  - [ ] Add offline flag to events
+- [ ] Add privacy controls
+  - [ ] Allow users to disable analytics
+  - [ ] Clear analytics queue on request
+  - [ ] GDPR compliance
+- [ ] Create analytics dashboard view
+- [ ] Test offline analytics
+
+### 9. Periodic Background Sync
+- [ ] Evaluate API support
+  - [ ] Check browser compatibility
+  - [ ] Implement feature detection
+  - [ ] Plan progressive enhancement
+- [ ] Request permission for periodic sync
+  - [ ] Check PeriodicSyncManager availability
+  - [ ] Register periodic sync with tag
+  - [ ] Recommended interval: 12-24 hours
+- [ ] Implement sync logic in service worker
+  - [ ] Listen to periodicsync event
+  - [ ] Fetch new pet listings
+  - [ ] Update cached data
+  - [ ] Check for updates to favorited pets
+- [ ] Add notification for new matches
+  - [ ] Compare new pets with user preferences
+  - [ ] Show notification for relevant pets
+  - [ ] Link to pet detail page
+- [ ] Implement battery-aware sync
+  - [ ] Check battery status API
+  - [ ] Skip sync if battery low
+  - [ ] Adjust frequency based on battery
+- [ ] Add user controls for periodic sync
+  - [ ] Enable/disable toggle in settings
+  - [ ] Frequency preference
+  - [ ] Show last sync timestamp
+- [ ] Monitor sync performance
+- [ ] Fallback for unsupported browsers
+- [ ] Test periodic sync
+
+
+## Testing Checklist
+
+### Cross-Platform Testing
+- [ ] Android Chrome (latest)
+- [ ] Android Chrome (version - 1)
+- [ ] iOS Safari (latest)
+- [ ] iOS Safari (iOS 15+)
+- [ ] Desktop Chrome
+- [ ] Desktop Edge
+- [ ] Desktop Firefox
+- [ ] Desktop Safari
+
+### Lighthouse Audits
+- [ ] PWA score > 90
+- [ ] Performance score > 85
+- [ ] Accessibility score > 95
+- [ ] Best Practices score > 90
+- [ ] SEO score > 90
+
+### Network Conditions
+- [ ] Offline mode (full offline)
+- [ ] Slow 3G (throttled)
+- [ ] Fast 3G
+- [ ] 4G
+- [ ] WiFi
+
+### Real Device Testing
+- [ ] Low-end Android device (2GB RAM)
+- [ ] Mid-range Android device
+- [ ] iPhone SE/older model
+- [ ] iPhone 13+
+- [ ] Tablet (Android/iPad)
+
+
+## Resources & Documentation
+
+### Service Worker APIs
+- [Service Worker API - MDN](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+- [Background Sync API](https://developer.chrome.com/docs/capabilities/periodic-background-sync)
+- [Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API)
+
+### Tools
+- [Workbox](https://developer.chrome.com/docs/workbox/) - Service Worker libraries
+- [PWA Builder](https://www.pwabuilder.com/) - Testing and manifest generation
+- [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) - Automated audits
+
+### Angular PWA
+- [@angular/pwa documentation](https://angular.io/guide/service-worker-intro)
+- [SwUpdate Service](https://angular.io/api/service-worker/SwUpdate)
+
+
+## Success Metrics
+
+### User Engagement
+- [ ] Track PWA install rate (target: 15% of visitors)
+- [ ] Measure offline usage (target: 10% of sessions)
+- [ ] Monitor background sync success rate (target: >95%)
+- [ ] Track notification opt-in rate (target: 25%)
+
+### Performance
+- [ ] Reduce initial load time by 30%
+- [ ] Achieve <2s time to interactive
+- [ ] Maintain cache size <150MB
+- [ ] Keep service worker update <500ms
+
+### Reliability
+- [ ] Zero data loss for offline appointments
+- [ ] 99.9% background sync success rate
+- [ ] <1% notification delivery failure
+- [ ] <5% update installation failures
 
 ---
 
-## ✅ FASE 2 MELHORIAS - COMPLETO (Backend)
-
-### Email Notifications
-- [x] `sendAppointmentAutoConfirmedToVisitor` - Email de confirmação automática
-- [x] `sendAppointmentAutoConfirmedToOng` - Notificação para ONG
-- [x] `sendAppointmentCancellationToVisitor` - Email de cancelamento
-- [x] `sendAppointmentCancellationToOng` - Notificação de cancelamento para ONG
-
-### Funcionalidades Avançadas
-- [x] Sistema de cancelamento de agendamentos
-- [x] Auto-criação de feriados portugueses
-- [x] Cleanup de exceções expiradas
-- [x] Validação de overlapping de exceções
-- [x] Backward compatibility com sistema legado
-
-### Integração
-- [x] Integrar EmailModule no AppointmentsModule
-- [x] Integrar notificações no fluxo de criação de appointments
-- [x] Endpoint `PATCH /api/appointments/:id/cancel`
-
----
-
-## 🔌 ENDPOINTS CRIADOS
-
-### Horários de Funcionamento
-```
-GET    /api/ongs/my-ong/operating-hours              (Auth: ONG)
-POST   /api/ongs/my-ong/operating-hours              (Auth: ONG)
-POST   /api/ongs/my-ong/operating-hours/bulk         (Auth: ONG)
-PUT    /api/ongs/my-ong/operating-hours/:dayOfWeek   (Auth: ONG)
-DELETE /api/ongs/my-ong/operating-hours/:dayOfWeek   (Auth: ONG)
-GET    /api/ongs/:ongId/operating-hours              (Public)
-```
-
-### Configurações de Agendamento
-```
-GET    /api/ongs/my-ong/appointment-settings         (Auth: ONG)
-POST   /api/ongs/my-ong/appointment-settings         (Auth: ONG)
-PUT    /api/ongs/my-ong/appointment-settings         (Auth: ONG)
-GET    /api/ongs/:ongId/appointment-settings         (Public)
-```
-
-### Slots & Datas Disponíveis (USUÁRIOS)
-```
-GET    /api/ongs/:ongId/available-slots?date=2025-01-10
-GET    /api/ongs/:ongId/available-dates?year=2025&month=1
-```
-
-### Exceções/Bloqueios
-```
-GET    /api/ongs/my-ong/exceptions                   (Auth: ONG)
-GET    /api/ongs/my-ong/exceptions/active            (Auth: ONG)
-POST   /api/ongs/my-ong/exceptions                   (Auth: ONG)
-POST   /api/ongs/my-ong/exceptions/holidays/:year    (Auth: ONG)
-PUT    /api/ongs/my-ong/exceptions/:id               (Auth: ONG)
-DELETE /api/ongs/my-ong/exceptions/:id               (Auth: ONG)
-DELETE /api/ongs/my-ong/exceptions/cleanup/expired   (Auth: ONG)
-GET    /api/ongs/:ongId/exceptions                   (Public)
-```
-
-### Agendamentos (ATUALIZADO)
-```
-POST   /api/appointments                              (Public)
-       Body: {
-         petId, visitorName, visitorEmail, visitorPhone,
-         scheduledStartTime: "2025-01-10T10:00:00Z"  // NOVO! (opcional)
-       }
-
-PATCH  /api/appointments/:id/cancel                  (Public)
-       Body: { reason?: "motivo opcional" }
-```
-
----
-
-## ✅ COMPLETO - FRONTEND
-
-### 1. Componente de Configuração de Horários (ONG)
-**Arquivo**: `frontend/src/app/features/ong/scheduling-settings/`
-- [x] Criar componente `SchedulingSettingsComponent`
-- [x] Formulário de horários de funcionamento (Segunda a Domingo)
-- [x] Toggle para abrir/fechar cada dia
-- [x] Inputs para horário de abertura/fechamento
-- [x] Inputs para horário de almoço (opcional)
-- [x] Configurações de agendamento (duração, visitas simultâneas, antecedência, etc.)
-- [x] Botão "Salvar Configurações" (salva horários e settings em paralelo)
-- [x] Rota: `/ong/scheduling-settings`
-
-### 2. Componente de Gestão de Bloqueios (ONG)
-**Arquivo**: `frontend/src/app/features/ong/availability-exceptions/`
-- [x] Listar exceções ativas
-- [x] Botão "Adicionar Bloqueio"
-- [x] Modal com date range picker
-- [x] Input para motivo
-- [x] Botão "Auto-criar Feriados 2025"
-- [x] Botão "Limpar Expirados"
-- [x] Editar/Deletar exceções
-- [x] Rota: `/ong/availability-exceptions`
-
-### 3. Calendário de Agendamento (USUÁRIO)
-**Arquivo**: `frontend/src/app/features/pets/schedule-appointment/`
-- [x] Calendário customizado com grid de 7x5
-- [x] Navegação entre meses
-- [x] Chamar `GET /api/ongs/:ongId/available-dates?year&month`
-- [x] Marcar em verde apenas dias disponíveis
-- [x] Desabilitar dias sem disponibilidade
-- [x] Sistema de passos (3 steps: Data → Horário → Dados)
-
-### 4. Seleção de Horários (USUÁRIO)
-**Arquivo**: `frontend/src/app/features/pets/schedule-appointment/`
-- [x] Chamar `GET /api/ongs/:ongId/available-slots?date=...`
-- [x] Mostrar slots em grade (botões clicáveis)
-- [x] Desabilitar slots não disponíveis
-- [x] Mostrar horários formatados em pt-PT
-- [x] Ao selecionar, avançar para step 3
-
-### 5. Confirmação de Agendamento
-- [x] Mostrar resumo antes de confirmar
-- [x] Exibir data, horário no formato completo
-- [x] Formulário com dados do visitante
-- [x] Botão "Confirmar Agendamento"
-- [x] Tela de sucesso: "Visita confirmada automaticamente!"
-- [x] Integração com novo sistema (scheduledStartTime)
-
-### 6. Services Criados
-- [x] `scheduling.service.ts` - Todos os endpoints do novo sistema
-- [x] Atualizar `appointments.service.ts` - scheduledStartTime e cancel
-- [x] Backward compatibility mantida (preferredDate/Time)
-
-### 7. Melhorias Gerais
-- [x] Atualizado componente de appointments da ONG para suportar ambos sistemas
-- [x] Rotas adicionadas no app.routes.ts
-- [x] Frontend compilando sem erros
-- [x] Backend rodando corretamente
-
----
-
-## 🎯 FASE 3 - FUTURO (Opcional)
-
-### Analytics & Relatórios
-- [ ] Dashboard de ocupação de horários
-- [ ] Gráfico de agendamentos por dia/semana/mês
-- [ ] Taxa de cancelamento
-- [ ] Horários mais populares
-
-### Reagendamento Automático
-- [ ] Se ONG bloquear uma data com agendamentos confirmados
-- [ ] Oferecer slots alternativos aos usuários
-- [ ] Enviar email com opções de reagendamento
-
-### Notificações Push
-- [ ] Lembrete 24h antes da visita
-- [ ] Lembrete 1h antes da visita
-- [ ] Notificação de cancelamento em tempo real
-
-### Lista de Espera
-- [ ] Se todos os slots estiverem ocupados
-- [ ] Usuário pode entrar em lista de espera
-- [ ] Notificar se houver cancelamento
-
----
-
-## 📁 ARQUIVOS CRIADOS (Referência)
-
-### Backend
-```
-backend/src/ongs/
-├── entities/
-│   ├── ong-operating-hours.entity.ts
-│   ├── appointment-settings.entity.ts
-│   └── ong-availability-exception.entity.ts
-├── services/
-│   ├── operating-hours.service.ts
-│   ├── appointment-settings.service.ts
-│   ├── available-slots.service.ts
-│   └── availability-exceptions.service.ts
-├── controllers/
-│   └── operating-hours.controller.ts
-├── dto/
-│   ├── create-operating-hours.dto.ts
-│   ├── update-operating-hours.dto.ts
-│   ├── bulk-operating-hours.dto.ts
-│   ├── create-appointment-settings.dto.ts
-│   ├── update-appointment-settings.dto.ts
-│   ├── create-availability-exception.dto.ts
-│   └── available-slot.dto.ts
-└── ongs.module.ts
-
-backend/src/appointments/
-├── entities/appointment.entity.ts (ATUALIZADO)
-├── dto/create-appointment.dto.ts (ATUALIZADO)
-├── appointments.service.ts (ATUALIZADO)
-├── appointments.controller.ts (ATUALIZADO)
-└── appointments.module.ts (ATUALIZADO)
-
-backend/src/email/
-└── email.service.ts (ATUALIZADO - 4 novos métodos)
-
-backend/src/database/migrations/
-└── 1736100000000-AddAppointmentSchedulingSystem.ts
-```
-
----
-
-## 🚀 COMO TESTAR (Backend já funcional)
-
-### 1. Configurar Horários de Funcionamento
-```bash
-POST /api/ongs/my-ong/operating-hours/bulk
-{
-  "operatingHours": [
-    { "dayOfWeek": 1, "isOpen": true, "openTime": "09:00", "closeTime": "17:00", "lunchBreakStart": "12:00", "lunchBreakEnd": "13:00" },
-    { "dayOfWeek": 2, "isOpen": true, "openTime": "09:00", "closeTime": "17:00", "lunchBreakStart": "12:00", "lunchBreakEnd": "13:00" },
-    // ... outros dias
-  ]
-}
-```
-
-### 2. Configurar Settings
-```bash
-POST /api/ongs/my-ong/appointment-settings
-{
-  "visitDurationMinutes": 60,
-  "maxConcurrentVisits": 2,
-  "minAdvanceBookingHours": 24,
-  "maxAdvanceBookingDays": 30,
-  "slotIntervalMinutes": 30
-}
-```
-
-### 3. Criar Feriados Automaticamente
-```bash
-POST /api/ongs/my-ong/exceptions/holidays/2025
-```
-
-### 4. Ver Datas Disponíveis
-```bash
-GET /api/ongs/{ongId}/available-dates?year=2025&month=1
-```
-
-### 5. Ver Slots de um Dia
-```bash
-GET /api/ongs/{ongId}/available-slots?date=2025-01-15
-```
-
-### 6. Criar Agendamento (Novo Sistema)
-```bash
-POST /api/appointments
-{
-  "petId": "uuid-do-pet",
-  "visitorName": "João Silva",
-  "visitorEmail": "joao@example.com",
-  "visitorPhone": "+351912345678",
-  "scheduledStartTime": "2025-01-15T10:00:00Z",
-  "notes": "Primeira visita"
-}
-```
-
----
-
-## 📝 NOTAS IMPORTANTES
-
-1. **Backend está 100% funcional** - Todas as tabelas criadas, endpoints funcionando
-2. **Emails precisam de configuração** - Adicionar credenciais SMTP no `.env`
-3. **Sistema é backward compatible** - Aceita agendamentos com e sem `scheduledStartTime`
-4. **Falta apenas o FRONTEND** - Toda a lógica de negócio já está implementada
-5. **Timezone padrão: Europe/Lisbon** - Configurado automaticamente
-
----
-
-## 🎯 PRIORIDADE PARA CONTINUAR
-
-1. **ALTA**: Criar componente de calendário com slots (usuário)
-2. **ALTA**: Criar painel de configuração de horários (ONG)
-3. **MÉDIA**: Criar gestão de bloqueios (ONG)
-4. **BAIXA**: Analytics e relatórios
-
----
-
-**Última atualização**: 5 de Janeiro de 2025
-**Status**: Backend completo (Fase 1 + Fase 2) | Frontend pendente
+**Last Updated:** 2025-11-06  
+**Version:** 1.0  
+**Maintained by:** Pet SOS Development Team

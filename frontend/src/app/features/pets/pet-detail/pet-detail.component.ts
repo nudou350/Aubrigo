@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { CommonModule, NgOptimizedImage } from "@angular/common";
 import { ActivatedRoute, Router } from "@angular/router";
 import { BottomNavComponent } from "../../../shared/components/bottom-nav/bottom-nav.component";
 import { FavoritesService } from "../../../core/services/favorites.service";
@@ -42,7 +42,7 @@ interface Pet {
 @Component({
   selector: "app-pet-detail",
   standalone: true,
-  imports: [CommonModule, BottomNavComponent],
+  imports: [CommonModule, BottomNavComponent, NgOptimizedImage],
   template: `
     <div class="pet-detail-screen">
       @if (loading()) {
@@ -91,9 +91,12 @@ interface Pet {
           </div>
           } @else {
           <img
-            [src]="currentImage()"
+            [ngSrc]="currentImage()"
             [alt]="pet()!.name"
+            fill
             class="carousel-image"
+            priority
+            sizes="100vw"
             (error)="onImageError($event)"
             (load)="onImageLoad()"
           />
@@ -345,15 +348,16 @@ interface Pet {
       .carousel-container {
         position: relative;
         width: 100%;
-        height: 320px;
+        height: 380px;
         overflow: hidden;
-        background: #f0f0f0;
+        background: linear-gradient(135deg, #f5fafa 0%, #e8f5f4 50%, #b8e3e1 100%);
       }
 
       .carousel-image {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
       }
 
       .image-placeholder {
@@ -679,7 +683,7 @@ interface Pet {
       /* Responsive Design */
       @media (min-width: 768px) {
         .carousel-container {
-          height: 400px;
+          height: 480px;
         }
 
         .content-section {
@@ -700,7 +704,8 @@ interface Pet {
         }
 
         .carousel-container {
-          height: 500px;
+          height: 560px;
+          max-height: 70vh;
         }
 
         .content-section {

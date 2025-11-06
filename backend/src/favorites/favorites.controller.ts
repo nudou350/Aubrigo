@@ -42,6 +42,14 @@ export class FavoritesController {
     return this.favoritesService.remove(id, email);
   }
 
+  @Get('check/:petId')
+  @ApiOperation({ summary: 'Check if a pet is favorited by user' })
+  @ApiQuery({ name: 'email', required: true, type: String })
+  @ApiResponse({ status: 200, description: 'Returns isFavorite status' })
+  async checkIsFavorite(@Param('petId') petId: string, @Query('email') email: string) {
+    return this.favoritesService.checkIsFavorite(petId, email);
+  }
+
   @Delete('pet/:petId')
   @ApiOperation({ summary: 'Remove a pet from favorites by pet ID' })
   @ApiQuery({ name: 'email', required: true, type: String })

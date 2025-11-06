@@ -1,5 +1,5 @@
 import { Component, inject, signal } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { CommonModule, NgOptimizedImage } from "@angular/common";
 import {
   FormControl,
   FormGroup,
@@ -12,7 +12,7 @@ import { AuthService } from "../../../core/services/auth.service";
 @Component({
   selector: "app-register",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage],
   template: `
     <div class="register-screen">
       <div class="register-content">
@@ -25,44 +25,68 @@ import { AuthService } from "../../../core/services/auth.service";
           <!-- Paw Steps Background - S-curve pattern -->
           <div class="paw-steps">
             <img
-              src="assets/paw_register.webp"
+              ngSrc="assets/paw_register.webp"
               alt="Paw step"
+              width="40"
+              height="40"
               class="paw-step paw-1"
+              loading="lazy"
             />
             <img
-              src="assets/paw_register.webp"
+              ngSrc="assets/paw_register.webp"
               alt="Paw step"
+              width="40"
+              height="40"
               class="paw-step paw-2"
+              loading="lazy"
             />
             <img
-              src="assets/paw_register.webp"
+              ngSrc="assets/paw_register.webp"
               alt="Paw step"
+              width="40"
+              height="40"
               class="paw-step paw-3"
+              loading="lazy"
             />
             <img
-              src="assets/paw_register.webp"
+              ngSrc="assets/paw_register.webp"
               alt="Paw step"
+              width="40"
+              height="40"
               class="paw-step paw-4"
+              loading="lazy"
             />
             <img
-              src="assets/paw_register.webp"
+              ngSrc="assets/paw_register.webp"
               alt="Paw step"
+              width="40"
+              height="40"
               class="paw-step paw-5"
+              loading="lazy"
             />
             <img
-              src="assets/paw_register.webp"
+              ngSrc="assets/paw_register.webp"
               alt="Paw step"
+              width="40"
+              height="40"
               class="paw-step paw-6"
+              loading="lazy"
             />
             <img
-              src="assets/paw_register.webp"
+              ngSrc="assets/paw_register.webp"
               alt="Paw step"
+              width="40"
+              height="40"
               class="paw-step paw-7"
+              loading="lazy"
             />
             <img
-              src="assets/paw_register.webp"
+              ngSrc="assets/paw_register.webp"
               alt="Paw step"
+              width="40"
+              height="40"
               class="paw-step paw-8"
+              loading="lazy"
             />
           </div>
 

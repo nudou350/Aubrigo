@@ -3,11 +3,14 @@ import { RouterOutlet } from '@angular/router';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { UpdateNotificationComponent } from './shared/components/update-notification/update-notification.component';
+import { InstallPromptComponent } from './shared/components/install-prompt/install-prompt.component';
+import { NetworkStatusComponent } from './shared/components/network-status/network-status.component';
+import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badge/offline-sync-badge.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent],
+  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent],
   template: `
     <div class="app-container">
       <main class="main-content">
@@ -32,6 +35,9 @@ import { UpdateNotificationComponent } from './shared/components/update-notifica
         </div>
       </footer>
       <app-update-notification></app-update-notification>
+      <app-install-prompt></app-install-prompt>
+      <app-network-status></app-network-status>
+      <app-offline-sync-badge></app-offline-sync-badge>
       <app-toast></app-toast>
     </div>
   `,
