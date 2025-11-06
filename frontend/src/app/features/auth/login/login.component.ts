@@ -86,12 +86,6 @@ import { AuthService } from '../../../core/services/auth.service';
           <div class="test-accounts">
             <h3 class="test-accounts-title">🧪 Contas de Teste</h3>
             <div class="test-account-section">
-              <p class="account-type">👑 Admin - Raphael Pereira:</p>
-              <button type="button" class="test-account-btn" (click)="fillLogin('dev.raphaelp@gmail.com', 'Admin123!')">
-                dev.raphaelp&#64;gmail.com
-              </button>
-            </div>
-            <div class="test-account-section">
               <p class="account-type">🏠 ONGs:</p>
               <button type="button" class="test-account-btn" (click)="fillLogin('cantinho@animais.pt', 'Password123!')">
                 cantinho&#64;animais.pt

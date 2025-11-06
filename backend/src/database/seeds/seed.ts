@@ -27,8 +27,8 @@ const AppDataSource = new DataSource({
 
 // Admin account
 const adminData = {
-  email: 'admin@petsos.com',
-  password: 'Password123!',
+  email: 'admin@aubrigo.pt',
+  password: 'Raphael1995#*',
   ongName: 'Admin',
   phone: '',
   instagramHandle: '',
@@ -428,8 +428,8 @@ async function seed() {
     console.log('🔐 Test Accounts (Password for all: Password123!):');
     console.log('');
     console.log('👑 ADMIN:');
-    console.log('  Email: admin@petsos.com');
-    console.log('  Password: Password123!');
+    console.log('  Email: admin@aubrigo.pt');
+    console.log('  Password: Raphael1995#*');
     console.log('');
     console.log('🏠 ONG ACCOUNTS:');
     ongData.forEach((ong) => {
