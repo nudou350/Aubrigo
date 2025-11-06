@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ShareService } from '../../../core/services/share.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -313,6 +313,13 @@ export class ShareButtonComponent {
   @Input() compact: boolean = false;
   @Input() ariaLabel: string = 'Compartilhar conteúdo';
 
+  /**
+   * Emits the platform name when sharing succeeds.
+   * Possible values: 'native', 'whatsapp', 'facebook', 'twitter', 'email'
+   * Note: 'copy' does not emit an event as it's just copying the link
+   */
+  @Output() shareSuccess = new EventEmitter<string>();
+
   showMenu = signal(false);
 
   constructor() {
@@ -335,6 +342,8 @@ export class ShareButtonComponent {
   async handleNativeShare(): Promise<void> {
     const shared = await this.shareService.share(this.shareData || {});
     if (shared) {
+      console.log('📤 Native share success');
+      this.shareSuccess.emit('native');
       this.closeMenu();
     }
   }
@@ -350,11 +359,14 @@ export class ShareButtonComponent {
 
     if (success) {
       if (platform === 'copy') {
-        this.toastService.show('Link copiado!', 'success');
+        this.toastService.success('Link copiado!');
+      } else {
+        console.log('📤 Share success via:', platform);
+        this.shareSuccess.emit(platform);
       }
       this.closeMenu();
     } else {
-      this.toastService.show('Erro ao compartilhar', 'error');
+      this.toastService.error('Erro ao compartilhar');
     }
   }
 }

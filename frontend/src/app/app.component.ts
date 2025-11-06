@@ -6,13 +6,15 @@ import { UpdateNotificationComponent } from './shared/components/update-notifica
 import { InstallPromptComponent } from './shared/components/install-prompt/install-prompt.component';
 import { NetworkStatusComponent } from './shared/components/network-status/network-status.component';
 import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badge/offline-sync-badge.component';
+import { ThemeToggleComponent } from './shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent],
+  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent, ThemeToggleComponent],
   template: `
     <div class="app-container">
+      <app-theme-toggle></app-theme-toggle>
       <main class="main-content">
         <router-outlet></router-outlet>
       </main>

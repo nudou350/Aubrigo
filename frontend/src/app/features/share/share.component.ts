@@ -88,7 +88,7 @@ import { Router, ActivatedRoute } from '@angular/router';
             Ir para Início
           </button>
 
-          @if (sharedContent?.url && isPetUrl(sharedContent.url)) {
+          @if (sharedContent?.url && isPetUrl(sharedContent?.url)) {
             <button class="btn-secondary" (click)="openSharedPet()">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -378,8 +378,8 @@ export class ShareComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  isPetUrl(url: string): boolean {
-    return url.includes('/pets/');
+  isPetUrl(url: string | undefined): boolean {
+    return url?.includes('/pets/') ?? false;
   }
 
   openSharedPet(): void {

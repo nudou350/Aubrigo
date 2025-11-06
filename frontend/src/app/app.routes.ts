@@ -72,6 +72,13 @@ export const routes: Routes = [
         (m) => m.FavoritesComponent
       ),
   },
+  {
+    path: 'share',
+    loadComponent: () =>
+      import('./features/share/share.component').then(
+        (m) => m.ShareComponent
+      ),
+  },
 
   // Pet management routes (specific routes must come before parameterized routes)
   {
