@@ -1,22 +1,18 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { UpdateNotificationComponent } from './shared/components/update-notification/update-notification.component';
 import { InstallPromptComponent } from './shared/components/install-prompt/install-prompt.component';
 import { NetworkStatusComponent } from './shared/components/network-status/network-status.component';
 import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badge/offline-sync-badge.component';
-import { ThemeToggleComponent } from './shared/components/theme-toggle/theme-toggle.component';
-import { AnalyticsService, EventType } from './core/services/analytics.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent, ThemeToggleComponent],
+  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent],
   template: `
     <div class="app-container">
-      <app-theme-toggle></app-theme-toggle>
       <main class="main-content">
         <router-outlet></router-outlet>
       </main>
@@ -55,13 +51,13 @@ import { AnalyticsService, EventType } from './core/services/analytics.service';
     .main-content {
       flex: 1;
       padding-bottom: 68px; /* Height of bottom navigation on mobile */
-      background: var(--color-background);
+      background: #ffffff;
     }
 
     /* Footer - Visible on all devices */
     .web-footer {
-      background: var(--color-background-secondary);
-      border-top: 1px solid var(--color-border);
+      background: #f9f9f9;
+      border-top: 1px solid #e0e0e0;
       padding: 20px 16px;
       margin-top: 40px;
       margin-bottom: 68px; /* Space for bottom navigation on mobile */
@@ -80,7 +76,7 @@ import { AnalyticsService, EventType } from './core/services/analytics.service';
     .footer-content p {
       margin: 0;
       font-size: 12px;
-      color: var(--color-text-secondary);
+      color: #666;
       display: flex;
       align-items: center;
       gap: 4px;
@@ -89,20 +85,19 @@ import { AnalyticsService, EventType } from './core/services/analytics.service';
     }
 
     .footer-content a {
-      color: var(--color-primary);
+      color: #4ca8a0;
       text-decoration: none;
       font-weight: 600;
       transition: all 0.2s;
     }
 
     .footer-content a:hover {
-      color: var(--color-primary);
+      color: #3a8d86;
       text-decoration: underline;
-      opacity: 0.8;
     }
 
     .separator {
-      color: var(--color-border);
+      color: #ccc;
       font-size: 12px;
     }
 
@@ -134,19 +129,6 @@ import { AnalyticsService, EventType } from './core/services/analytics.service';
     }
   `],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'Aubrigo';
-  private router = inject(Router);
-  private analytics = inject(AnalyticsService);
-
-  ngOnInit() {
-    // Track page views on navigation
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event) => {
-        if (event instanceof NavigationEnd) {
-          this.analytics.trackPageView(event.urlAfterRedirects, document.title);
-        }
-      });
-  }
 }

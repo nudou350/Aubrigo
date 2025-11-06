@@ -214,7 +214,7 @@ import { AuthService } from '../../../core/services/auth.service';
       left: 0;
       right: 0;
       height: 68px;
-      background: var(--color-primary-light);
+      background: #B8E3E1;
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -230,7 +230,7 @@ import { AuthService } from '../../../core/services/auth.service';
       justify-content: center;
       gap: 4px;
       text-decoration: none;
-      color: var(--color-primary);
+      color: #4ca8a0;
       transition: all 0.2s ease;
       flex: 1;
       background: none;
@@ -241,7 +241,7 @@ import { AuthService } from '../../../core/services/auth.service';
     }
 
     .nav-item.active {
-      color: var(--color-primary);
+      color: #4ca8a0;
     }
 
     .nav-item:hover {
@@ -258,7 +258,7 @@ import { AuthService } from '../../../core/services/auth.service';
       font-weight: 500;
       font-family: 'Inter', sans-serif;
       text-transform: uppercase;
-      color: var(--color-primary);
+      color: #4ca8a0;
       margin-top: 2px;
     }
 
@@ -270,7 +270,7 @@ import { AuthService } from '../../../core/services/auth.service';
     .paw-button {
       width: 60px;
       height: 60px;
-      background: var(--color-primary);
+      background: #4ca8a0;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -309,7 +309,7 @@ import { AuthService } from '../../../core/services/auth.service';
         top: 0;
         left: 0;
         right: 0;
-        background: var(--color-background);
+        background: #ffffff;
         box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
         z-index: 1000;
       }
@@ -411,8 +411,7 @@ import { AuthService } from '../../../core/services/auth.service';
       }
 
       .nav-cta:hover {
-        background: var(--color-primary);
-        opacity: 0.9;
+        background: #3d9690;
         transform: translateY(-1px);
         box-shadow: 0px 6px 16px rgba(76, 168, 160, 0.4);
       }
@@ -446,8 +445,8 @@ import { AuthService } from '../../../core/services/auth.service';
 
       .nav-logout {
         background: transparent;
-        color: var(--color-error);
-        border: 2px solid var(--color-error);
+        color: #E74C3C;
+        border: 2px solid #E74C3C;
         padding: 12px 24px;
         border-radius: 12px;
         font-size: 16px;
@@ -458,7 +457,7 @@ import { AuthService } from '../../../core/services/auth.service';
       }
 
       .nav-logout:hover {
-        background: var(--color-error);
+        background: #E74C3C;
         color: #ffffff;
         transform: translateY(-1px);
       }
