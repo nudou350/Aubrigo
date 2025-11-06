@@ -23,7 +23,9 @@
     "migration:run": "npm run typeorm -- migration:run -d src/data-source.ts",
     "migration:revert": "npm run typeorm -- migration:revert -d src/data-source.ts",
     "seed": "ts-node src/database/seeds/seed.ts",
-    "seed:reset-admin": "ts-node src/database/seeds/reset-admin.ts"
+    "seed:prod": "node dist/database/seeds/seed.js",
+    "seed:reset-admin": "ts-node src/database/seeds/reset-admin.ts",
+    "seed:reset-admin:prod": "node dist/database/seeds/reset-admin.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
