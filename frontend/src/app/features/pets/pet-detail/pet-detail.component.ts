@@ -7,6 +7,7 @@ import { ToastService } from "../../../core/services/toast.service";
 import { PetsService } from "../../../core/services/pets.service";
 import { ArticlesService, Article } from "../../../core/services/articles.service";
 import { normalizeImageUrl } from "../../../core/utils/image-url.util";
+import { AnalyticsService, EventType } from "../../../core/services/analytics.service";
 
 interface PetImage {
   id: string;
@@ -722,6 +723,7 @@ export class PetDetailComponent implements OnInit {
   private favoritesService = inject(FavoritesService);
   private toastService = inject(ToastService);
   private articlesService = inject(ArticlesService);
+  private analyticsService = inject(AnalyticsService);
 
   pet = signal<Pet | null>(null);
   loading = signal(true);
@@ -786,6 +788,12 @@ export class PetDetailComponent implements OnInit {
         next: () => {
           this.favoritedPetId.set(null);
           this.toastService.success('Removido dos favoritos');
+
+          // Track unfavorite
+          this.analyticsService.track(EventType.PET_UNFAVORITE, {
+            petId: pet.id,
+            ongId: pet.ong?.id
+          });
         },
         error: (error) => {
           console.error('Error removing favorite:', error);
@@ -798,6 +806,12 @@ export class PetDetailComponent implements OnInit {
         next: () => {
           this.favoritedPetId.set(pet.id);
           this.toastService.success('Adicionado aos favoritos');
+
+          // Track favorite
+          this.analyticsService.track(EventType.PET_FAVORITE, {
+            petId: pet.id,
+            ongId: pet.ong?.id
+          });
         },
         error: (error) => {
           console.error('Error adding favorite:', error);
@@ -821,6 +835,17 @@ export class PetDetailComponent implements OnInit {
           const imageUrl = primaryImage?.imageUrl || petData.images[0].imageUrl;
           this.currentImage.set(normalizeImageUrl(imageUrl));
         }
+
+        // Track pet view
+        this.analyticsService.track(EventType.PET_VIEW, {
+          petId: petData.id,
+          ongId: petData.ong?.id,
+          metadata: {
+            species: petData.species,
+            breed: petData.breed,
+            age: petData.age
+          }
+        });
 
         // Load ONG articles
         if (petData.ong?.id) {

@@ -105,8 +105,8 @@ export class PwaService {
         console.warn('⚠️ PWA: Install prompt is not available (Service Worker not active)');
         console.log('💡 To test PWA installation:');
         console.log('   1. Build in production mode: ng build');
-        console.log('   2. Serve the build: npx http-server dist/pet-sos-frontend/browser -p 4201');
-        console.log('   3. Open https://localhost:4201 (or use ngrok for HTTPS)');
+        console.log('   2. Serve the build: npx http-server dist/pet-sos-frontend/browser -p 4200');
+        console.log('   3. Open https://localhost:4200 (or use ngrok for HTTPS)');
       } else {
         console.warn('PWA: Install prompt is not available');
       }

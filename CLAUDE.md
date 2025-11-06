@@ -476,4 +476,3 @@ CREATE INDEX idx_appointments_pet_id ON appointments(pet_id);
 **Document Version:** 2.0
 **Last Updated:** January 5, 2025
 **Maintained By:** Pet SOS Development Team
-- rodar o frontend na porta 4201 em vez de 4200

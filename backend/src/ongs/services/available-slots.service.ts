@@ -129,18 +129,33 @@ export class AvailableSlotsService {
     const settings = await this.settingsService.findByOng(ongId);
     const operatingHours = await this.operatingHoursService.findByOng(ongId);
 
+    console.log('📅 Getting available dates for:', { ongId, year, month });
+    console.log('⚙️ Settings:', { maxAdvanceBookingDays: settings.maxAdvanceBookingDays, minAdvanceBookingHours: settings.minAdvanceBookingHours });
+    console.log('🕐 Operating hours count:', operatingHours.length);
+
     // Get all days in the month
     const daysInMonth = new Date(year, month, 0).getDate();
     const availableDates: string[] = [];
 
+    // Normalize today's date to start of day for comparison (set to midnight local time)
     const now = new Date();
-    const maxDate = new Date(now.getTime() + settings.maxAdvanceBookingDays * 24 * 60 * 60 * 1000);
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    today.setHours(0, 0, 0, 0);
+
+    const maxDate = new Date(today);
+    maxDate.setDate(maxDate.getDate() + settings.maxAdvanceBookingDays);
+
+    console.log('📆 Date range:', { today: this.formatDate(today), maxDate: this.formatDate(maxDate), daysInMonth });
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month - 1, day);
+      date.setHours(0, 0, 0, 0);
 
-      // Skip if date is in the past or beyond max advance booking
-      if (date < now || date > maxDate) {
+      // Skip if date is in the past (before today) or beyond max advance booking
+      const isBeforeToday = date.getTime() < today.getTime();
+      const isBeyondMax = date.getTime() > maxDate.getTime();
+
+      if (isBeforeToday || isBeyondMax) {
         continue;
       }
 
@@ -149,6 +164,7 @@ export class AvailableSlotsService {
       // Check if ONG is open on this day
       const hoursForDay = operatingHours.find((h) => h.dayOfWeek === dayOfWeek);
       if (!hoursForDay || !hoursForDay.isOpen) {
+        console.log(`⏭️ Skipping ${this.formatDate(date)} (day ${dayOfWeek}): ${!hoursForDay ? 'No hours configured' : 'Closed'}`);
         continue;
       }
 
@@ -167,8 +183,12 @@ export class AvailableSlotsService {
       }
 
       // If we got here, the day has availability
-      availableDates.push(this.formatDate(date));
+      const formattedDate = this.formatDate(date);
+      availableDates.push(formattedDate);
+      console.log(`✅ Added available date: ${formattedDate} (day ${dayOfWeek})`);
     }
+
+    console.log(`📊 Total available dates: ${availableDates.length}`);
 
     return {
       year,

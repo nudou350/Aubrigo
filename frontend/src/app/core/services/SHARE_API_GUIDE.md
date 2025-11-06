@@ -372,7 +372,7 @@ ng build
 
 2. Serve com HTTPS:
 ```bash
-npx http-server dist/aubrigo/browser -p 4201 --ssl
+npx http-server dist/aubrigo/browser -p 4200 --ssl
 ```
 
 3. Abrir no celular (necessário HTTPS real ou ngrok)

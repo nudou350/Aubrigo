@@ -129,6 +129,11 @@ import { ToastService } from '../../../core/services/toast.service';
               <h3>Configurações de Agendamento</h3>
               <p>Defina horários e regras de visitas</p>
             </a>
+            <a routerLink="/ong/analytics" class="action-card">
+              <div class="action-icon">📊</div>
+              <h3>Estatísticas</h3>
+              <p>Veja análises e métricas da sua ONG</p>
+            </a>
             <a routerLink="/ong/availability-exceptions" class="action-card">
               <div class="action-icon">🚫</div>
               <h3>Bloqueios e Férias</h3>

@@ -63,16 +63,67 @@ export class OperatingHoursService {
   }
 
   async findByOng(ongId: string): Promise<OngOperatingHours[]> {
-    return this.operatingHoursRepository.find({
+    const hours = await this.operatingHoursRepository.find({
       where: { ongId },
       order: { dayOfWeek: 'ASC' },
     });
+
+    // If no operating hours exist, create default ones
+    if (hours.length === 0) {
+      return this.createDefaultOperatingHours(ongId);
+    }
+
+    return hours;
+  }
+
+  private async createDefaultOperatingHours(ongId: string): Promise<OngOperatingHours[]> {
+    const defaultHours = [
+      // Monday to Friday: 9:00 - 18:00 with lunch break 12:00 - 13:00
+      { dayOfWeek: 1, isOpen: true, openTime: '09:00', closeTime: '18:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00' },
+      { dayOfWeek: 2, isOpen: true, openTime: '09:00', closeTime: '18:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00' },
+      { dayOfWeek: 3, isOpen: true, openTime: '09:00', closeTime: '18:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00' },
+      { dayOfWeek: 4, isOpen: true, openTime: '09:00', closeTime: '18:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00' },
+      { dayOfWeek: 5, isOpen: true, openTime: '09:00', closeTime: '18:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00' },
+      // Saturday: 9:00 - 13:00, no lunch break
+      { dayOfWeek: 6, isOpen: true, openTime: '09:00', closeTime: '13:00', lunchBreakStart: null, lunchBreakEnd: null },
+      // Sunday: Closed
+      { dayOfWeek: 0, isOpen: false, openTime: '09:00', closeTime: '18:00', lunchBreakStart: null, lunchBreakEnd: null },
+    ];
+
+    const created: OngOperatingHours[] = [];
+    for (const hours of defaultHours) {
+      const entity = this.operatingHoursRepository.create({
+        ongId,
+        ...hours,
+      });
+      const saved = await this.operatingHoursRepository.save(entity);
+      created.push(saved);
+    }
+
+    return created;
   }
 
   async findByOngAndDay(ongId: string, dayOfWeek: number): Promise<OngOperatingHours | null> {
-    return this.operatingHoursRepository.findOne({
+    let hours = await this.operatingHoursRepository.findOne({
       where: { ongId, dayOfWeek },
     });
+
+    // If no hours exist for this day, check if we need to create defaults
+    if (!hours) {
+      const allHours = await this.operatingHoursRepository.find({ where: { ongId } });
+
+      // If no operating hours exist at all, create defaults for all days
+      if (allHours.length === 0) {
+        await this.createDefaultOperatingHours(ongId);
+
+        // Now fetch the hours for the requested day
+        hours = await this.operatingHoursRepository.findOne({
+          where: { ongId, dayOfWeek },
+        });
+      }
+    }
+
+    return hours;
   }
 
   async update(ongId: string, dayOfWeek: number, dto: UpdateOperatingHoursDto): Promise<OngOperatingHours> {

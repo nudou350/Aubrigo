@@ -404,7 +404,7 @@ ng build
 
 2. Serve com HTTPS:
 ```bash
-npx http-server dist/aubrigo/browser -p 4201 --ssl
+npx http-server dist/aubrigo/browser -p 4200 --ssl
 ```
 
 3. Abra no navegador e teste:

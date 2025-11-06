@@ -8,6 +8,7 @@ import { AppointmentsService, CreateAppointmentDto } from '../../../core/service
 import { SchedulingService, AvailableSlot } from '../../../core/services/scheduling.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { environment } from '../../../../environments/environment';
+import { AnalyticsService, EventType } from '../../../core/services/analytics.service';
 
 interface Pet {
   id: string;
@@ -753,6 +754,7 @@ export class ScheduleAppointmentComponent implements OnInit {
   private appointmentsService = inject(AppointmentsService);
   private schedulingService = inject(SchedulingService);
   private toastService = inject(ToastService);
+  private analyticsService = inject(AnalyticsService);
 
   pet = signal<Pet | null>(null);
   loading = signal(true);
@@ -966,6 +968,16 @@ export class ScheduleAppointmentComponent implements OnInit {
       next: () => {
         this.submitting.set(false);
         this.toastService.success('Visita confirmada automaticamente! Verifique seu email.');
+
+        // Track appointment creation
+        this.analyticsService.track(EventType.APPOINTMENT_CREATE, {
+          petId: pet.id,
+          ongId: pet.ong?.id,
+          metadata: {
+            scheduledDate: slotTime
+          }
+        });
+
         setTimeout(() => {
           this.router.navigate(['/pets', pet.id]);
         }, 2000);

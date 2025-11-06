@@ -225,6 +225,13 @@ export const routes: Routes = [
             (m) => m.AvailabilityExceptionsComponent
           ),
       },
+      {
+        path: 'analytics',
+        loadComponent: () =>
+          import('./features/admin/analytics-dashboard/analytics-dashboard.component').then(
+            (m) => m.AnalyticsDashboardComponent
+          ),
+      },
     ]
   },
 
