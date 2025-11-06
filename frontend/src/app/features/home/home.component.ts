@@ -222,6 +222,63 @@ import { PwaService } from "../../core/services/pwa.service";
         } }
       </div>
     </div>
+
+    <!-- iOS Install Instructions Modal -->
+    @if (showIosInstructions()) {
+      <div class="ios-modal-overlay" (click)="closeIosInstructions()">
+        <div class="ios-modal" (click)="$event.stopPropagation()">
+          <button class="close-btn" (click)="closeIosInstructions()">✕</button>
+
+          <div class="modal-header">
+            <span class="icon">📱</span>
+            <h2>Instalar Aubrigo</h2>
+            <p>Siga os passos abaixo para adicionar o app à sua tela inicial</p>
+          </div>
+
+          <div class="instructions">
+            <div class="step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h3>Toque no botão Compartilhar</h3>
+                <p>Procure pelo ícone <strong>
+                  <svg width="16" height="20" viewBox="0 0 16 20" fill="currentColor" style="display: inline; vertical-align: middle;">
+                    <path d="M8 0L6.59 1.41L12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8-8-8z" transform="rotate(-90 8 8)"/>
+                  </svg>
+                </strong> na parte inferior da tela</p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3>Role para baixo</h3>
+                <p>No menu que aparecer, role até encontrar a opção</p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h3>Adicionar à Tela de Início</h3>
+                <p>Toque em <strong>"Adicionar à Tela de Início"</strong> ou <strong>"Add to Home Screen"</strong></p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h3>Confirme</h3>
+                <p>Toque em <strong>"Adicionar"</strong> no canto superior direito</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <p>✨ Pronto! O ícone do Aubrigo estará na sua tela inicial</p>
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [
     `
@@ -767,6 +824,161 @@ import { PwaService } from "../../core/services/pwa.service";
           gap: 32px;
         }
       }
+
+      /* iOS Install Instructions Modal */
+      .ios-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 20px;
+        backdrop-filter: blur(4px);
+      }
+
+      .ios-modal {
+        background: white;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: #f0f0f0;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        transition: all 0.2s;
+        z-index: 1;
+      }
+
+      .close-btn:hover {
+        background: #e0e0e0;
+        color: #333;
+      }
+
+      .modal-header {
+        text-align: center;
+        padding: 40px 30px 20px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .modal-header .icon {
+        font-size: 48px;
+        display: block;
+        margin-bottom: 16px;
+      }
+
+      .modal-header h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2C2C2C;
+        margin: 0 0 8px 0;
+      }
+
+      .modal-header p {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+      }
+
+      .instructions {
+        padding: 24px 30px;
+      }
+
+      .step {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .step:last-child {
+        margin-bottom: 0;
+      }
+
+      .step-number {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        background: #4ca8a0;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      .step-content {
+        flex: 1;
+      }
+
+      .step-content h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2C2C2C;
+        margin: 0 0 6px 0;
+      }
+
+      .step-content p {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .step-content strong {
+        color: #4ca8a0;
+        font-weight: 600;
+      }
+
+      .modal-footer {
+        background: #f9f9f9;
+        padding: 20px 30px;
+        border-top: 1px solid #f0f0f0;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+      }
+
+      .modal-footer p {
+        text-align: center;
+        font-size: 14px;
+        color: #4ca8a0;
+        margin: 0;
+        font-weight: 600;
+      }
     `,
   ],
 })
@@ -781,6 +993,7 @@ export class HomeComponent implements OnInit {
   pets = signal<Pet[]>([]);
   loading = signal(true);
   selectedSpecies = signal<string>("dog");
+  showIosInstructions = signal(false);
   currentLocation = signal("Todas as cidades");
   favoritePetIds = signal<Set<string>>(new Set());
   visitorEmail: string | null = null;
@@ -949,12 +1162,23 @@ export class HomeComponent implements OnInit {
   }
 
   async installPwa() {
+    // Check if it's iOS - show instructions instead of prompt
+    if (this.pwaService.isIOS()) {
+      this.showIosInstructions.set(true);
+      return;
+    }
+
+    // Android/Chrome - use native prompt
     const installed = await this.pwaService.promptInstall();
     if (installed) {
       this.toastService.success('App instalado! Acesse pelo ícone na tela inicial');
     } else {
       this.toastService.info('Adicione o Aubrigo à sua tela inicial para acesso rápido!');
     }
+  }
+
+  closeIosInstructions() {
+    this.showIosInstructions.set(false);
   }
 
   loadCitiesWithPets() {

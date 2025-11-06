@@ -13,6 +13,23 @@ import { ToastComponent } from './shared/components/toast/toast.component';
         <router-outlet></router-outlet>
       </main>
       <app-bottom-nav></app-bottom-nav>
+      <footer class="web-footer">
+        <div class="footer-content">
+          <p>
+            <span>Desenvolvido por</span>
+            <a href="https://www.linkedin.com/in/dev-raphaelp/" target="_blank" rel="noopener noreferrer">
+              Raphael Pereira
+            </a>
+          </p>
+          <span class="separator">•</span>
+          <p>
+            <span>Design por</span>
+            <a href="https://www.linkedin.com/in/tharaujovieira/" target="_blank" rel="noopener noreferrer">
+              Thaís Araújo
+            </a>
+          </p>
+        </div>
+      </footer>
       <app-toast></app-toast>
     </div>
   `,
@@ -29,11 +46,77 @@ import { ToastComponent } from './shared/components/toast/toast.component';
       background: #ffffff;
     }
 
+    /* Footer - Visible on all devices */
+    .web-footer {
+      background: #f9f9f9;
+      border-top: 1px solid #e0e0e0;
+      padding: 20px 16px;
+      margin-top: 40px;
+      margin-bottom: 68px; /* Space for bottom navigation on mobile */
+    }
+
+    .footer-content {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .footer-content p {
+      margin: 0;
+      font-size: 12px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-content a {
+      color: #4ca8a0;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .footer-content a:hover {
+      color: #3a8d86;
+      text-decoration: underline;
+    }
+
+    .separator {
+      color: #ccc;
+      font-size: 12px;
+    }
+
     /* Desktop: Add top padding for fixed top navigation */
     @media (min-width: 1024px) {
       .main-content {
         padding-top: 88px; /* Height of larger top navigation */
         padding-bottom: 0;
+      }
+
+      .web-footer {
+        padding: 24px 32px;
+        margin-top: 60px;
+        margin-bottom: 0; /* No bottom navbar on desktop */
+      }
+
+      .footer-content {
+        gap: 16px;
+      }
+
+      .footer-content p {
+        font-size: 14px;
+        gap: 6px;
+      }
+
+      .separator {
+        font-size: 14px;
       }
     }
   `],

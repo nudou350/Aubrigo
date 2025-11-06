@@ -31,7 +31,7 @@ export class PwaService {
     this.initPwaPrompt();
     this.checkIfInstalled();
 
-    // In debug mode, force installable to true for testing
+    // In debug mode or iOS, force installable to true for showing the button
     if (this.DEBUG_MODE && !this.isInstalled()) {
       this.isInstallable.set(true);
       console.log('🔧 DEBUG MODE: Install button forced to show');
@@ -127,5 +127,12 @@ export class PwaService {
   get isPwaSupported(): boolean {
     return 'BeforeInstallPromptEvent' in window ||
            'serviceWorker' in navigator;
+  }
+
+  /**
+   * Check if the device is iOS
+   */
+  isIOS(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
   }
 }
