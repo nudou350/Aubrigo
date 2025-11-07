@@ -111,9 +111,9 @@
 
 ## FASE 2: CORE BUSINESS
 
-### 2.1 ONGs (Ongs Module)
+### 2.1 ONGs (Ongs Module) ✅ COMPLETO
 
-#### Testes Unitários - `ongs.service.spec.ts`
+#### Testes Unitários - `ongs.service.spec.ts` ✅
 - **Gestão de ONGs:**
   - ✓ Criar perfil de ONG
   - ✓ Atualizar informações da ONG
@@ -148,7 +148,7 @@
   - ✓ Considerar exceções (feriados)
   - ✓ Respeitar antecedência mínima
 
-#### Testes de Integração - `ongs.controller.spec.ts`
+#### Testes de Integração - `ongs.controller.spec.ts` ✅
 - **GET /api/ongs:**
   - ✓ 200: Lista paginada de ONGs
   - ✓ 200: Filtrar por localização (query params)
@@ -174,9 +174,9 @@
   - ✓ 400: Data inválida (no passado)
   - ✓ 200: Array vazio se não há slots disponíveis
 
-#### Testes E2E - `ongs.e2e-spec.ts`
-- Fluxo completo: Criar ONG → Configurar horários → Verificar slots
-- Fluxo de busca: Buscar ONGs próximas → Ver detalhes
+#### Testes E2E - `ongs.e2e-spec.ts` ✅
+- ✓ Fluxo completo: Criar ONG → Configurar horários → Verificar slots
+- ✓ Fluxo de busca: Buscar ONGs próximas → Ver detalhes
 
 ---
 
