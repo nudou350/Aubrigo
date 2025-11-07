@@ -36,57 +36,71 @@ const AppDataSource = new DataSource({
     OngAvailabilityException,
   ],
   synchronize: false,
+  logging: false,
 });
 
-async function resetAdmin() {
+// Production admin account
+const adminData = {
+  email: 'admin@aubrigo.pt',
+  password: 'Raphael1995#*',
+  ongName: 'Admin',
+  phone: '',
+  instagramHandle: '',
+  location: 'Lisboa',
+};
+
+async function seedProduction() {
   try {
+    console.log('Starting production database seed...');
+    console.log('⚠️  WARNING: This will create ONLY the admin account');
+    console.log('');
+
     await AppDataSource.initialize();
-    console.log('Database connection initialized');
+    console.log('Database connection established');
 
     const userRepository = AppDataSource.getRepository(User);
 
-    // Delete all existing admins
-    const existingAdmins = await userRepository.find({
-      where: { role: UserRole.ADMIN },
+    // Check if admin already exists
+    const existingAdmin = await userRepository.findOne({
+      where: { email: adminData.email },
     });
 
-    if (existingAdmins.length > 0) {
-      await userRepository.remove(existingAdmins);
-      console.log(`✅ Removed ${existingAdmins.length} existing admin(s)`);
+    if (existingAdmin) {
+      console.log('⚠️  Admin account already exists!');
+      console.log('Email:', adminData.email);
+      console.log('');
+      console.log('To reset the admin password, use: npm run seed:reset-admin:prod');
+      await AppDataSource.destroy();
+      return;
     }
 
-    // Create new admin with admin@aubrigo.pt
-    const adminEmail = 'admin@aubrigo.pt';
-    const adminPassword = 'Raphael1995#*'; // Strong password
-    const passwordHash = await bcrypt.hash(adminPassword, 10);
-
+    // Create Admin account
+    console.log('Creating Admin account...');
+    const adminHashedPassword = await bcrypt.hash(adminData.password, 10);
     const admin = userRepository.create({
-      email: adminEmail,
-      passwordHash,
+      ...adminData,
+      passwordHash: adminHashedPassword,
       role: UserRole.ADMIN,
-      ongName: 'Admin',
-      phone: '',
-      instagramHandle: '',
-      location: 'Lisboa',
     });
-
     await userRepository.save(admin);
 
-    console.log('✅ Admin user created successfully!');
     console.log('');
-    console.log('='.repeat(50));
-    console.log('ADMIN CREDENTIALS:');
-    console.log('='.repeat(50));
-    console.log(`Email: ${adminEmail}`);
-    console.log(`Password: ${adminPassword}`);
-    console.log('='.repeat(50));
+    console.log('========================================');
+    console.log('✅ Production seed completed successfully!');
+    console.log('========================================');
     console.log('');
+    console.log('🔐 ADMIN ACCOUNT CREATED:');
+    console.log('  Email: admin@aubrigo.pt');
+    console.log('  Password: Raphael1995#*');
+    console.log('');
+    console.log('⚠️  IMPORTANT: Change the password after first login!');
+    console.log('========================================');
 
     await AppDataSource.destroy();
   } catch (error) {
-    console.error('❌ Error resetting admin:', error);
+    console.error('❌ Error during production seeding:', error);
     process.exit(1);
   }
 }
 
-resetAdmin();
+seedProduction();
