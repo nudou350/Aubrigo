@@ -80,10 +80,10 @@ describe('PetsController (Integration)', () => {
         pagination: { total: 0, page: 1, limit: 10, totalPages: 0 }
       });
 
-      await request(app.getHttpServer()).get('/pets?species=Dog').expect(200);
+      await request(app.getHttpServer()).get('/pets?species=dog').expect(200);
 
       expect(mockPetsService.search).toHaveBeenCalledWith(
-        expect.objectContaining({ species: 'Dog' }),
+        expect.objectContaining({ species: 'dog' }),
       );
     });
   });
@@ -92,10 +92,10 @@ describe('PetsController (Integration)', () => {
     it('should create pet successfully', async () => {
       const createDto = {
         name: 'Max',
-        species: 'Dog',
+        species: 'dog',
         age: 3,
-        gender: 'Male',
-        size: 'Large',
+        gender: 'male',
+        size: 'large',
       };
 
       mockPetsService.create.mockResolvedValue({ id: '1', ...createDto });
@@ -108,10 +108,10 @@ describe('PetsController (Integration)', () => {
       expect(response.body.name).toBe('Max');
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should return 403 without authentication', async () => {
       mockJwtAuthGuard.canActivate.mockReturnValueOnce(false);
 
-      await request(app.getHttpServer()).post('/pets').send({}).expect(401);
+      await request(app.getHttpServer()).post('/pets').send({}).expect(403);
     });
   });
 
