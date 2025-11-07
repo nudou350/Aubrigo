@@ -23,7 +23,7 @@ interface PetImage {
   template: `
     <div class="pet-form-page">
       <div class="form-header">
-        <a routerLink="/ong/dashboard" class="back-link">
+        <a routerLink="/pets/manage" class="back-link">
           ← Voltar
         </a>
         <h1>{{ isEditMode() ? 'Editar Pet' : 'Adicionar Novo Pet' }}</h1>
