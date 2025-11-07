@@ -461,11 +461,13 @@ interface Country {
       &:focus {
         outline: none;
         border-color: #5CB5B0;
+        border-left: none;
         background: white;
       }
 
       &.error {
         border-color: #E74C3C;
+        border-left: none;
         background: #FEE;
       }
 
