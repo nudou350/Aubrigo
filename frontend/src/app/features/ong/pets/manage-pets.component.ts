@@ -14,6 +14,9 @@ import { Pet } from '../../../core/services/pets.service';
   imports: [CommonModule, RouterLink, FormsModule],
   template: `
     <div class="manage-pets">
+      <a routerLink="/ong/dashboard" class="back-link">
+        ← Voltar
+      </a>
       <header class="page-header">
         <div>
           <h1>Gerenciar Pets</h1>
@@ -108,6 +111,20 @@ import { Pet } from '../../../core/services/pets.service';
       margin: 0 auto;
       padding: 40px 24px;
       padding-bottom: 100px;
+    }
+
+    .back-link {
+      color: #5CB5B0;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
 
     .page-header {
