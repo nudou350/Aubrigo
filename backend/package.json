@@ -1,8 +1,8 @@
 {
   "name": "pet-sos-backend",
   "version": "1.0.0",
-  "description": "Pet SOS Backend API - Animal Adoption Platform",
-  "author": "Pet SOS Team",
+  "description": "Aubrigo Backend API - Animal Adoption Platform",
+  "author": "Aubrigo Team",
   "private": true,
   "license": "MIT",
   "scripts": {

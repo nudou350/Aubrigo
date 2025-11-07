@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "========================================"
-echo "   Pet SOS - Starting Application"
+echo "   Aubrigo - Starting Application"
 echo "========================================"
 echo ""
 

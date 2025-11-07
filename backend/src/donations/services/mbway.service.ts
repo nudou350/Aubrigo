@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
-import * as QRCode from 'qrcode';
-import { v4 as uuidv4 } from 'uuid';
+import { Injectable, Logger } from "@nestjs/common";
+import * as QRCode from "qrcode";
+import { v4 as uuidv4 } from "uuid";
 
 export interface MBWayPaymentRequest {
   amount: number;
@@ -16,7 +16,7 @@ export interface MBWayPaymentResponse {
   phoneNumber: string;
   qrCodeDataUrl: string;
   expiresAt: Date;
-  status: 'pending' | 'paid' | 'expired' | 'cancelled';
+  status: "pending" | "paid" | "expired" | "cancelled";
 }
 
 @Injectable()
@@ -30,7 +30,7 @@ export class MBWayService {
    * with the actual MB Way API (SIBS or payment gateway that supports MB Way)
    */
   async createPaymentRequest(
-    request: MBWayPaymentRequest,
+    request: MBWayPaymentRequest
   ): Promise<MBWayPaymentResponse> {
     try {
       // Generate unique transaction ID
@@ -51,8 +51,8 @@ export class MBWayService {
 
       // Generate QR Code
       const qrCodeDataUrl = await QRCode.toDataURL(paymentData, {
-        errorCorrectionLevel: 'M',
-        type: 'image/png',
+        errorCorrectionLevel: "M",
+        type: "image/png",
         width: 300,
         margin: 1,
       });
@@ -68,24 +68,27 @@ export class MBWayService {
         phoneNumber: request.phoneNumber,
         qrCodeDataUrl,
         expiresAt,
-        status: 'pending',
+        status: "pending",
       };
 
       // Store in memory (in production, store in database)
       this.pendingTransactions.set(transactionId, response);
 
       // Set timeout to expire transaction
-      setTimeout(() => {
-        this.expireTransaction(transactionId);
-      }, 15 * 60 * 1000);
+      setTimeout(
+        () => {
+          this.expireTransaction(transactionId);
+        },
+        15 * 60 * 1000
+      );
 
       this.logger.log(
-        `MB Way payment request created: ${transactionId} for €${request.amount}`,
+        `MB Way payment request created: ${transactionId} for €${request.amount}`
       );
 
       return response;
     } catch (error) {
-      this.logger.error('Error creating MB Way payment request:', error);
+      this.logger.error("Error creating MB Way payment request:", error);
       throw error;
     }
   }
@@ -95,7 +98,7 @@ export class MBWayService {
    * In production, this would query the MB Way API
    */
   async checkPaymentStatus(
-    transactionId: string,
+    transactionId: string
   ): Promise<MBWayPaymentResponse | null> {
     return this.pendingTransactions.get(transactionId) || null;
   }
@@ -106,8 +109,8 @@ export class MBWayService {
    */
   async confirmPayment(transactionId: string): Promise<boolean> {
     const transaction = this.pendingTransactions.get(transactionId);
-    if (transaction && transaction.status === 'pending') {
-      transaction.status = 'paid';
+    if (transaction && transaction.status === "pending") {
+      transaction.status = "paid";
       this.pendingTransactions.set(transactionId, transaction);
       this.logger.log(`Payment confirmed for transaction: ${transactionId}`);
       return true;
@@ -120,8 +123,8 @@ export class MBWayService {
    */
   async cancelPayment(transactionId: string): Promise<boolean> {
     const transaction = this.pendingTransactions.get(transactionId);
-    if (transaction && transaction.status === 'pending') {
-      transaction.status = 'cancelled';
+    if (transaction && transaction.status === "pending") {
+      transaction.status = "cancelled";
       this.pendingTransactions.set(transactionId, transaction);
       this.logger.log(`Payment cancelled for transaction: ${transactionId}`);
       return true;
@@ -150,10 +153,10 @@ export class MBWayService {
     // MB Way QR Code format (simplified)
     // In production, use the actual MB Way QR code specification
     const paymentInfo = {
-      merchant: 'Pet SOS',
+      merchant: "Aubrigo",
       reference: data.reference,
       amount: data.amount.toFixed(2),
-      currency: 'EUR',
+      currency: "EUR",
       phone: data.phoneNumber,
       description: data.description,
       transactionId: data.transactionId,
@@ -167,8 +170,8 @@ export class MBWayService {
    */
   private expireTransaction(transactionId: string): void {
     const transaction = this.pendingTransactions.get(transactionId);
-    if (transaction && transaction.status === 'pending') {
-      transaction.status = 'expired';
+    if (transaction && transaction.status === "pending") {
+      transaction.status = "expired";
       this.pendingTransactions.set(transactionId, transaction);
       this.logger.log(`Transaction expired: ${transactionId}`);
     }

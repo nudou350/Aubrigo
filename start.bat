@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo    Pet SOS - Starting Application
+echo    Aubrigo - Starting Application
 echo ========================================
 echo.
 
@@ -36,9 +36,9 @@ echo Frontend will run on: http://localhost:4200
 echo.
 
 REM Start both services
-start "Pet SOS Backend" cmd /k "cd backend && npm run start:dev"
+start "Aubrigo Backend" cmd /k "cd backend && npm run start:dev"
 timeout /t 2 /nobreak > nul
-start "Pet SOS Frontend" cmd /k "cd frontend && npm start"
+start "Aubrigo Frontend" cmd /k "cd frontend && npm start"
 
 echo.
 echo Both services are starting in separate windows...

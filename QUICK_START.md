@@ -1,4 +1,4 @@
-# Quick Start Guide - Pet SOS
+# Quick Start Guide - Aubrigo
 
 ## Starting the Application
 
@@ -13,6 +13,7 @@ start.bat
 ```
 
 This will:
+
 - Automatically install dependencies if needed
 - Start backend on http://localhost:3000
 - Start frontend on http://localhost:4200
@@ -25,6 +26,7 @@ This will:
 ```
 
 This will:
+
 - Automatically install dependencies if needed
 - Start both services in a single terminal
 - Display output from both services
@@ -37,6 +39,7 @@ npm start
 ```
 
 Available npm scripts:
+
 - `npm start` - Start both frontend and backend
 - `npm run start:backend` - Start only backend
 - `npm run start:frontend` - Start only frontend
@@ -49,25 +52,31 @@ Available npm scripts:
 ## First Time Setup
 
 1. **Install Node.js** (v18 or higher)
+
    - Download from: https://nodejs.org/
 
 2. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd rescue-me
    ```
 
 3. **Install dependencies**
+
    ```bash
    npm run install:all
    ```
+
    Or let the start script do it automatically.
 
 4. **Set up environment variables**
+
    - Copy `.env.example` to `.env` in both `backend` and `frontend` folders
    - Update with your configuration
 
 5. **Set up the database**
+
    ```bash
    cd backend
    npm run migration:run
@@ -85,6 +94,7 @@ Available npm scripts:
 ## Default URLs
 
 After starting:
+
 - **Frontend**: http://localhost:4200
 - **Backend API**: http://localhost:3000
 - **Backend API Docs**: http://localhost:3000/api/docs (if Swagger is enabled)
@@ -94,13 +104,16 @@ After starting:
 ## Stopping the Application
 
 ### Windows (using start.bat):
+
 - Close the two command windows that opened
 - Or press `Ctrl+C` in each window
 
 ### Linux/Mac (using start.sh):
+
 - Press `Ctrl+C` in the terminal
 
 ### Using npm start:
+
 - Press `Ctrl+C` in the terminal
 
 ---
@@ -112,12 +125,14 @@ After starting:
 If you get an error about ports 3000 or 4200 being in use:
 
 **Windows:**
+
 ```batch
 npx kill-port 3000
 npx kill-port 4200
 ```
 
 **Linux/Mac:**
+
 ```bash
 lsof -ti:3000 | xargs kill -9
 lsof -ti:4200 | xargs kill -9
@@ -126,6 +141,7 @@ lsof -ti:4200 | xargs kill -9
 ### Dependencies Not Installing
 
 Try installing manually:
+
 ```bash
 cd backend
 npm install
@@ -153,12 +169,14 @@ cd ..
 ### Running Tests
 
 **Backend:**
+
 ```bash
 cd backend
 npm test
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm test
@@ -173,6 +191,7 @@ npm run build:all
 ```
 
 Or separately:
+
 ```bash
 cd backend && npm run build
 cd frontend && npm run build --configuration production

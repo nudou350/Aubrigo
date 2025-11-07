@@ -1,16 +1,20 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Donation } from './entities/donation.entity';
-import { CreateDonationDto } from './dto/create-donation.dto';
-import { MBWayService } from './services/mbway.service';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Donation } from "./entities/donation.entity";
+import { CreateDonationDto } from "./dto/create-donation.dto";
+import { MBWayService } from "./services/mbway.service";
 
 @Injectable()
 export class DonationsService {
   constructor(
     @InjectRepository(Donation)
     private donationRepository: Repository<Donation>,
-    private mbwayService: MBWayService,
+    private mbwayService: MBWayService
   ) {}
 
   async createDonation(createDonationDto: CreateDonationDto) {
@@ -20,26 +24,28 @@ export class DonationsService {
     const donation = this.donationRepository.create({
       ...donationData,
       paymentMethod,
-      paymentStatus: 'pending',
+      paymentStatus: "pending",
     });
 
     const savedDonation = await this.donationRepository.save(donation);
 
     // Handle different payment methods
-    if (paymentMethod === 'mbway') {
+    if (paymentMethod === "mbway") {
       return this.handleMBWayPayment(savedDonation, createDonationDto);
-    } else if (paymentMethod === 'stripe') {
+    } else if (paymentMethod === "stripe") {
       return this.handleStripePayment(savedDonation, createDonationDto);
-    } else if (paymentMethod === 'multibanco') {
+    } else if (paymentMethod === "multibanco") {
       return this.handleMultibancoPayment(savedDonation, createDonationDto);
     }
 
-    throw new BadRequestException('Invalid payment method');
+    throw new BadRequestException("Invalid payment method");
   }
 
   private async handleMBWayPayment(donation: Donation, dto: CreateDonationDto) {
     if (!dto.phoneNumber) {
-      throw new BadRequestException('Phone number is required for MB Way payment');
+      throw new BadRequestException(
+        "Phone number is required for MB Way payment"
+      );
     }
 
     // Create MB Way payment request
@@ -47,7 +53,7 @@ export class DonationsService {
       amount: donation.amount,
       phoneNumber: dto.phoneNumber,
       reference: donation.id,
-      description: `Donation to ${donation.ongId} - Pet SOS`,
+      description: `Donation to ${donation.ongId} - Aubrigo`,
     });
 
     // Update donation with MB Way transaction ID
@@ -55,7 +61,7 @@ export class DonationsService {
     await this.donationRepository.save(donation);
 
     return {
-      message: 'MB Way payment request created',
+      message: "MB Way payment request created",
       donation: {
         id: donation.id,
         amount: donation.amount,
@@ -69,20 +75,23 @@ export class DonationsService {
         phoneNumber: mbwayPayment.phoneNumber,
         expiresAt: mbwayPayment.expiresAt,
         instructions: [
-          '1. Abra a aplicação MB Way no seu telemóvel',
-          '2. Escaneie o código QR apresentado',
-          '3. Confirme o pagamento na aplicação',
-          '4. Aguarde a confirmação',
+          "1. Abra a aplicação MB Way no seu telemóvel",
+          "2. Escaneie o código QR apresentado",
+          "3. Confirme o pagamento na aplicação",
+          "4. Aguarde a confirmação",
         ],
       },
     };
   }
 
-  private async handleStripePayment(donation: Donation, dto: CreateDonationDto) {
+  private async handleStripePayment(
+    donation: Donation,
+    dto: CreateDonationDto
+  ) {
     // TODO: Implement Stripe payment
     // This would integrate with Stripe API
     return {
-      message: 'Stripe payment - To be implemented',
+      message: "Stripe payment - To be implemented",
       donation: {
         id: donation.id,
         amount: donation.amount,
@@ -91,11 +100,14 @@ export class DonationsService {
     };
   }
 
-  private async handleMultibancoPayment(donation: Donation, dto: CreateDonationDto) {
+  private async handleMultibancoPayment(
+    donation: Donation,
+    dto: CreateDonationDto
+  ) {
     // TODO: Implement Multibanco payment
     // This would generate Multibanco reference
     return {
-      message: 'Multibanco payment - To be implemented',
+      message: "Multibanco payment - To be implemented",
       donation: {
         id: donation.id,
         amount: donation.amount,
@@ -110,24 +122,24 @@ export class DonationsService {
     });
 
     if (!donation) {
-      throw new NotFoundException('Donation not found');
+      throw new NotFoundException("Donation not found");
     }
 
-    if (donation.paymentMethod === 'mbway' && donation.stripePaymentId) {
+    if (donation.paymentMethod === "mbway" && donation.stripePaymentId) {
       const mbwayStatus = await this.mbwayService.checkPaymentStatus(
-        donation.stripePaymentId,
+        donation.stripePaymentId
       );
 
-      if (mbwayStatus && mbwayStatus.status === 'paid') {
+      if (mbwayStatus && mbwayStatus.status === "paid") {
         // Update donation status
-        donation.paymentStatus = 'completed';
+        donation.paymentStatus = "completed";
         await this.donationRepository.save(donation);
       }
 
       return {
         donationId: donation.id,
         paymentStatus: donation.paymentStatus,
-        mbwayStatus: mbwayStatus?.status || 'unknown',
+        mbwayStatus: mbwayStatus?.status || "unknown",
       };
     }
 
@@ -148,7 +160,7 @@ export class DonationsService {
       });
 
       if (donation) {
-        donation.paymentStatus = 'completed';
+        donation.paymentStatus = "completed";
         await this.donationRepository.save(donation);
         return { success: true, donationId: donation.id };
       }
@@ -159,17 +171,17 @@ export class DonationsService {
 
   async getDonationsByOng(ongId: string) {
     const donations = await this.donationRepository.find({
-      where: { ongId, paymentStatus: 'completed' },
-      order: { createdAt: 'DESC' },
+      where: { ongId, paymentStatus: "completed" },
+      order: { createdAt: "DESC" },
     });
 
     const totalAmount = donations.reduce(
       (sum, donation) => sum + Number(donation.amount),
-      0,
+      0
     );
 
     const monthlyRecurring = donations
-      .filter((d) => d.donationType === 'monthly')
+      .filter((d) => d.donationType === "monthly")
       .reduce((sum, donation) => sum + Number(donation.amount), 0);
 
     return {

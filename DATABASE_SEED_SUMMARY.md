@@ -1,8 +1,8 @@
-# Database Seed Summary - Pet SOS
+# Database Seed Summary - Aubrigo
 
 ## What Was Created
 
-A comprehensive database seed system for the Pet SOS application with realistic Portuguese test data.
+A comprehensive database seed system for the Aubrigo application with realistic Portuguese test data.
 
 ## File Locations
 
@@ -27,12 +27,14 @@ npm run seed
 ### 3 ONG Accounts (Animal Shelters)
 
 1. **Cantinho dos Animais** - Lisboa
+
    - Email: `cantinho@animais.pt`
    - Password: `Password123!`
    - Phone: +351 21 234 5678
    - Instagram: @cantinhosdosanimais
 
 2. **Patinhas Amigas** - Porto
+
    - Email: `patinhas@amigas.pt`
    - Password: `Password123!`
    - Phone: +351 22 345 6789
@@ -87,7 +89,7 @@ All with Portuguese names, realistic descriptions, breeds, and Unsplash images:
 ✅ Proper ONG relationships  
 ✅ Hashed passwords using bcrypt  
 ✅ Location-based distribution across 3 cities  
-✅ Variety in breeds, ages, sizes, and genders  
+✅ Variety in breeds, ages, sizes, and genders
 
 ## How It Works
 
@@ -103,12 +105,14 @@ All with Portuguese names, realistic descriptions, breeds, and Unsplash images:
 ## Testing After Seeding
 
 ### Start the Backend
+
 ```bash
 cd backend
 npm run start:dev
 ```
 
 ### Test API Endpoints
+
 ```bash
 # Get all pets
 curl http://localhost:3000/api/pets
@@ -129,12 +133,14 @@ curl -X POST http://localhost:3000/api/auth/login \
 ```
 
 ### Start the Frontend
+
 ```bash
 cd frontend
 npm start
 ```
 
 Then visit:
+
 - http://localhost:4200 - Home page with pet listings
 - http://localhost:4200/login - Login with test accounts
 
@@ -161,21 +167,24 @@ ORDER BY p.species, p.name;
 ⚠️ **Warning**: Running the seed deletes ALL existing data!  
 ⚠️ **Never** run this in production!  
 ✅ Safe to run multiple times in development  
-✅ Creates consistent test data every time  
+✅ Creates consistent test data every time
 
 ## Troubleshooting
 
 ### Database Connection Error
+
 - Check PostgreSQL is running
 - Verify DATABASE_URL in .env
 - Ensure database exists: `createdb petsos_dev`
 
 ### Tables Don't Exist
+
 - Set `synchronize: true` in app.module.ts (development only)
 - Or run migrations if configured
 - Restart NestJS app to auto-create tables
 
 ### bcrypt Error (Windows)
+
 ```bash
 npm uninstall bcrypt
 npm install bcrypt --save
@@ -205,7 +214,7 @@ cd backend && npm run seed
 # Start backend
 cd backend && npm run start:dev
 
-# Start frontend  
+# Start frontend
 cd frontend && npm start
 
 # View logs
@@ -223,7 +232,8 @@ curl -X POST http://localhost:3000/api/auth/login \
 
 ## Success! 🎉
 
-Your Pet SOS database is now populated with:
+Your Aubrigo database is now populated with:
+
 - 3 test ONG accounts
 - 17 realistic pet listings
 - Complete with images and descriptions

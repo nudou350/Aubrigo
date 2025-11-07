@@ -1,10 +1,11 @@
-# Pet SOS - Animal Adoption Platform (PWA)
+# Aubrigo - Animal Adoption Platform (PWA)
 
 A comprehensive Progressive Web App designed to connect animal NGOs with potential pet adopters in Portugal. Built with modern technologies, it delivers a native app-like experience while maintaining the accessibility and reach of a web application.
 
 ## 🌟 Features
 
 ### For Adopters:
+
 - 🔍 Browse available pets with advanced filtering (species, size, gender, age, location)
 - 📱 Mobile-first PWA - Install to home screen for app-like experience
 - ❤️ Favorite pets and save them for later
@@ -14,6 +15,7 @@ A comprehensive Progressive Web App designed to connect animal NGOs with potenti
 - 🗺️ View shelter locations and contact information
 
 ### For NGOs:
+
 - 🐕 Manage pet listings (add, edit, delete)
 - 📸 Upload multiple images per pet
 - 📊 View donation history and statistics
@@ -23,6 +25,7 @@ A comprehensive Progressive Web App designed to connect animal NGOs with potenti
 ## 🛠️ Technology Stack
 
 ### Backend
+
 - **Framework**: NestJS (Node.js)
 - **Database**: PostgreSQL
 - **ORM**: TypeORM
@@ -37,6 +40,7 @@ A comprehensive Progressive Web App designed to connect animal NGOs with potenti
 - **Email**: SendGrid/NodeMailer (ready for integration)
 
 ### Frontend
+
 - **Framework**: Angular 17+ (standalone components)
 - **PWA**: Angular Service Worker
 - **State Management**: Angular Signals
@@ -99,31 +103,37 @@ Aubrigo/
 ### Backend Setup
 
 1. **Navigate to backend directory:**
+
    ```bash
    cd backend
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables:**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 4. **Configure database:**
+
    - Create a PostgreSQL database
    - Update `DATABASE_URL` in `.env`
 
 5. **Run database migrations:**
+
    ```bash
    npm run migration:run
    ```
 
 6. **Start development server:**
+
    ```bash
    npm run start:dev
    ```
@@ -134,11 +144,13 @@ Aubrigo/
 ### Frontend Setup
 
 1. **Navigate to frontend directory:**
+
    ```bash
    cd frontend
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
@@ -147,6 +159,7 @@ Aubrigo/
    Edit `src/environments/environment.ts` if needed
 
 4. **Start development server:**
+
    ```bash
    npm start
    ```
@@ -188,26 +201,29 @@ SENDGRID_FROM_EMAIL=noreply@petsos.com
 ```typescript
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api',
-  stripePublicKey: 'pk_test_...',
+  apiUrl: "http://localhost:3000/api",
+  stripePublicKey: "pk_test_...",
 };
 ```
 
 ## 📱 PWA Features
 
 ### Manifest Configuration
+
 - App name, description, icons
 - Theme colors matching brand (#4ca8a0)
 - Display mode: standalone
 - Shortcuts for quick actions
 
 ### Service Worker
+
 - Caching strategies for API calls
 - Offline support for core features
 - Background sync
 - Push notifications (ready for implementation)
 
 ### Installation
+
 - Custom install prompt
 - Works on iOS, Android, and Desktop
 - Add to home screen functionality
@@ -217,20 +233,24 @@ export const environment = {
 The project follows a comprehensive design system documented in `THEME-GUIDELINE.md`:
 
 **Colors:**
+
 - Primary: #4ca8a0 (Teal)
 - Secondary: #f4a3b8 (Pink)
 - Background: #ffffff, #f5f5f5
 
 **Typography:**
+
 - Font Family: Inter
 - Sizes: 12px - 24px
 - Weights: 400, 500, 600
 
 **Spacing:**
+
 - Base unit: 4px
 - Scale: 4px, 8px, 16px, 20px, 24px, 32px, 48px
 
 **Components:**
+
 - Buttons (primary, secondary, text)
 - Cards
 - Form elements
@@ -239,16 +259,19 @@ The project follows a comprehensive design system documented in `THEME-GUIDELINE
 ## 📚 API Documentation
 
 Once the backend is running, visit:
+
 - **Swagger UI**: http://localhost:3000/api/docs
 - Interactive API documentation with try-it-out functionality
 
 ### Main Endpoints:
 
 **Authentication:**
+
 - `POST /api/auth/register` - Register NGO
 - `POST /api/auth/login` - Login
 
 **Pets:**
+
 - `GET /api/pets` - List/search pets
 - `GET /api/pets/:id` - Get pet details
 - `POST /api/pets` - Create pet (auth required)
@@ -256,18 +279,21 @@ Once the backend is running, visit:
 - `DELETE /api/pets/:id` - Delete pet (auth required)
 
 **Donations:** ✅
+
 - `POST /api/donations` - Create donation (MB Way, Stripe, Multibanco)
 - `GET /api/donations/:id/status` - Check payment status
 - `POST /api/donations/mbway/confirm/:transactionId` - Confirm MB Way payment (webhook)
 - `GET /api/donations/ong/:ongId` - Get NGO donations (auth required)
 
 **Appointments:** (to be implemented)
+
 - `POST /api/appointments` - Schedule visit
 - `GET /api/appointments/ong` - Get NGO appointments
 
 ## 🧪 Testing
 
 ### Backend Tests
+
 ```bash
 cd backend
 npm test                # Unit tests
@@ -276,6 +302,7 @@ npm run test:cov       # Coverage report
 ```
 
 ### Frontend Tests
+
 ```bash
 cd frontend
 npm test               # Unit tests
@@ -285,17 +312,20 @@ npm run test:headless  # CI tests
 ## 🚢 Deployment
 
 ### Backend (Railway/Render)
+
 1. Connect repository
 2. Set environment variables
 3. Deploy automatically on push
 
 ### Frontend (Vercel/Netlify)
+
 1. Connect repository
 2. Set build command: `npm run build:prod`
 3. Set output directory: `dist/pet-sos-frontend/browser`
 4. Deploy automatically on push
 
 ### Database (Railway/Heroku)
+
 - PostgreSQL managed database
 - Automatic backups
 - Connection pooling
@@ -321,6 +351,7 @@ MIT License - see LICENSE file
 ## 🎯 Roadmap
 
 ### Phase 1 (MVP) ✅
+
 - [x] Backend API (Auth, Pets)
 - [x] Frontend (Auth, Home page)
 - [x] PWA Setup
@@ -331,6 +362,7 @@ MIT License - see LICENSE file
 - [ ] Basic styling implementation
 
 ### Phase 2
+
 - [ ] Complete all UI pages
 - [ ] Stripe payment integration
 - [ ] Multibanco integration
@@ -341,6 +373,7 @@ MIT License - see LICENSE file
 - [ ] Favorites system
 
 ### Phase 3
+
 - [ ] Push notifications
 - [ ] Social media sharing
 - [ ] Success stories
@@ -351,6 +384,7 @@ MIT License - see LICENSE file
 ## 📞 Support
 
 For issues and questions:
+
 - GitHub Issues: [Create an issue]
 - Email: support@petsos.com
 

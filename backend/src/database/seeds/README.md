@@ -1,6 +1,7 @@
-# Pet SOS Database Seeds
+# Aubrigo Database Seeds
 
-This directory contains seed data for the Pet SOS application, including:
+This directory contains seed data for the Aubrigo application, including:
+
 - 3 NGO (animal shelter) accounts
 - 8 dog listings with Portuguese names and descriptions
 - 9 cat listings with Portuguese names and descriptions
@@ -8,6 +9,7 @@ This directory contains seed data for the Pet SOS application, including:
 ## Seed Data Summary
 
 ### ONGs (Animal Shelters)
+
 1. **Cantinho dos Animais** (Lisboa)
    - Email: cantinho@animais.pt
    - Password: Password123!
@@ -21,6 +23,7 @@ This directory contains seed data for the Pet SOS application, including:
    - Password: Password123!
 
 ### Dogs (8 total)
+
 - Plutão (Border Collie, 3 years) - Lisboa
 - Nina (Rafeiro do Alentejo, 2 years) - Lisboa
 - Max (Labrador, 5 years) - Porto
@@ -31,6 +34,7 @@ This directory contains seed data for the Pet SOS application, including:
 - Mel (Golden Retriever, 1 year) - Porto
 
 ### Cats (9 total)
+
 - Mia (Persa, 2 years) - Lisboa
 - Simba (Maine Coon, 4 years) - Lisboa
 - Lua (Siamês, 3 years) - Porto
@@ -44,6 +48,7 @@ This directory contains seed data for the Pet SOS application, including:
 ## How to Run
 
 ### Prerequisites
+
 1. Make sure PostgreSQL is running
 2. Database should be created and accessible via DATABASE_URL in .env
 3. Ensure all dependencies are installed: `npm install`
@@ -105,11 +110,13 @@ Total pets: 17
 After running the seed, you can test the API endpoints:
 
 ### Get all pets
+
 ```bash
 curl http://localhost:3000/api/pets
 ```
 
 ### Login as an ONG
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
@@ -117,6 +124,7 @@ curl -X POST http://localhost:3000/api/auth/login \
 ```
 
 ### Get pets by species
+
 ```bash
 # Dogs only
 curl http://localhost:3000/api/pets?species=dog
@@ -126,6 +134,7 @@ curl http://localhost:3000/api/pets?species=cat
 ```
 
 ### Get pets by location
+
 ```bash
 curl http://localhost:3000/api/pets?location=Lisboa
 ```
@@ -139,6 +148,7 @@ To modify the seed data, edit the arrays in `seed.ts`:
 - `catData`: Array of cat listings
 
 Each pet should have:
+
 - name (Portuguese name)
 - species ('dog' or 'cat')
 - breed (breed name in Portuguese)
@@ -162,30 +172,35 @@ All images are sourced from Unsplash, a free stock photo service. The URLs point
 ## Troubleshooting
 
 ### Database connection error
+
 - Check that PostgreSQL is running
 - Verify DATABASE_URL in .env is correct
 - Ensure the database exists
 
 ### Permission errors
+
 - Make sure the database user has CREATE, INSERT, and DELETE permissions
 - Check that the database role matches the one in DATABASE_URL
 
 ### TypeORM errors
+
 - Run `npm install` to ensure all dependencies are installed
 - Check that entity files are correctly located
 
 ### Seed runs but no data appears
+
 - Check the console output for errors
 - Verify the database connection string
 - Try running the seed with logging enabled (already enabled in the script)
 
 ## Production Warning
 
-**IMPORTANT**: This seed script deletes all existing data before inserting new data. 
+**IMPORTANT**: This seed script deletes all existing data before inserting new data.
 
 **DO NOT run this in production!**
 
 For production deployments:
+
 1. Comment out the delete statements
 2. Or create a separate script that only inserts data if tables are empty
 3. Use database migrations for schema changes
@@ -193,6 +208,7 @@ For production deployments:
 ## Next Steps
 
 After seeding the database:
+
 1. Start the backend: `npm run start:dev`
 2. Test the API endpoints
 3. Start the frontend: `cd ../frontend && npm start`
@@ -201,6 +217,7 @@ After seeding the database:
 ## Support
 
 If you encounter any issues with the seed data:
+
 1. Check the console output for error messages
 2. Verify your database connection
 3. Ensure all entity relationships are correctly defined

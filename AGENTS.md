@@ -1,8 +1,8 @@
-# Pet SOS - Team Agents Specification
+# Aubrigo - Team Agents Specification
 
 ## Document Overview
 
-This document defines the roles, responsibilities, workflows, and collaboration patterns for the Pet SOS development team. Each agent has specific tasks, deliverables, and interaction protocols to ensure smooth project execution.
+This document defines the roles, responsibilities, workflows, and collaboration patterns for the Aubrigo development team. Each agent has specific tasks, deliverables, and interaction protocols to ensure smooth project execution.
 
 ---
 
@@ -27,6 +27,7 @@ This document defines the roles, responsibilities, workflows, and collaboration 
 **Primary Responsibility:** Design, develop, and maintain the NestJS backend API, database, and all server-side logic.
 
 **Expertise Required:**
+
 - NestJS framework (decorators, modules, services, guards)
 - TypeScript (advanced types, generics)
 - PostgreSQL & TypeORM
@@ -44,6 +45,7 @@ This document defines the roles, responsibilities, workflows, and collaboration 
 ### 1. Project Setup & Architecture
 
 **Tasks:**
+
 - Initialize NestJS project with proper folder structure
 - Configure TypeScript with strict mode
 - Set up PostgreSQL database connection
@@ -53,6 +55,7 @@ This document defines the roles, responsibilities, workflows, and collaboration 
 - Configure CORS and security middleware
 
 **Deliverables:**
+
 ```
 backend/
 ├── src/
@@ -106,6 +109,7 @@ backend/
 ### 2. Database Design & Migrations
 
 **Tasks:**
+
 - Create all entity classes with TypeORM decorators
 - Define relationships (OneToMany, ManyToOne)
 - Create database migrations
@@ -114,11 +118,12 @@ backend/
 - Set up database connection pooling
 
 **Key Entities:**
+
 ```typescript
 // user.entity.ts
-@Entity('users')
+@Entity("users")
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ unique: true })
@@ -142,10 +147,10 @@ export class User {
   @Column({ nullable: true })
   location: string;
 
-  @Column({ nullable: true, type: 'decimal' })
+  @Column({ nullable: true, type: "decimal" })
   latitude: number;
 
-  @Column({ nullable: true, type: 'decimal' })
+  @Column({ nullable: true, type: "decimal" })
   longitude: number;
 
   @CreateDateColumn()
@@ -154,21 +159,21 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Pet, pet => pet.ong)
+  @OneToMany(() => Pet, (pet) => pet.ong)
   pets: Pet[];
 
-  @OneToMany(() => Donation, donation => donation.ong)
+  @OneToMany(() => Donation, (donation) => donation.ong)
   donations: Donation[];
 }
 
 // pet.entity.ts
-@Entity('pets')
+@Entity("pets")
 export class Pet {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @ManyToOne(() => User, user => user.pets)
-  @JoinColumn({ name: 'ong_id' })
+  @ManyToOne(() => User, (user) => user.pets)
+  @JoinColumn({ name: "ong_id" })
   ong: User;
 
   @Column()
@@ -180,7 +185,7 @@ export class Pet {
   @Column({ nullable: true })
   breed: string;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: "int", nullable: true })
   age: number;
 
   @Column({ nullable: true })
@@ -192,16 +197,16 @@ export class Pet {
   @Column({ nullable: true })
   color: string;
 
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: "decimal", nullable: true })
   weight: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   description: string;
 
   @Column({ nullable: true })
   location: string;
 
-  @Column({ default: 'available' })
+  @Column({ default: "available" })
   status: string;
 
   @CreateDateColumn()
@@ -210,12 +215,13 @@ export class Pet {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => PetImage, image => image.pet)
+  @OneToMany(() => PetImage, (image) => image.pet)
   images: PetImage[];
 }
 ```
 
 **Deliverables:**
+
 - Migration files in `src/migrations/`
 - All entity files
 - Seed script: `npm run seed`
@@ -228,6 +234,7 @@ export class Pet {
 ### 3. Authentication System
 
 **Tasks:**
+
 - Implement user registration with password hashing (bcrypt)
 - Create login endpoint with JWT generation
 - Implement JWT strategy and guards
@@ -236,25 +243,28 @@ export class Pet {
 - Implement email verification (optional)
 
 **Key Files:**
+
 ```typescript
 // auth.service.ts
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService,
+    private jwtService: JwtService
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<{ user: User; accessToken: string }> {
+  async register(
+    registerDto: RegisterDto
+  ): Promise<{ user: User; accessToken: string }> {
     const { email, password, ongName } = registerDto;
-    
+
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException("Email already registered");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const user = await this.usersService.create({
       email,
       passwordHash: hashedPassword,
@@ -262,25 +272,27 @@ export class AuthService {
     });
 
     const accessToken = this.generateToken(user);
-    
+
     return { user, accessToken };
   }
 
-  async login(loginDto: LoginDto): Promise<{ user: User; accessToken: string }> {
+  async login(
+    loginDto: LoginDto
+  ): Promise<{ user: User; accessToken: string }> {
     const { email, password } = loginDto;
-    
+
     const user = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
 
     const accessToken = this.generateToken(user);
-    
+
     return { user, accessToken };
   }
 
@@ -292,6 +304,7 @@ export class AuthService {
 ```
 
 **API Endpoints:**
+
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `POST /api/auth/forgot-password`
@@ -305,6 +318,7 @@ export class AuthService {
 ### 4. Pet Management API
 
 **Tasks:**
+
 - Create CRUD endpoints for pets
 - Implement search and filtering logic
 - Add pagination support
@@ -314,9 +328,10 @@ export class AuthService {
 - Add validation (DTOs with class-validator)
 
 **Key Endpoints:**
+
 ```typescript
 // pets.controller.ts
-@Controller('api/pets')
+@Controller("api/pets")
 export class PetsController {
   constructor(private readonly petsService: PetsService) {}
 
@@ -325,35 +340,35 @@ export class PetsController {
     return this.petsService.search(query);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
+  @Get(":id")
+  async findOne(@Param("id") id: string) {
     return this.petsService.findOneWithDetails(id);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FilesInterceptor('images', 5))
+  @UseInterceptors(FilesInterceptor("images", 5))
   async create(
     @Body() createPetDto: CreatePetDto,
     @UploadedFiles() images: Express.Multer.File[],
-    @Request() req,
+    @Request() req
   ) {
     return this.petsService.create(createPetDto, images, req.user.id);
   }
 
-  @Put(':id')
+  @Put(":id")
   @UseGuards(JwtAuthGuard)
   async update(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updatePetDto: UpdatePetDto,
-    @Request() req,
+    @Request() req
   ) {
     return this.petsService.update(id, updatePetDto, req.user.id);
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @UseGuards(JwtAuthGuard)
-  async remove(@Param('id') id: string, @Request() req) {
+  async remove(@Param("id") id: string, @Request() req) {
     return this.petsService.remove(id, req.user.id);
   }
 }
@@ -365,15 +380,15 @@ export class SearchPetsDto {
   location?: string;
 
   @IsOptional()
-  @IsEnum(['dog', 'cat', 'fish', 'hamster'])
+  @IsEnum(["dog", "cat", "fish", "hamster"])
   species?: string;
 
   @IsOptional()
-  @IsEnum(['small', 'medium', 'large'])
+  @IsEnum(["small", "medium", "large"])
   size?: string;
 
   @IsOptional()
-  @IsEnum(['male', 'female'])
+  @IsEnum(["male", "female"])
   gender?: string;
 
   @IsOptional()
@@ -405,6 +420,7 @@ export class SearchPetsDto {
 ### 5. File Upload Service
 
 **Tasks:**
+
 - Create upload service for S3 or Cloudinary
 - Implement image validation (size, format)
 - Add image optimization/compression
@@ -413,6 +429,7 @@ export class SearchPetsDto {
 - Secure file naming (UUID-based)
 
 **Implementation:**
+
 ```typescript
 // upload.service.ts
 @Injectable()
@@ -427,18 +444,22 @@ export class UploadService {
     });
   }
 
-  async uploadPetImage(file: Express.Multer.File, petId: string): Promise<string> {
+  async uploadPetImage(
+    file: Express.Multer.File,
+    petId: string
+  ): Promise<string> {
     // Validate file
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) {
-      throw new BadRequestException('Invalid file type');
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.mimetype)) {
+      throw new BadRequestException("Invalid file type");
     }
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB
-      throw new BadRequestException('File too large');
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB
+      throw new BadRequestException("File too large");
     }
 
     // Generate unique filename
-    const ext = file.originalname.split('.').pop();
+    const ext = file.originalname.split(".").pop();
     const fileName = `pets/${petId}/${uuidv4()}.${ext}`;
 
     // Upload to S3
@@ -447,7 +468,7 @@ export class UploadService {
       Key: fileName,
       Body: file.buffer,
       ContentType: file.mimetype,
-      ACL: 'public-read',
+      ACL: "public-read",
     };
 
     await this.s3.upload(params).promise();
@@ -456,11 +477,13 @@ export class UploadService {
   }
 
   async deleteImage(imageUrl: string): Promise<void> {
-    const key = imageUrl.split('.com/')[1];
-    await this.s3.deleteObject({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: key,
-    }).promise();
+    const key = imageUrl.split(".com/")[1];
+    await this.s3
+      .deleteObject({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+      })
+      .promise();
   }
 }
 ```
@@ -472,6 +495,7 @@ export class UploadService {
 ### 6. Donation & Payment Integration
 
 **Tasks:**
+
 - Integrate Stripe SDK
 - Create payment intent endpoint
 - Implement webhook handler for payment events
@@ -481,6 +505,7 @@ export class UploadService {
 - Add refund capability (admin)
 
 **Implementation:**
+
 ```typescript
 // donations.service.ts
 @Injectable()
@@ -490,20 +515,22 @@ export class DonationsService {
   constructor(
     @InjectRepository(Donation)
     private donationRepository: Repository<Donation>,
-    private emailService: EmailService,
+    private emailService: EmailService
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2023-10-16',
+      apiVersion: "2023-10-16",
     });
   }
 
-  async createPaymentIntent(createDonationDto: CreateDonationDto): Promise<any> {
+  async createPaymentIntent(
+    createDonationDto: CreateDonationDto
+  ): Promise<any> {
     const { amount, donationType, ongId } = createDonationDto;
 
     // Create payment intent
     const paymentIntent = await this.stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
-      currency: 'eur',
+      currency: "eur",
       metadata: {
         donationType,
         ongId,
@@ -514,7 +541,7 @@ export class DonationsService {
     const donation = this.donationRepository.create({
       ...createDonationDto,
       stripePaymentId: paymentIntent.id,
-      paymentStatus: 'pending',
+      paymentStatus: "pending",
     });
     await this.donationRepository.save(donation);
 
@@ -528,14 +555,14 @@ export class DonationsService {
     const event = this.stripe.webhooks.constructEvent(
       payload,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET,
+      process.env.STRIPE_WEBHOOK_SECRET
     );
 
     switch (event.type) {
-      case 'payment_intent.succeeded':
+      case "payment_intent.succeeded":
         await this.handlePaymentSuccess(event.data.object);
         break;
-      case 'payment_intent.payment_failed':
+      case "payment_intent.payment_failed":
         await this.handlePaymentFailure(event.data.object);
         break;
     }
@@ -544,13 +571,13 @@ export class DonationsService {
   private async handlePaymentSuccess(paymentIntent: any): Promise<void> {
     const donation = await this.donationRepository.findOne({
       where: { stripePaymentId: paymentIntent.id },
-      relations: ['ong'],
+      relations: ["ong"],
     });
 
     if (donation) {
-      donation.paymentStatus = 'completed';
+      donation.paymentStatus = "completed";
       await this.donationRepository.save(donation);
-      
+
       // Send receipt email
       await this.emailService.sendDonationReceipt(donation);
     }
@@ -559,6 +586,7 @@ export class DonationsService {
 ```
 
 **API Endpoints:**
+
 - `POST /api/donations/create-payment-intent`
 - `POST /api/donations/webhook`
 - `GET /api/donations/ong/:ongId`
@@ -570,6 +598,7 @@ export class DonationsService {
 ### 7. Appointments System
 
 **Tasks:**
+
 - Create appointment CRUD endpoints
 - Implement status management (pending, confirmed, completed, cancelled)
 - Send email notifications to both parties
@@ -583,14 +612,17 @@ export class DonationsService {
 ### 8. Additional Features
 
 **Favorites System:**
+
 - Add/remove favorites
 - List user favorites
 
 **User Profile:**
+
 - Get/update profile
 - Upload profile image
 
 **Email Service:**
+
 - Welcome emails
 - Password reset emails
 - Appointment confirmations
@@ -603,20 +635,23 @@ export class DonationsService {
 ## Testing Requirements
 
 ### Unit Tests
+
 - Test all service methods
 - Test authentication logic
 - Test validation (DTOs)
 - Target: 80%+ coverage
 
 ### Integration Tests
+
 - Test API endpoints
 - Test database operations
 - Test file upload
 - Test payment flow (use Stripe test mode)
 
 ### Example Test:
+
 ```typescript
-describe('PetsService', () => {
+describe("PetsService", () => {
   let service: PetsService;
 
   beforeEach(async () => {
@@ -627,15 +662,15 @@ describe('PetsService', () => {
     service = module.get<PetsService>(PetsService);
   });
 
-  it('should create a pet', async () => {
+  it("should create a pet", async () => {
     const petDto = {
-      name: 'Test Dog',
-      species: 'dog',
+      name: "Test Dog",
+      species: "dog",
       age: 3,
     };
-    
-    const result = await service.create(petDto, [], 'user-id');
-    expect(result.name).toBe('Test Dog');
+
+    const result = await service.create(petDto, [], "user-id");
+    expect(result.name).toBe("Test Dog");
   });
 });
 ```
@@ -673,16 +708,19 @@ describe('PetsService', () => {
 ## Communication Requirements
 
 **Daily:**
+
 - Update task status in project management tool
 - Report blockers immediately
 - Quick sync with Frontend Developer on API contracts
 
 **Weekly:**
+
 - Participate in sprint planning
 - Demo completed features
 - Code review for team members
 
 **Artifacts to Share:**
+
 - API endpoint documentation (Swagger URL)
 - Database schema updates
 - Migration files
@@ -707,6 +745,7 @@ describe('PetsService', () => {
 **Primary Responsibility:** Build responsive, performant Angular application with modern best practices.
 
 **Expertise Required:**
+
 - Angular 17+ (standalone components, Signals)
 - TypeScript
 - RxJS (Observables, operators)
@@ -724,6 +763,7 @@ describe('PetsService', () => {
 ### 1. Project Setup
 
 **Tasks:**
+
 - Initialize Angular project with standalone components
 - Configure Angular Material or PrimeNG
 - Set up routing with lazy loading
@@ -733,6 +773,7 @@ describe('PetsService', () => {
 - Set up proxy configuration for local development
 
 **Project Structure:**
+
 ```
 frontend/
 ├── src/
@@ -787,6 +828,7 @@ frontend/
 ### 2. Shared Components Library
 
 **Tasks:**
+
 - Create reusable UI components
 - Implement component variants
 - Add proper inputs/outputs
@@ -798,28 +840,29 @@ frontend/
 ```typescript
 // button.component.ts
 @Component({
-  selector: 'app-button',
+  selector: "app-button",
   standalone: true,
   template: `
-    <button 
+    <button
       [class]="buttonClass()"
       [disabled]="disabled()"
       [type]="type()"
-      (click)="handleClick($event)">
+      (click)="handleClick($event)"
+    >
       @if (loading()) {
-        <span class="spinner"></span>
+      <span class="spinner"></span>
       }
       <ng-content></ng-content>
     </button>
   `,
-  styleUrls: ['./button.component.scss']
+  styleUrls: ["./button.component.scss"],
 })
 export class ButtonComponent {
-  variant = input<'primary' | 'secondary' | 'text'>('primary');
+  variant = input<"primary" | "secondary" | "text">("primary");
   disabled = input<boolean>(false);
   loading = input<boolean>(false);
-  type = input<'button' | 'submit'>('button');
-  
+  type = input<"button" | "submit">("button");
+
   clicked = output<Event>();
 
   buttonClass = computed(() => {
@@ -835,7 +878,7 @@ export class ButtonComponent {
 
 // form-field.component.ts
 @Component({
-  selector: 'app-form-field',
+  selector: "app-form-field",
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
@@ -848,48 +891,49 @@ export class ButtonComponent {
         [formControl]="control"
         [attr.aria-label]="label()"
         [attr.aria-required]="required()"
-        class="form-input">
+        class="form-input"
+      />
       @if (control.invalid && (control.dirty || control.touched)) {
-        <span class="error-message" role="alert">
-          {{ getErrorMessage() }}
-        </span>
+      <span class="error-message" role="alert">
+        {{ getErrorMessage() }}
+      </span>
       }
     </div>
   `,
-  styleUrls: ['./form-field.component.scss']
+  styleUrls: ["./form-field.component.scss"],
 })
 export class FormFieldComponent {
-  label = input<string>('');
-  type = input<string>('text');
-  placeholder = input<string>('');
+  label = input<string>("");
+  type = input<string>("text");
+  placeholder = input<string>("");
   required = input<boolean>(false);
   control = input.required<FormControl>();
-  
+
   inputId = `input-${Math.random().toString(36).substr(2, 9)}`;
 
   getErrorMessage(): string {
-    if (this.control.hasError('required')) {
-      return 'Este campo é obrigatório';
+    if (this.control.hasError("required")) {
+      return "Este campo é obrigatório";
     }
-    if (this.control.hasError('email')) {
-      return 'Email inválido';
+    if (this.control.hasError("email")) {
+      return "Email inválido";
     }
-    if (this.control.hasError('minlength')) {
-      const min = this.control.getError('minlength').requiredLength;
+    if (this.control.hasError("minlength")) {
+      const min = this.control.getError("minlength").requiredLength;
       return `Mínimo ${min} caracteres`;
     }
-    return 'Campo inválido';
+    return "Campo inválido";
   }
 }
 
 // pet-card.component.ts
 @Component({
-  selector: 'app-pet-card',
+  selector: "app-pet-card",
   standalone: true,
   imports: [CommonModule],
   template: `
     <div class="pet-card" (click)="cardClicked.emit(pet())">
-      <img [src]="pet().primaryImage" [alt]="pet().name" class="pet-image">
+      <img [src]="pet().primaryImage" [alt]="pet().name" class="pet-image" />
       <div class="pet-info">
         <h3>{{ pet().name }}</h3>
         <div class="pet-details">
@@ -899,7 +943,7 @@ export class FormFieldComponent {
           </span>
           <span class="gender">
             <mat-icon>{{ genderIcon() }}</mat-icon>
-            {{ pet().gender === 'male' ? 'Masculino' : 'Feminino' }}
+            {{ pet().gender === "male" ? "Masculino" : "Feminino" }}
           </span>
           <span class="size">
             <mat-icon>pets</mat-icon>
@@ -914,25 +958,25 @@ export class FormFieldComponent {
           <mat-icon>home</mat-icon>
           {{ pet().ong.name }}
         </div>
-        <p class="description">{{ pet().description | slice:0:100 }}...</p>
+        <p class="description">{{ pet().description | slice : 0 : 100 }}...</p>
         <button class="btn-learn-more">SABER MAIS</button>
       </div>
     </div>
   `,
-  styleUrls: ['./pet-card.component.scss']
+  styleUrls: ["./pet-card.component.scss"],
 })
 export class PetCardComponent {
   pet = input.required<Pet>();
   cardClicked = output<Pet>();
 
   genderIcon = computed(() => {
-    return this.pet().gender === 'male' ? 'male' : 'female';
+    return this.pet().gender === "male" ? "male" : "female";
   });
 }
 
 // bottom-navigation.component.ts
 @Component({
-  selector: 'app-bottom-navigation',
+  selector: "app-bottom-navigation",
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   template: `
@@ -941,7 +985,10 @@ export class PetCardComponent {
         <mat-icon>home</mat-icon>
         <span>HOME</span>
       </a>
-      <button class="nav-item center-button" (click)="centerButtonClicked.emit()">
+      <button
+        class="nav-item center-button"
+        (click)="centerButtonClicked.emit()"
+      >
         <div class="paw-icon">
           <mat-icon>pets</mat-icon>
         </div>
@@ -952,7 +999,7 @@ export class PetCardComponent {
       </a>
     </nav>
   `,
-  styleUrls: ['./bottom-navigation.component.scss']
+  styleUrls: ["./bottom-navigation.component.scss"],
 })
 export class BottomNavigationComponent {
   centerButtonClicked = output<void>();
@@ -966,6 +1013,7 @@ export class BottomNavigationComponent {
 ### 3. Authentication Module
 
 **Tasks:**
+
 - Create login page
 - Create registration page
 - Create forgot password page
@@ -980,12 +1028,12 @@ export class BottomNavigationComponent {
 ```typescript
 // auth.service.ts
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AuthService {
   private apiUrl = environment.apiUrl;
   private currentUserSignal = signal<User | null>(null);
-  
+
   currentUser = this.currentUserSignal.asReadonly();
   isAuthenticated = computed(() => !!this.currentUser());
 
@@ -994,34 +1042,32 @@ export class AuthService {
   }
 
   register(data: RegisterDto): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, data)
-      .pipe(
-        tap(response => this.handleAuthSuccess(response))
-      );
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/auth/register`, data)
+      .pipe(tap((response) => this.handleAuthSuccess(response)));
   }
 
   login(credentials: LoginDto): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials)
-      .pipe(
-        tap(response => this.handleAuthSuccess(response))
-      );
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials)
+      .pipe(tap((response) => this.handleAuthSuccess(response)));
   }
 
   logout(): void {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("currentUser");
     this.currentUserSignal.set(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(["/login"]);
   }
 
   private handleAuthSuccess(response: AuthResponse): void {
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('currentUser', JSON.stringify(response.user));
+    localStorage.setItem("accessToken", response.accessToken);
+    localStorage.setItem("currentUser", JSON.stringify(response.user));
     this.currentUserSignal.set(response.user);
   }
 
   private loadUserFromStorage(): void {
-    const userJson = localStorage.getItem('currentUser');
+    const userJson = localStorage.getItem("currentUser");
     if (userJson) {
       this.currentUserSignal.set(JSON.parse(userJson));
     }
@@ -1030,22 +1076,25 @@ export class AuthService {
 
 // login.component.ts
 @Component({
-  selector: 'app-login',
+  selector: "app-login",
   standalone: true,
   imports: [ReactiveFormsModule, FormFieldComponent, ButtonComponent],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  templateUrl: "./login.component.html",
+  styleUrls: ["./login.component.scss"],
 })
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
-  
+
   loading = signal(false);
   errorMessage = signal<string | null>(null);
 
   loginForm = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6)])
+    email: new FormControl("", [Validators.required, Validators.email]),
+    password: new FormControl("", [
+      Validators.required,
+      Validators.minLength(6),
+    ]),
   });
 
   onSubmit(): void {
@@ -1057,19 +1106,18 @@ export class LoginComponent {
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    this.authService.login(this.loginForm.value as LoginDto)
-      .subscribe({
-        next: () => {
-          this.router.navigate(['/home']);
-        },
-        error: (error) => {
-          this.errorMessage.set(error.error.message || 'Erro ao fazer login');
-          this.loading.set(false);
-        },
-        complete: () => {
-          this.loading.set(false);
-        }
-      });
+    this.authService.login(this.loginForm.value as LoginDto).subscribe({
+      next: () => {
+        this.router.navigate(["/home"]);
+      },
+      error: (error) => {
+        this.errorMessage.set(error.error.message || "Erro ao fazer login");
+        this.loading.set(false);
+      },
+      complete: () => {
+        this.loading.set(false);
+      },
+    });
   }
 }
 
@@ -1082,7 +1130,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+  router.navigate(["/login"], { queryParams: { returnUrl: state.url } });
   return false;
 };
 ```
@@ -1094,6 +1142,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 ### 4. Home & Pet Listing
 
 **Tasks:**
+
 - Create home page layout
 - Implement pet list with filtering
 - Add species filter tabs
@@ -1108,21 +1157,21 @@ export const authGuard: CanActivateFn = (route, state) => {
 ```typescript
 // home.component.ts
 @Component({
-  selector: 'app-home',
+  selector: "app-home",
   standalone: true,
   imports: [CommonModule, PetCardComponent, BottomNavigationComponent],
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  templateUrl: "./home.component.html",
+  styleUrls: ["./home.component.scss"],
 })
 export class HomeComponent implements OnInit {
   private petsService = inject(PetsService);
   private authService = inject(AuthService);
-  
+
   pets = signal<Pet[]>([]);
   loading = signal(true);
-  selectedSpecies = signal<string>('dog');
-  location = signal('Lisboa, Portugal');
-  
+  selectedSpecies = signal<string>("dog");
+  location = signal("Lisboa, Portugal");
+
   user = this.authService.currentUser;
 
   ngOnInit(): void {
@@ -1131,20 +1180,22 @@ export class HomeComponent implements OnInit {
 
   loadPets(): void {
     this.loading.set(true);
-    
-    this.petsService.searchPets({
-      species: this.selectedSpecies(),
-      location: this.location()
-    }).subscribe({
-      next: (response) => {
-        this.pets.set(response.data);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading pets:', error);
-        this.loading.set(false);
-      }
-    });
+
+    this.petsService
+      .searchPets({
+        species: this.selectedSpecies(),
+        location: this.location(),
+      })
+      .subscribe({
+        next: (response) => {
+          this.pets.set(response.data);
+          this.loading.set(false);
+        },
+        error: (error) => {
+          console.error("Error loading pets:", error);
+          this.loading.set(false);
+        },
+      });
   }
 
   onSpeciesChange(species: string): void {
@@ -1153,7 +1204,7 @@ export class HomeComponent implements OnInit {
   }
 
   onPetClick(pet: Pet): void {
-    this.router.navigate(['/pets', pet.id]);
+    this.router.navigate(["/pets", pet.id]);
   }
 }
 ```
@@ -1165,6 +1216,7 @@ export class HomeComponent implements OnInit {
 ### 5. Pet Detail Page
 
 **Tasks:**
+
 - Create pet detail layout
 - Implement image carousel
 - Display pet information
@@ -1178,23 +1230,23 @@ export class HomeComponent implements OnInit {
 ```typescript
 // pet-detail.component.ts
 @Component({
-  selector: 'app-pet-detail',
+  selector: "app-pet-detail",
   standalone: true,
   imports: [CommonModule, CarouselModule],
-  templateUrl: './pet-detail.component.html',
-  styleUrls: ['./pet-detail.component.scss']
+  templateUrl: "./pet-detail.component.html",
+  styleUrls: ["./pet-detail.component.scss"],
 })
 export class PetDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private petsService = inject(PetsService);
   private dialog = inject(MatDialog);
-  
+
   pet = signal<Pet | null>(null);
   loading = signal(true);
   isFavorite = signal(false);
 
   ngOnInit(): void {
-    const petId = this.route.snapshot.paramMap.get('id');
+    const petId = this.route.snapshot.paramMap.get("id");
     if (petId) {
       this.loadPet(petId);
     }
@@ -1207,19 +1259,19 @@ export class PetDetailComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading pet:', error);
+        console.error("Error loading pet:", error);
         this.loading.set(false);
-      }
+      },
     });
   }
 
   scheduleVisit(): void {
     const dialogRef = this.dialog.open(AppointmentDialogComponent, {
-      width: '400px',
-      data: { pet: this.pet() }
+      width: "400px",
+      data: { pet: this.pet() },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         // Show success message
       }
@@ -1231,12 +1283,15 @@ export class PetDetailComponent implements OnInit {
   }
 
   openMap(): void {
-    const address = encodeURIComponent(this.pet()?.ong.location || '');
-    window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+    const address = encodeURIComponent(this.pet()?.ong.location || "");
+    window.open(
+      `https://www.google.com/maps/search/?api=1&query=${address}`,
+      "_blank"
+    );
   }
 
   toggleFavorite(): void {
-    this.isFavorite.update(v => !v);
+    this.isFavorite.update((v) => !v);
     // Call API to save favorite
   }
 }
@@ -1249,6 +1304,7 @@ export class PetDetailComponent implements OnInit {
 ### 6. Pet Management (NGO Features)
 
 **Tasks:**
+
 - Create add pet form
 - Create edit pet form
 - Implement multi-image upload
@@ -1261,31 +1317,31 @@ export class PetDetailComponent implements OnInit {
 ```typescript
 // pet-form.component.ts
 @Component({
-  selector: 'app-pet-form',
+  selector: "app-pet-form",
   standalone: true,
   imports: [ReactiveFormsModule, FormFieldComponent],
-  templateUrl: './pet-form.component.html',
-  styleUrls: ['./pet-form.component.scss']
+  templateUrl: "./pet-form.component.html",
+  styleUrls: ["./pet-form.component.scss"],
 })
 export class PetFormComponent implements OnInit {
   private petsService = inject(PetsService);
   private authService = inject(AuthService);
   private router = inject(Router);
-  
+
   uploadedImages = signal<File[]>([]);
   loading = signal(false);
 
   petForm = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(2)]),
-    species: new FormControl('dog', Validators.required),
-    breed: new FormControl(''),
+    name: new FormControl("", [Validators.required, Validators.minLength(2)]),
+    species: new FormControl("dog", Validators.required),
+    breed: new FormControl(""),
     age: new FormControl(null, [Validators.min(0), Validators.max(30)]),
-    gender: new FormControl('', Validators.required),
-    size: new FormControl('', Validators.required),
-    color: new FormControl(''),
+    gender: new FormControl("", Validators.required),
+    size: new FormControl("", Validators.required),
+    color: new FormControl(""),
     weight: new FormControl(null),
-    description: new FormControl('', Validators.maxLength(500)),
-    location: new FormControl('', Validators.required),
+    description: new FormControl("", Validators.maxLength(500)),
+    location: new FormControl("", Validators.required),
   });
 
   onImagesSelected(event: Event): void {
@@ -1305,22 +1361,22 @@ export class PetFormComponent implements OnInit {
     this.loading.set(true);
 
     const formData = new FormData();
-    Object.keys(this.petForm.value).forEach(key => {
+    Object.keys(this.petForm.value).forEach((key) => {
       formData.append(key, this.petForm.value[key]);
     });
 
-    this.uploadedImages().forEach(image => {
-      formData.append('images', image);
+    this.uploadedImages().forEach((image) => {
+      formData.append("images", image);
     });
 
     this.petsService.createPet(formData).subscribe({
       next: (pet) => {
-        this.router.navigate(['/pets', pet.id]);
+        this.router.navigate(["/pets", pet.id]);
       },
       error: (error) => {
-        console.error('Error creating pet:', error);
+        console.error("Error creating pet:", error);
         this.loading.set(false);
-      }
+      },
     });
   }
 }
@@ -1333,6 +1389,7 @@ export class PetFormComponent implements OnInit {
 ### 7. Donation Page
 
 **Tasks:**
+
 - Create donation form
 - Integrate Stripe Elements
 - Implement one-time/recurring toggle
@@ -1345,35 +1402,35 @@ export class PetFormComponent implements OnInit {
 ```typescript
 // donation.component.ts
 @Component({
-  selector: 'app-donation',
+  selector: "app-donation",
   standalone: true,
   imports: [ReactiveFormsModule, FormFieldComponent],
-  templateUrl: './donation.component.html',
-  styleUrls: ['./donation.component.scss']
+  templateUrl: "./donation.component.html",
+  styleUrls: ["./donation.component.scss"],
 })
 export class DonationComponent implements OnInit {
   private donationsService = inject(DonationsService);
-  
+
   stripe: any;
   cardElement: any;
-  donationType = signal<'one_time' | 'monthly'>('one_time');
+  donationType = signal<"one_time" | "monthly">("one_time");
   loading = signal(false);
 
   donationForm = new FormGroup({
     amount: new FormControl(null, [Validators.required, Validators.min(5)]),
-    donorName: new FormControl('', Validators.required),
-    donorEmail: new FormControl('', [Validators.required, Validators.email]),
-    donorCpf: new FormControl(''),
-    donorBirthDate: new FormControl(''),
-    donorGender: new FormControl(''),
-    cardHolderName: new FormControl('', Validators.required),
+    donorName: new FormControl("", Validators.required),
+    donorEmail: new FormControl("", [Validators.required, Validators.email]),
+    donorCpf: new FormControl(""),
+    donorBirthDate: new FormControl(""),
+    donorGender: new FormControl(""),
+    cardHolderName: new FormControl("", Validators.required),
   });
 
   async ngOnInit(): Promise<void> {
     this.stripe = await loadStripe(environment.stripePublicKey);
     const elements = this.stripe.elements();
-    this.cardElement = elements.create('card');
-    this.cardElement.mount('#card-element');
+    this.cardElement = elements.create("card");
+    this.cardElement.mount("#card-element");
   }
 
   async onSubmit(): Promise<void> {
@@ -1386,10 +1443,12 @@ export class DonationComponent implements OnInit {
 
     try {
       // Create payment intent
-      const { clientSecret } = await this.donationsService.createPaymentIntent({
-        ...this.donationForm.value,
-        donationType: this.donationType(),
-      }).toPromise();
+      const { clientSecret } = await this.donationsService
+        .createPaymentIntent({
+          ...this.donationForm.value,
+          donationType: this.donationType(),
+        })
+        .toPromise();
 
       // Confirm payment
       const result = await this.stripe.confirmCardPayment(clientSecret, {
@@ -1406,10 +1465,10 @@ export class DonationComponent implements OnInit {
         console.error(result.error);
       } else {
         // Show success
-        this.router.navigate(['/donation-success']);
+        this.router.navigate(["/donation-success"]);
       }
     } catch (error) {
-      console.error('Donation error:', error);
+      console.error("Donation error:", error);
     } finally {
       this.loading.set(false);
     }
@@ -1424,6 +1483,7 @@ export class DonationComponent implements OnInit {
 ### 8. Additional Pages
 
 **Tasks:**
+
 - Profile page
 - ONG information page
 - Appointment scheduling modal
@@ -1440,14 +1500,14 @@ export class DonationComponent implements OnInit {
 
 ```scss
 // _variables.scss
-$primary-color: #5CB5B0;
-$primary-light: #B8E3E1;
-$secondary-color: #F5A623;
-$text-dark: #2C2C2C;
+$primary-color: #5cb5b0;
+$primary-light: #b8e3e1;
+$secondary-color: #f5a623;
+$text-dark: #2c2c2c;
 $text-medium: #666666;
-$background: #FFFFFF;
-$error: #E74C3C;
-$success: #27AE60;
+$background: #ffffff;
+$error: #e74c3c;
+$success: #27ae60;
 
 $border-radius: 8px;
 $border-radius-lg: 12px;
@@ -1469,12 +1529,14 @@ $breakpoint-desktop: 1024px;
 ## Testing Requirements
 
 ### Unit Tests
+
 - Test components
 - Test services
 - Test pipes
 - Target: 70%+ coverage
 
 ### E2E Tests
+
 - User registration flow
 - Login flow
 - Pet browsing
@@ -1488,11 +1550,13 @@ $breakpoint-desktop: 1024px;
 ## Communication Requirements
 
 **Daily:**
+
 - Update Frontend board
 - Sync with Backend on API contracts
 - Report UI/UX issues to Designer
 
 **Weekly:**
+
 - Demo new features
 - Participate in code reviews
 - Update component documentation
@@ -1516,6 +1580,7 @@ $breakpoint-desktop: 1024px;
 **Primary Responsibility:** Create beautiful, intuitive, and accessible user interfaces that delight users and drive adoption.
 
 **Expertise Required:**
+
 - UI/UX design principles
 - Figma or Adobe XD
 - User research methods
@@ -1533,6 +1598,7 @@ $breakpoint-desktop: 1024px;
 ### 1. Design System Creation
 
 **Tasks:**
+
 - Extract and document color palette from PDF
 - Define typography scale
 - Create spacing system
@@ -1544,6 +1610,7 @@ $breakpoint-desktop: 1024px;
 **Deliverables:**
 
 **Color Palette Documentation:**
+
 ```
 Primary Colors:
 - Teal: #5CB5B0 (Buttons, CTAs, Headers)
@@ -1566,6 +1633,7 @@ Usage Guidelines:
 ```
 
 **Typography Scale:**
+
 ```
 Font Family: Roboto or Open Sans
 
@@ -1590,6 +1658,7 @@ Body:
 ### 2. Wireframes & User Flows
 
 **Tasks:**
+
 - Create user journey maps
 - Design low-fidelity wireframes
 - Map user flows (registration, adoption, donation)
@@ -1600,18 +1669,22 @@ Body:
 **Key User Flows to Design:**
 
 1. **New NGO Onboarding:**
+
    - Landing → Register → Email Verification → First Pet Addition → Home
 
 2. **Pet Adoption Journey:**
+
    - Home → Browse Pets → View Details → Schedule Visit → Confirmation
 
 3. **Donation Flow:**
+
    - Home → Donate → Choose Amount → Enter Details → Payment → Success
 
 4. **Pet Management:**
    - Login → Dashboard → Add Pet → Upload Images → Preview → Publish
 
 **Deliverables:**
+
 - User flow diagrams (Figma/Miro)
 - Wireframe screens (low-fidelity)
 - Navigation sitemap
@@ -1623,6 +1696,7 @@ Body:
 ### 3. High-Fidelity Mockups
 
 **Tasks:**
+
 - Design all screens from PDF reference
 - Add visual polish (shadows, gradients)
 - Design loading states
@@ -1634,36 +1708,22 @@ Body:
 **Screen List (Priority Order):**
 
 **Phase 1 - Authentication (Week 2, Days 3-5):**
+
 1. Login screen
 2. Registration screen
 3. Forgot password screen
 4. Email verification screen
 
-**Phase 2 - Core Features (Week 3):**
-5. Home/Feed screen
-6. Pet detail screen
-7. Pet listing with filters
-8. Search results screen
+**Phase 2 - Core Features (Week 3):** 5. Home/Feed screen 6. Pet detail screen 7. Pet listing with filters 8. Search results screen
 
-**Phase 3 - NGO Features (Week 4, Days 1-3):**
-9. Add pet form
-10. Edit pet form
-11. NGO profile screen
-12. Pet management dashboard
+**Phase 3 - NGO Features (Week 4, Days 1-3):** 9. Add pet form 10. Edit pet form 11. NGO profile screen 12. Pet management dashboard
 
-**Phase 4 - Transactions (Week 4, Days 4-5):**
-13. Donation form
-14. Payment confirmation
-15. Appointment booking modal
-16. Success screens
+**Phase 4 - Transactions (Week 4, Days 4-5):** 13. Donation form 14. Payment confirmation 15. Appointment booking modal 16. Success screens
 
-**Phase 5 - Additional (Week 5, Days 1-2):**
-17. User profile
-18. ONG information page
-19. Settings screen
-20. About page
+**Phase 5 - Additional (Week 5, Days 1-2):** 17. User profile 18. ONG information page 19. Settings screen 20. About page
 
 **Design Requirements:**
+
 - Mobile: 375px width (iPhone SE)
 - Desktop: 1440px width
 - Include hover states for interactive elements
@@ -1677,6 +1737,7 @@ Body:
 ### 4. Interactive Prototype
 
 **Tasks:**
+
 - Create clickable prototype in Figma
 - Add micro-interactions
 - Define transition animations
@@ -1684,6 +1745,7 @@ Body:
 - Test with stakeholders
 
 **Prototype Flows:**
+
 1. Complete registration → first login
 2. Browse pets → view details → book visit
 3. Make a donation
@@ -1696,6 +1758,7 @@ Body:
 ### 5. Design Assets Export
 
 **Tasks:**
+
 - Export all assets (icons, images, illustrations)
 - Create SVG icons
 - Optimize images
@@ -1703,6 +1766,7 @@ Body:
 - Document asset naming conventions
 
 **Asset Structure:**
+
 ```
 assets/
 ├── icons/
@@ -1729,6 +1793,7 @@ assets/
 ### 6. User Testing
 
 **Tasks:**
+
 - Create test plan
 - Recruit test participants (5-8 users)
 - Conduct usability testing sessions
@@ -1737,12 +1802,14 @@ assets/
 - Iterate on designs based on feedback
 
 **Testing Scenarios:**
+
 1. "You want to adopt a dog in Lisboa. Show me how you'd find one."
 2. "You've found a dog you like. Schedule a visit to meet it."
 3. "Make a monthly donation of €20."
 4. "You run an animal shelter. Add a new pet to the platform."
 
 **Metrics to Track:**
+
 - Task completion rate
 - Time to complete tasks
 - Error rate
@@ -1756,6 +1823,7 @@ assets/
 ### 7. Documentation
 
 **Tasks:**
+
 - Create design handoff documentation
 - Write component usage guidelines
 - Document interaction patterns
@@ -1765,12 +1833,14 @@ assets/
 **Documentation Sections:**
 
 1. **Design Principles:**
+
    - User-first approach
    - Emotional design for pet adoption
    - Trust and transparency
    - Accessibility for all
 
 2. **Component Library:**
+
    - Buttons (primary, secondary, text)
    - Form inputs (text, email, password, dropdown)
    - Cards (pet card, info card, stat card)
@@ -1778,6 +1848,7 @@ assets/
    - Modals and dialogs
 
 3. **Spacing & Layout:**
+
    - Grid system (12 columns)
    - Container widths
    - Section spacing
@@ -1796,6 +1867,7 @@ assets/
 ## Accessibility Checklist
 
 ### Visual Accessibility
+
 - [ ] Color contrast ratio ≥ 4.5:1 for text
 - [ ] Color is not the only indicator
 - [ ] Focus indicators are visible
@@ -1803,6 +1875,7 @@ assets/
 - [ ] Icons have text alternatives
 
 ### Interaction Accessibility
+
 - [ ] All features keyboard accessible
 - [ ] Logical tab order
 - [ ] Skip navigation links
@@ -1810,6 +1883,7 @@ assets/
 - [ ] Error messages are descriptive
 
 ### Content Accessibility
+
 - [ ] Alt text for all images
 - [ ] Meaningful link text (not "click here")
 - [ ] Headings used correctly (h1, h2, h3)
@@ -1832,16 +1906,19 @@ assets/
 ## Communication Requirements
 
 **Daily:**
+
 - Post design updates in Slack
 - Respond to developer questions
 - Review implementation in browser
 
 **Weekly:**
+
 - Present designs in team meeting
 - Participate in design review
 - Update stakeholders on progress
 
 **Artifacts to Share:**
+
 - Figma links (view access for all)
 - PDF exports of key screens
 - Design system documentation
@@ -1866,6 +1943,7 @@ assets/
 **Primary Responsibility:** Set up infrastructure, deployment pipelines, monitoring, and ensure system reliability.
 
 **Expertise Required:**
+
 - Cloud platforms (AWS, DigitalOcean, Railway)
 - CI/CD (GitHub Actions, GitLab CI)
 - Docker & containerization
@@ -1882,6 +1960,7 @@ assets/
 ### 1. Infrastructure Setup
 
 **Tasks:**
+
 - Choose hosting platform
 - Set up PostgreSQL database
 - Configure S3 bucket for file storage
@@ -1892,6 +1971,7 @@ assets/
 **Recommended Stack:**
 
 **Option A - Railway (Simplest):**
+
 ```yaml
 # railway.toml
 [build]
@@ -1914,6 +1994,7 @@ template = "postgres"
 ```
 
 **Option B - AWS (Scalable):**
+
 - EC2 or ECS for backend
 - RDS PostgreSQL
 - S3 for storage
@@ -1928,6 +2009,7 @@ template = "postgres"
 ### 2. Environment Configuration
 
 **Tasks:**
+
 - Set up development environment
 - Set up staging environment
 - Set up production environment
@@ -1936,6 +2018,7 @@ template = "postgres"
 - Create environment documentation
 
 **Environment Variables Template:**
+
 ```bash
 # Development
 DATABASE_URL=postgresql://user:pass@localhost:5432/petsos_dev
@@ -1967,6 +2050,7 @@ SENTRY_DSN=...
 ### 3. CI/CD Pipeline
 
 **Tasks:**
+
 - Set up GitHub Actions workflows
 - Create build pipeline
 - Create test pipeline
@@ -1988,7 +2072,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15
@@ -1999,27 +2083,27 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
-      
+          node-version: "18"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run linter
         run: npm run lint
-      
+
       - name: Run unit tests
         run: npm test
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
-      
+
       - name: Run E2E tests
         run: npm run test:e2e
         env:
@@ -2028,42 +2112,42 @@ jobs:
   build-and-deploy:
     needs: test
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-      
+          node-version: "18"
+
       - name: Build backend
         run: |
           npm ci
           npm run build
-      
+
       - name: Build frontend
         run: |
           cd frontend
           npm ci
           npm run build:prod
-      
+
       - name: Deploy to Railway
         run: railway up
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-      
+
       - name: Run database migrations
         run: npm run migration:run
         env:
           DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
-      
+
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1
         with:
           payload: |
             {
-              "text": "✅ Pet SOS deployed to production successfully!"
+              "text": "✅ Aubrigo deployed to production successfully!"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
@@ -2071,12 +2155,12 @@ jobs:
   post-deploy:
     needs: build-and-deploy
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Health check
         run: |
           curl --fail https://api.petsos.com/health || exit 1
-      
+
       - name: Create Sentry release
         run: |
           curl https://sentry.io/api/0/organizations/petsos/releases/ \
@@ -2091,6 +2175,7 @@ jobs:
 ### 4. Monitoring & Logging
 
 **Tasks:**
+
 - Set up application monitoring (Sentry)
 - Configure uptime monitoring
 - Set up log aggregation
@@ -2099,9 +2184,10 @@ jobs:
 - Create dashboards
 
 **Sentry Integration:**
+
 ```typescript
 // main.ts
-import * as Sentry from '@sentry/node';
+import * as Sentry from "@sentry/node";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -2115,6 +2201,7 @@ app.use(Sentry.Handlers.errorHandler());
 ```
 
 **Monitoring Checklist:**
+
 - [ ] Application errors tracked
 - [ ] API performance monitored
 - [ ] Database performance monitored
@@ -2130,6 +2217,7 @@ app.use(Sentry.Handlers.errorHandler());
 ### 5. Database Management
 
 **Tasks:**
+
 - Set up automated backups
 - Configure backup retention (30 days)
 - Test restore procedures
@@ -2139,6 +2227,7 @@ app.use(Sentry.Handlers.errorHandler());
 - Monitor query performance
 
 **Backup Script:**
+
 ```bash
 #!/bin/bash
 # backup-database.sh
@@ -2158,6 +2247,7 @@ echo "Backup completed: $BACKUP_FILE"
 ```
 
 **Cron Job:**
+
 ```bash
 # Daily backup at 2 AM
 0 2 * * * /opt/scripts/backup-database.sh
@@ -2170,6 +2260,7 @@ echo "Backup completed: $BACKUP_FILE"
 ### 6. Security Configuration
 
 **Tasks:**
+
 - Configure firewall rules
 - Set up SSL/TLS
 - Implement rate limiting
@@ -2179,6 +2270,7 @@ echo "Backup completed: $BACKUP_FILE"
 - Regular security audits
 
 **Security Checklist:**
+
 - [ ] HTTPS enforced
 - [ ] Strong SSL ciphers only
 - [ ] HSTS enabled
@@ -2197,6 +2289,7 @@ echo "Backup completed: $BACKUP_FILE"
 ### 7. Performance Optimization
 
 **Tasks:**
+
 - Configure CDN
 - Set up caching (Redis)
 - Enable gzip compression
@@ -2205,6 +2298,7 @@ echo "Backup completed: $BACKUP_FILE"
 - Set up load balancing (if needed)
 
 **Redis Caching:**
+
 ```typescript
 // cache.service.ts
 @Injectable()
@@ -2237,6 +2331,7 @@ export class CacheService {
 ### 8. Documentation
 
 **Tasks:**
+
 - Create deployment runbook
 - Document infrastructure architecture
 - Create incident response plan
@@ -2244,6 +2339,7 @@ export class CacheService {
 - Create monitoring guide
 
 **Deliverables:**
+
 - `docs/infrastructure.md`
 - `docs/deployment.md`
 - `docs/monitoring.md`
@@ -2294,6 +2390,7 @@ export class CacheService {
 **Primary Responsibility:** Ensure product quality through comprehensive testing and automation.
 
 **Expertise Required:**
+
 - Manual testing
 - Test automation (Cypress, Playwright)
 - API testing (Postman, REST Assured)
@@ -2309,6 +2406,7 @@ export class CacheService {
 ### 1. Test Planning
 
 **Tasks:**
+
 - Create comprehensive test plan
 - Define test scenarios
 - Create test cases
@@ -2317,16 +2415,19 @@ export class CacheService {
 - Create test data
 
 **Test Plan Outline:**
+
 ```markdown
-# Pet SOS Test Plan
+# Aubrigo Test Plan
 
 ## 1. Scope
+
 - Frontend (Angular)
 - Backend API (NestJS)
 - Database
 - Third-party integrations (Stripe, AWS S3)
 
 ## 2. Test Types
+
 - Unit tests (developers)
 - Integration tests (developers)
 - E2E tests (QA)
@@ -2336,15 +2437,18 @@ export class CacheService {
 - Security tests (DevOps + QA)
 
 ## 3. Test Environments
+
 - Local development
 - Staging
 - Production (smoke tests only)
 
 ## 4. Entry/Exit Criteria
+
 - Entry: Feature deployed to staging
 - Exit: All test cases passed, no critical bugs
 
 ## 5. Defect Management
+
 - Critical: Fix immediately
 - High: Fix within 24 hours
 - Medium: Fix within sprint
@@ -2358,6 +2462,7 @@ export class CacheService {
 ### 2. Test Case Creation
 
 **Tasks:**
+
 - Write detailed test cases
 - Create test data sets
 - Document expected results
@@ -2367,6 +2472,7 @@ export class CacheService {
 **Sample Test Cases:**
 
 **TC001: User Registration - Happy Path**
+
 ```
 Title: Successful NGO Registration
 Priority: High
@@ -2396,6 +2502,7 @@ Test Data:
 ```
 
 **TC002: User Registration - Invalid Email**
+
 ```
 Title: Registration with Invalid Email
 Priority: Medium
@@ -2423,6 +2530,7 @@ Expected Results:
 ### 3. Manual Testing
 
 **Tasks:**
+
 - Execute test cases
 - Perform exploratory testing
 - Test on multiple devices/browsers
@@ -2433,12 +2541,14 @@ Expected Results:
 **Testing Matrix:**
 
 **Browsers:**
+
 - Chrome (latest)
 - Firefox (latest)
 - Safari (latest)
 - Edge (latest)
 
 **Devices:**
+
 - Desktop (1920x1080, 1440x900)
 - Tablet (iPad, Android tablet)
 - Mobile (iPhone 12, Samsung Galaxy S21)
@@ -2446,6 +2556,7 @@ Expected Results:
 **Test Scenarios (Priority):**
 
 **P0 (Critical):**
+
 1. User registration
 2. User login
 3. View pet listings
@@ -2453,20 +2564,9 @@ Expected Results:
 5. Make donation
 6. Schedule appointment
 
-**P1 (High):**
-7. Add new pet (NGO)
-8. Edit pet (NGO)
-9. Delete pet (NGO)
-10. Search/filter pets
-11. Forgot password
-12. Update profile
+**P1 (High):** 7. Add new pet (NGO) 8. Edit pet (NGO) 9. Delete pet (NGO) 10. Search/filter pets 11. Forgot password 12. Update profile
 
-**P2 (Medium):**
-13. Add to favorites
-14. View ONG information
-15. Contact shelter
-16. View donation history
-17. View appointment history
+**P2 (Medium):** 13. Add to favorites 14. View ONG information 15. Contact shelter 16. View donation history 17. View appointment history
 
 **Timeline:** Weeks 4-7 (ongoing)
 
@@ -2475,6 +2575,7 @@ Expected Results:
 ### 4. API Testing
 
 **Tasks:**
+
 - Test all API endpoints
 - Verify request/response formats
 - Test error handling
@@ -2483,32 +2584,34 @@ Expected Results:
 - Create Postman collections
 
 **Postman Test Script Example:**
+
 ```javascript
 // Test: POST /api/auth/register
 pm.test("Status code is 201", function () {
-    pm.response.to.have.status(201);
+  pm.response.to.have.status(201);
 });
 
 pm.test("Response has user and token", function () {
-    var jsonData = pm.response.json();
-    pm.expect(jsonData).to.have.property('user');
-    pm.expect(jsonData).to.have.property('accessToken');
+  var jsonData = pm.response.json();
+  pm.expect(jsonData).to.have.property("user");
+  pm.expect(jsonData).to.have.property("accessToken");
 });
 
 pm.test("User has correct properties", function () {
-    var jsonData = pm.response.json();
-    pm.expect(jsonData.user).to.have.property('id');
-    pm.expect(jsonData.user).to.have.property('email');
-    pm.expect(jsonData.user).to.have.property('ongName');
+  var jsonData = pm.response.json();
+  pm.expect(jsonData.user).to.have.property("id");
+  pm.expect(jsonData.user).to.have.property("email");
+  pm.expect(jsonData.user).to.have.property("ongName");
 });
 
 // Save token for subsequent requests
 if (pm.response.code === 201) {
-    pm.environment.set("accessToken", pm.response.json().accessToken);
+  pm.environment.set("accessToken", pm.response.json().accessToken);
 }
 ```
 
 **API Test Coverage:**
+
 - ✅ All endpoints tested
 - ✅ Happy path scenarios
 - ✅ Error scenarios (400, 401, 403, 404, 500)
@@ -2523,6 +2626,7 @@ if (pm.response.code === 201) {
 ### 5. Automated E2E Testing
 
 **Tasks:**
+
 - Set up Cypress or Playwright
 - Automate critical user flows
 - Create test fixtures
@@ -2530,86 +2634,88 @@ if (pm.response.code === 201) {
 - Maintain test suite
 
 **Cypress Test Example:**
+
 ```typescript
 // cypress/e2e/registration.cy.ts
-describe('User Registration', () => {
+describe("User Registration", () => {
   beforeEach(() => {
-    cy.visit('/cadastrar');
+    cy.visit("/cadastrar");
   });
 
-  it('should register new NGO successfully', () => {
+  it("should register new NGO successfully", () => {
     const timestamp = Date.now();
     const email = `test${timestamp}@shelter.com`;
 
-    cy.get('input[name="ongName"]').type('Test Animal Shelter');
+    cy.get('input[name="ongName"]').type("Test Animal Shelter");
     cy.get('input[name="email"]').type(email);
-    cy.get('input[name="password"]').type('SecurePass123');
-    cy.get('input[name="confirmPassword"]').type('SecurePass123');
-    
+    cy.get('input[name="password"]').type("SecurePass123");
+    cy.get('input[name="confirmPassword"]').type("SecurePass123");
+
     cy.get('button[type="submit"]').click();
-    
-    cy.url().should('include', '/home');
-    cy.contains('Hello').should('be.visible');
+
+    cy.url().should("include", "/home");
+    cy.contains("Hello").should("be.visible");
   });
 
-  it('should show error for existing email', () => {
-    cy.get('input[name="ongName"]').type('Test Shelter');
-    cy.get('input[name="email"]').type('existing@shelter.com');
-    cy.get('input[name="password"]').type('SecurePass123');
-    cy.get('input[name="confirmPassword"]').type('SecurePass123');
-    
+  it("should show error for existing email", () => {
+    cy.get('input[name="ongName"]').type("Test Shelter");
+    cy.get('input[name="email"]').type("existing@shelter.com");
+    cy.get('input[name="password"]').type("SecurePass123");
+    cy.get('input[name="confirmPassword"]').type("SecurePass123");
+
     cy.get('button[type="submit"]').click();
-    
-    cy.contains('Email already registered').should('be.visible');
+
+    cy.contains("Email already registered").should("be.visible");
   });
 
-  it('should validate password match', () => {
-    cy.get('input[name="ongName"]').type('Test Shelter');
-    cy.get('input[name="email"]').type('test@shelter.com');
-    cy.get('input[name="password"]').type('SecurePass123');
-    cy.get('input[name="confirmPassword"]').type('DifferentPass123');
-    
+  it("should validate password match", () => {
+    cy.get('input[name="ongName"]').type("Test Shelter");
+    cy.get('input[name="email"]').type("test@shelter.com");
+    cy.get('input[name="password"]').type("SecurePass123");
+    cy.get('input[name="confirmPassword"]').type("DifferentPass123");
+
     cy.get('button[type="submit"]').click();
-    
-    cy.contains('Passwords must match').should('be.visible');
+
+    cy.contains("Passwords must match").should("be.visible");
   });
 });
 
 // cypress/e2e/pet-adoption.cy.ts
-describe('Pet Adoption Flow', () => {
+describe("Pet Adoption Flow", () => {
   beforeEach(() => {
-    cy.login('test@shelter.com', 'SecurePass123');
-    cy.visit('/home');
+    cy.login("test@shelter.com", "SecurePass123");
+    cy.visit("/home");
   });
 
-  it('should browse and view pet details', () => {
-    cy.contains('Plutão').click();
-    
-    cy.url().should('include', '/pets/');
-    cy.contains('Border collie').should('be.visible');
-    cy.contains('3 anos').should('be.visible');
-    cy.contains('6 kg').should('be.visible');
+  it("should browse and view pet details", () => {
+    cy.contains("Plutão").click();
+
+    cy.url().should("include", "/pets/");
+    cy.contains("Border collie").should("be.visible");
+    cy.contains("3 anos").should("be.visible");
+    cy.contains("6 kg").should("be.visible");
   });
 
-  it('should schedule a visit', () => {
-    cy.visit('/pets/123');
-    
-    cy.contains('AGENDAR VISITA').click();
-    
-    cy.get('input[name="visitorName"]').type('Maria Santos');
-    cy.get('input[name="visitorEmail"]').type('maria@example.com');
-    cy.get('input[name="visitorPhone"]').type('912345678');
-    cy.get('input[name="preferredDate"]').type('2025-12-01');
-    cy.get('input[name="preferredTime"]').type('14:00');
-    
+  it("should schedule a visit", () => {
+    cy.visit("/pets/123");
+
+    cy.contains("AGENDAR VISITA").click();
+
+    cy.get('input[name="visitorName"]').type("Maria Santos");
+    cy.get('input[name="visitorEmail"]').type("maria@example.com");
+    cy.get('input[name="visitorPhone"]').type("912345678");
+    cy.get('input[name="preferredDate"]').type("2025-12-01");
+    cy.get('input[name="preferredTime"]').type("14:00");
+
     cy.get('button[type="submit"]').click();
-    
-    cy.contains('Appointment request sent').should('be.visible');
+
+    cy.contains("Appointment request sent").should("be.visible");
   });
 });
 ```
 
 **Automated Test Coverage:**
+
 - User registration & login
 - Pet browsing & filtering
 - Pet detail view
@@ -2624,6 +2730,7 @@ describe('Pet Adoption Flow', () => {
 ### 6. Accessibility Testing
 
 **Tasks:**
+
 - Test keyboard navigation
 - Test screen reader compatibility
 - Verify color contrast
@@ -2631,12 +2738,14 @@ describe('Pet Adoption Flow', () => {
 - Test with accessibility tools
 
 **Tools:**
+
 - axe DevTools
 - WAVE
 - Lighthouse
 - NVDA screen reader
 
 **Accessibility Checklist:**
+
 - [ ] All interactive elements keyboard accessible
 - [ ] Logical tab order
 - [ ] Skip to content link
@@ -2655,6 +2764,7 @@ describe('Pet Adoption Flow', () => {
 ### 7. Performance Testing
 
 **Tasks:**
+
 - Test page load times
 - Test API response times
 - Stress test donation flow
@@ -2662,12 +2772,14 @@ describe('Pet Adoption Flow', () => {
 - Identify bottlenecks
 
 **Performance Targets:**
+
 - Page load: < 2 seconds
 - API response: < 200ms (p95)
 - Time to Interactive: < 3 seconds
 - Lighthouse score: > 90
 
 **Tools:**
+
 - Lighthouse
 - WebPageTest
 - Chrome DevTools
@@ -2680,6 +2792,7 @@ describe('Pet Adoption Flow', () => {
 ### 8. Bug Reporting
 
 **Tasks:**
+
 - Document bugs clearly
 - Assign priority/severity
 - Provide reproduction steps
@@ -2687,12 +2800,14 @@ describe('Pet Adoption Flow', () => {
 - Track bug lifecycle
 
 **Bug Report Template:**
+
 ```markdown
 # Bug Report
 
 **Title:** Login button not working on mobile
 
 **Environment:**
+
 - Device: iPhone 12
 - OS: iOS 16.5
 - Browser: Safari
@@ -2705,6 +2820,7 @@ describe('Pet Adoption Flow', () => {
 When attempting to log in on mobile Safari, the login button does not respond to clicks.
 
 **Steps to Reproduce:**
+
 1. Open app on iPhone 12 Safari
 2. Navigate to login page
 3. Enter valid credentials
@@ -2750,16 +2866,19 @@ Works fine on desktop Chrome and Firefox
 ## Communication Requirements
 
 **Daily:**
+
 - Update test execution status
 - Report critical bugs immediately
 - Update test metrics dashboard
 
 **Weekly:**
+
 - Present test summary report
 - Demo automated tests
 - Participate in bug triage
 
 **Artifacts to Share:**
+
 - Test execution results
 - Bug reports
 - Test coverage metrics
@@ -2784,6 +2903,7 @@ Works fine on desktop Chrome and Firefox
 **Primary Responsibility:** Define product vision, prioritize features, and ensure successful delivery.
 
 **Expertise Required:**
+
 - Product strategy
 - User research
 - Roadmap planning
@@ -2799,6 +2919,7 @@ Works fine on desktop Chrome and Firefox
 ### 1. Product Vision & Strategy
 
 **Tasks:**
+
 - Define product vision
 - Identify target users
 - Create user personas
@@ -2807,8 +2928,9 @@ Works fine on desktop Chrome and Firefox
 - Create product roadmap
 
 **Product Vision:**
+
 ```
-"Pet SOS connects homeless animals with loving families by empowering
+"Aubrigo connects homeless animals with loving families by empowering
 NGOs with a modern, user-friendly platform that makes adoption
 transparent, accessible, and joyful."
 ```
@@ -2816,6 +2938,7 @@ transparent, accessible, and joyful."
 **Target Users:**
 
 **Primary Persona - Ana (Potential Adopter):**
+
 - Age: 28-35
 - Location: Lisbon
 - Occupation: Marketing professional
@@ -2824,6 +2947,7 @@ transparent, accessible, and joyful."
 - Tech-savvy, uses mobile apps daily
 
 **Secondary Persona - Carlos (NGO Manager):**
+
 - Age: 35-50
 - Role: Animal shelter manager
 - Goals: Find homes for animals, increase donations, raise awareness
@@ -2831,6 +2955,7 @@ transparent, accessible, and joyful."
 - Moderate tech skills
 
 **Success Metrics:**
+
 - 100+ NGOs onboarded (3 months)
 - 1000+ pets listed (3 months)
 - 500+ appointments booked (3 months)
@@ -2844,6 +2969,7 @@ transparent, accessible, and joyful."
 ### 2. Requirements Gathering
 
 **Tasks:**
+
 - Conduct stakeholder interviews
 - Define user stories
 - Create acceptance criteria
@@ -2853,6 +2979,7 @@ transparent, accessible, and joyful."
 **Feature Prioritization:**
 
 **Must Have (MVP):**
+
 1. User authentication (NGO accounts)
 2. Pet CRUD operations
 3. Pet listing with filters
@@ -2861,27 +2988,19 @@ transparent, accessible, and joyful."
 6. Appointment booking
 7. Email notifications
 
-**Should Have (Phase 2):**
-8. Favorites/wishlist
-9. Advanced search
-10. Photo gallery (multiple images)
-11. ONG profile pages
-12. User reviews/ratings
+**Should Have (Phase 2):** 8. Favorites/wishlist 9. Advanced search 10. Photo gallery (multiple images) 11. ONG profile pages 12. User reviews/ratings
 
-**Could Have (Phase 3):**
-13. Social media sharing
-14. Success stories
-15. Blog/content section
-16. Volunteer management
-17. Mobile app (native)
+**Could Have (Phase 3):** 13. Social media sharing 14. Success stories 15. Blog/content section 16. Volunteer management 17. Mobile app (native)
 
 **Won't Have (Not in scope):**
+
 - Live chat
 - Video calls
 - E-commerce (pet supplies)
 - Pet medical records
 
 **User Story Example:**
+
 ```
 As an NGO manager,
 I want to add a new pet with photos and details,
@@ -2903,6 +3022,7 @@ Acceptance Criteria:
 ### 3. Roadmap Planning
 
 **Tasks:**
+
 - Create sprint plan
 - Define release schedule
 - Identify dependencies
@@ -2912,24 +3032,28 @@ Acceptance Criteria:
 **Release Roadmap:**
 
 **Sprint 1-2 (Weeks 1-4): Foundation**
+
 - Project setup
 - Authentication
 - Database design
 - Basic UI components
 
 **Sprint 3-4 (Weeks 5-8): Core Features**
+
 - Pet listing
 - Pet detail
 - Search & filters
 - Pet management
 
 **Sprint 5-6 (Weeks 9-12): Transactions**
+
 - Donation integration
 - Appointment booking
 - Email notifications
 - NGO profiles
 
 **Sprint 7-8 (Weeks 13-16): Polish & Launch**
+
 - Bug fixes
 - Performance optimization
 - User testing
@@ -2937,6 +3061,7 @@ Acceptance Criteria:
 - Marketing prep
 
 **Post-Launch (Ongoing):**
+
 - Feature enhancements
 - User feedback implementation
 - Analytics review
@@ -2949,6 +3074,7 @@ Acceptance Criteria:
 ### 4. Sprint Planning & Management
 
 **Tasks:**
+
 - Run sprint planning meetings
 - Create/refine user stories
 - Conduct daily standups
@@ -2960,6 +3086,7 @@ Acceptance Criteria:
 **Sprint Ceremonies:**
 
 **Sprint Planning (Week start):**
+
 - Duration: 2 hours
 - Review backlog
 - Select sprint items
@@ -2967,18 +3094,21 @@ Acceptance Criteria:
 - Estimate story points
 
 **Daily Standup (Daily):**
+
 - Duration: 15 minutes
 - What did you do yesterday?
 - What will you do today?
 - Any blockers?
 
 **Sprint Review (Week end):**
+
 - Duration: 1 hour
 - Demo completed features
 - Gather feedback
 - Update backlog
 
 **Retrospective (Week end):**
+
 - Duration: 1 hour
 - What went well?
 - What can improve?
@@ -2991,6 +3121,7 @@ Acceptance Criteria:
 ### 5. Stakeholder Communication
 
 **Tasks:**
+
 - Weekly status updates
 - Monthly executive reports
 - Demo sessions
@@ -2999,39 +3130,48 @@ Acceptance Criteria:
 - Risk management
 
 **Weekly Status Report Template:**
+
 ```markdown
-# Pet SOS - Weekly Status Report
+# Aubrigo - Weekly Status Report
+
 Week of: November 4-8, 2025
 
 ## Summary
+
 This week we completed the authentication system and began work on
 pet listing features. We're on track for MVP launch in 12 weeks.
 
 ## Completed This Week
+
 ✅ User registration and login
 ✅ JWT authentication system
 ✅ Database migrations
 ✅ Login/register UI designs
 
 ## In Progress
+
 🔄 Pet listing API
 🔄 Home page UI
 🔄 Pet card component
 
 ## Planned for Next Week
+
 📅 Complete pet listing
 📅 Start pet detail page
 📅 Design pet add/edit forms
 
 ## Blockers
+
 ⚠️ Waiting for Stripe test account approval
 
 ## Metrics
+
 - Story points completed: 21/25 (84%)
 - Bugs found: 3 (all fixed)
 - Test coverage: 75%
 
 ## Risks
+
 - Payment integration delay may push donation feature by 1 week
 - Mitigation: Using Stripe test mode to proceed with development
 ```
@@ -3043,6 +3183,7 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 ### 6. User Testing & Feedback
 
 **Tasks:**
+
 - Organize user testing sessions
 - Collect and analyze feedback
 - Prioritize improvements
@@ -3052,12 +3193,14 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 **User Testing Plan:**
 
 **Phase 1: Prototype Testing (Week 6)**
+
 - 5 potential adopters
 - 3 NGO managers
 - Test key flows
 - Gather usability feedback
 
 **Phase 2: Beta Testing (Week 14)**
+
 - 3-5 real NGOs
 - 20-30 real users
 - 2-week beta period
@@ -3065,12 +3208,14 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 - Collect bug reports
 
 **Phase 3: Soft Launch (Week 16)**
+
 - Launch to limited audience
 - Monitor metrics closely
 - Quick iterations
 - Prepare for full launch
 
 **Feedback Collection Methods:**
+
 - In-app surveys
 - User interviews
 - Analytics (Mixpanel/Google Analytics)
@@ -3084,6 +3229,7 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 ### 7. Go-to-Market Strategy
 
 **Tasks:**
+
 - Define launch strategy
 - Create marketing plan
 - Prepare press materials
@@ -3093,6 +3239,7 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 **Launch Checklist:**
 
 **Pre-Launch (Week 15):**
+
 - [ ] All MVP features complete
 - [ ] Zero critical bugs
 - [ ] User documentation ready
@@ -3103,6 +3250,7 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 - [ ] Support email set up
 
 **Launch Week (Week 16):**
+
 - [ ] Deploy to production
 - [ ] Send launch emails
 - [ ] Post on social media
@@ -3111,6 +3259,7 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 - [ ] Quick bug fixes
 
 **Post-Launch (Week 17+):**
+
 - [ ] Daily metric reviews
 - [ ] Weekly user interviews
 - [ ] Monthly feature updates
@@ -3123,6 +3272,7 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 ### 8. Analytics & Metrics
 
 **Tasks:**
+
 - Define KPIs
 - Set up analytics tracking
 - Create dashboards
@@ -3132,31 +3282,37 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 **Key Metrics:**
 
 **Acquisition:**
+
 - New NGOs registered
 - New visitors
 - Traffic sources
 
 **Activation:**
+
 - NGOs who add first pet
 - Users who view pet details
 - Users who schedule appointments
 
 **Retention:**
+
 - Weekly active NGOs
 - Returning visitors
 - Email open rates
 
 **Revenue:**
+
 - Total donations
 - Average donation
 - Monthly recurring donations
 
 **Referral:**
+
 - Social shares
 - Referral traffic
 - Word-of-mouth
 
 **Analytics Tools:**
+
 - Google Analytics 4
 - Mixpanel (user behavior)
 - Stripe Dashboard (donations)
@@ -3183,16 +3339,19 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 ## Communication Requirements
 
 **Daily:**
+
 - Run standup meetings
 - Review and prioritize bugs
 - Respond to team questions
 
 **Weekly:**
+
 - Sprint planning/review
 - Status report to stakeholders
 - Backlog grooming
 
 **Monthly:**
+
 - Executive presentation
 - Roadmap updates
 - Strategic planning
@@ -3214,13 +3373,16 @@ pet listing features. We're on track for MVP launch in 12 weeks.
 ## Daily Communication
 
 ### Morning Standup (9:30 AM, 15 minutes)
+
 **Attendees:** All team members
 **Format:**
+
 - Each person: Yesterday, Today, Blockers
 - PM notes blockers and follows up
 - Keep it brief and focused
 
 **Example:**
+
 ```
 Backend Dev: "Yesterday I completed the pet listing API. Today I'll
 start on image upload. No blockers."
@@ -3234,26 +3396,31 @@ PM: "I'll make sure API docs are updated by noon."
 ### Slack Channels
 
 **#pet-sos-general**
+
 - Team announcements
 - General questions
 - Casual conversation
 
 **#pet-sos-dev**
+
 - Technical discussions
 - Code reviews
 - Deployment notifications
 
 **#pet-sos-design**
+
 - Design reviews
 - UI/UX feedback
 - Asset sharing
 
 **#pet-sos-bugs**
+
 - Bug reports
 - Bug triage
 - Bug fixes
 
 **#pet-sos-ci-cd**
+
 - Automated build notifications
 - Deployment status
 - Error alerts
@@ -3263,17 +3430,20 @@ PM: "I'll make sure API docs are updated by noon."
 ## Weekly Communication
 
 ### Sprint Planning (Monday, 2 hours)
+
 - Review last sprint
 - Plan current sprint
 - Estimate stories
 - Set sprint goal
 
 ### Sprint Review (Friday, 1 hour)
+
 - Demo completed features
 - Gather feedback
 - Update backlog
 
 ### Sprint Retrospective (Friday, 1 hour)
+
 - What went well?
 - What needs improvement?
 - Action items
@@ -3322,6 +3492,7 @@ Product Manager
 ```
 
 **Critical Path:**
+
 1. Backend API → Frontend Integration
 2. Design → Frontend Implementation
 3. Backend → Database → DevOps
@@ -3332,18 +3503,21 @@ Product Manager
 ## Conflict Resolution
 
 **Technical Disagreements:**
+
 1. Present both options
 2. List pros/cons
 3. Product Manager makes final call
 4. Document decision
 
 **Missed Deadlines:**
+
 1. Identify reason
 2. Reassess timeline
 3. Reprioritize if needed
 4. Communicate to stakeholders
 
 **Quality Issues:**
+
 1. QA documents issues
 2. Triage by severity
 3. Assign to appropriate developer
@@ -3354,18 +3528,21 @@ Product Manager
 ## Onboarding New Team Members
 
 **Day 1:**
+
 - Welcome meeting
 - Access to all tools
 - Codebase walkthrough
 - Review documentation
 
 **Week 1:**
+
 - Pair programming sessions
 - Attend all ceremonies
 - Complete first small task
 - Ask lots of questions
 
 **Month 1:**
+
 - Own a feature
 - Participate in code reviews
 - Contribute to documentation
@@ -3375,16 +3552,19 @@ Product Manager
 ## Knowledge Sharing
 
 **Tech Talks (Monthly):**
+
 - Team members present learnings
 - Share best practices
 - Demo cool features
 
 **Documentation:**
+
 - All code documented
 - Architecture decisions recorded
 - Onboarding guide updated
 
 **Pairing:**
+
 - Junior/Senior pairing
 - Cross-functional pairing
 - Rotate pairs weekly

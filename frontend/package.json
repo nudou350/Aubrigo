@@ -1,7 +1,7 @@
 {
   "name": "pet-sos-frontend",
   "version": "1.0.0",
-  "description": "Pet SOS Frontend - Progressive Web App for Animal Adoption",
+  "description": "Aubrigo Frontend - Progressive Web App for Animal Adoption",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

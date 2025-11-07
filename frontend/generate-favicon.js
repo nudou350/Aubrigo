@@ -1,29 +1,35 @@
 const sharp = require('sharp');
 const path = require('path');
 
-const inputFile = path.join(__dirname, 'src/assets/paw_register.webp');
+const inputFile = path.join(__dirname, 'src/assets/icon.PNG');
 const outputFile = path.join(__dirname, 'src/favicon.ico');
 
 async function generateFavicon() {
-  console.log('Gerando favicon.ico a partir de paw_register.webp com rotação de 45°...\n');
+  console.log('🚀 Gerando favicon a partir de icon.PNG...\n');
 
   try {
-    // Generate a 32x32 PNG first (ICO format needs PNG)
-    const pngBuffer = await sharp(inputFile)
-      .rotate(45, { background: { r: 76, g: 168, b: 160, alpha: 1 } })
+    // Generate favicon sizes (16x16 and 32x32)
+    await sharp(inputFile)
       .resize(32, 32, {
         fit: 'contain',
-        background: { r: 76, g: 168, b: 160, alpha: 1 } // #4ca8a0
+        background: { r: 255, g: 255, b: 255, alpha: 0 }
       })
       .png()
-      .toBuffer();
-
-    // Save as PNG (browsers support PNG as favicon)
-    await sharp(pngBuffer)
-      .toFile(outputFile.replace('.ico', '.png'));
+      .toFile(path.join(__dirname, 'src/favicon.png'));
 
     console.log('✓ Gerado: favicon.png (32x32)');
-    console.log('\nNota: Renomeie favicon.png para favicon.ico ou use favicon.png no HTML');
+
+    await sharp(inputFile)
+      .resize(16, 16, {
+        fit: 'contain',
+        background: { r: 255, g: 255, b: 255, alpha: 0 }
+      })
+      .png()
+      .toFile(path.join(__dirname, 'src/favicon-16x16.png'));
+
+    console.log('✓ Gerado: favicon-16x16.png (16x16)');
+    console.log('\n✅ Favicons gerados com sucesso!');
+    console.log('Nota: Renomeie favicon.png para favicon.ico ou use favicon.png no HTML');
   } catch (error) {
     console.error('✗ Erro ao gerar favicon:', error.message);
   }

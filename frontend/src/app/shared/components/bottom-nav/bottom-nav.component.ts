@@ -11,7 +11,8 @@ import { PwaService } from "../../../core/services/pwa.service";
   imports: [CommonModule, RouterLink],
   template: `
     <!-- Install PWA button - floating bottom right (mobile only) -->
-    @if (shouldShowNav() && !authService.isOng() && !authService.isAdmin() && !pwaService.isInstalled()) {
+    @if (shouldShowNav() && !authService.isOng() && !authService.isAdmin() &&
+    !pwaService.isInstalled()) {
     <button
       (click)="onInstallClick()"
       class="install-float-button"
@@ -43,7 +44,11 @@ import { PwaService } from "../../../core/services/pwa.service";
       </a>
       } @else {
       <!-- Show ONGs button when NOT on ONGs page -->
-      <a routerLink="/ongs" class="nav-item nav-item-center" [class.active]="isActive('/ongs')">
+      <a
+        routerLink="/ongs"
+        class="nav-item nav-item-center"
+        [class.active]="isActive('/ongs')"
+      >
         <div class="paw-button">
           <svg class="paw-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
@@ -97,15 +102,9 @@ import { PwaService } from "../../../core/services/pwa.service";
       <div class="top-nav-container">
         <div class="nav-brand">
           <div class="brand-logo">
-            <svg class="brand-paw" viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="8" cy="6" r="2" />
-              <circle cx="16" cy="6" r="2" />
-              <circle cx="6" cy="12" r="2" />
-              <circle cx="18" cy="12" r="2" />
-              <ellipse cx="12" cy="16" rx="4" ry="3" />
-            </svg>
+            <img src="assets/icon.PNG" alt="Aubrigo" class="brand-icon" />
           </div>
-          <span class="brand-name">Pet SOS</span>
+          <span class="brand-name">Aubrigo</span>
         </div>
 
         <div class="nav-links">
@@ -186,9 +185,7 @@ import { PwaService } from "../../../core/services/pwa.service";
             [class.active]="isActive('/donate')"
           >
             <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-              />
+              <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
             </svg>
             <span>Doar</span>
           </a>
@@ -216,7 +213,9 @@ import { PwaService } from "../../../core/services/pwa.service";
           }
           <button class="nav-profile" (click)="goToProfile()">
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+              />
             </svg>
           </button>
           <button (click)="onLogout()" class="nav-logout">Sair</button>
@@ -339,7 +338,7 @@ import { PwaService } from "../../../core/services/pwa.service";
         right: 20px;
         width: 56px;
         height: 56px;
-        background: linear-gradient(135deg, #5CB5B0 0%, #4A9D98 100%);
+        background: linear-gradient(135deg, #5cb5b0 0%, #4a9d98 100%);
         border-radius: 50%;
         border: none;
         display: flex;
@@ -407,20 +406,22 @@ import { PwaService } from "../../../core/services/pwa.service";
         }
 
         .brand-logo {
-          width: 48px;
-          height: 48px;
-          background: var(--color-primary);
+          width: 64px;
+          height: 64px;
+          background: #ffffff;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           box-shadow: 0px 2px 8px rgba(76, 168, 160, 0.3);
+          padding: 4px;
         }
 
-        .brand-paw {
-          width: 28px;
-          height: 28px;
-          color: #ffffff;
+        .brand-icon {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
         }
 
         .brand-name {

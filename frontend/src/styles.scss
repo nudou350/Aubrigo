@@ -1,31 +1,33 @@
-/* Pet SOS Global Styles - Following THEME-GUIDELINE.md */
+/* Aubrigo Global Styles - Following THEME-GUIDELINE.md */
 
 /* CSS Custom Properties (Design Tokens) */
-:root, .light-theme {
+:root,
+.light-theme {
   /* Primary Colors */
-  --color-primary: #4ca8a0!important;
-  --color-primary-light: rgba(76, 168, 160, 0.18)!important;
-  --color-primary-lighter: rgba(76, 168, 160, 0.12)!important;
-  --color-secondary: #f4a3b8!important;
+  --color-primary: #4ca8a0 !important;
+  --color-primary-light: rgba(76, 168, 160, 0.18) !important;
+  --color-primary-lighter: rgba(76, 168, 160, 0.12) !important;
+  --color-secondary: #f4a3b8 !important;
 
   /* Text Colors */
-  --color-text-primary: #161616!important;
-  --color-text-secondary: #333333!important;
+  --color-text-primary: #161616 !important;
+  --color-text-secondary: #333333 !important;
 
   /* Background Colors */
-  --color-background: #ffffff!important;
-  --color-background-secondary: #f5f5f5!important;
+  --color-background: #ffffff !important;
+  --color-background-secondary: #f5f5f5 !important;
 
   /* Border and Divider */
-  --color-border: #e5e5e5!important;
+  --color-border: #e5e5e5 !important;
 
   /* Semantic Colors */
-  --color-success: #4ca8a0!important;
-  --color-warning: #fbbf24!important;
-  --color-error: #ef4444!important;
+  --color-success: #4ca8a0 !important;
+  --color-warning: #fbbf24 !important;
+  --color-error: #ef4444 !important;
 
   /* Typography */
-  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   --font-size-h1: 24px;
   --font-size-h2: 20px;
   --font-size-h3: 18px;
@@ -95,13 +97,14 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
 /* Force light mode - disable automatic dark mode from system */
 :root {
-  color-scheme: light only!important;
+  color-scheme: light only !important;
 }
 
 html {
@@ -119,7 +122,12 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: var(--font-weight-semibold);
   margin: 0;
 }
@@ -183,15 +191,31 @@ img {
   text-align: center;
 }
 
-.mt-sm { margin-top: var(--spacing-sm); }
-.mt-md { margin-top: var(--spacing-md); }
-.mt-lg { margin-top: var(--spacing-lg); }
-.mt-xl { margin-top: var(--spacing-xl); }
+.mt-sm {
+  margin-top: var(--spacing-sm);
+}
+.mt-md {
+  margin-top: var(--spacing-md);
+}
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+.mt-xl {
+  margin-top: var(--spacing-xl);
+}
 
-.mb-sm { margin-bottom: var(--spacing-sm); }
-.mb-md { margin-bottom: var(--spacing-md); }
-.mb-lg { margin-bottom: var(--spacing-lg); }
-.mb-xl { margin-bottom: var(--spacing-xl); }
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+.mb-xl {
+  margin-bottom: var(--spacing-xl);
+}
 
 /* Primary Button */
 .btn-primary {
@@ -310,8 +334,12 @@ img {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Screen Layout */

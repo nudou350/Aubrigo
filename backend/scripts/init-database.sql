@@ -1,4 +1,4 @@
--- Pet SOS Database Initialization Script
+-- Aubrigo Database Initialization Script
 -- Run this after creating the database
 
 -- Create database (run as postgres superuser)

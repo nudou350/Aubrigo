@@ -2,9 +2,10 @@
 
 ## Overview
 
-This guide will help you populate your Pet SOS database with realistic test data including:
+This guide will help you populate your Aubrigo database with realistic test data including:
+
 - 3 Portuguese animal shelter (ONG) accounts
-- 8 dogs with Portuguese names and descriptions  
+- 8 dogs with Portuguese names and descriptions
 - 9 cats with Portuguese names and descriptions
 - 17 total pets with images
 
@@ -13,18 +14,21 @@ This guide will help you populate your Pet SOS database with realistic test data
 Before running the seed script, ensure:
 
 1. **PostgreSQL is running**
+
    ```bash
    # Check if PostgreSQL is running
    psql --version
    ```
 
 2. **Database exists**
+
    ```bash
    # The database should be created (petsos_dev)
    # Check your .env file for DATABASE_URL
    ```
 
 3. **Dependencies are installed**
+
    ```bash
    npm install
    ```
@@ -109,22 +113,24 @@ Test Accounts:
 
 After seeding, you can log in with these test accounts:
 
-| ONG Name | Email | Password | Location |
-|----------|-------|----------|----------|
-| Cantinho dos Animais | cantinho@animais.pt | Password123! | Lisboa |
-| Patinhas Amigas | patinhas@amigas.pt | Password123! | Porto |
-| Lar do Peludo | lar@peludo.pt | Password123! | Coimbra |
+| ONG Name             | Email               | Password     | Location |
+| -------------------- | ------------------- | ------------ | -------- |
+| Cantinho dos Animais | cantinho@animais.pt | Password123! | Lisboa   |
+| Patinhas Amigas      | patinhas@amigas.pt  | Password123! | Porto    |
+| Lar do Peludo        | lar@peludo.pt       | Password123! | Coimbra  |
 
 ## Verifying the Seed
 
 ### Option 1: Via API (Backend must be running)
 
 Start the backend:
+
 ```bash
 npm run start:dev
 ```
 
 Then test the endpoints:
+
 ```bash
 # Get all pets
 curl http://localhost:3000/api/pets
@@ -166,30 +172,30 @@ SELECT name, species, breed, location FROM pets;
 
 ### Dogs (8)
 
-| Name | Breed | Age | Size | Location |
-|------|-------|-----|------|----------|
-| Plutão | Border Collie | 3 | Large | Lisboa |
-| Nina | Rafeiro do Alentejo | 2 | Medium | Lisboa |
-| Max | Labrador | 5 | Large | Porto |
-| Bolinha | Yorkshire Terrier | 4 | Small | Porto |
-| Thor | Pastor Alemão | 6 | Large | Coimbra |
-| Luna | Husky Siberiano | 3 | Large | Coimbra |
-| Bobi | Sem Raça Definida | 7 | Medium | Lisboa |
-| Mel | Golden Retriever | 1 | Large | Porto |
+| Name    | Breed               | Age | Size   | Location |
+| ------- | ------------------- | --- | ------ | -------- |
+| Plutão  | Border Collie       | 3   | Large  | Lisboa   |
+| Nina    | Rafeiro do Alentejo | 2   | Medium | Lisboa   |
+| Max     | Labrador            | 5   | Large  | Porto    |
+| Bolinha | Yorkshire Terrier   | 4   | Small  | Porto    |
+| Thor    | Pastor Alemão       | 6   | Large  | Coimbra  |
+| Luna    | Husky Siberiano     | 3   | Large  | Coimbra  |
+| Bobi    | Sem Raça Definida   | 7   | Medium | Lisboa   |
+| Mel     | Golden Retriever    | 1   | Large  | Porto    |
 
 ### Cats (9)
 
-| Name | Breed | Age | Size | Location |
-|------|-------|-----|------|----------|
-| Mia | Persa | 2 | Medium | Lisboa |
-| Simba | Maine Coon | 4 | Large | Lisboa |
-| Lua | Siamês | 3 | Small | Porto |
-| Felix | Sem Raça Definida | 5 | Medium | Porto |
-| Princesa | Angorá Turco | 1 | Small | Coimbra |
-| Tigre | Sem Raça Definida | 6 | Medium | Coimbra |
-| Nala | Ragdoll | 2 | Medium | Lisboa |
-| Whiskers | British Shorthair | 4 | Medium | Porto |
-| Pantufa | Sem Raça Definida | 8 | Small | Coimbra |
+| Name     | Breed             | Age | Size   | Location |
+| -------- | ----------------- | --- | ------ | -------- |
+| Mia      | Persa             | 2   | Medium | Lisboa   |
+| Simba    | Maine Coon        | 4   | Large  | Lisboa   |
+| Lua      | Siamês            | 3   | Small  | Porto    |
+| Felix    | Sem Raça Definida | 5   | Medium | Porto    |
+| Princesa | Angorá Turco      | 1   | Small  | Coimbra  |
+| Tigre    | Sem Raça Definida | 6   | Medium | Coimbra  |
+| Nala     | Ragdoll           | 2   | Medium | Lisboa   |
+| Whiskers | British Shorthair | 4   | Medium | Porto    |
+| Pantufa  | Sem Raça Definida | 8   | Small  | Coimbra  |
 
 ## Troubleshooting
 
@@ -198,6 +204,7 @@ SELECT name, species, breed, location FROM pets;
 **Problem**: `ECONNREFUSED` or `Connection refused`
 
 **Solution**:
+
 1. Check if PostgreSQL is running
 2. Verify DATABASE_URL in .env
 3. Ensure database exists: `createdb petsos_dev`
@@ -207,6 +214,7 @@ SELECT name, species, breed, location FROM pets;
 **Problem**: Tables haven't been created
 
 **Solution**:
+
 1. Make sure `synchronize: true` in development (check app.module.ts)
 2. Or run migrations if you have them
 3. Restart the NestJS app to auto-create tables
@@ -216,6 +224,7 @@ SELECT name, species, breed, location FROM pets;
 **Problem**: Data already exists in database
 
 **Solution**:
+
 1. The seed script automatically deletes existing data
 2. If it fails, manually clear tables:
    ```sql
@@ -229,6 +238,7 @@ SELECT name, species, breed, location FROM pets;
 **Problem**: Dependencies not installed
 
 **Solution**:
+
 ```bash
 npm install
 ```
@@ -238,6 +248,7 @@ npm install
 **Problem**: bcrypt not properly installed (common on Windows)
 
 **Solution**:
+
 ```bash
 npm uninstall bcrypt
 npm install bcrypt --save
@@ -246,6 +257,7 @@ npm install bcrypt --save
 ## Re-running the Seed
 
 You can run the seed script multiple times. Each time it will:
+
 1. Delete all existing data (users, pets, pet_images)
 2. Re-create the test data fresh
 
@@ -256,11 +268,13 @@ You can run the seed script multiple times. Each time it will:
 After successfully seeding the database:
 
 1. **Start the backend** (if not already running):
+
    ```bash
    npm run start:dev
    ```
 
 2. **Start the frontend**:
+
    ```bash
    cd ../frontend
    npm start
@@ -282,6 +296,7 @@ After successfully seeding the database:
 **IMPORTANT**: Never run this seed script in production!
 
 The script deletes all data before inserting test data. For production:
+
 - Use migrations for schema changes
 - Use proper data import scripts
 - Never delete existing user data
@@ -290,6 +305,7 @@ The script deletes all data before inserting test data. For production:
 ## Need Help?
 
 For more details, see:
+
 - `src/database/seeds/README.md` - Detailed seed documentation
 - Entity files in `src/*/entities/` - Database schema
 - CLAUDE.md - Complete project specifications

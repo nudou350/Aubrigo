@@ -1,8 +1,8 @@
-# Pet SOS - Animal Adoption Platform
+# Aubrigo - Animal Adoption Platform
 
 ## Project Overview
 
-Pet SOS is a **Progressive Web App (PWA)** designed to connect animal NGOs (ONGs) with potential pet adopters in Portugal. Built with modern web technologies, it delivers a native app-like experience while maintaining the accessibility and reach of a web application.
+Aubrigo is a **Progressive Web App (PWA)** designed to connect animal NGOs (ONGs) with potential pet adopters in Portugal. Built with modern web technologies, it delivers a native app-like experience while maintaining the accessibility and reach of a web application.
 
 ### Core Objectives
 - Connect homeless pets with loving families
@@ -475,4 +475,4 @@ CREATE INDEX idx_appointments_pet_id ON appointments(pet_id);
 
 **Document Version:** 2.0
 **Last Updated:** January 5, 2025
-**Maintained By:** Pet SOS Development Team
+**Maintained By:** Aubrigo Development Team

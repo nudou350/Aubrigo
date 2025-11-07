@@ -1,7 +1,7 @@
 {
   "name": "rescue-me",
   "version": "1.0.0",
-  "description": "Pet SOS - Animal Adoption Platform",
+  "description": "Aubrigo - Animal Adoption Platform",
   "scripts": {
     "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "start:backend": "cd backend && npm run start:dev",
@@ -13,6 +13,6 @@
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
-  "author": "Pet SOS Team",
+  "author": "Aubrigo Team",
   "license": "MIT"
 }

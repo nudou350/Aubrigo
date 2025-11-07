@@ -1,4 +1,4 @@
-# Pet SOS - Animal Adoption Platform
+# Aubrigo - Animal Adoption Platform
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Angular](https://img.shields.io/badge/Angular-DD0031?style=flat&logo=angular&logoColor=white)](https://angular.io/)
@@ -10,12 +10,14 @@ A Progressive Web App (PWA) connecting animal NGOs with potential pet adopters i
 ## ✨ Features Implemented (90% Complete)
 
 ### Phase 1 ✅ Complete
+
 - File Upload Service (local storage with validation)
 - Complete Appointments API
 - ONG Profile Management
 - Frontend Appointment Scheduling
 
 ### Phase 2 ✅ Complete
+
 - Favorites/Wishlist API
 - Email Service (NodeMailer with templates)
 - Password Reset Flow (forgot/reset)
@@ -24,17 +26,21 @@ A Progressive Web App (PWA) connecting animal NGOs with potential pet adopters i
 ## 🚀 Quick Start
 
 \`\`\`bash
+
 # Clone and setup
+
 git clone https://github.com/nudou350/Aubrigo.git
 cd Aubrigo
 
 # Backend
+
 cd backend
 npm install
-cp .env.example .env  # Configure environment
+cp .env.example .env # Configure environment
 npm run start:dev
 
 # Frontend (new terminal)
+
 cd frontend
 npm install
 npm start
