@@ -70,6 +70,7 @@ jobs:
         EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
         EMAIL_USER: ${{ secrets.EMAIL_USER }}
         EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
         FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
       run: |
         # Copy deployment package to VPS
@@ -105,7 +106,7 @@ jobs:
           echo "EMAIL_PORT=$EMAIL_PORT" >> current/backend/.env
           echo "EMAIL_USER=$EMAIL_USER" >> current/backend/.env
           echo "EMAIL_PASSWORD=$EMAIL_PASSWORD" >> current/backend/.env
-          echo "EMAIL_FROM=noreply@aubrigo.pt" >> current/backend/.env
+          echo "EMAIL_FROM=$EMAIL_FROM" >> current/backend/.env
           echo "FRONTEND_URL=$FRONTEND_URL" >> current/backend/.env
 
           # Create logs directory
