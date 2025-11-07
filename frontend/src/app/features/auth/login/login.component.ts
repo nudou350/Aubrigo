@@ -81,30 +81,6 @@ import { AuthService } from '../../../core/services/auth.service';
               Ainda não tem uma conta? <a routerLink="/register">Cadastre aqui</a>
             </div>
           </form>
-
-          <!-- Test Accounts Info -->
-          <div class="test-accounts">
-            <h3 class="test-accounts-title">🧪 Contas de Teste</h3>
-            <div class="test-account-section">
-              <p class="account-type">🏠 ONGs:</p>
-              <button type="button" class="test-account-btn" (click)="fillLogin('cantinho@animais.pt', 'Password123!')">
-                cantinho&#64;animais.pt
-              </button>
-              <button type="button" class="test-account-btn" (click)="fillLogin('patinhas@amigas.pt', 'Password123!')">
-                patinhas&#64;amigas.pt
-              </button>
-              <button type="button" class="test-account-btn" (click)="fillLogin('lar@peludo.pt', 'Password123!')">
-                lar&#64;peludo.pt
-              </button>
-            </div>
-            <div class="test-account-section">
-              <p class="account-type">👤 Usuário:</p>
-              <button type="button" class="test-account-btn" (click)="fillLogin('user@test.com', 'Password123!')">
-                user&#64;test.com
-              </button>
-            </div>
-            <p class="test-accounts-note">Senha para todas: <strong>Password123!</strong></p>
-          </div>
         </div>
       </div>
     </div>
@@ -319,83 +295,6 @@ import { AuthService } from '../../../core/services/auth.service';
 
     .signup-link a:hover {
       text-decoration: underline;
-    }
-
-    /* Test Accounts Section */
-    .test-accounts {
-      margin-top: 24px;
-      padding: 20px;
-      background: linear-gradient(135deg, #f0faf9 0%, #e8f5f4 100%);
-      border-radius: 12px;
-      border: 2px dashed rgba(76, 168, 160, 0.3);
-    }
-
-    .test-accounts-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #2C2C2C;
-      margin: 0 0 16px 0;
-      text-align: center;
-    }
-
-    .test-account-section {
-      margin-bottom: 12px;
-    }
-
-    .test-account-section:last-of-type {
-      margin-bottom: 16px;
-    }
-
-    .account-type {
-      font-size: 13px;
-      font-weight: 600;
-      color: #666;
-      margin: 0 0 8px 0;
-    }
-
-    .test-account-btn {
-      width: 100%;
-      background: white;
-      color: var(--color-primary);
-      border: 1px solid rgba(76, 168, 160, 0.3);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: left;
-      margin-bottom: 8px;
-      font-family: 'Courier New', monospace;
-    }
-
-    .test-account-btn:last-child {
-      margin-bottom: 0;
-    }
-
-    .test-account-btn:hover {
-      background: var(--color-primary);
-      color: white;
-      border-color: var(--color-primary);
-      transform: translateX(4px);
-    }
-
-    .test-account-btn:active {
-      transform: translateX(2px);
-    }
-
-    .test-accounts-note {
-      font-size: 12px;
-      color: #666;
-      text-align: center;
-      margin: 0;
-      padding-top: 12px;
-      border-top: 1px dashed rgba(76, 168, 160, 0.2);
-    }
-
-    .test-accounts-note strong {
-      color: var(--color-primary);
-      font-weight: 600;
     }
 
     /* Tablet adjustments (768px - 1023px) */
@@ -614,14 +513,6 @@ export class LoginComponent {
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
   });
-
-  fillLogin(email: string, password: string): void {
-    this.loginForm.patchValue({
-      email,
-      password
-    });
-    this.loginForm.markAllAsTouched();
-  }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
