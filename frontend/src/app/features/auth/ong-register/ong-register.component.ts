@@ -1,8 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+
+interface Country {
+  code: string;
+  name: string;
+  dialCode: string;
+  flag: string;
+}
 
 @Component({
   selector: 'app-ong-register',
@@ -87,12 +94,47 @@ import { AuthService } from '../../../core/services/auth.service';
             </div>
 
             <div class="form-group">
+              <label for="countryCode">Código do País</label>
+              <div class="country-selector">
+                <input
+                  id="countryCode"
+                  type="text"
+                  formControlName="countrySearch"
+                  placeholder="Pesquisar país..."
+                  (focus)="showCountryDropdown.set(true)"
+                  (input)="onCountrySearch($event)"
+                  autocomplete="off"
+                  [class.error]="registerForm.get('countryCode')?.invalid && registerForm.get('countryCode')?.touched"
+                />
+                @if (showCountryDropdown() && filteredCountries().length > 0) {
+                  <div class="country-dropdown">
+                    @for (country of filteredCountries(); track country.code) {
+                      <div class="country-item" (click)="selectCountry(country)">
+                        <span class="country-flag">{{ country.flag }}</span>
+                        <span class="country-name">{{ country.name }}</span>
+                        <span class="country-code">{{ country.dialCode }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+                <input type="hidden" formControlName="countryCode" />
+              </div>
+              <div class="selected-country">
+                @if (selectedCountry()) {
+                  <span class="selected-flag">{{ selectedCountry()!.flag }}</span>
+                  <span class="selected-code">{{ selectedCountry()!.dialCode }}</span>
+                  <span class="selected-name">{{ selectedCountry()!.name }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
               <label for="phone">Telefone</label>
               <input
                 id="phone"
                 type="tel"
                 formControlName="phone"
-                placeholder="+351 21 234 5678"
+                placeholder="21 234 5678"
                 [class.error]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched"
               />
               @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
@@ -355,6 +397,81 @@ import { AuthService } from '../../../core/services/auth.service';
       }
     }
 
+    .country-selector {
+      position: relative;
+    }
+
+    .country-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 2px solid #5CB5B0;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .country-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #B8E3E1;
+      }
+
+      .country-flag {
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      .country-name {
+        flex: 1;
+        color: #2C2C2C;
+        font-size: 14px;
+      }
+
+      .country-code {
+        color: #5CB5B0;
+        font-weight: 600;
+        font-size: 14px;
+      }
+    }
+
+    .selected-country {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #E8F5F4;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+
+      .selected-flag {
+        font-size: 20px;
+      }
+
+      .selected-code {
+        color: #5CB5B0;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .selected-name {
+        color: #666;
+        font-size: 13px;
+      }
+    }
+
     .btn-primary {
       width: 100%;
       background: #5CB5B0;
@@ -429,6 +546,42 @@ export class OngRegisterComponent {
   isLoading = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
+  showCountryDropdown = signal(false);
+  searchQuery = signal('');
+  selectedCountry = signal<Country | null>(null);
+
+  countries: Country[] = [
+    { code: 'PT', name: 'Portugal', dialCode: '+351', flag: '🇵🇹' },
+    { code: 'ES', name: 'Espanha', dialCode: '+34', flag: '🇪🇸' },
+    { code: 'FR', name: 'França', dialCode: '+33', flag: '🇫🇷' },
+    { code: 'IT', name: 'Itália', dialCode: '+39', flag: '🇮🇹' },
+    { code: 'DE', name: 'Alemanha', dialCode: '+49', flag: '🇩🇪' },
+    { code: 'GB', name: 'Reino Unido', dialCode: '+44', flag: '🇬🇧' },
+    { code: 'NL', name: 'Holanda', dialCode: '+31', flag: '🇳🇱' },
+    { code: 'BE', name: 'Bélgica', dialCode: '+32', flag: '🇧🇪' },
+    { code: 'CH', name: 'Suíça', dialCode: '+41', flag: '🇨🇭' },
+    { code: 'AT', name: 'Áustria', dialCode: '+43', flag: '🇦🇹' },
+    { code: 'BR', name: 'Brasil', dialCode: '+55', flag: '🇧🇷' },
+    { code: 'US', name: 'Estados Unidos', dialCode: '+1', flag: '🇺🇸' },
+    { code: 'CA', name: 'Canadá', dialCode: '+1', flag: '🇨🇦' },
+    { code: 'IE', name: 'Irlanda', dialCode: '+353', flag: '🇮🇪' },
+    { code: 'LU', name: 'Luxemburgo', dialCode: '+352', flag: '🇱🇺' },
+  ];
+
+  filteredCountries = computed(() => {
+    const query = this.searchQuery().toLowerCase();
+    if (!query) {
+      return this.countries.slice(0, 5); // Show first 5 by default
+    }
+
+    const filtered = this.countries.filter(country =>
+      country.name.toLowerCase().includes(query) ||
+      country.dialCode.includes(query) ||
+      country.code.toLowerCase().includes(query)
+    );
+
+    return filtered.slice(0, 5); // Limit to 5 results
+  });
 
   constructor(
     private fb: FormBuilder,
@@ -439,12 +592,28 @@ export class OngRegisterComponent {
       ongName: ['', [Validators.required, Validators.minLength(3)]],
       city: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
+      countryCode: ['', Validators.required],
+      countrySearch: [''],
       phone: ['', Validators.required],
       hasWhatsapp: [false],
       instagramHandle: [''],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
+
+    // Set Portugal as default
+    this.selectedCountry.set(this.countries[0]);
+    this.registerForm.patchValue({ countryCode: this.countries[0].dialCode });
+
+    // Close dropdown when clicking outside
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest('.country-selector')) {
+          this.showCountryDropdown.set(false);
+        }
+      });
+    }
   }
 
   passwordMatchValidator(form: FormGroup) {
@@ -458,6 +627,22 @@ export class OngRegisterComponent {
     return password.value === confirmPassword.value ? null : { mismatch: true };
   }
 
+  onCountrySearch(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery.set(input.value);
+    this.showCountryDropdown.set(true);
+  }
+
+  selectCountry(country: Country) {
+    this.selectedCountry.set(country);
+    this.registerForm.patchValue({
+      countryCode: country.dialCode,
+      countrySearch: ''
+    });
+    this.searchQuery.set('');
+    this.showCountryDropdown.set(false);
+  }
+
   onSubmit() {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
@@ -469,10 +654,16 @@ export class OngRegisterComponent {
 
     // Map city to location and send all required fields
     const formValue = this.registerForm.value;
+
+    // Combine country code with phone number
+    const fullPhone = formValue.countryCode && formValue.phone
+      ? `${formValue.countryCode} ${formValue.phone}`
+      : formValue.phone;
+
     const registerData = {
       ongName: formValue.ongName,
       email: formValue.email,
-      phone: formValue.phone,
+      phone: fullPhone,
       hasWhatsapp: formValue.hasWhatsapp,
       instagramHandle: formValue.instagramHandle || undefined,
       password: formValue.password,
