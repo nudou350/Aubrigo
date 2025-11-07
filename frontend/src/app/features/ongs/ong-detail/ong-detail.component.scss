@@ -196,18 +196,12 @@
 .pet-count {
   display: flex;
   align-items: center;
-  gap: 10px;
   padding: 12px 16px;
   background: rgba(184, 227, 225, 0.2);
   border-radius: 12px;
   font-size: 15px;
   font-weight: 500;
   color: #4ca8a0;
-}
-
-.pet-count svg {
-  width: 24px;
-  height: 24px;
 }
 
 /* Contact Section */
@@ -320,7 +314,14 @@
 }
 
 .contact-button.instagram:hover {
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  background: linear-gradient(
+    45deg,
+    #f09433 0%,
+    #e6683c 25%,
+    #dc2743 50%,
+    #cc2366 75%,
+    #bc1888 100%
+  );
   color: white;
   border-color: transparent;
 }
@@ -444,7 +445,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
   width: calc(100% - 40px);
   margin: 0 20px;
   padding: 18px;
@@ -459,11 +459,6 @@
   transition: all 0.2s ease;
 }
 
-.view-pets-button svg {
-  width: 28px;
-  height: 28px;
-}
-
 .view-pets-button:hover {
   background: #3d9690;
   transform: translateY(-2px);
@@ -474,6 +469,7 @@
 @media (min-width: 768px) {
   .ong-detail-screen {
     padding-bottom: 32px;
+    padding-top: 16px;
   }
 
   .ong-image-container {
