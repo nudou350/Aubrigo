@@ -180,9 +180,9 @@
 
 ---
 
-### 2.2 Pets (Pets Module)
+### 2.2 Pets (Pets Module) ✅ COMPLETO
 
-#### Testes Unitários - `pets.service.spec.ts`
+#### Testes Unitários - `pets.service.spec.ts` ✅
 - **Gestão de Pets:**
   - ✓ Criar pet com dados válidos
   - ✓ Atualizar informações do pet
@@ -215,7 +215,7 @@
   - ✓ Não permitir reverter de "adopted" sem permissão
   - ✓ Registrar histórico de mudanças de status
 
-#### Testes de Integração - `pets.controller.spec.ts`
+#### Testes de Integração - `pets.controller.spec.ts` ✅
 - **GET /api/pets:**
   - ✓ 200: Lista paginada de pets
   - ✓ 200: Filtros múltiplos funcionam (species + size + gender)
@@ -251,18 +251,18 @@
   - ✓ 400: Tipo de arquivo inválido
   - ✓ 413: Arquivo muito grande
 
-#### Testes E2E - `pets.e2e-spec.ts`
-- Fluxo ONG: Login → Criar pet → Upload imagens → Editar → Marcar como adotado
-- Fluxo Usuário: Buscar pets → Filtrar por critérios → Ver detalhes
-- Fluxo completo de adoção: Ver pet → Favoritar → Agendar visita → Marcar adotado
+#### Testes E2E - `pets.e2e-spec.ts` ✅
+- ✓ Fluxo ONG: Login → Criar pet → Upload imagens → Editar → Marcar como adotado
+- ✓ Fluxo Usuário: Buscar pets → Filtrar por critérios → Ver detalhes
+- ✓ Fluxo completo de adoção: Ver pet → Favoritar → Agendar visita → Marcar adotado
 
 ---
 
 ## FASE 3: FUNCIONALIDADES DE INTERAÇÃO
 
-### 3.1 Favoritos (Favorites Module)
+### 3.1 Favoritos (Favorites Module) ✅ COMPLETO
 
-#### Testes Unitários - `favorites.service.spec.ts`
+#### Testes Unitários - `favorites.service.spec.ts` ✅
 - **Gestão de Favoritos:**
   - ✓ Adicionar pet aos favoritos
   - ✓ Não permitir duplicatas (mesmo email + pet)
@@ -292,9 +292,9 @@
 
 ---
 
-### 3.2 Agendamentos (Appointments Module)
+### 3.2 Agendamentos (Appointments Module) ✅ COMPLETO
 
-#### Testes Unitários - `appointments.service.spec.ts`
+#### Testes Unitários - `appointments.service.spec.ts` ✅
 - **Criação de Agendamento:**
   - ✓ Criar agendamento com dados válidos
   - ✓ Validar horário disponível (não conflita)
@@ -348,9 +348,9 @@
 
 ## FASE 4: MONETIZAÇÃO E CONTEÚDO
 
-### 4.1 Doações (Donations Module)
+### 4.1 Doações (Donations Module) ✅ COMPLETO
 
-#### Testes Unitários - `donations.service.spec.ts`
+#### Testes Unitários - `donations.service.spec.ts` ✅
 - **Processamento de Doação:**
   - ✓ Criar doação one-time com Stripe
   - ✓ Criar doação recorrente (mensal)
@@ -409,9 +409,9 @@
 
 ---
 
-### 4.2 Artigos (Articles Module)
+### 4.2 Artigos (Articles Module) ✅ COMPLETO
 
-#### Testes Unitários - `articles.service.spec.ts`
+#### Testes Unitários - `articles.service.spec.ts` ✅
 - **Gestão de Artigos:**
   - ✓ Criar artigo (apenas admin/ONG)
   - ✓ Atualizar artigo
@@ -463,9 +463,9 @@
 
 ## FASE 5: ADMINISTRAÇÃO E ANALYTICS
 
-### 5.1 Admin (Admin Module)
+### 5.1 Admin (Admin Module) ✅ COMPLETO
 
-#### Testes Unitários - `admin.service.spec.ts`
+#### Testes Unitários - `admin.service.spec.ts` ✅
 - **Gestão de Usuários:**
   - ✓ Listar todos os usuários
   - ✓ Bloquear/desbloquear usuário
@@ -506,9 +506,9 @@
 
 ---
 
-### 5.2 Analytics (Analytics Module)
+### 5.2 Analytics (Analytics Module) ✅ COMPLETO
 
-#### Testes Unitários - `analytics.service.spec.ts`
+#### Testes Unitários - `analytics.service.spec.ts` ✅
 - **Métricas de Pets:**
   - ✓ Taxa de adoção (adopted / total)
   - ✓ Tempo médio até adoção
