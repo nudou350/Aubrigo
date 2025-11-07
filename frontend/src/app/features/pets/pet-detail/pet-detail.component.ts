@@ -179,7 +179,7 @@ interface Pet {
 
         <!-- ONG Info Section -->
         <div class="ong-section">
-          <h3 class="section-title">Patinhas Amigas</h3>
+          <h3 class="section-title">Entrar em Contato</h3>
 
           <div class="ong-actions">
             @if (pet()!.ong.phone) { @if (pet()!.ong.hasWhatsapp) {
