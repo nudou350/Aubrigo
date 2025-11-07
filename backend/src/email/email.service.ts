@@ -373,7 +373,7 @@ export class EmailService {
         `
             : ""
         }
-        <p>Se você acredita que houve um erro ou gostaria de mais informações, por favor entre em contato conosco.</p>
+        <p>Se você acredita que houve um erro ou gostaria de mais informações, por favor entre em contato conosco através do email <strong><a href="mailto:admin@aubrigo.pt">admin@aubrigo.pt</a></strong>.</p>
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
