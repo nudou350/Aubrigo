@@ -21,4 +21,13 @@ export class UpdatePetDto extends PartialType(CreatePetDto) {
   @IsOptional()
   @IsString()
   deletedImageIds?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'ID of the image to set as primary',
+    example: 'uuid-of-primary-image',
+  })
+  @IsOptional()
+  @IsString()
+  primaryImageId?: string;
 }

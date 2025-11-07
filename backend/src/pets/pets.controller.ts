@@ -115,10 +115,16 @@ export class PetsController {
       ? String(updatePetDto['deletedImageIds']).split(',').filter(id => id.trim())
       : [];
 
-    // Remove deletedImageIds from DTO as it's not a Pet entity property
-    delete updatePetDto['deletedImageIds'];
+    // Get primary image ID from body
+    const primaryImageId = updatePetDto['primaryImageId']
+      ? String(updatePetDto['primaryImageId']).trim()
+      : undefined;
 
-    return this.petsService.update(id, updatePetDto, req.user.userId, imageUrls, deletedImageIds);
+    // Remove non-entity properties from DTO
+    delete updatePetDto['deletedImageIds'];
+    delete updatePetDto['primaryImageId'];
+
+    return this.petsService.update(id, updatePetDto, req.user.userId, imageUrls, deletedImageIds, primaryImageId);
   }
 
   @Delete(':id')

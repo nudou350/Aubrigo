@@ -6,9 +6,15 @@ import { ShareButtonComponent } from "../../../shared/components/share-button/sh
 import { FavoritesService } from "../../../core/services/favorites.service";
 import { ToastService } from "../../../core/services/toast.service";
 import { PetsService } from "../../../core/services/pets.service";
-import { ArticlesService, Article } from "../../../core/services/articles.service";
+import {
+  ArticlesService,
+  Article,
+} from "../../../core/services/articles.service";
 import { normalizeImageUrl } from "../../../core/utils/image-url.util";
-import { AnalyticsService, EventType } from "../../../core/services/analytics.service";
+import {
+  AnalyticsService,
+  EventType,
+} from "../../../core/services/analytics.service";
 
 interface PetImage {
   id: string;
@@ -46,7 +52,12 @@ interface Pet {
 @Component({
   selector: "app-pet-detail",
   standalone: true,
-  imports: [CommonModule, BottomNavComponent, NgOptimizedImage, ShareButtonComponent],
+  imports: [
+    CommonModule,
+    BottomNavComponent,
+    NgOptimizedImage,
+    ShareButtonComponent,
+  ],
   template: `
     <div class="pet-detail-screen">
       @if (loading()) {
@@ -70,8 +81,19 @@ interface Pet {
           (click)="toggleFavorite()"
           title="Adicionar aos favoritos"
         >
-          <svg width="28" height="28" viewBox="0 0 24 24" [attr.fill]="isFavorited() ? 'currentColor' : 'none'" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            [attr.fill]="isFavorited() ? 'currentColor' : 'none'"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
           </svg>
         </button>
         <!-- Share Button -->
@@ -81,7 +103,8 @@ interface Pet {
           [buttonText]="''"
           [ariaLabel]="'Compartilhar ' + pet()!.name"
           (shareSuccess)="onShare($event)"
-          class="share-button-header">
+          class="share-button-header"
+        >
         </app-share-button>
       </div>
 
@@ -159,33 +182,31 @@ interface Pet {
           <h3 class="section-title">Patinhas Amigas</h3>
 
           <div class="ong-actions">
-            @if (pet()!.ong.phone) {
-              @if (pet()!.ong.hasWhatsapp) {
-                <button
-                  class="action-button whatsapp"
-                  (click)="callOng()"
-                  aria-label="Conversar no WhatsApp"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
-                    />
-                  </svg>
-                </button>
-              } @else {
-                <button
-                  class="action-button phone"
-                  (click)="callPhone()"
-                  aria-label="Ligar para ONG"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"
-                    />
-                  </svg>
-                </button>
-              }
-            }
+            @if (pet()!.ong.phone) { @if (pet()!.ong.hasWhatsapp) {
+            <button
+              class="action-button whatsapp"
+              (click)="callOng()"
+              aria-label="Conversar no WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+                />
+              </svg>
+            </button>
+            } @else {
+            <button
+              class="action-button phone"
+              (click)="callPhone()"
+              aria-label="Ligar para ONG"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"
+                />
+              </svg>
+            </button>
+            } }
             <button
               class="action-button location"
               (click)="viewLocation()"
@@ -228,7 +249,9 @@ interface Pet {
             @for (article of displayedArticles(); track article.id) {
             <div class="article-item" [class]="'priority-' + article.priority">
               <div class="article-header">
-                <span class="article-icon">{{ getArticleIcon(article.category) }}</span>
+                <span class="article-icon">{{
+                  getArticleIcon(article.category)
+                }}</span>
                 <span class="article-title-text">{{ article.title }}</span>
                 @if (article.priority === 'urgent') {
                 <span class="urgent-badge">URGENTE</span>
@@ -247,8 +270,7 @@ interface Pet {
           <button class="show-more-btn" (click)="toggleShowAllArticles()">
             Ver mais necessidades ({{ ongArticles().length - 3 }})
           </button>
-          }
-          @if (showAllArticles() && ongArticles().length > 3) {
+          } @if (showAllArticles() && ongArticles().length > 3) {
           <button class="show-more-btn" (click)="toggleShowAllArticles()">
             Ver menos
           </button>
@@ -310,7 +332,7 @@ interface Pet {
       /* Header */
       .header {
         background: #ffffff;
-        padding: 16px 20px;
+        padding: 18px 20px;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -371,8 +393,8 @@ interface Pet {
       }
 
       .favorite-button-header.favorited {
-        color: #E74C3C;
-        background: #FFF5F5;
+        color: #e74c3c;
+        background: #fff5f5;
       }
 
       .favorite-button-header:active {
@@ -418,7 +440,12 @@ interface Pet {
         width: 100%;
         height: 380px;
         overflow: hidden;
-        background: linear-gradient(135deg, #f5fafa 0%, #e8f5f4 50%, #b8e3e1 100%);
+        background: linear-gradient(
+          135deg,
+          #f5fafa 0%,
+          #e8f5f4 50%,
+          #b8e3e1 100%
+        );
       }
 
       .carousel-image {
@@ -591,11 +618,11 @@ interface Pet {
       }
 
       .action-button.whatsapp {
-        background: #25D366;
+        background: #25d366;
       }
 
       .action-button.phone {
-        background: #5CB5B0;
+        background: #5cb5b0;
       }
 
       .action-button.location {
@@ -603,7 +630,14 @@ interface Pet {
       }
 
       .action-button.instagram {
-        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        background: linear-gradient(
+          45deg,
+          #f09433 0%,
+          #e6683c 25%,
+          #dc2743 50%,
+          #cc2366 75%,
+          #bc1888 100%
+        );
       }
 
       .action-button:hover {
@@ -683,20 +717,20 @@ interface Pet {
       }
 
       .article-item.priority-low {
-        border-left-color: #81C784;
+        border-left-color: #81c784;
       }
 
       .article-item.priority-medium {
-        border-left-color: #FFB74D;
+        border-left-color: #ffb74d;
       }
 
       .article-item.priority-high {
-        border-left-color: #FF8A65;
+        border-left-color: #ff8a65;
       }
 
       .article-item.priority-urgent {
-        border-left-color: #E57373;
-        background: #FFEBEE;
+        border-left-color: #e57373;
+        background: #ffebee;
       }
 
       .article-header {
@@ -720,7 +754,7 @@ interface Pet {
       }
 
       .urgent-badge {
-        background: #E57373;
+        background: #e57373;
         color: white;
         padding: 2px 8px;
         border-radius: 4px;
@@ -770,6 +804,10 @@ interface Pet {
 
       /* Responsive Design */
       @media (min-width: 768px) {
+        .pet-detail-screen {
+          padding-top: 18px;
+        }
+
         .carousel-container {
           height: 480px;
         }
@@ -830,7 +868,7 @@ export class PetDetailComponent implements OnInit {
     return {
       title: `Conheça ${currentPet.name}!`,
       text: `${currentPet.name} está esperando por uma família no Aubrigo. ${currentPet.breed}, ${currentPet.age} anos. Veja mais detalhes!`,
-      url: petUrl
+      url: petUrl,
     };
   });
 
@@ -867,8 +905,8 @@ export class PetDetailComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error checking favorite status:', error);
-      }
+        console.error("Error checking favorite status:", error);
+      },
     });
   }
 
@@ -883,40 +921,44 @@ export class PetDetailComponent implements OnInit {
 
     if (this.isFavorited()) {
       // Remove from favorites
-      this.favoritesService.removeFavoriteByPetId(pet.id, this.visitorEmail).subscribe({
-        next: () => {
-          this.favoritedPetId.set(null);
-          this.toastService.success('Removido dos favoritos');
+      this.favoritesService
+        .removeFavoriteByPetId(pet.id, this.visitorEmail)
+        .subscribe({
+          next: () => {
+            this.favoritedPetId.set(null);
+            this.toastService.success("Removido dos favoritos");
 
-          // Track unfavorite
-          this.analyticsService.track(EventType.PET_UNFAVORITE, {
-            petId: pet.id,
-            ongId: pet.ong?.id
-          });
-        },
-        error: (error) => {
-          console.error('Error removing favorite:', error);
-          this.toastService.error('Erro ao remover dos favoritos');
-        }
-      });
+            // Track unfavorite
+            this.analyticsService.track(EventType.PET_UNFAVORITE, {
+              petId: pet.id,
+              ongId: pet.ong?.id,
+            });
+          },
+          error: (error) => {
+            console.error("Error removing favorite:", error);
+            this.toastService.error("Erro ao remover dos favoritos");
+          },
+        });
     } else {
       // Add to favorites
-      this.favoritesService.addToFavorites(pet.id, this.visitorEmail).subscribe({
-        next: () => {
-          this.favoritedPetId.set(pet.id);
-          this.toastService.success('Adicionado aos favoritos');
+      this.favoritesService
+        .addToFavorites(pet.id, this.visitorEmail)
+        .subscribe({
+          next: () => {
+            this.favoritedPetId.set(pet.id);
+            this.toastService.success("Adicionado aos favoritos");
 
-          // Track favorite
-          this.analyticsService.track(EventType.PET_FAVORITE, {
-            petId: pet.id,
-            ongId: pet.ong?.id
-          });
-        },
-        error: (error) => {
-          console.error('Error adding favorite:', error);
-          this.toastService.error('Erro ao adicionar aos favoritos');
-        }
-      });
+            // Track favorite
+            this.analyticsService.track(EventType.PET_FAVORITE, {
+              petId: pet.id,
+              ongId: pet.ong?.id,
+            });
+          },
+          error: (error) => {
+            console.error("Error adding favorite:", error);
+            this.toastService.error("Erro ao adicionar aos favoritos");
+          },
+        });
     }
   }
 
@@ -928,11 +970,14 @@ export class PetDetailComponent implements OnInit {
 
         // Set initial image
         if (petData.images && petData.images.length > 0) {
-          const primaryImage = petData.images.find(
+          const primaryImageIndex = petData.images.findIndex(
             (img) => img.isPrimary
           );
-          const imageUrl = primaryImage?.imageUrl || petData.images[0].imageUrl;
-          this.currentImage.set(normalizeImageUrl(imageUrl));
+          const initialIndex = primaryImageIndex >= 0 ? primaryImageIndex : 0;
+          this.currentImageIndex.set(initialIndex);
+          this.currentImage.set(
+            normalizeImageUrl(petData.images[initialIndex].imageUrl)
+          );
         }
 
         // Track pet view
@@ -942,8 +987,8 @@ export class PetDetailComponent implements OnInit {
           metadata: {
             species: petData.species,
             breed: petData.breed,
-            age: petData.age
-          }
+            age: petData.age,
+          },
         });
 
         // Load ONG articles
@@ -988,7 +1033,7 @@ export class PetDetailComponent implements OnInit {
     const pet = this.pet();
     if (!pet) return;
 
-    console.log('📤 Pet shared via:', platform);
+    console.log("📤 Pet shared via:", platform);
 
     // Track share analytics
     this.analyticsService.track(EventType.PET_SHARE, {
@@ -997,22 +1042,22 @@ export class PetDetailComponent implements OnInit {
       metadata: {
         platform,
         species: pet.species,
-        breed: pet.breed
-      }
+        breed: pet.breed,
+      },
     });
 
-    this.toastService.success('Pet compartilhado!');
+    this.toastService.success("Pet compartilhado!");
   }
 
   getArticleIcon(category: string): string {
     const icons: Record<string, string> = {
-      food: '🍖',
-      medicine: '💊',
-      debt: '💰',
-      supplies: '🛠️',
-      other: '📦'
+      food: "🍖",
+      medicine: "💊",
+      debt: "💰",
+      supplies: "🛠️",
+      other: "📦",
     };
-    return icons[category] || '📦';
+    return icons[category] || "📦";
   }
 
   nextImage() {
@@ -1055,7 +1100,7 @@ export class PetDetailComponent implements OnInit {
     const pet = this.pet();
     if (pet?.ong.phone) {
       // Format phone number (remove spaces, dashes, parentheses)
-      const phoneNumber = pet.ong.phone.replace(/[\s\-\(\)]/g, '');
+      const phoneNumber = pet.ong.phone.replace(/[\s\-\(\)]/g, "");
 
       // Create WhatsApp message
       const message = `Olá! Vi o ${pet.name} no Aubrigo e gostaria de saber mais informações sobre a adoção.`;
@@ -1066,7 +1111,7 @@ export class PetDetailComponent implements OnInit {
       const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
       // Open WhatsApp in a new window/tab
-      const whatsappWindow = window.open(whatsappUrl, '_blank');
+      const whatsappWindow = window.open(whatsappUrl, "_blank");
 
       // Fallback to phone call if user blocks popup or WhatsApp is not available
       // This timeout gives time for WhatsApp to open
@@ -1102,7 +1147,7 @@ export class PetDetailComponent implements OnInit {
     const pet = this.pet();
     if (pet?.ong.instagramHandle) {
       // Remove @ if present and open Instagram profile
-      const handle = pet.ong.instagramHandle.replace('@', '');
+      const handle = pet.ong.instagramHandle.replace("@", "");
       window.open(`https://www.instagram.com/${handle}`, "_blank");
     }
   }
@@ -1110,7 +1155,7 @@ export class PetDetailComponent implements OnInit {
   scheduleVisit() {
     const pet = this.pet();
     if (pet) {
-      this.router.navigate(['/pets', pet.id, 'schedule']);
+      this.router.navigate(["/pets", pet.id, "schedule"]);
     }
   }
 
@@ -1124,7 +1169,7 @@ export class PetDetailComponent implements OnInit {
   }
 
   formatAmount(amount: any): string {
-    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    return numAmount ? numAmount.toFixed(2) : '0.00';
+    const numAmount = typeof amount === "string" ? parseFloat(amount) : amount;
+    return numAmount ? numAmount.toFixed(2) : "0.00";
   }
 }

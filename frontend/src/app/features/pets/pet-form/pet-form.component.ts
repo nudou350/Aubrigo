@@ -959,6 +959,14 @@ export class PetFormComponent implements OnInit {
       formData.append('deletedImageIds', this.deletedImageIds().join(','));
     }
 
+    // Add primary image ID (for edit mode)
+    if (this.isEditMode()) {
+      const primaryImage = this.images().find(img => img.isPrimary);
+      if (primaryImage && primaryImage.id) {
+        formData.append('primaryImageId', primaryImage.id);
+      }
+    }
+
     // Add new images (reorganize so primary is first for create mode)
     const newImages = this.images().filter(img => img.file);
 

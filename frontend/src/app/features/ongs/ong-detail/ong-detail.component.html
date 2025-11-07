@@ -70,13 +70,6 @@
       }
 
       <div class="pet-count">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="8" cy="6" r="2" />
-          <circle cx="16" cy="6" r="2" />
-          <circle cx="6" cy="12" r="2" />
-          <circle cx="18" cy="12" r="2" />
-          <ellipse cx="12" cy="16" rx="4" ry="3" />
-        </svg>
         <span>{{ ong()!.petCount }} pets disponíveis para adoção</span>
       </div>
     </div>
@@ -181,13 +174,6 @@
   <!-- View Pets Button -->
   @if (ong()!.petCount > 0) {
   <button class="view-pets-button" (click)="viewPets()">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <circle cx="8" cy="6" r="2" />
-      <circle cx="16" cy="6" r="2" />
-      <circle cx="6" cy="12" r="2" />
-      <circle cx="18" cy="12" r="2" />
-      <ellipse cx="12" cy="16" rx="4" ry="3" />
-    </svg>
     Ver Pets para Adoção ({{ ong()!.petCount }})
   </button>
   } }

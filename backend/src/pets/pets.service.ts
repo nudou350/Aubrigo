@@ -166,7 +166,7 @@ export class PetsService {
     return this.findOne(savedPet.id);
   }
 
-  async update(id: string, updatePetDto: UpdatePetDto, userId: string, imageUrls: string[] = [], deletedImageIds: string[] = []) {
+  async update(id: string, updatePetDto: UpdatePetDto, userId: string, imageUrls: string[] = [], deletedImageIds: string[] = [], primaryImageId?: string) {
     const pet = await this.findOne(id);
 
     // Check ownership
@@ -222,6 +222,21 @@ export class PetsService {
       );
 
       await this.petImageRepository.save(images);
+    }
+
+    // Update primary image if specified
+    if (primaryImageId) {
+      // First, set all images to not primary
+      await this.petImageRepository.update(
+        { petId: id },
+        { isPrimary: false }
+      );
+
+      // Then, set the selected image as primary
+      await this.petImageRepository.update(
+        { id: primaryImageId, petId: id },
+        { isPrimary: true }
+      );
     }
 
     return this.findOne(id);
