@@ -248,7 +248,7 @@ describe('OngsController (Integration)', () => {
         .expect(200);
 
       expect(response.body).toHaveProperty('totalPets');
-      expect(mockOngsService.getOngStats).toHaveBeenCalledWith(mockOng.id, undefined);
+      expect(mockOngsService.getOngStats).toHaveBeenCalledWith(mockOng.id, mockOng.id);
     });
 
     it('should return 403 when user lacks permission', async () => {

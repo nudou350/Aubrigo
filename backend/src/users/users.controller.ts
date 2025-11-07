@@ -38,14 +38,7 @@ export class UsersController {
     return this.usersService.findAll({ search, location });
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get ONG details by ID' })
-  @ApiResponse({ status: 200, description: 'ONG details retrieved' })
-  @ApiResponse({ status: 404, description: 'ONG not found' })
-  async getOngById(@Param('id') id: string) {
-    return this.usersService.findOngById(id);
-  }
-
+  // Profile routes must come before :id route to avoid matching "profile" as an id
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -109,5 +102,13 @@ export class UsersController {
     @Body() changePasswordDto: ChangeUserPasswordDto,
   ) {
     return this.usersService.changePassword(user.id, changePasswordDto);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get ONG details by ID' })
+  @ApiResponse({ status: 200, description: 'ONG details retrieved' })
+  @ApiResponse({ status: 404, description: 'ONG not found' })
+  async getOngById(@Param('id') id: string) {
+    return this.usersService.findOngById(id);
   }
 }

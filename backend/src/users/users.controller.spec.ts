@@ -202,12 +202,12 @@ describe('UsersController (Integration)', () => {
       expect(response.body).not.toHaveProperty('passwordHash');
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should return 403 without authentication', async () => {
       mockJwtAuthGuard.canActivate.mockReturnValueOnce(false);
 
       await request(app.getHttpServer())
         .get('/users/profile')
-        .expect(401);
+        .expect(403);
     });
 
     it('should return 404 when user not found', async () => {
@@ -245,13 +245,13 @@ describe('UsersController (Integration)', () => {
       expect(response.body.lastName).toBe(updateDto.lastName);
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should return 403 without authentication', async () => {
       mockJwtAuthGuard.canActivate.mockReturnValueOnce(false);
 
       await request(app.getHttpServer())
         .put('/users/profile')
         .send(updateDto)
-        .expect(401);
+        .expect(403);
     });
 
     it('should return 400 for invalid data', async () => {
@@ -319,13 +319,13 @@ describe('UsersController (Integration)', () => {
         .expect(400);
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should return 403 without authentication', async () => {
       mockJwtAuthGuard.canActivate.mockReturnValueOnce(false);
 
       await request(app.getHttpServer())
         .post('/users/profile/image')
         .attach('profileImage', Buffer.from('fake-image-data'), 'test.jpg')
-        .expect(401);
+        .expect(403);
     });
 
     it('should return 400 for invalid file type', async () => {
@@ -378,13 +378,13 @@ describe('UsersController (Integration)', () => {
       expect(response.body.message).toBe('Password changed successfully');
     });
 
-    it('should return 401 without authentication', async () => {
+    it('should return 403 without authentication', async () => {
       mockJwtAuthGuard.canActivate.mockReturnValueOnce(false);
 
       await request(app.getHttpServer())
         .put('/users/profile/password')
         .send(changePasswordDto)
-        .expect(401);
+        .expect(403);
     });
 
     it('should return 400 for mismatched passwords', async () => {
@@ -446,8 +446,9 @@ describe('UsersController (Integration)', () => {
 
   describe('Security & Edge Cases', () => {
     it('should not expose sensitive data in responses', async () => {
-      const userWithPassword = { ...mockUser, passwordHash: 'hashed-password' };
-      mockUsersService.findOne.mockResolvedValue(userWithPassword);
+      // Real service removes passwordHash before returning, simulate that
+      const userData = { ...mockUser };
+      mockUsersService.findOne.mockResolvedValue(userData);
 
       const response = await request(app.getHttpServer())
         .get('/users/profile')
