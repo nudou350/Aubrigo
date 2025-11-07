@@ -7,11 +7,12 @@ import { UsersService } from '../../core/services/users.service';
 import { OngService } from '../../core/services/ong.service';
 import { ToastService } from '../../core/services/toast.service';
 import { FavoritesService } from '../../core/services/favorites.service';
+import { CountrySelectorComponent } from '../../shared/components/country-selector/country-selector.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, CountrySelectorComponent],
   template: `
     <div class="profile-container">
       <header class="profile-header">
@@ -187,6 +188,13 @@ import { FavoritesService } from '../../core/services/favorites.service';
               </button>
             </div>
           }
+
+          <!-- Country Selector Section -->
+          <div class="country-section">
+            <h3>País / Country</h3>
+            <p class="section-description">Selecione o país para visualizar animais e ONGs disponíveis.</p>
+            <app-country-selector></app-country-selector>
+          </div>
 
           <!-- Change Password Section -->
           <div class="password-section">
@@ -449,6 +457,7 @@ import { FavoritesService } from '../../core/services/favorites.service';
     }
 
     .favorites-section,
+    .country-section,
     .password-section {
       background: white;
       border-radius: 12px;
@@ -458,11 +467,18 @@ import { FavoritesService } from '../../core/services/favorites.service';
     }
 
     .favorites-section h3,
+    .country-section h3,
     .password-section h3 {
       margin: 0 0 16px 0;
       font-size: 18px;
       font-weight: 600;
       color: #2C2C2C;
+    }
+
+    .section-description {
+      font-size: 14px;
+      color: #666666;
+      margin: 0 0 16px 0;
     }
 
     .password-form {

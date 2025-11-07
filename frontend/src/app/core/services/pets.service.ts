@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { CountryService } from './country.service';
 
 export interface Pet {
   id: string;
@@ -52,6 +53,7 @@ export interface SearchPetsParams {
   sortBy?: string;
   page?: number;
   limit?: number;
+  countryCode?: string;
 }
 
 export interface PetsResponse {
@@ -69,13 +71,20 @@ export interface PetsResponse {
 })
 export class PetsService {
   private http = inject(HttpClient);
+  private countryService = inject(CountryService);
   private apiUrl = `${environment.apiUrl}/pets`;
 
   searchPets(params: SearchPetsParams): Observable<PetsResponse> {
     let httpParams = new HttpParams();
 
-    Object.keys(params).forEach((key) => {
-      const value = params[key as keyof SearchPetsParams];
+    // Automatically add current country code if not provided
+    const searchParams = {
+      ...params,
+      countryCode: params.countryCode || this.countryService.getCountry()
+    };
+
+    Object.keys(searchParams).forEach((key) => {
+      const value = searchParams[key as keyof SearchPetsParams];
       if (value !== undefined && value !== null) {
         httpParams = httpParams.set(key, value.toString());
       }
@@ -100,7 +109,9 @@ export class PetsService {
     return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`);
   }
 
-  getCitiesWithPets(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/cities`);
+  getCitiesWithPets(countryCode?: string): Observable<string[]> {
+    const country = countryCode || this.countryService.getCountry();
+    const params = new HttpParams().set('countryCode', country);
+    return this.http.get<string[]>(`${this.apiUrl}/cities`, { params });
   }
 }

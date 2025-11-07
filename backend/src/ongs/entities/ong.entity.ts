@@ -60,6 +60,9 @@ export class Ong {
   @Column({ name: 'rejection_reason', type: 'text', nullable: true })
   rejectionReason: string;
 
+  @Column({ name: 'country_code', length: 2, default: 'PT' })
+  countryCode: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

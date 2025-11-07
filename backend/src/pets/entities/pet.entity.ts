@@ -58,6 +58,9 @@ export class Pet {
   @Column({ default: 'available' })
   status: string; // available, pending, adopted
 
+  @Column({ name: 'country_code', length: 2, default: 'PT' })
+  countryCode: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

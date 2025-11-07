@@ -86,6 +86,9 @@ export class User {
   @Column({ name: 'allow_appointments', default: true })
   allowAppointments: boolean;
 
+  @Column({ name: 'country_code', length: 2, default: 'PT' })
+  countryCode: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
