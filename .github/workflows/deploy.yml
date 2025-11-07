@@ -113,6 +113,10 @@ jobs:
           cd /var/www/aubrigo/current/backend
           mkdir -p logs
 
+          # Run database migrations
+          echo "Running database migrations..."
+          npm run migration:run:prod || echo "Warning: Migration failed or no pending migrations"
+
           # Restart backend with PM2
           pm2 delete aubrigo-backend || true
           pm2 start ecosystem.config.js
