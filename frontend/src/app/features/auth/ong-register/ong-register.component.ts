@@ -452,6 +452,7 @@ interface Country {
       flex: 1;
       padding: 12px 16px;
       border: 2px solid transparent;
+      border-left: none;
       background: #B8E3E1;
       border-radius: 0 8px 8px 0;
       font-size: 16px;
