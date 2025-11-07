@@ -62,7 +62,7 @@ describe('AnalyticsService', () => {
           category: 'engagement',
           petId: 'pet-1',
           sessionId: 'session-1',
-          timestamp: new Date().toISOString(),
+          timestamp: Date.now(),
         },
         '192.168.1.1',
         'Mozilla/5.0',

@@ -42,28 +42,25 @@ describe('DonationsService', () => {
 
   describe('createDonation', () => {
     it('should create MB Way donation successfully', async () => {
-      mockDonationRepository.create.mockReturnValue({
+      const createdDonation = {
         id: 'don-1',
         amount: 50,
         paymentStatus: 'pending',
-      });
-      mockDonationRepository.save.mockResolvedValueOnce({
-        id: 'don-1',
-        amount: 50,
-        paymentStatus: 'pending',
+        paymentMethod: 'mbway',
         ongId: 'ong-1',
-      });
+      };
+
+      mockDonationRepository.create.mockReturnValue(createdDonation);
+      mockDonationRepository.save
+        .mockResolvedValueOnce(createdDonation)
+        .mockResolvedValueOnce({ ...createdDonation, stripePaymentId: 'txn-123' });
+
       mockMBWayService.createPaymentRequest.mockResolvedValue({
         transactionId: 'txn-123',
         reference: 'ref-123',
         qrCodeDataUrl: 'data:image/png;base64,...',
         phoneNumber: '+351912345678',
         expiresAt: new Date(),
-      });
-      mockDonationRepository.save.mockResolvedValueOnce({
-        id: 'don-1',
-        amount: 50,
-        stripePaymentId: 'txn-123',
       });
 
       const result = await service.createDonation({

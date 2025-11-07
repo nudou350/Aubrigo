@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ArticlesService } from './articles.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Article, ArticleStatus } from './entities/article.entity';
+import { Article, ArticleStatus, ArticleCategory, ArticlePriority } from './entities/article.entity';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 
 describe('ArticlesService', () => {
@@ -48,9 +48,9 @@ describe('ArticlesService', () => {
 
       const result = await service.create('ong-1', {
         title: 'Test Article',
-        content: 'Content',
-        category: 'news',
-        priority: 1,
+        description: 'Content',
+        category: ArticleCategory.OTHER,
+        priority: ArticlePriority.MEDIUM,
       });
 
       expect(result).toBeDefined();
