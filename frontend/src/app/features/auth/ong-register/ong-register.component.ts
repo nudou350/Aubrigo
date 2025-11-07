@@ -94,49 +94,52 @@ interface Country {
             </div>
 
             <div class="form-group">
-              <label for="countryCode">Código do País</label>
-              <div class="country-selector">
+              <label for="phone">Telefone</label>
+              <div class="phone-input-wrapper">
+                <button
+                  type="button"
+                  class="flag-selector"
+                  (click)="toggleCountryDropdown()"
+                  [class.error]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched"
+                >
+                  <span class="flag">{{ selectedCountry()?.flag || '🌐' }}</span>
+                  <svg viewBox="0 0 24 24" fill="currentColor" class="dropdown-icon">
+                    <path d="M7 10l5 5 5-5z"/>
+                  </svg>
+                </button>
                 <input
-                  id="countryCode"
-                  type="text"
-                  formControlName="countrySearch"
-                  placeholder="Pesquisar país..."
-                  (focus)="showCountryDropdown.set(true)"
-                  (input)="onCountrySearch($event)"
-                  autocomplete="off"
-                  [class.error]="registerForm.get('countryCode')?.invalid && registerForm.get('countryCode')?.touched"
+                  id="phone"
+                  type="tel"
+                  formControlName="phone"
+                  placeholder="21 234 5678"
+                  class="phone-input"
+                  [class.error]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched"
                 />
-                @if (showCountryDropdown() && filteredCountries().length > 0) {
+                @if (showCountryDropdown()) {
+                  <div class="country-dropdown-overlay" (click)="closeCountryDropdown()"></div>
                   <div class="country-dropdown">
-                    @for (country of filteredCountries(); track country.code) {
-                      <div class="country-item" (click)="selectCountry(country)">
-                        <span class="country-flag">{{ country.flag }}</span>
-                        <span class="country-name">{{ country.name }}</span>
-                        <span class="country-code">{{ country.dialCode }}</span>
-                      </div>
-                    }
+                    <input
+                      type="text"
+                      formControlName="countrySearch"
+                      placeholder="Pesquisar país..."
+                      class="country-search"
+                      (input)="onCountrySearch($event)"
+                      autocomplete="off"
+                      #searchInput
+                    />
+                    <div class="country-list">
+                      @for (country of filteredCountries(); track country.code) {
+                        <div class="country-item" (click)="selectCountry(country)">
+                          <span class="country-flag">{{ country.flag }}</span>
+                          <span class="country-name">{{ country.name }}</span>
+                          <span class="country-code">{{ country.dialCode }}</span>
+                        </div>
+                      }
+                    </div>
                   </div>
                 }
                 <input type="hidden" formControlName="countryCode" />
               </div>
-              <div class="selected-country">
-                @if (selectedCountry()) {
-                  <span class="selected-flag">{{ selectedCountry()!.flag }}</span>
-                  <span class="selected-code">{{ selectedCountry()!.dialCode }}</span>
-                  <span class="selected-name">{{ selectedCountry()!.name }}</span>
-                }
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="phone">Telefone</label>
-              <input
-                id="phone"
-                type="tel"
-                formControlName="phone"
-                placeholder="21 234 5678"
-                [class.error]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched"
-              />
               @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
                 <span class="error-text">Telefone é obrigatório</span>
               }
@@ -397,30 +400,131 @@ interface Country {
       }
     }
 
-    .country-selector {
+    .phone-input-wrapper {
       position: relative;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .flag-selector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 0 12px;
+      background: #B8E3E1;
+      border: 2px solid transparent;
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 70px;
+
+      &:hover {
+        background: #A0D8D5;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: #5CB5B0;
+        background: white;
+      }
+
+      &.error {
+        border-color: #E74C3C;
+        background: #FEE;
+      }
+
+      .flag {
+        font-size: 24px;
+        line-height: 1;
+      }
+
+      .dropdown-icon {
+        width: 16px;
+        height: 16px;
+        color: #666;
+      }
+    }
+
+    .phone-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid transparent;
+      background: #B8E3E1;
+      border-radius: 0 8px 8px 0;
+      font-size: 16px;
+      transition: all 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #5CB5B0;
+        background: white;
+      }
+
+      &.error {
+        border-color: #E74C3C;
+        background: #FEE;
+      }
+
+      &::placeholder {
+        color: #999;
+      }
+    }
+
+    .country-dropdown-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: transparent;
+      z-index: 999;
     }
 
     .country-dropdown {
       position: absolute;
-      top: 100%;
+      top: calc(100% + 4px);
       left: 0;
       right: 0;
       background: white;
       border: 2px solid #5CB5B0;
-      border-top: none;
-      border-radius: 0 0 8px 8px;
+      border-radius: 8px;
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .country-search {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-bottom: 2px solid #E0E0E0;
+      font-size: 15px;
+      background: #F5F5F5;
+
+      &:focus {
+        outline: none;
+        background: white;
+        border-bottom-color: #5CB5B0;
+      }
+
+      &::placeholder {
+        color: #999;
+      }
+    }
+
+    .country-list {
       max-height: 200px;
       overflow-y: auto;
-      z-index: 1000;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .country-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
+      gap: 12px;
+      padding: 12px 16px;
       cursor: pointer;
       transition: background 0.2s;
 
@@ -429,46 +533,22 @@ interface Country {
       }
 
       .country-flag {
-        font-size: 20px;
+        font-size: 22px;
         line-height: 1;
+        min-width: 30px;
       }
 
       .country-name {
         flex: 1;
         color: #2C2C2C;
         font-size: 14px;
+        font-weight: 500;
       }
 
       .country-code {
         color: #5CB5B0;
         font-weight: 600;
         font-size: 14px;
-      }
-    }
-
-    .selected-country {
-      margin-top: 8px;
-      padding: 8px 12px;
-      background: #E8F5F4;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 40px;
-
-      .selected-flag {
-        font-size: 20px;
-      }
-
-      .selected-code {
-        color: #5CB5B0;
-        font-weight: 600;
-        font-size: 14px;
-      }
-
-      .selected-name {
-        color: #666;
-        font-size: 13px;
       }
     }
 
@@ -604,16 +684,6 @@ export class OngRegisterComponent {
     // Set Portugal as default
     this.selectedCountry.set(this.countries[0]);
     this.registerForm.patchValue({ countryCode: this.countries[0].dialCode });
-
-    // Close dropdown when clicking outside
-    if (typeof document !== 'undefined') {
-      document.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        if (!target.closest('.country-selector')) {
-          this.showCountryDropdown.set(false);
-        }
-      });
-    }
   }
 
   passwordMatchValidator(form: FormGroup) {
@@ -627,10 +697,24 @@ export class OngRegisterComponent {
     return password.value === confirmPassword.value ? null : { mismatch: true };
   }
 
+  toggleCountryDropdown() {
+    this.showCountryDropdown.set(!this.showCountryDropdown());
+    if (this.showCountryDropdown()) {
+      // Reset search and focus on search input
+      this.searchQuery.set('');
+      this.registerForm.patchValue({ countrySearch: '' });
+    }
+  }
+
+  closeCountryDropdown() {
+    this.showCountryDropdown.set(false);
+    this.searchQuery.set('');
+    this.registerForm.patchValue({ countrySearch: '' });
+  }
+
   onCountrySearch(event: Event) {
     const input = event.target as HTMLInputElement;
     this.searchQuery.set(input.value);
-    this.showCountryDropdown.set(true);
   }
 
   selectCountry(country: Country) {
