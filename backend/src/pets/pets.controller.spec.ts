@@ -24,7 +24,11 @@ describe('PetsController (Integration)', () => {
   };
 
   const mockJwtAuthGuard = {
-    canActivate: jest.fn(() => true),
+    canActivate: jest.fn((context) => {
+      const request = context.switchToHttp().getRequest();
+      request.user = { id: 'mock-ong-id', role: 'ONG' };
+      return true;
+    }),
   };
 
   beforeAll(async () => {

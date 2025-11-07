@@ -42,7 +42,12 @@ describe('UsersController (Integration)', () => {
   };
 
   const mockJwtAuthGuard = {
-    canActivate: jest.fn(() => true),
+    canActivate: jest.fn((context) => {
+      const request = context.switchToHttp().getRequest();
+      // Attach mock user to request
+      request.user = mockUser;
+      return true;
+    }),
   };
 
   beforeAll(async () => {

@@ -47,11 +47,23 @@ describe('OngsController (Integration)', () => {
   };
 
   const mockJwtAuthGuard = {
-    canActivate: jest.fn(() => true),
+    canActivate: jest.fn((context) => {
+      const request = context.switchToHttp().getRequest();
+      // Attach mock user to request
+      request.user = mockOng;
+      return true;
+    }),
   };
 
   const mockRoleGuard = {
-    canActivate: jest.fn(() => true),
+    canActivate: jest.fn((context) => {
+      const request = context.switchToHttp().getRequest();
+      // Ensure user is attached
+      if (!request.user) {
+        request.user = mockOng;
+      }
+      return true;
+    }),
   };
 
   beforeAll(async () => {
