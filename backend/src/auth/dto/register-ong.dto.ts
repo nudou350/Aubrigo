@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterOngDto {
@@ -35,6 +35,11 @@ export class RegisterOngDto {
   @IsOptional()
   @IsString()
   phone?: string;
+
+  @ApiProperty({ example: true, required: false })
+  @IsOptional()
+  @IsBoolean()
+  hasWhatsapp?: boolean;
 
   @ApiProperty({ example: '@cantinhoanimais', required: false })
   @IsOptional()

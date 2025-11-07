@@ -56,6 +56,9 @@ export class User {
   @Column({ nullable: true })
   phone: string;
 
+  @Column({ name: 'has_whatsapp', default: false })
+  hasWhatsapp: boolean;
+
   @Column({ nullable: true })
   location: string;
 

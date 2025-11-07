@@ -100,6 +100,27 @@ import { AuthService } from '../../../core/services/auth.service';
               }
             </div>
 
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  formControlName="hasWhatsapp"
+                  class="checkbox-input"
+                />
+                <span class="checkbox-text">WhatsApp</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label for="instagram">Instagram</label>
+              <input
+                id="instagram"
+                type="text"
+                formControlName="instagramHandle"
+                placeholder="opcional"
+              />
+            </div>
+
             <div class="form-group">
               <label for="password">Senha</label>
               <input
@@ -310,6 +331,30 @@ import { AuthService } from '../../../core/services/auth.service';
       }
     }
 
+    .checkbox-group {
+      margin-bottom: 16px;
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: normal;
+      }
+
+      .checkbox-input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #5CB5B0;
+      }
+
+      .checkbox-text {
+        color: #2C2C2C;
+        font-size: 14px;
+      }
+    }
+
     .btn-primary {
       width: 100%;
       background: #5CB5B0;
@@ -395,6 +440,8 @@ export class OngRegisterComponent {
       city: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
+      hasWhatsapp: [false],
+      instagramHandle: [''],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
@@ -426,6 +473,8 @@ export class OngRegisterComponent {
       ongName: formValue.ongName,
       email: formValue.email,
       phone: formValue.phone,
+      hasWhatsapp: formValue.hasWhatsapp,
+      instagramHandle: formValue.instagramHandle || undefined,
       password: formValue.password,
       confirmPassword: formValue.confirmPassword,
       location: formValue.city, // Map city to location for backend
