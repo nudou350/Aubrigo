@@ -58,11 +58,14 @@ describe('AnalyticsService', () => {
 
       const result = await service.trackEvent(
         {
+          id: 'evt-1',
           type: 'pet_view',
           category: 'engagement',
           petId: 'pet-1',
           sessionId: 'session-1',
           timestamp: Date.now(),
+          offline: false,
+          sent: false,
         },
         '192.168.1.1',
         'Mozilla/5.0',

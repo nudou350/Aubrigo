@@ -74,8 +74,10 @@ describe('DonationsService', () => {
       });
 
       expect(result).toBeDefined();
-      expect(result.mbway).toBeDefined();
-      expect(result.mbway.transactionId).toBe('txn-123');
+      expect('mbway' in result).toBe(true);
+      if ('mbway' in result) {
+        expect((result as any).mbway.transactionId).toBe('txn-123');
+      }
     });
 
     it('should handle Stripe payment method', async () => {
