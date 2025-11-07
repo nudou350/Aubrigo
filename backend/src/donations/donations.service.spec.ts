@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DonationsService } from './donations.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Donation, PaymentStatus, DonationType } from './entities/donation.entity';
+import { Donation } from './entities/donation.entity';
 import { User } from '../users/entities/user.entity';
-import { EmailService } from '../email/email.service';
+import { MBWayService } from './services/mbway.service';
 import { NotFoundException } from '@nestjs/common';
 
 describe('DonationsService', () => {
@@ -17,12 +17,10 @@ describe('DonationsService', () => {
     find: jest.fn(),
   };
 
-  const mockUserRepository = {
-    findOne: jest.fn(),
-  };
-
-  const mockEmailService = {
-    sendDonationReceipt: jest.fn(),
+  const mockMBWayService = {
+    createPaymentRequest: jest.fn(),
+    checkPaymentStatus: jest.fn(),
+    confirmPayment: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -30,8 +28,7 @@ describe('DonationsService', () => {
       providers: [
         DonationsService,
         { provide: getRepositoryToken(Donation), useValue: mockDonationRepository },
-        { provide: getRepositoryToken(User), useValue: mockUserRepository },
-        { provide: EmailService, useValue: mockEmailService },
+        { provide: MBWayService, useValue: mockMBWayService },
       ],
     }).compile();
 
@@ -43,67 +40,134 @@ describe('DonationsService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should create donation successfully', async () => {
-      mockUserRepository.findOne.mockResolvedValue({ id: 'ong-1' });
-      mockDonationRepository.create.mockReturnValue({});
-      mockDonationRepository.save.mockResolvedValue({
+  describe('createDonation', () => {
+    it('should create MB Way donation successfully', async () => {
+      mockDonationRepository.create.mockReturnValue({
         id: 'don-1',
         amount: 50,
-        paymentStatus: PaymentStatus.PENDING,
+        paymentStatus: 'pending',
+      });
+      mockDonationRepository.save.mockResolvedValueOnce({
+        id: 'don-1',
+        amount: 50,
+        paymentStatus: 'pending',
+        ongId: 'ong-1',
+      });
+      mockMBWayService.createPaymentRequest.mockResolvedValue({
+        transactionId: 'txn-123',
+        reference: 'ref-123',
+        qrCodeDataUrl: 'data:image/png;base64,...',
+        phoneNumber: '+351912345678',
+        expiresAt: new Date(),
+      });
+      mockDonationRepository.save.mockResolvedValueOnce({
+        id: 'don-1',
+        amount: 50,
+        stripePaymentId: 'txn-123',
       });
 
-      const result = await service.create({
+      const result = await service.createDonation({
         ongId: 'ong-1',
         donorName: 'John Doe',
         donorEmail: 'john@test.com',
         amount: 50,
-        donationType: DonationType.ONE_TIME,
+        donationType: 'one_time',
+        paymentMethod: 'mbway',
+        phoneNumber: '+351912345678',
       });
 
       expect(result).toBeDefined();
-      expect(result.amount).toBe(50);
+      expect(result.mbway).toBeDefined();
+      expect(result.mbway.transactionId).toBe('txn-123');
     });
 
-    it('should throw NotFoundException if ONG not found', async () => {
-      mockUserRepository.findOne.mockResolvedValue(null);
+    it('should handle Stripe payment method', async () => {
+      mockDonationRepository.create.mockReturnValue({
+        id: 'don-1',
+        amount: 100,
+        paymentStatus: 'pending',
+      });
+      mockDonationRepository.save.mockResolvedValue({
+        id: 'don-1',
+        amount: 100,
+      });
 
-      await expect(
-        service.create({
-          ongId: 'invalid',
-          donorName: 'John',
-          donorEmail: 'john@test.com',
-          amount: 50,
-          donationType: DonationType.ONE_TIME,
-        }),
-      ).rejects.toThrow(NotFoundException);
-    });
-  });
+      const result = await service.createDonation({
+        ongId: 'ong-1',
+        donorName: 'Jane Doe',
+        donorEmail: 'jane@test.com',
+        amount: 100,
+        donationType: 'monthly',
+        paymentMethod: 'stripe',
+      });
 
-  describe('findByOng', () => {
-    it('should return ONG donations', async () => {
-      mockDonationRepository.find.mockResolvedValue([
-        { id: '1', amount: 50 },
-        { id: '2', amount: 100 },
-      ]);
-
-      const result = await service.findByOng('ong-1');
-
-      expect(result).toHaveLength(2);
+      expect(result).toBeDefined();
+      expect(result.message).toContain('Stripe');
     });
   });
 
-  describe('getStatistics', () => {
-    it('should calculate donation statistics', async () => {
+  describe('getDonationsByOng', () => {
+    it('should return ONG donations with statistics', async () => {
       mockDonationRepository.find.mockResolvedValue([
-        { amount: 50, paymentStatus: PaymentStatus.COMPLETED },
-        { amount: 100, paymentStatus: PaymentStatus.COMPLETED },
+        { id: '1', amount: 50, donationType: 'one_time', paymentStatus: 'completed' },
+        { id: '2', amount: 100, donationType: 'monthly', paymentStatus: 'completed' },
       ]);
 
-      const result = await service.getStatistics('ong-1');
+      const result = await service.getDonationsByOng('ong-1');
 
-      expect(result.totalAmount).toBe(150);
-      expect(result.donationCount).toBe(2);
+      expect(result.donations).toHaveLength(2);
+      expect(result.statistics.totalAmount).toBe(150);
+      expect(result.statistics.totalDonations).toBe(2);
+      expect(result.statistics.monthlyRecurring).toBe(100);
+    });
+  });
+
+  describe('checkPaymentStatus', () => {
+    it('should check MB Way payment status', async () => {
+      mockDonationRepository.findOne.mockResolvedValue({
+        id: 'don-1',
+        paymentMethod: 'mbway',
+        stripePaymentId: 'txn-123',
+        paymentStatus: 'pending',
+      });
+      mockMBWayService.checkPaymentStatus.mockResolvedValue({
+        status: 'paid',
+      });
+      mockDonationRepository.save.mockResolvedValue({
+        id: 'don-1',
+        paymentStatus: 'completed',
+      });
+
+      const result = await service.checkPaymentStatus('don-1');
+
+      expect(result.paymentStatus).toBe('completed');
+      expect(result.mbwayStatus).toBe('paid');
+    });
+
+    it('should throw NotFoundException if donation not found', async () => {
+      mockDonationRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.checkPaymentStatus('invalid')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('confirmMBWayPayment', () => {
+    it('should confirm MB Way payment', async () => {
+      mockMBWayService.confirmPayment.mockResolvedValue(true);
+      mockDonationRepository.findOne.mockResolvedValue({
+        id: 'don-1',
+        stripePaymentId: 'txn-123',
+        paymentStatus: 'pending',
+      });
+      mockDonationRepository.save.mockResolvedValue({
+        id: 'don-1',
+        paymentStatus: 'completed',
+      });
+
+      const result = await service.confirmMBWayPayment('txn-123');
+
+      expect(result.success).toBe(true);
+      expect(result.donationId).toBe('don-1');
     });
   });
 });

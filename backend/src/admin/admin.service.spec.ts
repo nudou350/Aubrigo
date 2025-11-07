@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User, UserRole, OngStatus } from '../users/entities/user.entity';
 import { Pet } from '../pets/entities/pet.entity';
 import { Donation } from '../donations/entities/donation.entity';
+import { EmailService } from '../email/email.service';
 
 describe('AdminService', () => {
   let service: AdminService;
@@ -24,6 +25,11 @@ describe('AdminService', () => {
     find: jest.fn(),
   };
 
+  const mockEmailService = {
+    sendOngApprovalEmail: jest.fn(),
+    sendOngRejectionEmail: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -31,6 +37,7 @@ describe('AdminService', () => {
         { provide: getRepositoryToken(User), useValue: mockUserRepository },
         { provide: getRepositoryToken(Pet), useValue: mockPetRepository },
         { provide: getRepositoryToken(Donation), useValue: mockDonationRepository },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 
@@ -57,25 +64,41 @@ describe('AdminService', () => {
       mockUserRepository.findOne.mockResolvedValue({
         id: 'ong-1',
         ongStatus: OngStatus.PENDING,
+        ongName: 'Test ONG',
+        email: 'ong@test.com',
       });
-      mockUserRepository.save.mockResolvedValue({ id: 'ong-1', ongStatus: OngStatus.APPROVED });
+      mockUserRepository.save.mockResolvedValue({
+        id: 'ong-1',
+        ongStatus: OngStatus.APPROVED,
+        ongName: 'Test ONG',
+        email: 'ong@test.com',
+      });
+      mockEmailService.sendOngApprovalEmail.mockResolvedValue(true);
 
       const result = await service.approveOng('ong-1');
 
-      expect(result.ongStatus).toBe(OngStatus.APPROVED);
+      expect(result.ong.status).toBe(OngStatus.APPROVED);
     });
   });
 
-  describe('getPlatformStatistics', () => {
-    it('should return platform statistics', async () => {
-      mockUserRepository.count.mockResolvedValue(10);
-      mockPetRepository.count.mockResolvedValue(50);
-      mockDonationRepository.find.mockResolvedValue([{ amount: 100 }]);
+  describe('getDashboardStats', () => {
+    it('should return dashboard statistics', async () => {
+      mockUserRepository.count
+        .mockResolvedValueOnce(10) // totalUsers
+        .mockResolvedValueOnce(5) // totalOngs
+        .mockResolvedValueOnce(2); // pendingOngs
+      mockPetRepository.count
+        .mockResolvedValueOnce(50) // totalPets
+        .mockResolvedValueOnce(30); // availablePets
+      mockDonationRepository.find.mockResolvedValue([{ amount: 100 }, { amount: 200 }]);
 
-      const result = await service.getPlatformStatistics();
+      const result = await service.getDashboardStats();
 
       expect(result.totalUsers).toBe(10);
+      expect(result.totalOngs).toBe(5);
+      expect(result.pendingOngs).toBe(2);
       expect(result.totalPets).toBe(50);
+      expect(result.totalDonations).toBe(300);
     });
   });
 });

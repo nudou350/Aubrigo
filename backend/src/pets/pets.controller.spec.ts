@@ -5,7 +5,6 @@ import { PetsController } from './pets.controller';
 import { PetsService } from './pets.service';
 import { UploadService } from '../upload/upload.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { PetStatus, PetSize, PetGender } from './entities/pet.entity';
 
 describe('PetsController (Integration)', () => {
   let app: INestApplication;
@@ -17,7 +16,6 @@ describe('PetsController (Integration)', () => {
     update: jest.fn(),
     remove: jest.fn(),
     findByOng: jest.fn(),
-    updateStatus: jest.fn(),
     getCitiesWithPets: jest.fn(),
   };
 
@@ -58,18 +56,25 @@ describe('PetsController (Integration)', () => {
     it('should return list of pets', async () => {
       mockPetsService.search.mockResolvedValue({
         data: [{ id: '1', name: 'Max' }],
-        total: 1,
-        page: 1,
-        limit: 10,
+        pagination: {
+          total: 1,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+        },
       });
 
       const response = await request(app.getHttpServer()).get('/pets').expect(200);
 
       expect(response.body.data).toHaveLength(1);
+      expect(response.body.pagination.total).toBe(1);
     });
 
     it('should filter by species', async () => {
-      mockPetsService.search.mockResolvedValue({ data: [], total: 0 });
+      mockPetsService.search.mockResolvedValue({
+        data: [],
+        pagination: { total: 0, page: 1, limit: 10, totalPages: 0 }
+      });
 
       await request(app.getHttpServer()).get('/pets?species=Dog').expect(200);
 
@@ -85,8 +90,8 @@ describe('PetsController (Integration)', () => {
         name: 'Max',
         species: 'Dog',
         age: 3,
-        gender: PetGender.MALE,
-        size: PetSize.LARGE,
+        gender: 'Male',
+        size: 'Large',
       };
 
       mockPetsService.create.mockResolvedValue({ id: '1', ...createDto });
@@ -121,11 +126,11 @@ describe('PetsController (Integration)', () => {
 
   describe('DELETE /pets/:id', () => {
     it('should delete pet successfully', async () => {
-      mockPetsService.remove.mockResolvedValue({ message: 'Pet removed successfully' });
+      mockPetsService.remove.mockResolvedValue({ message: 'Pet deleted successfully' });
 
       const response = await request(app.getHttpServer()).delete('/pets/1').expect(200);
 
-      expect(response.body.message).toBe('Pet removed successfully');
+      expect(response.body.message).toBe('Pet deleted successfully');
     });
   });
 });

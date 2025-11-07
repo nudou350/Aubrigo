@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PetsService } from './pets.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Pet, PetStatus, PetSize, PetGender } from './entities/pet.entity';
+import { Pet } from './entities/pet.entity';
 import { PetImage } from './entities/pet-image.entity';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { CreatePetDto } from './dto/create-pet.dto';
@@ -21,12 +21,13 @@ describe('PetsService', () => {
     species: 'Dog',
     breed: 'Labrador',
     age: 3,
-    gender: PetGender.MALE,
-    size: PetSize.LARGE,
-    status: PetStatus.AVAILABLE,
+    gender: 'Male',
+    size: 'Large',
+    status: 'available',
     ongId: mockOngId,
     location: 'Lisbon',
     description: 'Friendly dog',
+    images: [],
   };
 
   const mockQueryBuilder: any = {
@@ -43,6 +44,7 @@ describe('PetsService', () => {
   const mockPetRepository = {
     create: jest.fn(),
     save: jest.fn(),
+    update: jest.fn(),
     findOne: jest.fn(),
     find: jest.fn(),
     remove: jest.fn(),
@@ -53,7 +55,7 @@ describe('PetsService', () => {
     create: jest.fn(),
     save: jest.fn(),
     find: jest.fn(),
-    remove: jest.fn(),
+    delete: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -81,8 +83,8 @@ describe('PetsService', () => {
       species: 'Dog',
       breed: 'Labrador',
       age: 3,
-      gender: PetGender.MALE,
-      size: PetSize.LARGE,
+      gender: 'Male',
+      size: 'Large',
       description: 'Friendly dog',
       location: 'Lisbon',
     };
@@ -90,6 +92,7 @@ describe('PetsService', () => {
     it('should create pet successfully', async () => {
       mockPetRepository.create.mockReturnValue(mockPet);
       mockPetRepository.save.mockResolvedValue(mockPet);
+      mockPetRepository.findOne.mockResolvedValue(mockPet);
 
       const result = await service.create(createDto, mockOngId, []);
 
@@ -102,12 +105,18 @@ describe('PetsService', () => {
       const imageUrls = ['url1.jpg', 'url2.jpg'];
       mockPetRepository.create.mockReturnValue(mockPet);
       mockPetRepository.save.mockResolvedValue({ ...mockPet, id: 'pet-123' });
+      mockPetRepository.findOne.mockResolvedValue(mockPet);
       mockPetImageRepository.create.mockImplementation((img) => img);
-      mockPetImageRepository.save.mockResolvedValue({});
+      mockPetImageRepository.save.mockResolvedValue([]);
 
       await service.create(createDto, mockOngId, imageUrls);
 
-      expect(mockPetImageRepository.save).toHaveBeenCalledTimes(2);
+      expect(mockPetImageRepository.save).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ imageUrl: 'url1.jpg', isPrimary: true }),
+          expect.objectContaining({ imageUrl: 'url2.jpg', isPrimary: false }),
+        ]),
+      );
     });
   });
 
@@ -115,7 +124,7 @@ describe('PetsService', () => {
     it('should search pets with filters', async () => {
       const searchDto: SearchPetsDto = {
         species: 'Dog',
-        size: PetSize.LARGE,
+        size: 'Large',
         page: 1,
         limit: 10,
       };
@@ -126,7 +135,9 @@ describe('PetsService', () => {
       const result = await service.search(searchDto);
 
       expect(result.data).toHaveLength(1);
-      expect(result.total).toBe(1);
+      expect(result.pagination.total).toBe(1);
+      expect(result.pagination.page).toBe(1);
+      expect(result.pagination.limit).toBe(10);
     });
 
     it('should filter by species', async () => {
@@ -170,8 +181,9 @@ describe('PetsService', () => {
   describe('update', () => {
     it('should update own pet successfully', async () => {
       const updateDto: UpdatePetDto = { name: 'Updated Max' };
-      mockPetRepository.findOne.mockResolvedValue(mockPet);
-      mockPetRepository.save.mockResolvedValue({ ...mockPet, ...updateDto });
+      mockPetRepository.findOne.mockResolvedValueOnce(mockPet);
+      mockPetRepository.update.mockResolvedValue({ affected: 1 });
+      mockPetRepository.findOne.mockResolvedValueOnce({ ...mockPet, name: 'Updated Max' });
 
       const result = await service.update('pet-123', updateDto, mockOngId, []);
 
@@ -194,7 +206,7 @@ describe('PetsService', () => {
 
       const result = await service.remove('pet-123', mockOngId);
 
-      expect(result.message).toBe('Pet removed successfully');
+      expect(result.message).toBe('Pet deleted successfully');
     });
 
     it('should throw ForbiddenException when removing other ONG pet', async () => {
@@ -206,14 +218,30 @@ describe('PetsService', () => {
     });
   });
 
-  describe('updateStatus', () => {
-    it('should update pet status', async () => {
-      mockPetRepository.findOne.mockResolvedValue(mockPet);
-      mockPetRepository.save.mockResolvedValue({ ...mockPet, status: PetStatus.ADOPTED });
+  describe('findByOng', () => {
+    it('should find all pets for an ONG', async () => {
+      mockPetRepository.find.mockResolvedValue([mockPet]);
 
-      const result = await service.updateStatus('pet-123', PetStatus.ADOPTED, mockOngId);
+      const result = await service.findByOng(mockOngId);
 
-      expect(result.status).toBe(PetStatus.ADOPTED);
+      expect(result).toHaveLength(1);
+      expect(mockPetRepository.find).toHaveBeenCalledWith({
+        where: { ongId: mockOngId },
+        relations: ['images'],
+        order: { createdAt: 'DESC' },
+      });
+    });
+  });
+
+  describe('getCitiesWithPets', () => {
+    it('should return list of cities with available pets', async () => {
+      const mockCities = [{ location: 'Lisbon' }, { location: 'Porto' }];
+      mockQueryBuilder.select = jest.fn().mockReturnThis();
+      mockQueryBuilder.getRawMany = jest.fn().mockResolvedValue(mockCities);
+
+      const result = await service.getCitiesWithPets();
+
+      expect(result).toEqual(['Lisbon', 'Porto']);
     });
   });
 });

@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Pet, PetStatus } from '../src/pets/entities/pet.entity';
+import { Pet } from '../src/pets/entities/pet.entity';
 import { User, UserRole } from '../src/users/entities/user.entity';
 
 describe('Pets E2E Tests', () => {
@@ -51,7 +51,7 @@ describe('Pets E2E Tests', () => {
   });
 
   describe('Complete Pet Management Flow', () => {
-    it('should complete flow: Create → Update → Mark as Adopted', async () => {
+    it('should complete flow: Create → Update → View', async () => {
       // Create pet
       const createResponse = await request(app.getHttpServer())
         .post('/pets')
@@ -71,18 +71,20 @@ describe('Pets E2E Tests', () => {
       expect(createResponse.body.name).toBe('Max');
 
       // Update pet
-      await request(app.getHttpServer())
+      const updateResponse = await request(app.getHttpServer())
         .put(`/pets/${petId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({ name: 'Maximus' })
         .expect(200);
 
-      // Mark as adopted
-      await request(app.getHttpServer())
-        .put(`/pets/${petId}/status`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ status: PetStatus.ADOPTED })
+      expect(updateResponse.body.name).toBe('Maximus');
+
+      // View pet
+      const viewResponse = await request(app.getHttpServer())
+        .get(`/pets/${petId}`)
         .expect(200);
+
+      expect(viewResponse.body.name).toBe('Maximus');
     });
   });
 
@@ -93,7 +95,10 @@ describe('Pets E2E Tests', () => {
         .expect(200);
 
       expect(response.body).toHaveProperty('data');
-      expect(response.body).toHaveProperty('total');
+      expect(response.body).toHaveProperty('pagination');
+      expect(response.body.pagination).toHaveProperty('total');
+      expect(response.body.pagination).toHaveProperty('page');
+      expect(response.body.pagination).toHaveProperty('limit');
     });
   });
 
