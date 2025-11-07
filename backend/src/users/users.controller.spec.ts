@@ -307,7 +307,7 @@ describe('UsersController (Integration)', () => {
       const response = await request(app.getHttpServer())
         .post('/users/profile/image')
         .attach('profileImage', Buffer.from('fake-image-data'), 'test.jpg')
-        .expect(200);
+        .expect(201);
 
       expect(response.body).toHaveProperty('message', 'Profile image uploaded successfully');
       expect(response.body).toHaveProperty('profileImageUrl', imageUrl);
