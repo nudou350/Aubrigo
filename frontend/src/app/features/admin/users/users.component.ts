@@ -30,10 +30,6 @@ import { ToastService } from '../../../core/services/toast.service';
             <span class="stat-label">Total de Usuários</span>
           </div>
           <div class="stat-box">
-            <span class="stat-value">{{ getUsersByRole('admin').length }}</span>
-            <span class="stat-label">Administradores</span>
-          </div>
-          <div class="stat-box">
             <span class="stat-value">{{ getUsersByRole('ong').length }}</span>
             <span class="stat-label">ONGs</span>
           </div>
@@ -52,7 +48,6 @@ import { ToastService } from '../../../core/services/toast.service';
           >
           <select class="role-filter" (change)="onFilterRole($event)">
             <option value="">Todos os tipos</option>
-            <option value="admin">Administradores</option>
             <option value="ong">ONGs</option>
             <option value="user">Usuários</option>
           </select>
@@ -184,9 +179,17 @@ import { ToastService } from '../../../core/services/toast.service';
 
     .stats-summary {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       margin-bottom: 32px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+      }
     }
 
     .stat-box {
@@ -377,10 +380,6 @@ import { ToastService } from '../../../core/services/toast.service';
         font-size: 28px;
       }
 
-      .stats-summary {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
       .filters {
         flex-direction: column;
       }
@@ -420,8 +419,10 @@ export class AdminUsersComponent implements OnInit {
 
     this.adminService.getUsers().subscribe({
       next: (users) => {
-        this.users.set(users);
-        this.filteredUsers.set(users);
+        // Filter out admin users
+        const nonAdminUsers = users.filter(u => u.role !== 'admin');
+        this.users.set(nonAdminUsers);
+        this.filteredUsers.set(nonAdminUsers);
         this.isLoading.set(false);
       },
       error: (error) => {

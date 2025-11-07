@@ -94,6 +94,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Check if ONG account was rejected
+    if (user.role === UserRole.ONG && user.ongStatus === OngStatus.REJECTED) {
+      throw new UnauthorizedException('Your account request was not approved. Please contact admin@aubrigo.pt if you believe this was an error.');
+    }
+
     // Generate token
     const accessToken = this.generateToken(user);
 
