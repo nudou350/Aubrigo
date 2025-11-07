@@ -21,7 +21,7 @@ export class Pet {
   @Column({ name: 'ong_id' })
   ongId: string;
 
-  @ManyToOne(() => User, (user) => user.pets)
+  @ManyToOne(() => User, (user) => user.pets, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ong_id' })
   ong: User;
 

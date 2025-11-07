@@ -7,8 +7,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole, OngStatus } from '../users/entities/user.entity';
 import { Pet } from '../pets/entities/pet.entity';
+import { PetImage } from '../pets/entities/pet-image.entity';
 import { Donation } from '../donations/entities/donation.entity';
 import { EmailService } from '../email/email.service';
+import { UploadService } from '../upload/upload.service';
 
 @Injectable()
 export class AdminService {
@@ -17,9 +19,12 @@ export class AdminService {
     private userRepository: Repository<User>,
     @InjectRepository(Pet)
     private petRepository: Repository<Pet>,
+    @InjectRepository(PetImage)
+    private petImageRepository: Repository<PetImage>,
     @InjectRepository(Donation)
     private donationRepository: Repository<Donation>,
     private emailService: EmailService,
+    private uploadService: UploadService,
   ) {}
 
   async getDashboardStats() {
@@ -161,6 +166,41 @@ export class AdminService {
       throw new NotFoundException('User not found');
     }
 
+    // If user is an ONG, delete all associated physical files before deletion
+    if (user.role === UserRole.ONG) {
+      // 1. Find all pets belonging to this ONG
+      const pets = await this.petRepository.find({
+        where: { ongId: userId },
+      });
+
+      // 2. Collect all pet image URLs
+      const imageUrlsToDelete: string[] = [];
+
+      for (const pet of pets) {
+        const petImages = await this.petImageRepository.find({
+          where: { petId: pet.id },
+        });
+
+        imageUrlsToDelete.push(...petImages.map(img => img.imageUrl));
+      }
+
+      // 3. Add ONG profile image if exists
+      if (user.profileImageUrl) {
+        imageUrlsToDelete.push(user.profileImageUrl);
+      }
+
+      // 4. Delete all physical files
+      if (imageUrlsToDelete.length > 0) {
+        await this.uploadService.deleteMultipleImages(imageUrlsToDelete);
+      }
+    } else {
+      // For regular users, just delete profile image if exists
+      if (user.profileImageUrl) {
+        await this.uploadService.deleteImage(user.profileImageUrl);
+      }
+    }
+
+    // 5. Delete user (CASCADE will handle database records)
     await this.userRepository.remove(user);
 
     return {
