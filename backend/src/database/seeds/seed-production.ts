@@ -51,31 +51,45 @@ const adminData = {
 
 async function seedProduction() {
   try {
-    console.log('Starting production database seed...');
-    console.log('⚠️  WARNING: This will create ONLY the admin account');
+    console.log('========================================');
+    console.log('🚨 PRODUCTION DATABASE SEED 🚨');
+    console.log('========================================');
+    console.log('⚠️  WARNING: This will DELETE ALL DATA');
+    console.log('⚠️  and create ONLY the admin account');
+    console.log('========================================');
     console.log('');
 
     await AppDataSource.initialize();
-    console.log('Database connection established');
+    console.log('✅ Database connection established');
 
     const userRepository = AppDataSource.getRepository(User);
 
-    // Check if admin already exists
-    const existingAdmin = await userRepository.findOne({
-      where: { email: adminData.email },
-    });
+    console.log('');
+    console.log('🗑️  Cleaning ALL existing data...');
 
-    if (existingAdmin) {
-      console.log('⚠️  Admin account already exists!');
-      console.log('Email:', adminData.email);
-      console.log('');
-      console.log('To reset the admin password, use: npm run seed:reset-admin:prod');
-      await AppDataSource.destroy();
-      return;
-    }
+    // Delete all data from all tables using CASCADE
+    await AppDataSource.query(`
+      TRUNCATE TABLE
+        "ong_availability_exceptions",
+        "appointment_settings",
+        "ong_operating_hours",
+        "ongs",
+        "articles",
+        "appointments",
+        "favorites",
+        "donations",
+        "pet_images",
+        "pets",
+        "password_reset_tokens",
+        "users"
+      RESTART IDENTITY CASCADE
+    `);
+
+    console.log('✅ All data cleared successfully');
+    console.log('');
 
     // Create Admin account
-    console.log('Creating Admin account...');
+    console.log('👑 Creating Admin account...');
     const adminHashedPassword = await bcrypt.hash(adminData.password, 10);
     const admin = userRepository.create({
       ...adminData,
