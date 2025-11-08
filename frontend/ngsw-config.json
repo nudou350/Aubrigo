@@ -2,11 +2,11 @@
   "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
   "appData": {
-    "version": "1.1.0.1762607711049",
+    "version": "1.1.1.1762609777286",
     "name": "Aubrigo",
     "build": {
-      "timestamp": "2025-11-08T13:15:11.071Z",
-      "commit": "0abf53b"
+      "timestamp": "2025-11-08T13:49:37.315Z",
+      "commit": "3af434a"
     }
   },
   "navigationFallback": {
@@ -44,10 +44,7 @@
   "dataGroups": [
     {
       "name": "api-pets",
-      "urls": [
-        "/api/pets",
-        "/api/pets/*"
-      ],
+      "urls": ["/api/pets", "/api/pets/*"],
       "cacheConfig": {
         "strategy": "freshness",
         "maxSize": 100,
@@ -57,10 +54,7 @@
     },
     {
       "name": "api-auth",
-      "urls": [
-        "/api/auth/*",
-        "/api/users/*"
-      ],
+      "urls": ["/api/auth/*", "/api/users/*"],
       "cacheConfig": {
         "strategy": "freshness",
         "maxSize": 50,
@@ -70,10 +64,7 @@
     },
     {
       "name": "api-ongs",
-      "urls": [
-        "/api/ongs",
-        "/api/ongs/*"
-      ],
+      "urls": ["/api/ongs", "/api/ongs/*"],
       "cacheConfig": {
         "strategy": "performance",
         "maxSize": 50,
@@ -97,10 +88,7 @@
     },
     {
       "name": "api-favorites",
-      "urls": [
-        "/api/favorites",
-        "/api/favorites/*"
-      ],
+      "urls": ["/api/favorites", "/api/favorites/*"],
       "cacheConfig": {
         "strategy": "freshness",
         "maxSize": 100,
