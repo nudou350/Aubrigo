@@ -110,7 +110,7 @@ export class UsersService {
    */
   changePassword(data: ChangePasswordDto): Observable<{ message: string }> {
     return this.http.put<{ message: string }>(
-      `${this.apiUrl}/profile/change-password`,
+      `${this.apiUrl}/profile/password`,
       data
     );
   }
