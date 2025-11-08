@@ -26,7 +26,7 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state) =
     if (currentUser.role === 'admin') {
       router.navigate(['/admin']);
     } else if (currentUser.role === 'ong') {
-      router.navigate(['/ong-dashboard']);
+      router.navigate(['/ong']);
     } else {
       router.navigate(['/home']);
     }

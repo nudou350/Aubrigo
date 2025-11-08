@@ -1,5 +1,13 @@
 <div class="country-selector">
-  <label class="country-selector__label">País / Country</label>
+  <div class="country-selector__header">
+    <label class="country-selector__label">País / Country</label>
+    <button
+      class="country-selector__reset"
+      (click)="resetToAutoDetect()"
+      title="Detectar automaticamente baseado na sua localização">
+      🔄 Auto-detectar
+    </button>
+  </div>
 
   <div class="country-selector__input-wrapper">
     <input

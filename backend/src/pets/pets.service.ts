@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pet } from './entities/pet.entity';
 import { PetImage } from './entities/pet-image.entity';
+import { User } from '../users/entities/user.entity';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { SearchPetsDto } from './dto/search-pets.dto';
@@ -147,7 +148,7 @@ export class PetsService {
 
   async create(createPetDto: CreatePetDto, userId: string, imageUrls: string[] = []) {
     // Get ONG's country code from userId
-    const ong = await this.petRepository.manager.findOne('User', {
+    const ong = await this.petRepository.manager.findOne(User, {
       where: { id: userId },
     });
 

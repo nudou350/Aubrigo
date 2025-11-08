@@ -27,16 +27,17 @@ export class CountryService {
 
   /**
    * Initialize country from storage or detect automatically
+   * Priority: User selection (localStorage) > IP detection > Default (PT)
    */
   private initializeCountry(): void {
-    // Try to get from localStorage first
     const storedCountry = localStorage.getItem(this.STORAGE_KEY);
 
     if (storedCountry) {
+      // User has previously selected a country - respect their choice
       this.currentCountry.set(storedCountry);
       this.loadCountryData(storedCountry);
     } else {
-      // Detect from backend
+      // No stored country - detect from backend on first visit
       this.detectCountry().subscribe({
         next: (result) => {
           if (result?.countryCode) {
@@ -115,10 +116,27 @@ export class CountryService {
   }
 
   /**
-   * Clear stored country (for logout or reset)
+   * Clear stored country and re-detect from current location
    */
   clearCountry(): void {
     localStorage.removeItem(this.STORAGE_KEY);
     this.initializeCountry();
+  }
+
+  /**
+   * Force re-detection of country (useful if user changed location)
+   */
+  forceRedetect(): void {
+    this.detectCountry().subscribe({
+      next: (result) => {
+        if (result?.countryCode) {
+          this.setCountry(result.countryCode);
+          this.currentCountryData.set(result.country);
+        }
+      },
+      error: () => {
+        console.error('Country detection failed');
+      }
+    });
   }
 }

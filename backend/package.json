@@ -26,10 +26,7 @@
     "migration:revert:prod": "node ./node_modules/typeorm/cli.js migration:revert -d dist/data-source.js",
     "seed": "ts-node src/database/seeds/seed.ts",
     "seed:prod": "node dist/database/seeds/seed.js",
-    "seed:production": "ts-node src/database/seeds/seed-production.ts",
-    "seed:production:prod": "node dist/database/seeds/seed-production.js",
-    "seed:reset-admin": "ts-node src/database/seeds/reset-admin.ts",
-    "seed:reset-admin:prod": "node dist/database/seeds/reset-admin.js"
+    "seed:build": "npm run build && npm run seed:prod"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

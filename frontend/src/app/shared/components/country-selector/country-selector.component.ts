@@ -30,7 +30,7 @@ export class CountrySelectorComponent implements OnInit {
       if (currentCountry) {
         this.selectedCountry.set(currentCountry);
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {
@@ -154,5 +154,16 @@ export class CountrySelectorComponent implements OnInit {
    */
   isFocused(index: number): boolean {
     return this.focusedIndex() === index;
+  }
+
+  /**
+   * Reset to auto-detect country based on current location
+   */
+  resetToAutoDetect(): void {
+    if (confirm('Deseja detectar automaticamente o país baseado na sua localização atual?')) {
+      this.countryService.clearCountry();
+      // Reload page to apply new country
+      window.location.reload();
+    }
   }
 }

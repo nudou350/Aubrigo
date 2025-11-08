@@ -28,6 +28,8 @@ export interface Ong {
   profileImageUrl?: string;
   rating?: number;
   status?: string;
+  countryCode?: string;
+  ongStatus?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -105,17 +107,25 @@ export class AdminService {
   }
 
   /**
-   * Get all ONGs
+   * Get all ONGs (optionally filtered by country)
    */
-  getOngs(): Observable<Ong[]> {
-    return this.http.get<Ong[]>(`${this.apiUrl}/ongs`);
+  getOngs(countryCode?: string): Observable<Ong[]> {
+    let params = new HttpParams();
+    if (countryCode) {
+      params = params.set('countryCode', countryCode);
+    }
+    return this.http.get<Ong[]>(`${this.apiUrl}/ongs`, { params });
   }
 
   /**
-   * Get pending ONGs awaiting approval
+   * Get pending ONGs awaiting approval (optionally filtered by country)
    */
-  getPendingOngs(): Observable<PendingOng[]> {
-    return this.http.get<PendingOng[]>(`${this.apiUrl}/ongs/pending`);
+  getPendingOngs(countryCode?: string): Observable<PendingOng[]> {
+    let params = new HttpParams();
+    if (countryCode) {
+      params = params.set('countryCode', countryCode);
+    }
+    return this.http.get<PendingOng[]>(`${this.apiUrl}/ongs/pending`, { params });
   }
 
   /**

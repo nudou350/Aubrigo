@@ -57,48 +57,63 @@ export class CountryService {
    * ipapi.co, ip-api.com, or MaxMind GeoIP2
    */
   detectCountryFromRequest(req: any): string {
+    console.log('=== Country Detection Debug ===');
+    console.log('CloudFront header:', req.headers['cloudfront-viewer-country']);
+    console.log('Cloudflare header:', req.headers['cf-ipcountry']);
+    console.log('Accept-Language:', req.headers['accept-language']);
+    console.log('X-Forwarded-For:', req.headers['x-forwarded-for']);
+    console.log('==============================');
+
     // Try to get country from CloudFront or other CDN headers
     const cloudFrontCountry = req.headers['cloudfront-viewer-country'];
     if (cloudFrontCountry) {
+      console.log('✅ Detected from CloudFront:', cloudFrontCountry.toUpperCase());
       return cloudFrontCountry.toUpperCase();
     }
 
     // Try to get country from Cloudflare headers
     const cloudflareCountry = req.headers['cf-ipcountry'];
     if (cloudflareCountry) {
+      console.log('✅ Detected from Cloudflare:', cloudflareCountry.toUpperCase());
       return cloudflareCountry.toUpperCase();
     }
 
-    // Try to get from Accept-Language header as fallback
+    // IMPORTANT: Accept-Language is NOT reliable for geolocation
+    // A user in Portugal might have en-US as their browser language
+    // We should only use this as a very last resort and be smart about it
+
     const acceptLanguage = req.headers['accept-language'];
     if (acceptLanguage) {
       const language = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
 
-      // Map common languages to countries
-      const languageMap: Record<string, string> = {
-        'pt': 'PT',
-        'br': 'BR',
-        'es': 'ES',
-        'fr': 'FR',
-        'it': 'IT',
-        'de': 'DE',
-        'en': 'US',
-      };
+      // Only trust Portuguese language variants for country detection
+      // For other languages, default to PT since this is a Portugal-based platform
+      if (language === 'pt') {
+        // Check for pt-BR vs pt-PT
+        if (acceptLanguage.includes('-')) {
+          const region = acceptLanguage.split(',')[0].split('-')[1].toUpperCase();
+          if (region === 'BR') {
+            console.log('✅ Detected Brazilian Portuguese:', region);
+            return 'BR';
+          }
+        }
+        console.log('✅ Detected Portuguese, defaulting to Portugal');
+        return 'PT';
+      }
 
-      // If Accept-Language includes region (e.g., pt-BR, pt-PT)
-      if (acceptLanguage.includes('-')) {
+      // For non-Portuguese languages, check if there's a valid region
+      // But IGNORE en-US, en-GB etc in favor of defaulting to PT
+      if (acceptLanguage.includes('-') && language !== 'en') {
         const region = acceptLanguage.split(',')[0].split('-')[1].toUpperCase();
         if (this.isValidCountryCode(region)) {
+          console.log('⚠️  Detected from Accept-Language region (non-English):', region);
           return region;
         }
       }
-
-      if (languageMap[language]) {
-        return languageMap[language];
-      }
     }
 
-    // Default to Portugal
+    // Default to Portugal - this is a Portugal-based platform
+    console.log('⚠️  No reliable geolocation found, defaulting to Portugal (PT)');
     return 'PT';
   }
 
