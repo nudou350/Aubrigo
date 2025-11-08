@@ -4,7 +4,7 @@
   "description": "Aubrigo Frontend - Progressive Web App for Animal Adoption",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "set NODE_OPTIONS=--no-deprecation && ng serve",
     "prebuild": "node scripts/update-pwa-version.js",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
