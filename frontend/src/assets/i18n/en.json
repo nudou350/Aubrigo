@@ -53,40 +53,104 @@
     },
     "register": {
       "title": "Register",
+      "userTitle": "Create User Account",
+      "ongTitle": "Create NGO Account",
+      "userSubtitle": "Start your journey to adopt a new friend",
+      "ongSubtitle": "Register your organization to help animals find a home",
       "firstName": "First Name",
+      "firstNamePlaceholder": "John",
+      "firstNameRequired": "First name is required",
       "lastName": "Last Name",
+      "lastNamePlaceholder": "Doe",
+      "lastNameRequired": "Last name is required",
       "email": "Email",
+      "emailPlaceholder": "john@example.com",
+      "emailRequired": "Valid email is required",
+      "ongEmail": "NGO Email",
+      "ongEmailPlaceholder": "contact@shelter.org",
       "password": "Password",
+      "passwordPlaceholder": "Minimum 8 characters",
+      "passwordRequired": "Password must be at least 8 characters",
       "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Repeat your password",
       "registerButton": "REGISTER",
+      "createAccountButton": "CREATE ACCOUNT",
+      "sendForApproval": "SUBMIT FOR APPROVAL",
+      "creatingAccount": "Creating account...",
+      "sending": "Sending...",
       "alreadyHaveAccount": "Already have an account?",
-      "loginHere": "Login here",
+      "loginHere": "Login",
+      "backToAccountType": "← Back to account type",
       "passwordMismatch": "Passwords do not match",
-      "registerError": "Error registering"
+      "registerError": "Error creating account. Please try again.",
+      "ongName": "NGO Name",
+      "ongNamePlaceholder": "Animal Shelter",
+      "ongNameRequired": "NGO name is required (minimum 3 characters)",
+      "city": "City",
+      "cityPlaceholder": "Select a city",
+      "cityRequired": "City is required",
+      "phone": "Phone",
+      "phonePlaceholder": "21 234 5678",
+      "phoneRequired": "Phone is required",
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "instagramPlaceholder": "optional",
+      "approvalNotice": "Your account will be reviewed by an administrator before approval",
+      "registrationSubmitted": "✓ Registration Submitted!",
+      "ongSuccessMessage": "Your registration has been successfully submitted! Our team will review your organization and you will receive an email when it is approved. This usually takes 1-2 business days.",
+      "goToLogin": "GO TO LOGIN",
+      "countrySearch": "Search country..."
     },
     "forgotPassword": {
       "title": "Forgot Password",
+      "titleAlt": "Forgot your password?",
+      "subtitle": "Don't worry, it happens",
       "description": "Enter your email to receive recovery instructions",
+      "instructions": "Please enter the email registered in the app.",
       "email": "Email",
+      "emailPlaceholder": "Email",
       "sendButton": "SEND",
-      "backToLogin": "Back to login",
+      "backToLogin": "Back",
       "emailSent": "Email sent successfully!",
-      "sendError": "Error sending email"
+      "emailSuccess": "Recovery email sent successfully! Check your inbox.",
+      "sendError": "Error sending recovery email. Please try again.",
+      "invalidEmail": "Invalid email"
     },
     "resetPassword": {
       "title": "Reset Password",
+      "description": "Enter your new password below.",
       "newPassword": "New Password",
+      "newPasswordPlaceholder": "Minimum 6 characters",
       "confirmPassword": "Confirm New Password",
-      "resetButton": "RESET",
-      "resetSuccess": "Password reset successfully!",
-      "resetError": "Error resetting password"
+      "confirmPasswordPlaceholder": "Type again",
+      "resetButton": "RESET PASSWORD",
+      "resetting": "Resetting...",
+      "resetSuccess": "Password Reset!",
+      "resetSuccessMessage": "Your password has been successfully changed.",
+      "goToLogin": "Go to Login",
+      "resetError": "Error resetting password. Token may have expired.",
+      "invalidToken": "Invalid reset token",
+      "fillAllFields": "Please fill in all fields",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "passwordsDoNotMatch": "Passwords do not match"
     },
     "accountType": {
-      "title": "Choose account type",
-      "user": "User",
-      "ong": "NGO",
-      "userDescription": "Adopt a pet",
-      "ongDescription": "Manage donations and animals"
+      "title": "Create Account",
+      "subtitle": "Choose the type of account you want to create",
+      "user": "I'm an Adopter",
+      "ong": "I'm an NGO",
+      "userDescription": "I want to adopt a pet",
+      "ongDescription": "I work with animal rescue and adoption",
+      "userFeature1": "Search available pets",
+      "userFeature2": "Schedule visits",
+      "userFeature3": "Make donations",
+      "userFeature4": "Favorite pets",
+      "ongFeature1": "Register pets for adoption",
+      "ongFeature2": "Manage visits",
+      "ongFeature3": "Receive donations",
+      "ongFeature4": "Manage team",
+      "alreadyHaveAccount": "Already have an account?",
+      "login": "Login"
     }
   },
   "home": {
@@ -361,48 +425,79 @@
   },
   "pwa": {
     "install": {
+      "close": "Close",
       "title": "Install Aubrigo",
-      "description": "Install the app for quick access",
-      "installButton": "Install App",
-      "iosInstructions": {
-        "title": "Install Aubrigo",
-        "subtitle": "Follow the steps below to add the app to your home screen",
-        "step1": {
-          "title": "Tap the Share button",
-          "description": "Look for the icon at the bottom of the screen"
-        },
-        "step2": {
-          "title": "Scroll down",
-          "description": "In the menu that appears, scroll to find the option"
-        },
-        "step3": {
-          "title": "Add to Home Screen",
-          "description": "Tap \"Add to Home Screen\""
-        },
-        "step4": {
-          "title": "Confirm",
-          "description": "Tap \"Add\" in the top right corner"
-        },
-        "footer": "✨ Done! The Aubrigo icon will be on your home screen"
-      },
-      "installed": "App installed! Access from the home screen icon",
-      "alreadyInstalled": "App already installed"
+      "subtitle": "Get quick access and offline features",
+      "benefit1": "Instant access from home screen",
+      "benefit2": "Works even without internet",
+      "benefit3": "Faster and optimized",
+      "iosTitle": "To install on iPhone/iPad:",
+      "iosStep1": "Tap the <strong>Share</strong> button",
+      "iosStep2": "Select <strong>\"Add to Home Screen\"</strong>",
+      "iosStep3": "Tap <strong>\"Add\"</strong>",
+      "installNow": "Install Now",
+      "maybeLater": "Maybe Later",
+      "understood": "Got it"
     },
-    "update": {
-      "title": "Update Available",
-      "description": "A new version is available",
-      "updateButton": "Update",
-      "laterButton": "Later"
-    },
-    "offline": {
-      "title": "No Connection",
-      "description": "You are offline. Some features may be limited.",
-      "reconnected": "Connection restored!"
+    "network": {
+      "offlineTitle": "You are offline",
+      "offlineMessage": "Some features may be limited",
+      "onlineTitle": "You are online",
+      "onlineMessage": "All features available",
+      "offline": "Offline"
     },
     "sync": {
-      "syncing": "Syncing...",
-      "synced": "Synced",
-      "error": "Error syncing"
+      "synchronize": "Synchronize",
+      "waitingConnection": "Waiting for connection...",
+      "syncing": "Synchronizing...",
+      "action": "action",
+      "actions": "actions",
+      "pending": "pending",
+      "pendings": "pending"
+    },
+    "update": {
+      "title": "New version available!",
+      "message": "Update now to get the latest improvements.",
+      "updateNow": "Update",
+      "later": "Later"
+    }
+  },
+  "payment": {
+    "mbway": {
+      "title": "MB Way Payment",
+      "generating": "Generating QR code...",
+      "reference": "Reference:",
+      "amount": "Amount:",
+      "phone": "Mobile:",
+      "expires": "Expires in:",
+      "howToPay": "How to pay:",
+      "step1": "Open the MB Way app on your phone",
+      "step2": "Scan the QR code shown above",
+      "step3": "Confirm the payment in the app",
+      "step4": "Wait for payment confirmation",
+      "statusPending": "Awaiting payment...",
+      "statusPaid": "Payment confirmed!",
+      "statusExpired": "Payment expired",
+      "statusCancelled": "Payment cancelled",
+      "expired": "Expired",
+      "minute": "minute",
+      "minutes": "minutes"
+    },
+    "pix": {
+      "title": "PIX Payment",
+      "keyLabel": "PIX Key (Mobile):",
+      "amount": "Amount:",
+      "noKey": "This NGO has not yet configured a PIX key for donations.",
+      "contactOng": "Please contact the NGO directly for other donation methods.",
+      "howToDonate": "How to donate via PIX:",
+      "step1": "Open your bank app",
+      "step2": "Select the \"PIX\" option",
+      "step3": "Choose \"Copy and Paste PIX\" or \"PIX Key\"",
+      "step4": "Enter the PIX key above (mobile number)",
+      "step5": "Enter the amount you wish to donate",
+      "step6": "Confirm the details and complete the payment",
+      "importantLabel": "📌 Important:",
+      "importantMessage": "PIX payment is instant and secure. Make sure to verify the details before confirming the transaction."
     }
   },
   "validation": {

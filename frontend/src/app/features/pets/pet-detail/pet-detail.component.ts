@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from "@angular/core";
 import { CommonModule, NgOptimizedImage } from "@angular/common";
 import { ActivatedRoute, Router } from "@angular/router";
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BottomNavComponent } from "../../../shared/components/bottom-nav/bottom-nav.component";
 import { ShareButtonComponent } from "../../../shared/components/share-button/share-button.component";
 import { FavoritesService } from "../../../core/services/favorites.service";
@@ -57,12 +58,13 @@ interface Pet {
     BottomNavComponent,
     NgOptimizedImage,
     ShareButtonComponent,
+    TranslateModule,
   ],
   template: `
     <div class="pet-detail-screen">
       @if (loading()) {
       <div class="loading-container">
-        <div class="loading">Carregando...</div>
+        <div class="loading">{{ 'common.loading' | translate }}</div>
       </div>
       } @else if (pet()) {
       <!-- Header with Back Button -->
@@ -79,7 +81,7 @@ interface Pet {
           class="favorite-button-header"
           [class.favorited]="isFavorited()"
           (click)="toggleFavorite()"
-          title="Adicionar aos favoritos"
+          [title]="'favorites.addedToFavorites' | translate"
         >
           <svg
             width="28"
@@ -123,7 +125,7 @@ interface Pet {
               />
             </svg>
             <p class="placeholder-text">{{ pet()!.name }}</p>
-            <span class="placeholder-subtext">Imagem não disponível</span>
+            <span class="placeholder-subtext">{{ 'common.loading' | translate }}</span>
           </div>
           } @else {
           <img
@@ -165,7 +167,7 @@ interface Pet {
       <!-- Pet Info Banner -->
       <div class="info-banner">
         <span class="info-text"
-          >{{ pet()!.breed }} | {{ pet()!.age }} anos |
+          >{{ pet()!.breed }} | {{ 'home.petCard.years' | translate:{age: pet()!.age} }} |
           {{ pet()!.weight }} kg</span
         >
       </div>
@@ -179,7 +181,7 @@ interface Pet {
 
         <!-- ONG Info Section -->
         <div class="ong-section">
-          <h3 class="section-title">Entrar em Contato</h3>
+          <h3 class="section-title">{{ 'ongs.detail.contact' | translate }}</h3>
 
           <div class="ong-actions">
             @if (pet()!.ong.phone) { @if (pet()!.ong.hasWhatsapp) {
@@ -237,7 +239,7 @@ interface Pet {
         <!-- Schedule Visit Button -->
         @if (pet()!.ong.allowAppointments !== false) {
         <button class="schedule-button" (click)="scheduleVisit()">
-          AGENDAR VISITA
+          {{ 'pets.detail.scheduleVisit' | translate | uppercase }}
         </button>
         }
 
@@ -280,9 +282,9 @@ interface Pet {
       </div>
       } @else {
       <div class="error-container">
-        <p class="error-text">Pet não encontrado</p>
+        <p class="error-text">{{ 'errors.notFound' | translate }}</p>
         <button class="back-to-home-button" (click)="goBack()">
-          Voltar para Home
+          {{ 'common.back' | translate }}
         </button>
       </div>
       }
@@ -849,6 +851,7 @@ export class PetDetailComponent implements OnInit {
   private toastService = inject(ToastService);
   private articlesService = inject(ArticlesService);
   private analyticsService = inject(AnalyticsService);
+  private translate = inject(TranslateService);
 
   pet = signal<Pet | null>(null);
   loading = signal(true);
@@ -925,7 +928,7 @@ export class PetDetailComponent implements OnInit {
         .subscribe({
           next: () => {
             this.favoritedPetId.set(null);
-            this.toastService.success("Removido dos favoritos");
+            this.toastService.success(this.translate.instant('favorites.removedFromFavorites'));
 
             // Track unfavorite
             this.analyticsService.track(EventType.PET_UNFAVORITE, {
@@ -934,7 +937,7 @@ export class PetDetailComponent implements OnInit {
             });
           },
           error: (error) => {
-            this.toastService.error("Erro ao remover dos favoritos");
+            this.toastService.error(this.translate.instant('favorites.errorRemove'));
           },
         });
     } else {
@@ -944,7 +947,7 @@ export class PetDetailComponent implements OnInit {
         .subscribe({
           next: () => {
             this.favoritedPetId.set(pet.id);
-            this.toastService.success("Adicionado aos favoritos");
+            this.toastService.success(this.translate.instant('favorites.addedToFavorites'));
 
             // Track favorite
             this.analyticsService.track(EventType.PET_FAVORITE, {
@@ -953,7 +956,7 @@ export class PetDetailComponent implements OnInit {
             });
           },
           error: (error) => {
-            this.toastService.error("Erro ao adicionar aos favoritos");
+            this.toastService.error(this.translate.instant('favorites.errorAdd'));
           },
         });
     }
@@ -1040,7 +1043,7 @@ export class PetDetailComponent implements OnInit {
       },
     });
 
-    this.toastService.success("Pet compartilhado!");
+    this.toastService.success(this.translate.instant('pets.detail.share'));
   }
 
   getArticleIcon(category: string): string {

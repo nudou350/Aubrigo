@@ -1,17 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-account-type',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="account-type-container">
       <div class="content">
         <img src="assets/logo.svg" alt="Aubrigo" class="logo" *ngIf="false">
-        <h1>Criar Conta</h1>
-        <p class="subtitle">Escolha o tipo de conta que deseja criar</p>
+        <h1>{{ 'auth.accountType.title' | translate }}</h1>
+        <p class="subtitle">{{ 'auth.accountType.subtitle' | translate }}</p>
 
         <div class="account-options">
           <button class="account-card" (click)="selectUserAccount()">
@@ -21,13 +22,13 @@ import { Router } from '@angular/router';
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
             </div>
-            <h3>Sou Adotante</h3>
-            <p>Quero adotar um animal de estimação</p>
+            <h3>{{ 'auth.accountType.user' | translate }}</h3>
+            <p>{{ 'auth.accountType.userDescription' | translate }}</p>
             <ul class="features">
-              <li>Buscar pets disponíveis</li>
-              <li>Agendar visitas</li>
-              <li>Fazer doações</li>
-              <li>Favoritar pets</li>
+              <li>{{ 'auth.accountType.userFeature1' | translate }}</li>
+              <li>{{ 'auth.accountType.userFeature2' | translate }}</li>
+              <li>{{ 'auth.accountType.userFeature3' | translate }}</li>
+              <li>{{ 'auth.accountType.userFeature4' | translate }}</li>
             </ul>
           </button>
 
@@ -37,20 +38,20 @@ import { Router } from '@angular/router';
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
               </svg>
             </div>
-            <h3>Sou ONG</h3>
-            <p>Trabalho com resgate e adoção de animais</p>
+            <h3>{{ 'auth.accountType.ong' | translate }}</h3>
+            <p>{{ 'auth.accountType.ongDescription' | translate }}</p>
             <ul class="features">
-              <li>Cadastrar pets para adoção</li>
-              <li>Gerenciar visitas</li>
-              <li>Receber doações</li>
-              <li>Gerenciar equipe</li>
+              <li>{{ 'auth.accountType.ongFeature1' | translate }}</li>
+              <li>{{ 'auth.accountType.ongFeature2' | translate }}</li>
+              <li>{{ 'auth.accountType.ongFeature3' | translate }}</li>
+              <li>{{ 'auth.accountType.ongFeature4' | translate }}</li>
             </ul>
           </button>
         </div>
 
         <p class="login-link">
-          Já tem uma conta?
-          <a routerLink="/login">Entrar</a>
+          {{ 'auth.accountType.alreadyHaveAccount' | translate }}
+          <a routerLink="/login">{{ 'auth.accountType.login' | translate }}</a>
         </p>
       </div>
     </div>

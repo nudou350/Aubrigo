@@ -53,40 +53,104 @@
     },
     "register": {
       "title": "Registro",
+      "userTitle": "Crear Cuenta de Usuario",
+      "ongTitle": "Crear Cuenta de ONG",
+      "userSubtitle": "Crea tu cuenta para comenzar a adoptar mascotas",
+      "ongSubtitle": "Registra tu ONG para publicar mascotas para adopción",
       "firstName": "Nombre",
+      "firstNamePlaceholder": "Ingresa tu nombre",
+      "firstNameRequired": "El nombre es obligatorio",
       "lastName": "Apellido",
+      "lastNamePlaceholder": "Ingresa tu apellido",
+      "lastNameRequired": "El apellido es obligatorio",
       "email": "Correo electrónico",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "ongEmail": "Correo electrónico de la ONG",
+      "ongEmailPlaceholder": "correo@ong.com",
       "password": "Contraseña",
+      "passwordPlaceholder": "Crea una contraseña",
+      "passwordRequired": "La contraseña es obligatoria",
       "confirmPassword": "Confirmar Contraseña",
+      "confirmPasswordPlaceholder": "Confirma tu contraseña",
       "registerButton": "REGISTRARSE",
+      "createAccountButton": "Crear Cuenta",
+      "sendForApproval": "Enviar para Aprobación",
+      "creatingAccount": "Creando cuenta...",
+      "sending": "Enviando...",
+      "backToAccountType": "← Volver a la selección de tipo de cuenta",
       "alreadyHaveAccount": "¿Ya tiene una cuenta?",
       "loginHere": "Entre aquí",
+      "ongName": "Nombre de la ONG",
+      "ongNamePlaceholder": "Nombre oficial de la organización",
+      "ongNameRequired": "El nombre de la ONG es obligatorio",
+      "city": "Ciudad",
+      "cityPlaceholder": "Ciudad donde opera la ONG",
+      "cityRequired": "La ciudad es obligatoria",
+      "phone": "Teléfono",
+      "phonePlaceholder": "+34 900 000 000",
+      "phoneRequired": "El teléfono es obligatorio",
+      "whatsapp": "WhatsApp (opcional)",
+      "instagram": "Instagram (opcional)",
+      "instagramPlaceholder": "@nombredelaong",
+      "approvalNotice": "Tu registro será revisado por nuestro equipo. Te notificaremos por correo electrónico cuando tu cuenta sea aprobada.",
+      "registrationSubmitted": "Registro enviado con éxito",
+      "ongSuccessMessage": "Tu solicitud de registro de ONG ha sido enviada para revisión. Recibirás un correo electrónico cuando sea aprobada.",
+      "goToLogin": "Ir al Inicio de Sesión",
+      "countrySearch": "Buscar país...",
       "passwordMismatch": "Las contraseñas no coinciden",
       "registerError": "Error al registrarse"
     },
     "forgotPassword": {
       "title": "Olvidó la Contraseña",
+      "titleAlt": "¿Olvidaste tu contraseña?",
+      "subtitle": "Restablece tu contraseña",
       "description": "Ingrese su correo electrónico para recibir las instrucciones de recuperación",
+      "instructions": "Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.",
       "email": "Correo electrónico",
+      "emailPlaceholder": "Ingresa tu correo electrónico",
       "sendButton": "ENVIAR",
       "backToLogin": "Volver al inicio de sesión",
       "emailSent": "¡Correo enviado con éxito!",
-      "sendError": "Error al enviar correo"
+      "emailSuccess": "Correo electrónico de restablecimiento enviado. Revisa tu bandeja de entrada.",
+      "sendError": "Error al enviar correo",
+      "invalidEmail": "Por favor, ingresa un correo electrónico válido"
     },
     "resetPassword": {
       "title": "Restablecer Contraseña",
+      "description": "Ingresa tu nueva contraseña a continuación.",
       "newPassword": "Nueva Contraseña",
+      "newPasswordPlaceholder": "Nueva contraseña",
       "confirmPassword": "Confirmar Nueva Contraseña",
+      "confirmPasswordPlaceholder": "Confirmar nueva contraseña",
       "resetButton": "RESTABLECER",
+      "resetting": "Restableciendo contraseña...",
       "resetSuccess": "¡Contraseña restablecida con éxito!",
-      "resetError": "Error al restablecer contraseña"
+      "resetSuccessMessage": "¡Contraseña restablecida con éxito! Ahora puedes iniciar sesión.",
+      "resetError": "Error al restablecer contraseña",
+      "goToLogin": "Ir al Inicio de Sesión",
+      "invalidToken": "Enlace de restablecimiento inválido o expirado",
+      "fillAllFields": "Por favor, completa todos los campos",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden"
     },
     "accountType": {
       "title": "Elija el tipo de cuenta",
+      "subtitle": "¿Cómo deseas usar Aubrigo?",
       "user": "Usuario",
       "ong": "ONG",
       "userDescription": "Adoptar una mascota",
-      "ongDescription": "Gestionar donaciones y animales"
+      "ongDescription": "Gestionar donaciones y animales",
+      "userFeature1": "Buscar mascotas para adoptar",
+      "userFeature2": "Guardar favoritos y hacer seguimiento",
+      "userFeature3": "Programar visitas a refugios",
+      "userFeature4": "Apoyar a ONGs con donaciones",
+      "ongFeature1": "Publicar mascotas para adopción",
+      "ongFeature2": "Gestionar solicitudes de adopción",
+      "ongFeature3": "Recibir donaciones",
+      "ongFeature4": "Conectar con adoptantes potenciales",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "login": "Iniciar Sesión"
     }
   },
   "home": {
@@ -361,48 +425,79 @@
   },
   "pwa": {
     "install": {
+      "close": "Cerrar",
       "title": "Instalar Aubrigo",
-      "description": "Instale la aplicación para un acceso rápido",
-      "installButton": "Instalar App",
-      "iosInstructions": {
-        "title": "Instalar Aubrigo",
-        "subtitle": "Siga los pasos a continuación para añadir la aplicación a su pantalla de inicio",
-        "step1": {
-          "title": "Toque el botón Compartir",
-          "description": "Busque el ícono en la parte inferior de la pantalla"
-        },
-        "step2": {
-          "title": "Desplácese hacia abajo",
-          "description": "En el menú que aparece, desplácese hasta encontrar la opción"
-        },
-        "step3": {
-          "title": "Añadir a pantalla de inicio",
-          "description": "Toque \"Añadir a pantalla de inicio\" o \"Add to Home Screen\""
-        },
-        "step4": {
-          "title": "Confirme",
-          "description": "Toque \"Añadir\" en la esquina superior derecha"
-        },
-        "footer": "✨ ¡Listo! El ícono de Aubrigo estará en su pantalla de inicio"
-      },
-      "installed": "¡App instalada! Acceda desde el ícono en la pantalla de inicio",
-      "alreadyInstalled": "App ya instalada"
+      "subtitle": "Ten acceso rápido y funciones sin conexión",
+      "benefit1": "Acceso instantáneo desde la pantalla de inicio",
+      "benefit2": "Funciona incluso sin internet",
+      "benefit3": "Más rápido y optimizado",
+      "iosTitle": "Para instalar en iPhone/iPad:",
+      "iosStep1": "Toca el botón <strong>Compartir</strong>",
+      "iosStep2": "Selecciona <strong>\"Añadir a pantalla de inicio\"</strong>",
+      "iosStep3": "Toca <strong>\"Añadir\"</strong>",
+      "installNow": "Instalar Ahora",
+      "maybeLater": "Tal Vez Después",
+      "understood": "Entendido"
     },
-    "update": {
-      "title": "Actualización Disponible",
-      "description": "Una nueva versión está disponible",
-      "updateButton": "Actualizar",
-      "laterButton": "Más tarde"
-    },
-    "offline": {
-      "title": "Sin Conexión",
-      "description": "Está sin conexión. Algunas funcionalidades pueden estar limitadas.",
-      "reconnected": "¡Conexión restaurada!"
+    "network": {
+      "offlineTitle": "Estás sin conexión",
+      "offlineMessage": "Algunas funciones pueden estar limitadas",
+      "onlineTitle": "Estás en línea",
+      "onlineMessage": "Todas las funciones disponibles",
+      "offline": "Sin conexión"
     },
     "sync": {
+      "synchronize": "Sincronizar",
+      "waitingConnection": "Esperando conexión...",
       "syncing": "Sincronizando...",
-      "synced": "Sincronizado",
-      "error": "Error al sincronizar"
+      "action": "acción",
+      "actions": "acciones",
+      "pending": "pendiente",
+      "pendings": "pendientes"
+    },
+    "update": {
+      "title": "¡Nueva versión disponible!",
+      "message": "Actualiza ahora para obtener las últimas mejoras.",
+      "updateNow": "Actualizar",
+      "later": "Después"
+    }
+  },
+  "payment": {
+    "mbway": {
+      "title": "Pago MB Way",
+      "generating": "Generando código QR...",
+      "reference": "Referencia:",
+      "amount": "Cantidad:",
+      "phone": "Móvil:",
+      "expires": "Expira en:",
+      "howToPay": "Cómo pagar:",
+      "step1": "Abre la aplicación MB Way en tu móvil",
+      "step2": "Escanea el código QR mostrado arriba",
+      "step3": "Confirma el pago en la aplicación",
+      "step4": "Espera la confirmación del pago",
+      "statusPending": "Esperando pago...",
+      "statusPaid": "¡Pago confirmado!",
+      "statusExpired": "Pago expirado",
+      "statusCancelled": "Pago cancelado",
+      "expired": "Expirado",
+      "minute": "minuto",
+      "minutes": "minutos"
+    },
+    "pix": {
+      "title": "Pago PIX",
+      "keyLabel": "Clave PIX (Móvil):",
+      "amount": "Cantidad:",
+      "noKey": "Esta ONG aún no ha configurado una clave PIX para donaciones.",
+      "contactOng": "Por favor, contacta directamente con la ONG para otros métodos de donación.",
+      "howToDonate": "Cómo donar vía PIX:",
+      "step1": "Abre la aplicación de tu banco",
+      "step2": "Selecciona la opción \"PIX\"",
+      "step3": "Elige \"Copiar y Pegar PIX\" o \"Clave PIX\"",
+      "step4": "Ingresa la clave PIX arriba (número de móvil)",
+      "step5": "Ingresa la cantidad que deseas donar",
+      "step6": "Confirma los datos y completa el pago",
+      "importantLabel": "📌 Importante:",
+      "importantMessage": "El pago PIX es instantáneo y seguro. Asegúrate de verificar los datos antes de confirmar la transacción."
     }
   },
   "validation": {

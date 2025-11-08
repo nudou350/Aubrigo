@@ -1,4 +1,4 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, signal, inject } from "@angular/core";
 import { CommonModule, NgOptimizedImage } from "@angular/common";
 import {
   FormControl,
@@ -8,19 +8,20 @@ import {
 } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: "app-forgot-password",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage, TranslateModule],
   template: `
     <div class="forgot-password-screen">
       <div class="forgot-password-content">
         <div class="forgot-password-card">
           <!-- Title -->
           <div class="title-section">
-            <h2 class="title">Esqueceu sua senha?</h2>
-            <p class="subtitle">Não se preocupe, isso acontece</p>
+            <h2 class="title">{{ 'auth.forgotPassword.titleAlt' | translate }}</h2>
+            <p class="subtitle">{{ 'auth.forgotPassword.subtitle' | translate }}</p>
           </div>
 
           <!-- Paw Steps Background -->
@@ -61,7 +62,7 @@ import { AuthService } from "../../../core/services/auth.service";
 
           <!-- Instructions -->
           <p class="instructions">
-            Por favor, insira o email cadastrado no aplicativo.
+            {{ 'auth.forgotPassword.instructions' | translate }}
           </p>
 
           <!-- Forgot Password Form -->
@@ -84,7 +85,7 @@ import { AuthService } from "../../../core/services/auth.service";
                   type="email"
                   formControlName="email"
                   class="form-input"
-                  placeholder="Email"
+                  [placeholder]="'auth.forgotPassword.emailPlaceholder' | translate"
                   [class.error]="
                     forgotPasswordForm.get('email')?.invalid &&
                     forgotPasswordForm.get('email')?.touched
@@ -93,7 +94,7 @@ import { AuthService } from "../../../core/services/auth.service";
               </div>
               @if (forgotPasswordForm.get('email')?.invalid &&
               forgotPasswordForm.get('email')?.touched) {
-              <span class="form-error">Email inválido</span>
+              <span class="form-error">{{ 'auth.forgotPassword.invalidEmail' | translate }}</span>
               }
             </div>
 
@@ -104,11 +105,11 @@ import { AuthService } from "../../../core/services/auth.service";
             >
               @if (loading()) {
               <span class="spinner"></span>
-              } @else { ENVIAR }
+              } @else { {{ 'auth.forgotPassword.sendButton' | translate }} }
             </button>
 
             <div class="back-link">
-              <a routerLink="/login">Voltar</a>
+              <a routerLink="/login">{{ 'auth.forgotPassword.backToLogin' | translate }}</a>
             </div>
           </form>
         </div>
@@ -480,6 +481,7 @@ import { AuthService } from "../../../core/services/auth.service";
 })
 export class ForgotPasswordComponent {
   private authService = inject(AuthService);
+  private translate = inject(TranslateService);
 
   loading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -503,12 +505,16 @@ export class ForgotPasswordComponent {
 
     this.authService.forgotPassword(email).subscribe({
       next: (response) => {
-        this.successMessage.set(response.message || "Email de recuperação enviado com sucesso! Verifique sua caixa de entrada.");
+        this.successMessage.set(
+          response.message || this.translate.instant('auth.forgotPassword.emailSuccess')
+        );
         this.forgotPasswordForm.reset();
         this.loading.set(false);
       },
       error: (error) => {
-        this.errorMessage.set(error.error?.message || "Erro ao enviar email de recuperação. Tente novamente.");
+        this.errorMessage.set(
+          error.error?.message || this.translate.instant('auth.forgotPassword.sendError')
+        );
         this.loading.set(false);
       }
     });

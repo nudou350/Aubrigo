@@ -1,4 +1,4 @@
-import { Component, signal, computed, effect } from "@angular/core";
+import { Component, signal, computed, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormBuilder,
@@ -8,6 +8,7 @@ import {
 } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface Country {
   code: string;
@@ -19,15 +20,15 @@ interface Country {
 @Component({
   selector: "app-ong-register",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="register-container">
       <div class="register-card">
         <div class="register-header">
           <div class="icon">🏠</div>
-          <h1>Criar Conta ONG</h1>
+          <h1>{{ 'auth.register.ongTitle' | translate }}</h1>
           <p>
-            Registre sua organização para ajudar animais a encontrarem um lar
+            {{ 'auth.register.ongSubtitle' | translate }}
           </p>
           <div class="approval-notice">
             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -35,19 +36,16 @@ interface Country {
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
               />
             </svg>
-            <span
-              >Sua conta será revisada por um administrador antes de ser
-              aprovada</span
-            >
+            <span>{{ 'auth.register.approvalNotice' | translate }}</span>
           </div>
         </div>
 
         @if (successMessage()) {
         <div class="success-banner">
-          <h3>✓ Registro Enviado!</h3>
+          <h3>{{ 'auth.register.registrationSubmitted' | translate }}</h3>
           <p>{{ successMessage() }}</p>
           <button class="btn-secondary" routerLink="/login">
-            IR PARA LOGIN
+            {{ 'auth.register.goToLogin' | translate }}
           </button>
         </div>
         } @else {
@@ -59,12 +57,12 @@ interface Country {
           }
 
           <div class="form-group">
-            <label for="ongName">Nome da ONG</label>
+            <label for="ongName">{{ 'auth.register.ongName' | translate }}</label>
             <input
               id="ongName"
               type="text"
               formControlName="ongName"
-              placeholder="Cantinho dos Animais"
+              [placeholder]="'auth.register.ongNamePlaceholder' | translate"
               [class.error]="
                 registerForm.get('ongName')?.invalid &&
                 registerForm.get('ongName')?.touched
@@ -72,14 +70,12 @@ interface Country {
             />
             @if (registerForm.get('ongName')?.invalid &&
             registerForm.get('ongName')?.touched) {
-            <span class="error-text"
-              >Nome da ONG é obrigatório (mínimo 3 caracteres)</span
-            >
+            <span class="error-text">{{ 'auth.register.ongNameRequired' | translate }}</span>
             }
           </div>
 
           <div class="form-group">
-            <label for="city">Cidade</label>
+            <label for="city">{{ 'auth.register.city' | translate }}</label>
             <select
               id="city"
               formControlName="city"
@@ -88,7 +84,7 @@ interface Country {
                 registerForm.get('city')?.touched
               "
             >
-              <option value="">Selecione uma cidade</option>
+              <option value="">{{ 'auth.register.cityPlaceholder' | translate }}</option>
               <option value="Lisboa">Lisboa</option>
               <option value="Porto">Porto</option>
               <option value="Beja">Beja</option>
@@ -99,17 +95,17 @@ interface Country {
             </select>
             @if (registerForm.get('city')?.invalid &&
             registerForm.get('city')?.touched) {
-            <span class="error-text">Cidade é obrigatória</span>
+            <span class="error-text">{{ 'auth.register.cityRequired' | translate }}</span>
             }
           </div>
 
           <div class="form-group">
-            <label for="email">Email da ONG</label>
+            <label for="email">{{ 'auth.register.ongEmail' | translate }}</label>
             <input
               id="email"
               type="email"
               formControlName="email"
-              placeholder="contato@cantinho.pt"
+              [placeholder]="'auth.register.ongEmailPlaceholder' | translate"
               [class.error]="
                 registerForm.get('email')?.invalid &&
                 registerForm.get('email')?.touched
@@ -117,12 +113,12 @@ interface Country {
             />
             @if (registerForm.get('email')?.invalid &&
             registerForm.get('email')?.touched) {
-            <span class="error-text">Email válido é obrigatório</span>
+            <span class="error-text">{{ 'auth.register.emailRequired' | translate }}</span>
             }
           </div>
 
           <div class="form-group">
-            <label for="phone">Telefone</label>
+            <label for="phone">{{ 'auth.register.phone' | translate }}</label>
             <div class="phone-input-wrapper">
               <button
                 type="button"
@@ -146,7 +142,7 @@ interface Country {
                 id="phone"
                 type="tel"
                 formControlName="phone"
-                placeholder="21 234 5678"
+                [placeholder]="'auth.register.phonePlaceholder' | translate"
                 class="phone-input radius-left-0"
                 [class.error]="
                   registerForm.get('phone')?.invalid &&
@@ -162,7 +158,7 @@ interface Country {
                 <input
                   type="text"
                   formControlName="countrySearch"
-                  placeholder="Pesquisar país..."
+                  [placeholder]="'auth.register.countrySearch' | translate"
                   class="country-search"
                   (input)="onCountrySearch($event)"
                   autocomplete="off"
@@ -183,7 +179,7 @@ interface Country {
             </div>
             @if (registerForm.get('phone')?.invalid &&
             registerForm.get('phone')?.touched) {
-            <span class="error-text">Telefone é obrigatório</span>
+            <span class="error-text">{{ 'auth.register.phoneRequired' | translate }}</span>
             }
           </div>
 
@@ -194,27 +190,27 @@ interface Country {
                 formControlName="hasWhatsapp"
                 class="checkbox-input"
               />
-              <span class="checkbox-text">WhatsApp</span>
+              <span class="checkbox-text">{{ 'auth.register.whatsapp' | translate }}</span>
             </label>
           </div>
 
           <div class="form-group">
-            <label for="instagram">Instagram</label>
+            <label for="instagram">{{ 'auth.register.instagram' | translate }}</label>
             <input
               id="instagram"
               type="text"
               formControlName="instagramHandle"
-              placeholder="opcional"
+              [placeholder]="'auth.register.instagramPlaceholder' | translate"
             />
           </div>
 
           <div class="form-group">
-            <label for="password">Senha</label>
+            <label for="password">{{ 'auth.register.password' | translate }}</label>
             <input
               id="password"
               type="password"
               formControlName="password"
-              placeholder="Mínimo 8 caracteres"
+              [placeholder]="'auth.register.passwordPlaceholder' | translate"
               [class.error]="
                 registerForm.get('password')?.invalid &&
                 registerForm.get('password')?.touched
@@ -222,19 +218,17 @@ interface Country {
             />
             @if (registerForm.get('password')?.invalid &&
             registerForm.get('password')?.touched) {
-            <span class="error-text"
-              >Senha deve ter no mínimo 8 caracteres</span
-            >
+            <span class="error-text">{{ 'auth.register.passwordRequired' | translate }}</span>
             }
           </div>
 
           <div class="form-group">
-            <label for="confirmPassword">Confirmar Senha</label>
+            <label for="confirmPassword">{{ 'auth.register.confirmPassword' | translate }}</label>
             <input
               id="confirmPassword"
               type="password"
               formControlName="confirmPassword"
-              placeholder="Repita sua senha"
+              [placeholder]="'auth.register.confirmPasswordPlaceholder' | translate"
               [class.error]="
                 registerForm.get('confirmPassword')?.invalid &&
                 registerForm.get('confirmPassword')?.touched
@@ -242,7 +236,7 @@ interface Country {
             />
             @if (registerForm.get('confirmPassword')?.invalid &&
             registerForm.get('confirmPassword')?.touched) {
-            <span class="error-text">Senhas não coincidem</span>
+            <span class="error-text">{{ 'auth.register.passwordMismatch' | translate }}</span>
             }
           </div>
 
@@ -254,13 +248,13 @@ interface Country {
             @if (isLoading()) {
             <span class="spinner"></span>
             }
-            {{ isLoading() ? "Enviando..." : "ENVIAR PARA APROVAÇÃO" }}
+            {{ isLoading() ? ('auth.register.sending' | translate) : ('auth.register.sendForApproval' | translate) }}
           </button>
 
           <div class="footer-links">
-            <p>Já tem uma conta? <a routerLink="/login">Entrar</a></p>
+            <p>{{ 'auth.register.alreadyHaveAccount' | translate }} <a routerLink="/login">{{ 'auth.register.loginHere' | translate }}</a></p>
             <p>
-              <a routerLink="/account-type">← Voltar para escolha de conta</a>
+              <a routerLink="/account-type">{{ 'auth.register.backToAccountType' | translate }}</a>
             </p>
           </div>
         </form>
@@ -686,6 +680,8 @@ interface Country {
   ],
 })
 export class OngRegisterComponent {
+  private translate = inject(TranslateService);
+
   registerForm: FormGroup;
   isLoading = signal(false);
   errorMessage = signal("");
@@ -828,13 +824,13 @@ export class OngRegisterComponent {
       next: (response) => {
         this.isLoading.set(false);
         this.successMessage.set(
-          "Seu registro foi enviado com sucesso! Nossa equipe irá revisar sua organização e você receberá um email quando for aprovada. Isso geralmente leva 1-2 dias úteis."
+          this.translate.instant('auth.register.ongSuccessMessage')
         );
       },
       error: (error) => {
         this.isLoading.set(false);
         this.errorMessage.set(
-          error.error?.message || "Erro ao criar conta. Tente novamente."
+          error.error?.message || this.translate.instant('auth.register.registerError')
         );
       },
     });

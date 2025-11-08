@@ -4,27 +4,28 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { OngService, Donation, DonationStatistics } from '../../../core/services/ong.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-ong-donations',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslateModule],
   template: `
     <div class="donations-page">
       <header class="page-header">
         <a routerLink="/ong/dashboard" class="back-link">
-          ← Voltar
+          {{ 'common.back' | translate }}
         </a>
         <div>
-          <h1>Doações Recebidas</h1>
-          <p>Acompanhe o histórico de doações da sua ONG</p>
+          <h1>{{ 'ongDashboard.donations.title' | translate }}</h1>
+          <p>{{ 'ongDashboard.donations.subtitle' | translate }}</p>
         </div>
       </header>
 
       @if (isLoading()) {
         <div class="loading">
           <div class="spinner"></div>
-          <p>Carregando doações...</p>
+          <p>{{ 'ongDashboard.donations.loading' | translate }}</p>
         </div>
       } @else {
         <!-- Statistics -->
@@ -33,8 +34,8 @@ import { ToastService } from '../../../core/services/toast.service';
             <div class="stat-icon total">💰</div>
             <div class="stat-content">
               <h3>€{{ stats().totalAmount.toFixed(2) }}</h3>
-              <p>Total Recebido</p>
-              <span class="subtext">{{ stats().totalDonations }} doações</span>
+              <p>{{ 'ongDashboard.donations.totalReceived' | translate }}</p>
+              <span class="subtext">{{ stats().totalDonations }} {{ 'ongDashboard.donations.donationsCount' | translate }}</span>
             </div>
           </div>
 
@@ -42,8 +43,8 @@ import { ToastService } from '../../../core/services/toast.service';
             <div class="stat-icon recurring">🔄</div>
             <div class="stat-content">
               <h3>€{{ stats().monthlyRecurring.toFixed(2) }}</h3>
-              <p>Doações Mensais</p>
-              <span class="subtext">Recorrente</span>
+              <p>{{ 'ongDashboard.donations.monthlyDonations' | translate }}</p>
+              <span class="subtext">{{ 'ongDashboard.donations.recurring' | translate }}</span>
             </div>
           </div>
         </div>
@@ -51,19 +52,19 @@ import { ToastService } from '../../../core/services/toast.service';
         <!-- Filters -->
         <div class="filters">
           <select class="filter-select" [(ngModel)]="filterType" (change)="filterDonations()">
-            <option value="">Todos os tipos</option>
-            <option value="one_time">Única</option>
-            <option value="monthly">Mensal</option>
+            <option value="">{{ 'ongDashboard.donations.allTypes' | translate }}</option>
+            <option value="one_time">{{ 'ongDashboard.donations.oneTime' | translate }}</option>
+            <option value="monthly">{{ 'ongDashboard.donations.monthly' | translate }}</option>
           </select>
           <select class="filter-select" [(ngModel)]="filterStatus" (change)="filterDonations()">
-            <option value="">Todos os status</option>
-            <option value="completed">Concluída</option>
-            <option value="pending">Pendente</option>
-            <option value="failed">Falhada</option>
+            <option value="">{{ 'ongDashboard.donations.allStatus' | translate }}</option>
+            <option value="completed">{{ 'ongDashboard.donations.completed' | translate }}</option>
+            <option value="pending">{{ 'ongDashboard.donations.pending' | translate }}</option>
+            <option value="failed">{{ 'ongDashboard.donations.failed' | translate }}</option>
           </select>
           <input
             type="text"
-            placeholder="🔍 Buscar por nome do doador..."
+            [placeholder]="'ongDashboard.donations.searchPlaceholder' | translate"
             class="search-input"
             [(ngModel)]="searchTerm"
             (input)="filterDonations()"
@@ -74,19 +75,19 @@ import { ToastService } from '../../../core/services/toast.service';
         @if (filteredDonations().length === 0) {
           <div class="empty-state">
             <div class="empty-icon">💸</div>
-            <h3>Nenhuma doação encontrada</h3>
-            <p>{{ donations().length === 0 ? 'Quando receberem doações, elas aparecerão aqui' : 'Nenhuma doação encontrada com esses filtros' }}</p>
+            <h3>{{ 'ongDashboard.donations.noDonations' | translate }}</h3>
+            <p>{{ donations().length === 0 ? ('ongDashboard.donations.noDonationsYet' | translate) : ('ongDashboard.donations.noDonationsFiltered' | translate) }}</p>
           </div>
         } @else {
           <div class="donations-table-container">
             <table class="donations-table">
               <thead>
                 <tr>
-                  <th>Doador</th>
-                  <th>Valor</th>
-                  <th>Tipo</th>
-                  <th>Status</th>
-                  <th>Data</th>
+                  <th>{{ 'ongDashboard.donations.donor' | translate }}</th>
+                  <th>{{ 'ongDashboard.donations.amount' | translate }}</th>
+                  <th>{{ 'ongDashboard.donations.type' | translate }}</th>
+                  <th>{{ 'ongDashboard.donations.status' | translate }}</th>
+                  <th>{{ 'ongDashboard.donations.date' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -465,6 +466,7 @@ import { ToastService } from '../../../core/services/toast.service';
 export class OngDonationsComponent implements OnInit {
   private ongService = inject(OngService);
   private toastService = inject(ToastService);
+  private translate = inject(TranslateService);
   Math = Math;
 
   isLoading = signal(true);
@@ -497,7 +499,7 @@ export class OngDonationsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar doações');
+        this.toastService.error(this.translate.instant('ongDashboard.donations.errorLoad'));
         this.isLoading.set(false);
       }
     });
@@ -536,23 +538,24 @@ export class OngDonationsComponent implements OnInit {
 
   getTypeLabel(type: string): string {
     const labels: any = {
-      one_time: 'Única',
-      monthly: 'Mensal'
+      one_time: this.translate.instant('ongDashboard.donations.oneTime'),
+      monthly: this.translate.instant('ongDashboard.donations.monthly')
     };
     return labels[type] || type;
   }
 
   getStatusLabel(status: string): string {
     const labels: any = {
-      completed: 'Concluída',
-      pending: 'Pendente',
-      failed: 'Falhada'
+      completed: this.translate.instant('ongDashboard.donations.completed'),
+      pending: this.translate.instant('ongDashboard.donations.pending'),
+      failed: this.translate.instant('ongDashboard.donations.failed')
     };
     return labels[status] || status;
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('pt-PT', {
+    const locale = this.translate.currentLang === 'en' ? 'en-US' : this.translate.currentLang === 'pt' ? 'pt-PT' : 'pt-BR';
+    return new Date(date).toLocaleDateString(locale, {
       day: '2-digit',
       month: 'short',
       year: 'numeric'
@@ -560,7 +563,8 @@ export class OngDonationsComponent implements OnInit {
   }
 
   formatTime(date: string): string {
-    return new Date(date).toLocaleTimeString('pt-PT', {
+    const locale = this.translate.currentLang === 'en' ? 'en-US' : this.translate.currentLang === 'pt' ? 'pt-PT' : 'pt-BR';
+    return new Date(date).toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit'
     });

@@ -53,40 +53,104 @@
     },
     "register": {
       "title": "Cadastro",
+      "userTitle": "Criar Conta de Usuário",
+      "ongTitle": "Criar Conta ONG",
+      "userSubtitle": "Comece sua jornada para adotar um novo amigo",
+      "ongSubtitle": "Registre sua organização para ajudar animais a encontrarem um lar",
       "firstName": "Nome",
+      "firstNamePlaceholder": "João",
+      "firstNameRequired": "Nome é obrigatório",
       "lastName": "Sobrenome",
+      "lastNamePlaceholder": "Silva",
+      "lastNameRequired": "Sobrenome é obrigatório",
       "email": "Email",
+      "emailPlaceholder": "joao@example.com",
+      "emailRequired": "Email válido é obrigatório",
+      "ongEmail": "Email da ONG",
+      "ongEmailPlaceholder": "contato@cantinho.pt",
       "password": "Senha",
+      "passwordPlaceholder": "Mínimo 8 caracteres",
+      "passwordRequired": "Senha deve ter no mínimo 8 caracteres",
       "confirmPassword": "Confirmar Senha",
+      "confirmPasswordPlaceholder": "Repita sua senha",
       "registerButton": "CADASTRAR",
+      "createAccountButton": "CRIAR CONTA",
+      "sendForApproval": "ENVIAR PARA APROVAÇÃO",
+      "creatingAccount": "Criando conta...",
+      "sending": "Enviando...",
       "alreadyHaveAccount": "Já tem uma conta?",
-      "loginHere": "Entre aqui",
-      "passwordMismatch": "As senhas não coincidem",
-      "registerError": "Erro ao cadastrar"
+      "loginHere": "Entrar",
+      "backToAccountType": "← Voltar para escolha de conta",
+      "passwordMismatch": "Senhas não coincidem",
+      "registerError": "Erro ao criar conta. Tente novamente.",
+      "ongName": "Nome da ONG",
+      "ongNamePlaceholder": "Cantinho dos Animais",
+      "ongNameRequired": "Nome da ONG é obrigatório (mínimo 3 caracteres)",
+      "city": "Cidade",
+      "cityPlaceholder": "Selecione uma cidade",
+      "cityRequired": "Cidade é obrigatória",
+      "phone": "Telefone",
+      "phonePlaceholder": "21 234 5678",
+      "phoneRequired": "Telefone é obrigatório",
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "instagramPlaceholder": "opcional",
+      "approvalNotice": "Sua conta será revisada por um administrador antes de ser aprovada",
+      "registrationSubmitted": "✓ Registro Enviado!",
+      "ongSuccessMessage": "Seu registro foi enviado com sucesso! Nossa equipe irá revisar sua organização e você receberá um email quando for aprovada. Isso geralmente leva 1-2 dias úteis.",
+      "goToLogin": "IR PARA LOGIN",
+      "countrySearch": "Pesquisar país..."
     },
     "forgotPassword": {
       "title": "Esqueceu a Senha",
+      "titleAlt": "Esqueceu sua senha?",
+      "subtitle": "Não se preocupe, isso acontece",
       "description": "Digite seu e-mail para receber as instruções de recuperação",
+      "instructions": "Por favor, insira o email cadastrado no aplicativo.",
       "email": "Email",
+      "emailPlaceholder": "Email",
       "sendButton": "ENVIAR",
-      "backToLogin": "Voltar ao login",
+      "backToLogin": "Voltar",
       "emailSent": "E-mail enviado com sucesso!",
-      "sendError": "Erro ao enviar e-mail"
+      "emailSuccess": "Email de recuperação enviado com sucesso! Verifique sua caixa de entrada.",
+      "sendError": "Erro ao enviar email de recuperação. Tente novamente.",
+      "invalidEmail": "Email inválido"
     },
     "resetPassword": {
       "title": "Redefinir Senha",
+      "description": "Digite sua nova senha abaixo.",
       "newPassword": "Nova Senha",
+      "newPasswordPlaceholder": "Mínimo 6 caracteres",
       "confirmPassword": "Confirmar Nova Senha",
-      "resetButton": "REDEFINIR",
-      "resetSuccess": "Senha redefinida com sucesso!",
-      "resetError": "Erro ao redefinir senha"
+      "confirmPasswordPlaceholder": "Digite novamente",
+      "resetButton": "REDEFINIR SENHA",
+      "resetting": "Redefinindo...",
+      "resetSuccess": "Senha Redefinida!",
+      "resetSuccessMessage": "Sua senha foi alterada com sucesso.",
+      "goToLogin": "Ir para Login",
+      "resetError": "Erro ao redefinir senha. O token pode estar expirado.",
+      "invalidToken": "Token de redefinição inválido",
+      "fillAllFields": "Por favor, preencha todos os campos",
+      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+      "passwordsDoNotMatch": "As senhas não coincidem"
     },
     "accountType": {
-      "title": "Escolha o tipo de conta",
-      "user": "Utilizador",
-      "ong": "ONG",
-      "userDescription": "Adotar um pet",
-      "ongDescription": "Gerir doações e animais"
+      "title": "Criar Conta",
+      "subtitle": "Escolha o tipo de conta que deseja criar",
+      "user": "Sou Adotante",
+      "ong": "Sou ONG",
+      "userDescription": "Quero adotar um animal de estimação",
+      "ongDescription": "Trabalho com resgate e adoção de animais",
+      "userFeature1": "Buscar pets disponíveis",
+      "userFeature2": "Agendar visitas",
+      "userFeature3": "Fazer doações",
+      "userFeature4": "Favoritar pets",
+      "ongFeature1": "Cadastrar pets para adoção",
+      "ongFeature2": "Gerenciar visitas",
+      "ongFeature3": "Receber doações",
+      "ongFeature4": "Gerenciar equipe",
+      "alreadyHaveAccount": "Já tem uma conta?",
+      "login": "Entrar"
     }
   },
   "home": {
@@ -361,48 +425,79 @@
   },
   "pwa": {
     "install": {
+      "close": "Fechar",
       "title": "Instalar Aubrigo",
-      "description": "Instale o app para acesso rápido",
-      "installButton": "Instalar App",
-      "iosInstructions": {
-        "title": "Instalar Aubrigo",
-        "subtitle": "Siga os passos abaixo para adicionar o app à sua tela inicial",
-        "step1": {
-          "title": "Toque no botão Compartilhar",
-          "description": "Procure pelo ícone na parte inferior da tela"
-        },
-        "step2": {
-          "title": "Role para baixo",
-          "description": "No menu que aparecer, role até encontrar a opção"
-        },
-        "step3": {
-          "title": "Adicionar à Tela de Início",
-          "description": "Toque em \"Adicionar à Tela de Início\" ou \"Add to Home Screen\""
-        },
-        "step4": {
-          "title": "Confirme",
-          "description": "Toque em \"Adicionar\" no canto superior direito"
-        },
-        "footer": "✨ Pronto! O ícone do Aubrigo estará na sua tela inicial"
-      },
-      "installed": "App instalado! Acesse pelo ícone na tela inicial",
-      "alreadyInstalled": "App já instalado"
+      "subtitle": "Tenha acesso rápido e recursos offline",
+      "benefit1": "Acesso instantâneo da tela inicial",
+      "benefit2": "Funciona mesmo sem internet",
+      "benefit3": "Mais rápido e otimizado",
+      "iosTitle": "Para instalar no iPhone/iPad:",
+      "iosStep1": "Toque no botão <strong>Compartilhar</strong>",
+      "iosStep2": "Selecione <strong>\"Adicionar à Tela de Início\"</strong>",
+      "iosStep3": "Toque em <strong>\"Adicionar\"</strong>",
+      "installNow": "Instalar Agora",
+      "maybeLater": "Talvez Depois",
+      "understood": "Entendi"
     },
-    "update": {
-      "title": "Atualização Disponível",
-      "description": "Uma nova versão está disponível",
-      "updateButton": "Atualizar",
-      "laterButton": "Mais tarde"
-    },
-    "offline": {
-      "title": "Sem Conexão",
-      "description": "Você está offline. Algumas funcionalidades podem estar limitadas.",
-      "reconnected": "Conexão restaurada!"
+    "network": {
+      "offlineTitle": "Você está offline",
+      "offlineMessage": "Algumas funcionalidades podem estar limitadas",
+      "onlineTitle": "Você está online",
+      "onlineMessage": "Todas as funcionalidades disponíveis",
+      "offline": "Offline"
     },
     "sync": {
+      "synchronize": "Sincronizar",
+      "waitingConnection": "Aguardando conexão...",
       "syncing": "Sincronizando...",
-      "synced": "Sincronizado",
-      "error": "Erro ao sincronizar"
+      "action": "ação",
+      "actions": "ações",
+      "pending": "pendente",
+      "pendings": "pendentes"
+    },
+    "update": {
+      "title": "Nova versão disponível!",
+      "message": "Atualize agora para obter as últimas melhorias.",
+      "updateNow": "Atualizar",
+      "later": "Depois"
+    }
+  },
+  "payment": {
+    "mbway": {
+      "title": "Pagamento MB Way",
+      "generating": "A gerar código QR...",
+      "reference": "Referência:",
+      "amount": "Valor:",
+      "phone": "Telemóvel:",
+      "expires": "Expira em:",
+      "howToPay": "Como pagar:",
+      "step1": "Abra a aplicação MB Way no seu telemóvel",
+      "step2": "Escaneie o código QR apresentado acima",
+      "step3": "Confirme o pagamento na aplicação",
+      "step4": "Aguarde a confirmação do pagamento",
+      "statusPending": "Aguardando pagamento...",
+      "statusPaid": "Pagamento confirmado!",
+      "statusExpired": "Pagamento expirado",
+      "statusCancelled": "Pagamento cancelado",
+      "expired": "Expirado",
+      "minute": "minuto",
+      "minutes": "minutos"
+    },
+    "pix": {
+      "title": "Pagamento PIX",
+      "keyLabel": "Chave PIX (Celular):",
+      "amount": "Valor:",
+      "noKey": "Esta ONG ainda não configurou uma chave PIX para doações.",
+      "contactOng": "Por favor, entre em contato diretamente com a ONG para outras formas de doação.",
+      "howToDonate": "Como fazer a doação via PIX:",
+      "step1": "Abra o aplicativo do seu banco",
+      "step2": "Selecione a opção \"PIX\"",
+      "step3": "Escolha \"Pix Copia e Cola\" ou \"Chave PIX\"",
+      "step4": "Insira a chave PIX acima (número de celular)",
+      "step5": "Digite o valor que deseja doar",
+      "step6": "Confirme os dados e finalize o pagamento",
+      "importantLabel": "📌 Importante:",
+      "importantMessage": "O pagamento via PIX é instantâneo e seguro. Certifique-se de verificar os dados antes de confirmar a transação."
     }
   },
   "validation": {

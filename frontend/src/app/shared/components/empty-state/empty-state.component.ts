@@ -175,7 +175,7 @@ export type EmptyStateIcon = 'pets' | 'favorites' | 'appointments' | 'search' | 
 })
 export class EmptyStateComponent {
   @Input() icon: EmptyStateIcon = 'generic';
-  @Input() title: string = 'Nenhum item encontrado';
+  @Input() title: string = '';
   @Input() description?: string;
   @Input() buttonText?: string;
   @Input() secondaryButtonText?: string;

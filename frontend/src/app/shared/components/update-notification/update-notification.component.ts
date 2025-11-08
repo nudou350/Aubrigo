@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { PwaService } from '../../../core/services/pwa.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 
@@ -12,7 +13,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 @Component({
   selector: 'app-update-notification',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     @if (showNotification()) {
       <div class="update-notification" [@slideDown]>
@@ -23,15 +24,15 @@ import { trigger, transition, style, animate } from '@angular/animations';
             </svg>
           </div>
           <div class="update-message">
-            <strong>Nova versão disponível!</strong>
-            <p>Atualize agora para obter as últimas melhorias.</p>
+            <strong>{{ 'pwa.update.title' | translate }}</strong>
+            <p>{{ 'pwa.update.message' | translate }}</p>
           </div>
           <div class="update-actions">
             <button class="btn-update" (click)="updateNow()">
-              Atualizar
+              {{ 'pwa.update.updateNow' | translate }}
             </button>
             <button class="btn-dismiss" (click)="dismiss()">
-              Depois
+              {{ 'pwa.update.later' | translate }}
             </button>
           </div>
         </div>

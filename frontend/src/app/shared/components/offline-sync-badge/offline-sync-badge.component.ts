@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { OfflineQueueService } from '../../../core/services/offline-queue.service';
 import { NetworkStatusService } from '../../../core/services/network-status.service';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -13,7 +14,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 @Component({
   selector: 'app-offline-sync-badge',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     @if (pendingCount() > 0) {
       <div class="sync-badge" [@fadeIn] [class.syncing]="isSyncing()">
@@ -22,22 +23,22 @@ import { trigger, transition, style, animate } from '@angular/animations';
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
           <span class="badge-text">
-            {{ pendingCount() }} {{ pendingCount() === 1 ? 'ação' : 'ações' }} pendente{{ pendingCount() === 1 ? '' : 's' }}
+            {{ getPendingText() }}
           </span>
         </div>
 
         @if (networkService.isOnline() && !isSyncing()) {
           <button class="sync-btn" (click)="syncNow()">
-            Sincronizar
+            {{ 'pwa.sync.synchronize' | translate }}
           </button>
         }
 
         @if (!networkService.isOnline()) {
-          <span class="status-text">Aguardando conexão...</span>
+          <span class="status-text">{{ 'pwa.sync.waitingConnection' | translate }}</span>
         }
 
         @if (isSyncing()) {
-          <span class="status-text">Sincronizando...</span>
+          <span class="status-text">{{ 'pwa.sync.syncing' | translate }}</span>
         }
       </div>
     }
@@ -143,6 +144,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 })
 export class OfflineSyncBadgeComponent implements OnInit {
   private queueService = inject(OfflineQueueService);
+  private translate = inject(TranslateService);
   public networkService = inject(NetworkStatusService);
 
   pendingCount = signal(0);
@@ -179,5 +181,16 @@ export class OfflineSyncBadgeComponent implements OnInit {
     } finally {
       this.isSyncing.set(false);
     }
+  }
+
+  getPendingText(): string {
+    const count = this.pendingCount();
+    const actionWord = count === 1 ?
+      this.translate.instant('pwa.sync.action') :
+      this.translate.instant('pwa.sync.actions');
+    const pendingWord = count === 1 ?
+      this.translate.instant('pwa.sync.pending') :
+      this.translate.instant('pwa.sync.pendings');
+    return `${count} ${actionWord} ${pendingWord}`;
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { NetworkStatusService } from '../../../core/services/network-status.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 
@@ -12,7 +13,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 @Component({
   selector: 'app-network-status',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     <!-- Offline notification -->
     @if (networkService.justWentOffline()) {
@@ -22,8 +23,8 @@ import { trigger, transition, style, animate } from '@angular/animations';
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3" />
           </svg>
           <div class="toast-message">
-            <strong>Você está offline</strong>
-            <p>Algumas funcionalidades podem estar limitadas</p>
+            <strong>{{ 'pwa.network.offlineTitle' | translate }}</strong>
+            <p>{{ 'pwa.network.offlineMessage' | translate }}</p>
           </div>
         </div>
       </div>
@@ -37,8 +38,8 @@ import { trigger, transition, style, animate } from '@angular/animations';
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
           </svg>
           <div class="toast-message">
-            <strong>Você está online</strong>
-            <p>Todas as funcionalidades disponíveis</p>
+            <strong>{{ 'pwa.network.onlineTitle' | translate }}</strong>
+            <p>{{ 'pwa.network.onlineMessage' | translate }}</p>
           </div>
         </div>
       </div>
@@ -50,7 +51,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3" />
         </svg>
-        <span>Offline</span>
+        <span>{{ 'pwa.network.offline' | translate }}</span>
       </div>
     }
   `,

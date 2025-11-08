@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="reset-password-screen">
       <div class="container">
@@ -18,7 +19,7 @@ import { HttpClient } from '@angular/common/http';
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
             </svg>
           </button>
-          <h1 class="title">Redefinir Senha</h1>
+          <h1 class="title">{{ 'auth.resetPassword.title' | translate }}</h1>
         </div>
 
         <!-- Content -->
@@ -31,29 +32,29 @@ import { HttpClient } from '@angular/common/http';
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                 </svg>
               </div>
-              <h2>Senha Redefinida!</h2>
-              <p>Sua senha foi alterada com sucesso.</p>
+              <h2>{{ 'auth.resetPassword.resetSuccess' | translate }}</h2>
+              <p>{{ 'auth.resetPassword.resetSuccessMessage' | translate }}</p>
               <button class="btn-primary" (click)="goToLogin()">
-                Ir para Login
+                {{ 'auth.resetPassword.goToLogin' | translate }}
               </button>
             </div>
           } @else {
             <!-- Form -->
             <div class="form-container">
               <div class="intro-text">
-                <p>Digite sua nova senha abaixo.</p>
+                <p>{{ 'auth.resetPassword.description' | translate }}</p>
               </div>
 
               <form (ngSubmit)="resetPassword()">
                 <div class="form-group">
-                  <label for="newPassword">Nova Senha</label>
+                  <label for="newPassword">{{ 'auth.resetPassword.newPassword' | translate }}</label>
                   <div class="password-input">
                     <input
                       [type]="showPassword() ? 'text' : 'password'"
                       id="newPassword"
                       name="newPassword"
                       [(ngModel)]="formData.newPassword"
-                      placeholder="Mínimo 6 caracteres"
+                      [placeholder]="'auth.resetPassword.newPasswordPlaceholder' | translate"
                       required
                       minlength="6"
                     />
@@ -76,13 +77,13 @@ import { HttpClient } from '@angular/common/http';
                 </div>
 
                 <div class="form-group">
-                  <label for="confirmPassword">Confirmar Nova Senha</label>
+                  <label for="confirmPassword">{{ 'auth.resetPassword.confirmPassword' | translate }}</label>
                   <input
                     type="password"
                     id="confirmPassword"
                     name="confirmPassword"
                     [(ngModel)]="formData.confirmPassword"
-                    placeholder="Digite novamente"
+                    [placeholder]="'auth.resetPassword.confirmPasswordPlaceholder' | translate"
                     required
                     minlength="6"
                   />
@@ -99,7 +100,7 @@ import { HttpClient } from '@angular/common/http';
                   class="btn-submit"
                   [disabled]="submitting()"
                 >
-                  {{ submitting() ? 'Redefinindo...' : 'REDEFINIR SENHA' }}
+                  {{ submitting() ? ('auth.resetPassword.resetting' | translate) : ('auth.resetPassword.resetButton' | translate) }}
                 </button>
               </form>
             </div>
@@ -312,6 +313,7 @@ export class ResetPasswordComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private http = inject(HttpClient);
+  private translate = inject(TranslateService);
 
   token = signal('');
   submitting = signal(false);
@@ -327,7 +329,7 @@ export class ResetPasswordComponent implements OnInit {
   ngOnInit() {
     this.token.set(this.route.snapshot.queryParamMap.get('token') || '');
     if (!this.token()) {
-      this.errorMessage.set('Token de redefinição inválido');
+      this.errorMessage.set(this.translate.instant('auth.resetPassword.invalidToken'));
     }
   }
 
@@ -341,17 +343,17 @@ export class ResetPasswordComponent implements OnInit {
     this.errorMessage.set('');
 
     if (!this.formData.newPassword || !this.formData.confirmPassword) {
-      this.errorMessage.set('Por favor, preencha todos os campos');
+      this.errorMessage.set(this.translate.instant('auth.resetPassword.fillAllFields'));
       return;
     }
 
     if (this.formData.newPassword.length < 6) {
-      this.errorMessage.set('A senha deve ter pelo menos 6 caracteres');
+      this.errorMessage.set(this.translate.instant('auth.resetPassword.passwordTooShort'));
       return;
     }
 
     if (this.formData.newPassword !== this.formData.confirmPassword) {
-      this.errorMessage.set('As senhas não coincidem');
+      this.errorMessage.set(this.translate.instant('auth.resetPassword.passwordsDoNotMatch'));
       return;
     }
 
@@ -371,7 +373,7 @@ export class ResetPasswordComponent implements OnInit {
       error: (error) => {
         this.submitting.set(false);
         this.errorMessage.set(
-          error.error?.message || 'Erro ao redefinir senha. O token pode estar expirado.'
+          error.error?.message || this.translate.instant('auth.resetPassword.resetError')
         );
       }
     });

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BottomNavComponent } from '../../../shared/components/bottom-nav/bottom-nav.component';
 import { AppointmentsService, CreateAppointmentDto } from '../../../core/services/appointments.service';
 import { SchedulingService, AvailableSlot } from '../../../core/services/scheduling.service';
@@ -33,7 +34,7 @@ interface AppointmentForm {
 @Component({
   selector: 'app-schedule-appointment',
   standalone: true,
-  imports: [CommonModule, FormsModule, BottomNavComponent],
+  imports: [CommonModule, FormsModule, BottomNavComponent, TranslateModule],
   template: `
     <div class="schedule-screen">
       <!-- Header -->
@@ -43,12 +44,12 @@ interface AppointmentForm {
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
           </svg>
         </button>
-        <h1 class="title">Agendar Visita</h1>
+        <h1 class="title">{{ 'pets.appointment.title' | translate }}</h1>
       </div>
 
       @if (loading()) {
         <div class="loading-container">
-          <div class="loading">Carregando...</div>
+          <div class="loading">{{ 'common.loading' | translate }}</div>
         </div>
       } @else if (pet()) {
         <div class="content">
@@ -76,27 +77,27 @@ interface AppointmentForm {
           <div class="steps">
             <div class="step" [class.active]="currentStep() === 1" [class.completed]="currentStep() > 1">
               <div class="step-circle">1</div>
-              <span class="step-label">Escolher Data</span>
+              <span class="step-label">{{ 'pets.appointment.preferredDate' | translate }}</span>
             </div>
             <div class="step-line" [class.completed]="currentStep() > 1"></div>
             <div class="step" [class.active]="currentStep() === 2" [class.completed]="currentStep() > 2">
               <div class="step-circle">2</div>
-              <span class="step-label">Escolher Horário</span>
+              <span class="step-label">{{ 'pets.appointment.preferredTime' | translate }}</span>
             </div>
             <div class="step-line" [class.completed]="currentStep() > 2"></div>
             <div class="step" [class.active]="currentStep() === 3" [class.completed]="currentStep() > 3">
               <div class="step-circle">3</div>
-              <span class="step-label">Seus Dados</span>
+              <span class="step-label">{{ 'profile.personalInfo' | translate }}</span>
             </div>
           </div>
 
           <!-- Step 1: Choose Date -->
           @if (currentStep() === 1) {
             <div class="step-content">
-              <h3 class="step-title">Escolha uma data disponível</h3>
+              <h3 class="step-title">{{ 'pets.appointment.preferredDate' | translate }}</h3>
 
               @if (loadingCalendar()) {
-                <div class="calendar-loading">Carregando datas...</div>
+                <div class="calendar-loading">{{ 'common.loading' | translate }}</div>
               } @else {
                 <!-- Month Navigation -->
                 <div class="month-nav">
@@ -146,17 +147,17 @@ interface AppointmentForm {
           <!-- Step 2: Choose Time Slot -->
           @if (currentStep() === 2) {
             <div class="step-content">
-              <h3 class="step-title">Escolha um horário</h3>
+              <h3 class="step-title">{{ 'pets.appointment.preferredTime' | translate }}</h3>
               <p class="step-subtitle">{{ formatSelectedDate() }}</p>
 
               @if (loadingSlots()) {
-                <div class="slots-loading">Carregando horários...</div>
+                <div class="slots-loading">{{ 'common.loading' | translate }}</div>
               } @else {
                 @if (availableSlots().length === 0) {
                   <div class="no-slots">
-                    <p>Nenhum horário disponível para esta data.</p>
+                    <p>{{ 'errors.notFound' | translate }}</p>
                     <button class="btn-secondary" (click)="backToStep(1)">
-                      Escolher outra data
+                      {{ 'common.back' | translate }}
                     </button>
                   </div>
                 } @else {
@@ -174,10 +175,10 @@ interface AppointmentForm {
 
                   <div class="step-actions">
                     <button class="btn-secondary" (click)="backToStep(1)">
-                      Voltar
+                      {{ 'common.back' | translate }}
                     </button>
                     <button class="btn-primary" (click)="nextStep()" [disabled]="!selectedSlot()">
-                      Continuar
+                      {{ 'common.next' | translate }}
                     </button>
                   </div>
                 }
@@ -188,55 +189,55 @@ interface AppointmentForm {
           <!-- Step 3: Fill Personal Data -->
           @if (currentStep() === 3) {
             <div class="step-content">
-              <h3 class="step-title">Seus dados</h3>
+              <h3 class="step-title">{{ 'profile.personalInfo' | translate }}</h3>
               <p class="step-subtitle">
                 {{ formatSelectedDate() }} às {{ formatTime(selectedSlot()!) }}
               </p>
 
               <form class="appointment-form" (ngSubmit)="submitAppointment()">
                 <div class="form-group">
-                  <label for="visitorName">Nome Completo *</label>
+                  <label for="visitorName">{{ 'pets.appointment.visitorName' | translate }} *</label>
                   <input
                     type="text"
                     id="visitorName"
                     name="visitorName"
                     [(ngModel)]="formData.visitorName"
-                    placeholder="Digite seu nome"
+                    [placeholder]="'pets.appointment.visitorName' | translate"
                     required
                   />
                 </div>
 
                 <div class="form-group">
-                  <label for="visitorEmail">Email *</label>
+                  <label for="visitorEmail">{{ 'pets.appointment.visitorEmail' | translate }} *</label>
                   <input
                     type="email"
                     id="visitorEmail"
                     name="visitorEmail"
                     [(ngModel)]="formData.visitorEmail"
-                    placeholder="seu@email.com"
+                    [placeholder]="'pets.appointment.visitorEmail' | translate"
                     required
                   />
                 </div>
 
                 <div class="form-group">
-                  <label for="visitorPhone">Telefone *</label>
+                  <label for="visitorPhone">{{ 'pets.appointment.visitorPhone' | translate }} *</label>
                   <input
                     type="tel"
                     id="visitorPhone"
                     name="visitorPhone"
                     [(ngModel)]="formData.visitorPhone"
-                    placeholder="(00) 00000-0000"
+                    [placeholder]="'pets.appointment.visitorPhone' | translate"
                     required
                   />
                 </div>
 
                 <div class="form-group">
-                  <label for="notes">Observações (Opcional)</label>
+                  <label for="notes">{{ 'pets.appointment.notes' | translate }}</label>
                   <textarea
                     id="notes"
                     name="notes"
                     [(ngModel)]="formData.notes"
-                    placeholder="Alguma informação adicional..."
+                    [placeholder]="'pets.appointment.notes' | translate"
                     rows="4"
                   ></textarea>
                 </div>
@@ -254,14 +255,14 @@ interface AppointmentForm {
                     (click)="backToStep(2)"
                     [disabled]="submitting()"
                   >
-                    Voltar
+                    {{ 'common.back' | translate }}
                   </button>
                   <button
                     type="submit"
                     class="btn-primary"
                     [disabled]="submitting()"
                   >
-                    {{ submitting() ? 'Confirmando...' : 'Confirmar Agendamento' }}
+                    {{ (submitting() ? 'common.loading' : 'pets.appointment.scheduleButton') | translate }}
                   </button>
                 </div>
               </form>
@@ -270,9 +271,9 @@ interface AppointmentForm {
         </div>
       } @else {
         <div class="error-container">
-          <p class="error-text">Pet não encontrado</p>
+          <p class="error-text">{{ 'errors.notFound' | translate }}</p>
           <button class="back-button-full" (click)="goBack()">
-            Voltar
+            {{ 'common.back' | translate }}
           </button>
         </div>
       }
@@ -755,6 +756,7 @@ export class ScheduleAppointmentComponent implements OnInit {
   private schedulingService = inject(SchedulingService);
   private toastService = inject(ToastService);
   private analyticsService = inject(AnalyticsService);
+  private translate = inject(TranslateService);
 
   pet = signal<Pet | null>(null);
   loading = signal(true);
@@ -839,7 +841,7 @@ export class ScheduleAppointmentComponent implements OnInit {
         this.loadAvailableDates();
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar informações do pet');
+        this.toastService.error(this.translate.instant('pets.form.error'));
         this.loading.set(false);
       }
     });
@@ -860,7 +862,7 @@ export class ScheduleAppointmentComponent implements OnInit {
         this.loadingCalendar.set(false);
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar datas disponíveis');
+        this.toastService.error(this.translate.instant('pets.appointment.error'));
         this.loadingCalendar.set(false);
       }
     });
@@ -885,7 +887,7 @@ export class ScheduleAppointmentComponent implements OnInit {
         this.loadingSlots.set(false);
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar horários disponíveis');
+        this.toastService.error(this.translate.instant('pets.appointment.error'));
         this.loadingSlots.set(false);
       }
     });
@@ -946,7 +948,7 @@ export class ScheduleAppointmentComponent implements OnInit {
     this.errorMessage.set('');
 
     if (!this.formData.visitorName || !this.formData.visitorEmail || !this.formData.visitorPhone) {
-      this.errorMessage.set('Por favor, preencha todos os campos obrigatórios');
+      this.errorMessage.set(this.translate.instant('validation.required'));
       return;
     }
 
@@ -964,7 +966,7 @@ export class ScheduleAppointmentComponent implements OnInit {
     this.appointmentsService.createAppointment(appointmentData).subscribe({
       next: () => {
         this.submitting.set(false);
-        this.toastService.success('Visita confirmada automaticamente! Verifique seu email.');
+        this.toastService.success(this.translate.instant('pets.appointment.success'));
 
         // Track appointment creation
         this.analyticsService.track(EventType.APPOINTMENT_CREATE, {
@@ -981,9 +983,7 @@ export class ScheduleAppointmentComponent implements OnInit {
       },
       error: (error) => {
         this.submitting.set(false);
-        this.errorMessage.set(
-          error.error?.message || 'Erro ao agendar visita. Por favor, tente novamente.'
-        );
+        this.errorMessage.set(this.translate.instant('pets.appointment.error'));
         this.toastService.error(this.errorMessage());
       }
     });
