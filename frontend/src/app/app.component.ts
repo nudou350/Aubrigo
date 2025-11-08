@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { UpdateNotificationComponent } from './shared/components/update-notification/update-notification.component';
@@ -12,7 +12,7 @@ import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badg
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent],
+  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent, TranslateModule],
   template: `
     <div class="app-container">
       <main class="main-content">
@@ -22,14 +22,14 @@ import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badg
       <footer class="web-footer">
         <div class="footer-content">
           <p>
-            <span>Desenvolvido por</span>
+            <span>{{ 'footer.developedBy' | translate }}</span>
             <a href="https://www.linkedin.com/in/dev-raphaelp/" target="_blank" rel="noopener noreferrer">
               Raphael Pereira
             </a>
           </p>
           <span class="separator">•</span>
           <p>
-            <span>Design por</span>
+            <span>{{ 'footer.designedBy' | translate }}</span>
             <a href="https://www.linkedin.com/in/tharaujovieira/" target="_blank" rel="noopener noreferrer">
               Thaís Araújo
             </a>
