@@ -476,3 +476,4 @@ CREATE INDEX idx_appointments_pet_id ON appointments(pet_id);
 **Document Version:** 2.0
 **Last Updated:** January 5, 2025
 **Maintained By:** Aubrigo Development Team
+- sempre que fizermos uma alteracao, acrescente uma pequena versao no PWA para dar trigger nos commits

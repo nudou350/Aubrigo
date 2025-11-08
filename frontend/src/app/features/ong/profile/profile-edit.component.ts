@@ -613,7 +613,8 @@ export class ProfileEditComponent implements OnInit {
         await new Promise<void>((resolve, reject) => {
           this.ongService.changePassword({
             currentPassword: this.profileForm.value.currentPassword,
-            newPassword: this.profileForm.value.newPassword
+            newPassword: this.profileForm.value.newPassword,
+            confirmPassword: this.profileForm.value.confirmPassword
           }).subscribe({
             next: () => {
               this.toastService.success('Senha alterada com sucesso');
