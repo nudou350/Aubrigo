@@ -813,7 +813,7 @@ export class ProfileComponent implements OnInit {
 
     const service = this.isOng ? this.ongService : this.usersService;
 
-    service.changePassword({ currentPassword, newPassword }).subscribe({
+    service.changePassword({ currentPassword, newPassword, confirmPassword }).subscribe({
       next: () => {
         this.toastService.success('Senha alterada com sucesso');
         this.togglePasswordForm();

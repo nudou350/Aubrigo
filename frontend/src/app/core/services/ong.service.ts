@@ -34,6 +34,7 @@ export interface UpdateOngProfileDto {
 export interface ChangePasswordDto {
   currentPassword: string;
   newPassword: string;
+  confirmPassword: string;
 }
 
 export interface OngDashboardStats {
