@@ -73,6 +73,7 @@ export class UsersService {
   async findAll(filters?: {
     search?: string;
     location?: string;
+    countryCode?: string;
   }): Promise<any[]> {
     const queryBuilder = this.userRepository
       .createQueryBuilder('user')
@@ -83,10 +84,18 @@ export class UsersService {
         'user.location',
         'user.phone',
         'user.instagramHandle',
+        'user.countryCode',
       ])
       // Only return ONGs with role='ong' and status='approved'
       .where('user.role = :role', { role: 'ong' })
       .andWhere('user.ongStatus = :status', { status: 'approved' });
+
+    // IMPORTANT: Filter by country code
+    if (filters?.countryCode) {
+      queryBuilder.andWhere('user.countryCode = :countryCode', {
+        countryCode: filters.countryCode,
+      });
+    }
 
     // Filter by search (ONG name)
     if (filters?.search) {

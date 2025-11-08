@@ -37,36 +37,36 @@ const AppDataSource = new DataSource({
   logging: false,
 });
 
-// Admin account - Global access to all countries
+// Admin account - Production
 const adminData = {
   email: 'admin@aubrigo.pt',
   password: 'IIIlll33#',
   firstName: 'Admin',
   lastName: 'Aubrigo',
-  countryCode: 'PT', // Default country, but admin has access to all countries via filters
+  countryCode: 'PT',
 };
 
-// Test ONG accounts for Portugal
+// Production ONG accounts for Portugal (demo/showcase)
 const portugueseOngs = [
   {
-    email: 'ong.lisboa@test.pt',
-    password: 'Password123!',
-    ongName: 'ONG Lisboa',
+    email: 'ong.lisboa@aubrigo.pt',
+    password: 'OngLisboa2025!',
+    ongName: 'Amigos dos Animais Lisboa',
     phone: '+351 21 234 5678',
     hasWhatsapp: true,
-    instagramHandle: '@onglisboa',
+    instagramHandle: '@amigosdosanimais_lisboa',
     location: 'Lisboa',
     countryCode: 'PT',
     latitude: 38.7223,
     longitude: -9.1393,
   },
   {
-    email: 'ong.porto@test.pt',
-    password: 'Password123!',
-    ongName: 'ONG Porto',
+    email: 'ong.porto@aubrigo.pt',
+    password: 'OngPorto2025!',
+    ongName: 'Patinhas Felizes Porto',
     phone: '+351 22 345 6789',
     hasWhatsapp: true,
-    instagramHandle: '@ongporto',
+    instagramHandle: '@patinhasfelizes_porto',
     location: 'Porto',
     countryCode: 'PT',
     latitude: 41.1579,
@@ -74,103 +74,62 @@ const portugueseOngs = [
   },
 ];
 
-// Test ONG accounts for Brazil
-const brazilianOngs = [
-  {
-    email: 'ong.saopaulo@test.br',
-    password: 'Password123!',
-    ongName: 'ONG São Paulo',
-    phone: '+55 11 98765-4321',
-    hasWhatsapp: true,
-    instagramHandle: '@ongsaopaulo',
-    location: 'São Paulo',
-    countryCode: 'BR',
-    latitude: -23.5505,
-    longitude: -46.6333,
-  },
-  {
-    email: 'ong.rio@test.br',
-    password: 'Password123!',
-    ongName: 'ONG Rio de Janeiro',
-    phone: '+55 21 98765-4321',
-    hasWhatsapp: true,
-    instagramHandle: '@ongrio',
-    location: 'Rio de Janeiro',
-    countryCode: 'BR',
-    latitude: -22.9068,
-    longitude: -43.1729,
-  },
-];
-
-// Test regular user
-const regularUser = {
-  email: 'user@test.com',
-  password: 'Password123!',
-  firstName: 'User',
-  lastName: 'Test',
-  countryCode: 'PT',
-};
-
-// Sample pets for Portugal
+// Sample pets for Portugal (demo/showcase)
 const portuguesePets = [
   {
     name: 'Rex',
     species: 'dog',
-    breed: 'Labrador',
+    breed: 'Labrador Retriever',
     age: 3,
     gender: 'male',
     size: 'large',
-    color: 'amarelo',
+    color: 'Dourado',
     weight: 28.5,
-    description: 'Rex é um Labrador muito amigável e brincalhão. Adora crianças!',
+    description: 'O Rex é um Labrador muito amigável e brincalhão. Adora crianças e é perfeito para famílias ativas. Está vacinado e castrado.',
     images: ['https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800'],
   },
   {
     name: 'Luna',
     species: 'cat',
-    breed: 'Persa',
+    breed: 'Gato Persa',
     age: 2,
     gender: 'female',
     size: 'medium',
-    color: 'branco',
+    color: 'Branco',
     weight: 4.5,
-    description: 'Luna é uma gata Persa elegante e carinhosa.',
+    description: 'A Luna é uma gata Persa elegante e carinhosa. Ideal para apartamentos e pessoas que buscam companhia tranquila.',
     images: ['https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=800'],
   },
-];
-
-// Sample pets for Brazil
-const brazilianPets = [
   {
-    name: 'Thor',
+    name: 'Bela',
     species: 'dog',
-    breed: 'Pastor Alemão',
-    age: 4,
-    gender: 'male',
+    breed: 'Golden Retriever',
+    age: 5,
+    gender: 'female',
     size: 'large',
-    color: 'preto e marrom',
-    weight: 35.0,
-    description: 'Thor é um Pastor Alemão leal e protetor.',
-    images: ['https://images.unsplash.com/photo-1568393691622-c7ba131d63b4?w=800'],
+    color: 'Dourado claro',
+    weight: 30.0,
+    description: 'A Bela é uma Golden muito dócil e amorosa. Ótima com crianças e outros animais.',
+    images: ['https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=800'],
   },
   {
-    name: 'Mia',
+    name: 'Mimi',
     species: 'cat',
-    breed: 'Siamês',
+    breed: 'Gato Europeu',
     age: 1,
     gender: 'female',
     size: 'small',
-    color: 'creme e marrom',
-    weight: 3.5,
-    description: 'Mia é uma gatinha Siamesa muito expressiva.',
-    images: ['https://images.unsplash.com/photo-1573865526739-10c1d3a1f0cc?w=800'],
+    color: 'Tricolor',
+    weight: 3.2,
+    description: 'A Mimi é uma gatinha jovem e brincalhona. Muito ativa e curiosa, perfeita para quem gosta de energia felina.',
+    images: ['https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800'],
   },
 ];
 
-async function seed() {
+async function seedProduction() {
   try {
     console.log('========================================');
-    console.log('🌱 Starting Aubrigo Database Seed');
+    console.log('🌱 Starting Aubrigo PRODUCTION Seed (Portugal Only)');
     console.log('========================================\n');
 
     await AppDataSource.initialize();
@@ -213,20 +172,6 @@ async function seed() {
     await userRepository.save(admin);
     console.log(`✅ Admin created: ${adminData.email}\n`);
 
-    // Create Regular User
-    console.log('👤 Creating Regular User...');
-    const userHashedPassword = await bcrypt.hash(regularUser.password, 10);
-    const user = userRepository.create({
-      email: regularUser.email,
-      passwordHash: userHashedPassword,
-      firstName: regularUser.firstName,
-      lastName: regularUser.lastName,
-      role: UserRole.USER,
-      countryCode: regularUser.countryCode,
-    });
-    await userRepository.save(user);
-    console.log(`✅ User created: ${regularUser.email}\n`);
-
     // Create Portuguese ONGs
     console.log('🇵🇹 Creating Portuguese ONGs...');
     const createdPtOngs: User[] = [];
@@ -252,31 +197,6 @@ async function seed() {
     }
     console.log('');
 
-    // Create Brazilian ONGs
-    console.log('🇧🇷 Creating Brazilian ONGs...');
-    const createdBrOngs: User[] = [];
-    for (const ong of brazilianOngs) {
-      const hashedPassword = await bcrypt.hash(ong.password, 10);
-      const ongUser = userRepository.create({
-        email: ong.email,
-        passwordHash: hashedPassword,
-        ongName: ong.ongName,
-        phone: ong.phone,
-        hasWhatsapp: ong.hasWhatsapp,
-        instagramHandle: ong.instagramHandle,
-        location: ong.location,
-        latitude: ong.latitude,
-        longitude: ong.longitude,
-        role: UserRole.ONG,
-        ongStatus: OngStatus.APPROVED,
-        countryCode: ong.countryCode,
-      });
-      const saved = await userRepository.save(ongUser);
-      createdBrOngs.push(saved);
-      console.log(`  ✅ ${ong.ongName} - ${ong.email}`);
-    }
-    console.log('');
-
     // Create Portuguese Pets
     console.log('🐾 Creating Portuguese Pets...');
     let petCount = 0;
@@ -287,36 +207,8 @@ async function seed() {
         ...petWithoutImages,
         ongId: ong.id,
         status: 'available',
-        location: ong.location, // Use ONG's location
-        countryCode: ong.countryCode, // Inherit country from ONG
-      });
-      const savedPet = await petRepository.save(pet);
-
-      for (let i = 0; i < images.length; i++) {
-        const petImage = petImageRepository.create({
-          petId: savedPet.id,
-          imageUrl: images[i],
-          isPrimary: i === 0,
-          displayOrder: i,
-        });
-        await petImageRepository.save(petImage);
-      }
-      petCount++;
-      console.log(`  ✅ ${petData.name} (${petData.species})`);
-    }
-    console.log('');
-
-    // Create Brazilian Pets
-    console.log('🐾 Creating Brazilian Pets...');
-    for (const petData of brazilianPets) {
-      const ong = createdBrOngs[petCount % createdBrOngs.length];
-      const { images, ...petWithoutImages } = petData;
-      const pet = petRepository.create({
-        ...petWithoutImages,
-        ongId: ong.id,
-        status: 'available',
-        location: ong.location, // Use ONG's location
-        countryCode: ong.countryCode, // Inherit country from ONG
+        location: ong.location,
+        countryCode: ong.countryCode,
       });
       const savedPet = await petRepository.save(pet);
 
@@ -335,25 +227,20 @@ async function seed() {
     console.log('');
 
     console.log('========================================');
-    console.log('✅ Seed Completed Successfully!');
+    console.log('✅ Production Seed Completed Successfully!');
     console.log('========================================\n');
 
     console.log('📊 Summary:');
     console.log(`  🇵🇹 Portuguese ONGs: ${createdPtOngs.length}`);
-    console.log(`  🇧🇷 Brazilian ONGs: ${createdBrOngs.length}`);
     console.log(`  🐾 Total Pets: ${petCount}\n`);
 
     console.log('========================================');
-    console.log('🔐 TEST ACCOUNTS');
+    console.log('🔐 PRODUCTION ACCOUNTS');
     console.log('========================================\n');
 
-    console.log('👑 ADMIN (Global Access):');
+    console.log('👑 ADMIN:');
     console.log(`  Email: ${adminData.email}`);
     console.log(`  Password: ${adminData.password}\n`);
-
-    console.log('👤 REGULAR USER:');
-    console.log(`  Email: ${regularUser.email}`);
-    console.log(`  Password: ${regularUser.password}\n`);
 
     console.log('🇵🇹 PORTUGUESE ONGs:');
     portugueseOngs.forEach((ong) => {
@@ -362,14 +249,9 @@ async function seed() {
       console.log(`     🔑 ${ong.password}\n`);
     });
 
-    console.log('🇧🇷 BRAZILIAN ONGs:');
-    brazilianOngs.forEach((ong) => {
-      console.log(`  📧 ${ong.email}`);
-      console.log(`     🏢 ${ong.ongName}`);
-      console.log(`     🔑 ${ong.password}\n`);
-    });
-
     console.log('========================================\n');
+    console.log('⚠️  IMPORTANT: Save these credentials securely!');
+    console.log('⚠️  Change ONG passwords after first login.\n');
 
     await AppDataSource.destroy();
     process.exit(0);
@@ -379,4 +261,4 @@ async function seed() {
   }
 }
 
-seed();
+seedProduction();

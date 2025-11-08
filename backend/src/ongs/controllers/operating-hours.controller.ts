@@ -9,6 +9,7 @@ import {
   UseGuards,
   ParseIntPipe,
   Query,
+  Header,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -143,6 +144,9 @@ export class OperatingHoursController {
   // ==================== AVAILABLE SLOTS ====================
 
   @Get(':ongId/available-slots')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
   @ApiOperation({ summary: 'Get available time slots for a specific date' })
   @ApiResponse({ status: 200, description: 'Available slots retrieved successfully' })
   async getAvailableSlots(@Param('ongId') ongId: string, @Query('date') dateString: string) {
@@ -151,6 +155,9 @@ export class OperatingHoursController {
   }
 
   @Get(':ongId/available-dates')
+  @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  @Header('Pragma', 'no-cache')
+  @Header('Expires', '0')
   @ApiOperation({ summary: 'Get all available dates in a month' })
   @ApiResponse({ status: 200, description: 'Available dates retrieved successfully' })
   async getAvailableDates(

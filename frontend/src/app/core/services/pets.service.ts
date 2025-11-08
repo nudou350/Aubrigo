@@ -78,9 +78,10 @@ export class PetsService {
     let httpParams = new HttpParams();
 
     // Automatically add current country code if not provided
+    const currentCountry = this.countryService.getCountry();
     const searchParams = {
       ...params,
-      countryCode: params.countryCode || this.countryService.getCountry()
+      countryCode: params.countryCode || currentCountry
     };
 
     Object.keys(searchParams).forEach((key) => {

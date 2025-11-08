@@ -39,9 +39,10 @@ export class UsersController {
   @ApiResponse({ status: 200, description: "List of all ONGs" })
   async getAllOngs(
     @Query("search") search?: string,
-    @Query("location") location?: string
+    @Query("location") location?: string,
+    @Query("countryCode") countryCode?: string
   ) {
-    return this.usersService.findAll({ search, location });
+    return this.usersService.findAll({ search, location, countryCode });
   }
 
   // Profile routes must come before :id route to avoid matching "profile" as an id

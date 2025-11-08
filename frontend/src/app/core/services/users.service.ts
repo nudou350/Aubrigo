@@ -140,7 +140,7 @@ export class UsersService {
   /**
    * Get all ONGs with optional filters
    */
-  getAllOngs(filters?: { search?: string; location?: string }): Observable<ONG[]> {
+  getAllOngs(filters?: { search?: string; location?: string; countryCode?: string }): Observable<ONG[]> {
     let url = this.apiUrl;
     const params = new URLSearchParams();
 
@@ -150,6 +150,10 @@ export class UsersService {
 
     if (filters?.location) {
       params.append('location', filters.location);
+    }
+
+    if (filters?.countryCode) {
+      params.append('countryCode', filters.countryCode);
     }
 
     if (params.toString()) {

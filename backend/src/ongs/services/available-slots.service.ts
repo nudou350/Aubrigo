@@ -129,10 +129,6 @@ export class AvailableSlotsService {
     const settings = await this.settingsService.findByOng(ongId);
     const operatingHours = await this.operatingHoursService.findByOng(ongId);
 
-    console.log('📅 Getting available dates for:', { ongId, year, month });
-    console.log('⚙️ Settings:', { maxAdvanceBookingDays: settings.maxAdvanceBookingDays, minAdvanceBookingHours: settings.minAdvanceBookingHours });
-    console.log('🕐 Operating hours count:', operatingHours.length);
-
     // Get all days in the month
     const daysInMonth = new Date(year, month, 0).getDate();
     const availableDates: string[] = [];
@@ -144,8 +140,6 @@ export class AvailableSlotsService {
 
     const maxDate = new Date(today);
     maxDate.setDate(maxDate.getDate() + settings.maxAdvanceBookingDays);
-
-    console.log('📆 Date range:', { today: this.formatDate(today), maxDate: this.formatDate(maxDate), daysInMonth });
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month - 1, day);
@@ -164,7 +158,6 @@ export class AvailableSlotsService {
       // Check if ONG is open on this day
       const hoursForDay = operatingHours.find((h) => h.dayOfWeek === dayOfWeek);
       if (!hoursForDay || !hoursForDay.isOpen) {
-        console.log(`⏭️ Skipping ${this.formatDate(date)} (day ${dayOfWeek}): ${!hoursForDay ? 'No hours configured' : 'Closed'}`);
         continue;
       }
 
@@ -182,13 +175,19 @@ export class AvailableSlotsService {
         continue;
       }
 
+      // Check if this date has at least one available slot
+      const slotsResponse = await this.getAvailableSlots(ongId, date);
+      const availableSlots = slotsResponse.slots.filter(slot => slot.available);
+      const hasAvailableSlots = availableSlots.length > 0;
+
+      if (!hasAvailableSlots) {
+        continue;
+      }
+
       // If we got here, the day has availability
       const formattedDate = this.formatDate(date);
       availableDates.push(formattedDate);
-      console.log(`✅ Added available date: ${formattedDate} (day ${dayOfWeek})`);
     }
-
-    console.log(`📊 Total available dates: ${availableDates.length}`);
 
     return {
       year,

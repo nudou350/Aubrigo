@@ -5,6 +5,7 @@ import { UsersService, ONG } from '../../core/services/users.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
 import { PetsService } from '../../core/services/pets.service';
+import { CountryService } from '../../core/services/country.service';
 
 @Component({
   selector: 'app-ongs',
@@ -18,6 +19,7 @@ export class OngsComponent implements OnInit {
   private petsService = inject(PetsService);
   private router = inject(Router);
   private toastService = inject(ToastService);
+  private countryService = inject(CountryService);
   authService = inject(AuthService);
 
   ongs = signal<ONG[]>([]);
@@ -71,6 +73,9 @@ export class OngsComponent implements OnInit {
 
     const filters: any = {};
 
+    // IMPORTANT: Add country filter to show only ONGs from user's country
+    filters.countryCode = this.countryService.getCountry();
+
     // Add search filter
     if (this.searchQuery()) {
       filters.search = this.searchQuery();
@@ -86,7 +91,6 @@ export class OngsComponent implements OnInit {
 
     this.usersService.getAllOngs(filters).subscribe({
       next: (ongs) => {
-        console.log('ONGs carregadas:', ongs);
         this.ongs.set(ongs);
         this.loading.set(false);
       },
