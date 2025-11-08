@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { DonationsService, MBWayPaymentResponse, Ong } from '../../core/services/donations.service';
 import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway-qrcode.component';
+import { PixPaymentComponent } from '../../shared/components/pix-payment/pix-payment.component';
+import { CountryService } from '../../core/services/country.service';
 import { AnalyticsService, EventType } from '../../core/services/analytics.service';
 
 @Component({
   selector: 'app-donation',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MbwayQrcodeComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, MbwayQrcodeComponent, PixPaymentComponent],
   template: `
     <div class="screen">
       <div class="container">
@@ -21,17 +23,24 @@ import { AnalyticsService, EventType } from '../../core/services/analytics.servi
           <!-- ONG Selection -->
           <div class="form-group">
             <label class="form-label" for="ongId">Selecione a ONG</label>
-            <select
-              id="ongId"
-              [(ngModel)]="selectedOngId"
-              (ngModelChange)="onOngSelect()"
-              class="form-input"
-            >
-              <option value="">Escolha uma ONG...</option>
-              @for (ong of ongs(); track ong.id) {
-                <option [value]="ong.id">{{ ong.ongName }}</option>
-              }
-            </select>
+            @if (ongs().length > 0) {
+              <select
+                id="ongId"
+                [(ngModel)]="selectedOngId"
+                (ngModelChange)="onOngSelect()"
+                class="form-input"
+              >
+                <option value="">Escolha uma ONG...</option>
+                @for (ong of ongs(); track ong.id) {
+                  <option [value]="ong.id">{{ ong.ongName }}</option>
+                }
+              </select>
+            } @else {
+              <div class="no-ongs-message">
+                <p>⚠️ Não há ONGs disponíveis no seu país neste momento.</p>
+                <p>As doações são processadas localmente para garantir segurança e conformidade com regulamentações locais.</p>
+              </div>
+            }
           </div>
 
           <!-- Donation Instructions -->
@@ -39,29 +48,45 @@ import { AnalyticsService, EventType } from '../../core/services/analytics.servi
             <div class="donation-instructions">
               <div class="ong-info-card">
                 <h3>{{ selectedOng()!.ongName }}</h3>
-                @if (selectedOng()!.phone) {
-                  <div class="phone-info">
-                    <span class="icon">📱</span>
-                    <div>
-                      <p class="phone-label">Número MB Way para doações:</p>
-                      <p class="phone-number">{{ selectedOng()!.phone }}</p>
+
+                <!-- Brazil: Show PIX -->
+                @if (isBrazil()) {
+                  @if (selectedOng()!.phone) {
+                    <app-pix-payment
+                      [pixKey]="selectedOng()!.phone"
+                    />
+                  } @else {
+                    <div class="no-phone-message">
+                      <p>Esta ONG ainda não configurou uma chave PIX para doações.</p>
+                      <p>Por favor, entre em contato diretamente com a ONG para outras formas de doação.</p>
                     </div>
-                  </div>
-                  <div class="instructions-text">
-                    <p>Para fazer uma doação:</p>
-                    <ol>
-                      <li>Abra o app MB Way no seu telemóvel</li>
-                      <li>Selecione "Transferir" ou "Enviar Dinheiro"</li>
-                      <li>Insira o número acima</li>
-                      <li>Digite o valor que deseja doar</li>
-                      <li>Confirme a transação</li>
-                    </ol>
-                  </div>
+                  }
                 } @else {
-                  <div class="no-phone-message">
-                    <p>Esta ONG ainda não configurou um número para doações MB Way.</p>
-                    <p>Por favor, entre em contato diretamente com a ONG para outras formas de doação.</p>
-                  </div>
+                  <!-- Portugal: Show MBWay -->
+                  @if (selectedOng()!.phone) {
+                    <div class="phone-info">
+                      <span class="icon">📱</span>
+                      <div>
+                        <p class="phone-label">Número MB Way para doações:</p>
+                        <p class="phone-number">{{ selectedOng()!.phone }}</p>
+                      </div>
+                    </div>
+                    <div class="instructions-text">
+                      <p>Para fazer uma doação:</p>
+                      <ol>
+                        <li>Abra o app MB Way no seu telemóvel</li>
+                        <li>Selecione "Transferir" ou "Enviar Dinheiro"</li>
+                        <li>Insira o número acima</li>
+                        <li>Digite o valor que deseja doar</li>
+                        <li>Confirme a transação</li>
+                      </ol>
+                    </div>
+                  } @else {
+                    <div class="no-phone-message">
+                      <p>Esta ONG ainda não configurou um número para doações MB Way.</p>
+                      <p>Por favor, entre em contato diretamente com a ONG para outras formas de doação.</p>
+                    </div>
+                  }
                 }
               </div>
             </div>
@@ -319,6 +344,26 @@ import { AnalyticsService, EventType } from '../../core/services/analytics.servi
       color: #f57c00;
     }
 
+    .no-ongs-message {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid #ffc107;
+      border-radius: var(--radius-md);
+      padding: var(--spacing-xl);
+      text-align: center;
+      margin-top: var(--spacing-md);
+    }
+
+    .no-ongs-message p {
+      margin: var(--spacing-md) 0;
+      color: #f57c00;
+      line-height: 1.6;
+    }
+
+    .no-ongs-message p:first-child {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-base);
+    }
+
     @media (max-width: 480px) {
       .payment-methods {
         grid-template-columns: 1fr;
@@ -337,6 +382,7 @@ import { AnalyticsService, EventType } from '../../core/services/analytics.servi
 })
 export class DonationComponent implements OnInit {
   private donationsService = inject(DonationsService);
+  private countryService = inject(CountryService);
   private analytics = inject(AnalyticsService);
 
   loading = signal(false);
@@ -347,6 +393,11 @@ export class DonationComponent implements OnInit {
   ongs = signal<Ong[]>([]);
   selectedOngId: string = '';
   selectedOng = signal<Ong | null>(null);
+
+  // Helper method to check if current country is Brazil
+  isBrazil(): boolean {
+    return this.countryService.getCountry() === 'BR';
+  }
 
   // Helper method to convert expiration date
   getExpirationDate(): Date | undefined {
@@ -360,7 +411,7 @@ export class DonationComponent implements OnInit {
     donorEmail: new FormControl(''),
     amount: new FormControl(50, [Validators.required, Validators.min(0.05)]),
     donationType: new FormControl<'one_time' | 'monthly'>('one_time', [Validators.required]),
-    paymentMethod: new FormControl<'mbway' | 'stripe' | 'multibanco'>('mbway', [Validators.required]),
+    paymentMethod: new FormControl<'mbway' | 'stripe' | 'multibanco' | 'pix'>('mbway', [Validators.required]),
     phoneNumber: new FormControl(''),
     cardHolderName: new FormControl(''),
   });
@@ -372,7 +423,12 @@ export class DonationComponent implements OnInit {
   }
 
   loadOngs() {
-    this.donationsService.getAllOngs().subscribe({
+    const filters: any = {};
+
+    // IMPORTANT: Add country filter to show only ONGs from user's country
+    filters.countryCode = this.countryService.getCountry();
+
+    this.donationsService.getAllOngs(filters).subscribe({
       next: (ongs) => {
         this.ongs.set(ongs);
       },
@@ -388,7 +444,7 @@ export class DonationComponent implements OnInit {
     this.selectedOng.set(ong || null);
   }
 
-  selectPaymentMethod(method: 'mbway' | 'stripe' | 'multibanco') {
+  selectPaymentMethod(method: 'mbway' | 'stripe' | 'multibanco' | 'pix') {
     this.donationForm.patchValue({ paymentMethod: method });
 
     // Update validators based on payment method
@@ -397,8 +453,8 @@ export class DonationComponent implements OnInit {
     const nameControl = this.donationForm.get('donorName');
     const emailControl = this.donationForm.get('donorEmail');
 
-    if (method === 'mbway') {
-      // MBWay: only phone is required, name and email are optional
+    if (method === 'mbway' || method === 'pix') {
+      // MBWay/PIX: only phone is required, name and email are optional
       phoneControl?.setValidators([Validators.required]);
       cardControl?.clearValidators();
       nameControl?.clearValidators();

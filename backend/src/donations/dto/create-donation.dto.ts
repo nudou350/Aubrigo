@@ -48,10 +48,10 @@ export class CreateDonationDto {
 
   @ApiProperty({
     example: 'mbway',
-    enum: ['mbway', 'stripe', 'multibanco'],
+    enum: ['mbway', 'stripe', 'multibanco', 'pix'],
     description: 'Payment method',
   })
-  @IsEnum(['mbway', 'stripe', 'multibanco'])
+  @IsEnum(['mbway', 'stripe', 'multibanco', 'pix'])
   paymentMethod: string;
 
   // For MB Way

@@ -12,8 +12,8 @@ export interface DonationRequest {
   donorGender?: string;
   amount: number;
   donationType: 'one_time' | 'monthly';
-  paymentMethod: 'mbway' | 'stripe' | 'multibanco';
-  phoneNumber?: string; // For MB Way
+  paymentMethod: 'mbway' | 'stripe' | 'multibanco' | 'pix';
+  phoneNumber?: string; // For MB Way / PIX
   cardHolderName?: string; // For Stripe
 }
 
@@ -47,6 +47,7 @@ export interface Ong {
   profileImageUrl?: string;
   location?: string;
   phone?: string;
+  countryCode?: string;
 }
 
 @Injectable({
@@ -57,8 +58,16 @@ export class DonationsService {
   private apiUrl = `${environment.apiUrl}/donations`;
   private usersUrl = `${environment.apiUrl}/users`;
 
-  getAllOngs(): Observable<Ong[]> {
-    return this.http.get<Ong[]>(this.usersUrl);
+  getAllOngs(filters?: { search?: string; location?: string; countryCode?: string }): Observable<Ong[]> {
+    let params: any = {};
+
+    if (filters) {
+      if (filters.search) params.search = filters.search;
+      if (filters.location) params.location = filters.location;
+      if (filters.countryCode) params.countryCode = filters.countryCode;
+    }
+
+    return this.http.get<Ong[]>(this.usersUrl, { params });
   }
 
   createDonation(donationData: DonationRequest): Observable<MBWayPaymentResponse> {
