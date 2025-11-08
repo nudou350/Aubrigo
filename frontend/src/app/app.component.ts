@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { BottomNavComponent } from './shared/components/bottom-nav/bottom-nav.component';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { UpdateNotificationComponent } from './shared/components/update-notification/update-notification.component';
@@ -129,6 +131,47 @@ import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badg
     }
   `],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  private translate = inject(TranslateService);
   title = 'Aubrigo';
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    // Initialize available languages
+    this.translate.addLangs(['pt', 'es', 'en']);
+
+    // Set default language
+    this.translate.setDefaultLang('pt');
+  }
+
+  ngOnInit(): void {
+    // Only execute in browser
+    if (isPlatformBrowser(this.platformId)) {
+      this.initializeLanguage();
+      this.updateHtmlLang();
+    }
+  }
+
+  private initializeLanguage(): void {
+    const savedLanguage = localStorage.getItem('appLanguage');
+
+    if (savedLanguage && this.translate.langs.includes(savedLanguage)) {
+      this.translate.use(savedLanguage);
+    } else {
+      // Detect browser language
+      const browserLang = this.translate.getBrowserLang();
+      const langToUse = browserLang?.match(/pt|es|en/) ? browserLang : 'pt';
+      this.translate.use(langToUse);
+      localStorage.setItem('appLanguage', langToUse);
+    }
+  }
+
+  private updateHtmlLang(): void {
+    this.translate.onLangChange.subscribe((event) => {
+      document.documentElement.lang = event.lang;
+      localStorage.setItem('appLanguage', event.lang);
+    });
+
+    // Set initial lang attribute
+    document.documentElement.lang = this.translate.currentLang || 'pt';
+  }
 }

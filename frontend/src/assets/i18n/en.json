@@ -1,0 +1,442 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading...",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "add": "Add",
+    "remove": "Remove",
+    "filter": "Filter",
+    "sort": "Sort",
+    "all": "All",
+    "none": "None",
+    "learnMore": "LEARN MORE",
+    "clearFilter": "Clear filter",
+    "clearFilters": "Clear filters"
+  },
+  "navigation": {
+    "home": "HOME",
+    "pets": "PETS",
+    "ongs": "NGOS",
+    "favorites": "FAVORITES",
+    "profile": "Profile",
+    "dashboard": "DASHBOARD",
+    "admin": "Admin",
+    "donate": "Donate",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "addPet": "Add Pet"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot your password?",
+      "loginButton": "LOGIN",
+      "noAccount": "Don't have an account yet?",
+      "registerHere": "Register here",
+      "invalidEmail": "Invalid email",
+      "passwordRequired": "Password is required",
+      "loginError": "Error logging in"
+    },
+    "register": {
+      "title": "Register",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "registerButton": "REGISTER",
+      "alreadyHaveAccount": "Already have an account?",
+      "loginHere": "Login here",
+      "passwordMismatch": "Passwords do not match",
+      "registerError": "Error registering"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "description": "Enter your email to receive recovery instructions",
+      "email": "Email",
+      "sendButton": "SEND",
+      "backToLogin": "Back to login",
+      "emailSent": "Email sent successfully!",
+      "sendError": "Error sending email"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "resetButton": "RESET",
+      "resetSuccess": "Password reset successfully!",
+      "resetError": "Error resetting password"
+    },
+    "accountType": {
+      "title": "Choose account type",
+      "user": "User",
+      "ong": "NGO",
+      "userDescription": "Adopt a pet",
+      "ongDescription": "Manage donations and animals"
+    }
+  },
+  "home": {
+    "greeting": "Hello!",
+    "greetingWithName": "Hello, {{name}}!",
+    "loadingPets": "Loading pets...",
+    "noPetsFound": "No pets found",
+    "filters": {
+      "location": "Location",
+      "allCities": "All cities",
+      "typeCityName": "Type a city name...",
+      "ong": "NGO",
+      "allOngs": "All NGOs",
+      "typeOngName": "Type NGO name...",
+      "sort": "Sort by",
+      "urgent": "Urgent",
+      "oldest": "Oldest",
+      "newest": "Newest",
+      "gender": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "size": "Size",
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "age": "Age",
+      "allAges": "All",
+      "ageRange_0_1": "0-1 years",
+      "ageRange_2_3": "2-3 years",
+      "ageRange_4_6": "4-6 years",
+      "ageRange_7_10": "7-10 years",
+      "ageRange_10_plus": "10+ years",
+      "filtersButton": "Filters",
+      "activeFilters": "{{count}} active filters"
+    },
+    "species": {
+      "dog": "Dog",
+      "cat": "Cat",
+      "fish": "Fish",
+      "hamster": "Hamster",
+      "bird": "Bird",
+      "rabbit": "Rabbit"
+    },
+    "petCard": {
+      "years": "{{age}} years",
+      "addToFavorites": "Add to favorites",
+      "removeFromFavorites": "Remove from favorites"
+    }
+  },
+  "pets": {
+    "title": "Adopt a Pet",
+    "detail": {
+      "about": "About {{name}}",
+      "characteristics": "Characteristics",
+      "description": "Description",
+      "location": "Location",
+      "age": "Age",
+      "gender": "Gender",
+      "size": "Size",
+      "weight": "Weight",
+      "breed": "Breed",
+      "color": "Color",
+      "ongInfo": "NGO Information",
+      "scheduleVisit": "Schedule Visit",
+      "share": "Share"
+    },
+    "form": {
+      "addPet": "Add Pet",
+      "editPet": "Edit Pet",
+      "name": "Name",
+      "species": "Species",
+      "breed": "Breed",
+      "age": "Age (years)",
+      "gender": "Gender",
+      "size": "Size",
+      "weight": "Weight (kg)",
+      "color": "Color",
+      "location": "Location",
+      "description": "Description",
+      "status": "Status",
+      "available": "Available",
+      "pending": "Pending",
+      "adopted": "Adopted",
+      "images": "Images",
+      "uploadImages": "Upload Images",
+      "primaryImage": "Primary Image",
+      "saveButton": "SAVE",
+      "successAdd": "Pet added successfully!",
+      "successEdit": "Pet updated successfully!",
+      "error": "Error saving pet"
+    },
+    "appointment": {
+      "title": "Schedule Visit",
+      "visitorName": "Your Name",
+      "visitorEmail": "Your Email",
+      "visitorPhone": "Your Phone",
+      "preferredDate": "Preferred Date",
+      "preferredTime": "Preferred Time",
+      "notes": "Notes",
+      "scheduleButton": "SCHEDULE",
+      "success": "Visit scheduled successfully!",
+      "error": "Error scheduling visit"
+    }
+  },
+  "ongs": {
+    "title": "NGOs",
+    "allOngs": "All NGOs",
+    "searchPlaceholder": "Search NGOs...",
+    "noOngsFound": "No NGOs found",
+    "detail": {
+      "about": "About",
+      "contact": "Contact",
+      "location": "Location",
+      "phone": "Phone",
+      "email": "Email",
+      "instagram": "Instagram",
+      "website": "Website",
+      "pets": "Pets",
+      "viewPets": "View Pets",
+      "donate": "Donate"
+    }
+  },
+  "favorites": {
+    "title": "Favorites",
+    "noFavorites": "No favorites yet",
+    "addedToFavorites": "Added to favorites",
+    "removedFromFavorites": "Removed from favorites",
+    "errorAdd": "Error adding to favorites",
+    "errorRemove": "Error removing from favorites",
+    "configureEmail": "Please configure your email first"
+  },
+  "donations": {
+    "title": "Donate",
+    "oneTime": "One-time Donation",
+    "monthly": "Monthly Donation",
+    "amount": "Amount",
+    "customAmount": "Custom Amount",
+    "donorInfo": "Donor Information",
+    "donorName": "Full Name",
+    "donorEmail": "Email",
+    "donorCpf": "CPF",
+    "donorBirthDate": "Birth Date",
+    "donorGender": "Gender",
+    "paymentMethod": "Payment Method",
+    "creditCard": "Credit Card",
+    "mbway": "MBWay",
+    "pix": "PIX",
+    "cardNumber": "Card Number",
+    "cardName": "Name on Card",
+    "cardExpiry": "Expiry",
+    "cardCvc": "CVC",
+    "donateButton": "DONATE",
+    "processing": "Processing...",
+    "success": "Donation completed successfully!",
+    "error": "Error processing donation",
+    "thankYou": "Thank you for your donation!"
+  },
+  "profile": {
+    "title": "Profile",
+    "personalInfo": "Personal Information",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "location": "Location",
+    "ongInfo": "NGO Information",
+    "ongName": "NGO Name",
+    "profileImage": "Profile Image",
+    "uploadImage": "Upload Image",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "saveButton": "SAVE",
+    "success": "Profile updated successfully!",
+    "error": "Error updating profile"
+  },
+  "ong": {
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Welcome, {{name}}!",
+      "statistics": "Statistics",
+      "totalPets": "Total Pets",
+      "availablePets": "Available Pets",
+      "adoptedPets": "Adopted Pets",
+      "pendingAppointments": "Pending Appointments",
+      "totalDonations": "Total Donations",
+      "recentActivity": "Recent Activity",
+      "quickActions": "Quick Actions"
+    },
+    "pets": {
+      "title": "Manage Pets",
+      "addNew": "Add New Pet",
+      "noPets": "No pets registered",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this pet?",
+      "deleteSuccess": "Pet deleted successfully!",
+      "deleteError": "Error deleting pet"
+    },
+    "appointments": {
+      "title": "Appointments",
+      "noAppointments": "No appointments",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "visitorInfo": "Visitor Information",
+      "petInfo": "Pet Information",
+      "date": "Date",
+      "time": "Time",
+      "status": "Status",
+      "notes": "Notes",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "complete": "Mark as Completed",
+      "confirmSuccess": "Appointment confirmed!",
+      "cancelSuccess": "Appointment cancelled!",
+      "completeSuccess": "Appointment marked as completed!",
+      "error": "Error updating appointment"
+    },
+    "donations": {
+      "title": "Donations",
+      "noDonations": "No donations received",
+      "totalReceived": "Total Received",
+      "thisMonth": "This Month",
+      "donorName": "Donor",
+      "amount": "Amount",
+      "date": "Date",
+      "type": "Type",
+      "status": "Status",
+      "paymentMethod": "Payment Method"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "statistics": "System Statistics",
+      "totalUsers": "Total Users",
+      "totalOngs": "Total NGOs",
+      "totalPets": "Total Pets",
+      "totalDonations": "Total Donations"
+    },
+    "users": {
+      "title": "Manage Users",
+      "noUsers": "No users",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "actions": "Actions",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "delete": "Delete"
+    },
+    "ongs": {
+      "title": "Manage NGOs",
+      "noOngs": "No NGOs",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "pets": {
+      "title": "Manage Pets",
+      "noPets": "No pets"
+    },
+    "reports": {
+      "title": "Reports",
+      "generate": "Generate Report",
+      "exportCsv": "Export CSV",
+      "exportPdf": "Export PDF"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Install Aubrigo",
+      "description": "Install the app for quick access",
+      "installButton": "Install App",
+      "iosInstructions": {
+        "title": "Install Aubrigo",
+        "subtitle": "Follow the steps below to add the app to your home screen",
+        "step1": {
+          "title": "Tap the Share button",
+          "description": "Look for the icon at the bottom of the screen"
+        },
+        "step2": {
+          "title": "Scroll down",
+          "description": "In the menu that appears, scroll to find the option"
+        },
+        "step3": {
+          "title": "Add to Home Screen",
+          "description": "Tap \"Add to Home Screen\""
+        },
+        "step4": {
+          "title": "Confirm",
+          "description": "Tap \"Add\" in the top right corner"
+        },
+        "footer": "✨ Done! The Aubrigo icon will be on your home screen"
+      },
+      "installed": "App installed! Access from the home screen icon",
+      "alreadyInstalled": "App already installed"
+    },
+    "update": {
+      "title": "Update Available",
+      "description": "A new version is available",
+      "updateButton": "Update",
+      "laterButton": "Later"
+    },
+    "offline": {
+      "title": "No Connection",
+      "description": "You are offline. Some features may be limited.",
+      "reconnected": "Connection restored!"
+    },
+    "sync": {
+      "syncing": "Syncing...",
+      "synced": "Synced",
+      "error": "Error syncing"
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Invalid email",
+    "minLength": "Minimum {{length}} characters",
+    "maxLength": "Maximum {{length}} characters",
+    "min": "Minimum value: {{min}}",
+    "max": "Maximum value: {{max}}",
+    "pattern": "Invalid format",
+    "passwordMismatch": "Passwords do not match",
+    "invalidPhone": "Invalid phone",
+    "invalidCpf": "Invalid CPF",
+    "invalidDate": "Invalid date"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "network": "Connection error",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access denied",
+    "notFound": "Not found",
+    "serverError": "Server error",
+    "timeout": "Timeout",
+    "unknown": "Unknown error"
+  },
+  "success": {
+    "saved": "Saved successfully!",
+    "deleted": "Deleted successfully!",
+    "updated": "Updated successfully!",
+    "created": "Created successfully!",
+    "sent": "Sent successfully!"
+  },
+  "footer": {
+    "developedBy": "Developed by",
+    "designedBy": "Designed by"
+  }
+}

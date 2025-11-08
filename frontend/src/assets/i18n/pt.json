@@ -1,0 +1,442 @@
+{
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "search": "Pesquisar",
+    "loading": "A carregar...",
+    "yes": "Sim",
+    "no": "Não",
+    "confirm": "Confirmar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "next": "Seguinte",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "add": "Adicionar",
+    "remove": "Remover",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "all": "Todos",
+    "none": "Nenhum",
+    "learnMore": "SABER MAIS",
+    "clearFilter": "Limpar filtro",
+    "clearFilters": "Limpar filtros"
+  },
+  "navigation": {
+    "home": "HOME",
+    "pets": "PETS",
+    "ongs": "ONGS",
+    "favorites": "FAVORITOS",
+    "profile": "Perfil",
+    "dashboard": "DASHBOARD",
+    "admin": "Admin",
+    "donate": "Doar",
+    "login": "Login",
+    "register": "Registrar",
+    "logout": "Sair",
+    "addPet": "Adicionar Pet"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Senha",
+      "forgotPassword": "Esqueceu sua senha?",
+      "loginButton": "LOGIN",
+      "noAccount": "Ainda não tem uma conta?",
+      "registerHere": "Cadastre aqui",
+      "invalidEmail": "Email inválido",
+      "passwordRequired": "Senha é obrigatória",
+      "loginError": "Erro ao fazer login"
+    },
+    "register": {
+      "title": "Cadastro",
+      "firstName": "Nome",
+      "lastName": "Sobrenome",
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar Senha",
+      "registerButton": "CADASTRAR",
+      "alreadyHaveAccount": "Já tem uma conta?",
+      "loginHere": "Entre aqui",
+      "passwordMismatch": "As senhas não coincidem",
+      "registerError": "Erro ao cadastrar"
+    },
+    "forgotPassword": {
+      "title": "Esqueceu a Senha",
+      "description": "Digite seu e-mail para receber as instruções de recuperação",
+      "email": "Email",
+      "sendButton": "ENVIAR",
+      "backToLogin": "Voltar ao login",
+      "emailSent": "E-mail enviado com sucesso!",
+      "sendError": "Erro ao enviar e-mail"
+    },
+    "resetPassword": {
+      "title": "Redefinir Senha",
+      "newPassword": "Nova Senha",
+      "confirmPassword": "Confirmar Nova Senha",
+      "resetButton": "REDEFINIR",
+      "resetSuccess": "Senha redefinida com sucesso!",
+      "resetError": "Erro ao redefinir senha"
+    },
+    "accountType": {
+      "title": "Escolha o tipo de conta",
+      "user": "Utilizador",
+      "ong": "ONG",
+      "userDescription": "Adotar um pet",
+      "ongDescription": "Gerir doações e animais"
+    }
+  },
+  "home": {
+    "greeting": "Olá!",
+    "greetingWithName": "Olá, {{name}}!",
+    "loadingPets": "Carregando pets...",
+    "noPetsFound": "Nenhum pet encontrado",
+    "filters": {
+      "location": "Localização",
+      "allCities": "Todas as cidades",
+      "typeCityName": "Digite uma cidade...",
+      "ong": "ONG",
+      "allOngs": "Todas as ONGs",
+      "typeOngName": "Digite o nome da ONG...",
+      "sort": "Ordenar por",
+      "urgent": "Urgência",
+      "oldest": "Mais antigos",
+      "newest": "Mais recentes",
+      "gender": "Gênero",
+      "male": "Macho",
+      "female": "Fêmea",
+      "size": "Porte",
+      "small": "Pequeno",
+      "medium": "Médio",
+      "large": "Grande",
+      "age": "Idade",
+      "allAges": "Todas",
+      "ageRange_0_1": "0-1 anos",
+      "ageRange_2_3": "2-3 anos",
+      "ageRange_4_6": "4-6 anos",
+      "ageRange_7_10": "7-10 anos",
+      "ageRange_10_plus": "10+ anos",
+      "filtersButton": "Filtros",
+      "activeFilters": "{{count}} filtros ativos"
+    },
+    "species": {
+      "dog": "Cão",
+      "cat": "Gato",
+      "fish": "Peixe",
+      "hamster": "Hamster",
+      "bird": "Pássaro",
+      "rabbit": "Coelho"
+    },
+    "petCard": {
+      "years": "{{age}} anos",
+      "addToFavorites": "Adicionar aos favoritos",
+      "removeFromFavorites": "Remover dos favoritos"
+    }
+  },
+  "pets": {
+    "title": "Adote um Pet",
+    "detail": {
+      "about": "Sobre {{name}}",
+      "characteristics": "Características",
+      "description": "Descrição",
+      "location": "Localização",
+      "age": "Idade",
+      "gender": "Gênero",
+      "size": "Porte",
+      "weight": "Peso",
+      "breed": "Raça",
+      "color": "Cor",
+      "ongInfo": "Informação da ONG",
+      "scheduleVisit": "Agendar Visita",
+      "share": "Partilhar"
+    },
+    "form": {
+      "addPet": "Adicionar Pet",
+      "editPet": "Editar Pet",
+      "name": "Nome",
+      "species": "Espécie",
+      "breed": "Raça",
+      "age": "Idade (anos)",
+      "gender": "Género",
+      "size": "Porte",
+      "weight": "Peso (kg)",
+      "color": "Cor",
+      "location": "Localização",
+      "description": "Descrição",
+      "status": "Status",
+      "available": "Disponível",
+      "pending": "Pendente",
+      "adopted": "Adotado",
+      "images": "Imagens",
+      "uploadImages": "Upload de Imagens",
+      "primaryImage": "Imagem Principal",
+      "saveButton": "SALVAR",
+      "successAdd": "Pet adicionado com sucesso!",
+      "successEdit": "Pet atualizado com sucesso!",
+      "error": "Erro ao salvar pet"
+    },
+    "appointment": {
+      "title": "Agendar Visita",
+      "visitorName": "Seu Nome",
+      "visitorEmail": "Seu E-mail",
+      "visitorPhone": "Seu Telefone",
+      "preferredDate": "Data Preferida",
+      "preferredTime": "Hora Preferida",
+      "notes": "Observações",
+      "scheduleButton": "AGENDAR",
+      "success": "Visita agendada com sucesso!",
+      "error": "Erro ao agendar visita"
+    }
+  },
+  "ongs": {
+    "title": "ONGs",
+    "allOngs": "Todas as ONGs",
+    "searchPlaceholder": "Pesquisar ONGs...",
+    "noOngsFound": "Nenhuma ONG encontrada",
+    "detail": {
+      "about": "Sobre",
+      "contact": "Contacto",
+      "location": "Localização",
+      "phone": "Telefone",
+      "email": "E-mail",
+      "instagram": "Instagram",
+      "website": "Website",
+      "pets": "Animais",
+      "viewPets": "Ver Animais",
+      "donate": "Doar"
+    }
+  },
+  "favorites": {
+    "title": "Favoritos",
+    "noFavorites": "Nenhum favorito ainda",
+    "addedToFavorites": "Adicionado aos favoritos",
+    "removedFromFavorites": "Removido dos favoritos",
+    "errorAdd": "Erro ao adicionar aos favoritos",
+    "errorRemove": "Erro ao remover dos favoritos",
+    "configureEmail": "Por favor, configure seu e-mail primeiro"
+  },
+  "donations": {
+    "title": "Doar",
+    "oneTime": "Doação Única",
+    "monthly": "Doação Mensal",
+    "amount": "Valor",
+    "customAmount": "Valor Personalizado",
+    "donorInfo": "Informações do Doador",
+    "donorName": "Nome Completo",
+    "donorEmail": "E-mail",
+    "donorCpf": "CPF",
+    "donorBirthDate": "Data de Nascimento",
+    "donorGender": "Género",
+    "paymentMethod": "Método de Pagamento",
+    "creditCard": "Cartão de Crédito",
+    "mbway": "MBWay",
+    "pix": "PIX",
+    "cardNumber": "Número do Cartão",
+    "cardName": "Nome no Cartão",
+    "cardExpiry": "Validade",
+    "cardCvc": "CVC",
+    "donateButton": "DOAR",
+    "processing": "Processando...",
+    "success": "Doação realizada com sucesso!",
+    "error": "Erro ao processar doação",
+    "thankYou": "Obrigado pela sua doação!"
+  },
+  "profile": {
+    "title": "Perfil",
+    "personalInfo": "Informações Pessoais",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "location": "Localização",
+    "ongInfo": "Informações da ONG",
+    "ongName": "Nome da ONG",
+    "profileImage": "Imagem de Perfil",
+    "uploadImage": "Upload de Imagem",
+    "changePassword": "Alterar Senha",
+    "currentPassword": "Senha Atual",
+    "newPassword": "Nova Senha",
+    "confirmPassword": "Confirmar Senha",
+    "saveButton": "SALVAR",
+    "success": "Perfil atualizado com sucesso!",
+    "error": "Erro ao atualizar perfil"
+  },
+  "ong": {
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Bem-vindo, {{name}}!",
+      "statistics": "Estatísticas",
+      "totalPets": "Total de Pets",
+      "availablePets": "Pets Disponíveis",
+      "adoptedPets": "Pets Adotados",
+      "pendingAppointments": "Agendamentos Pendentes",
+      "totalDonations": "Total de Doações",
+      "recentActivity": "Atividade Recente",
+      "quickActions": "Ações Rápidas"
+    },
+    "pets": {
+      "title": "Gerir Pets",
+      "addNew": "Adicionar Novo Pet",
+      "noPets": "Nenhum pet cadastrado",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "confirmDelete": "Tem certeza que deseja eliminar este pet?",
+      "deleteSuccess": "Pet eliminado com sucesso!",
+      "deleteError": "Erro ao eliminar pet"
+    },
+    "appointments": {
+      "title": "Agendamentos",
+      "noAppointments": "Nenhum agendamento",
+      "pending": "Pendente",
+      "confirmed": "Confirmado",
+      "completed": "Concluído",
+      "cancelled": "Cancelado",
+      "visitorInfo": "Informações do Visitante",
+      "petInfo": "Informações do Pet",
+      "date": "Data",
+      "time": "Hora",
+      "status": "Status",
+      "notes": "Observações",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar",
+      "complete": "Marcar como Concluído",
+      "confirmSuccess": "Agendamento confirmado!",
+      "cancelSuccess": "Agendamento cancelado!",
+      "completeSuccess": "Agendamento marcado como concluído!",
+      "error": "Erro ao atualizar agendamento"
+    },
+    "donations": {
+      "title": "Doações",
+      "noDonations": "Nenhuma doação recebida",
+      "totalReceived": "Total Recebido",
+      "thisMonth": "Este Mês",
+      "donorName": "Doador",
+      "amount": "Valor",
+      "date": "Data",
+      "type": "Tipo",
+      "status": "Status",
+      "paymentMethod": "Método de Pagamento"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "statistics": "Estatísticas do Sistema",
+      "totalUsers": "Total de Utilizadores",
+      "totalOngs": "Total de ONGs",
+      "totalPets": "Total de Pets",
+      "totalDonations": "Total de Doações"
+    },
+    "users": {
+      "title": "Gerir Utilizadores",
+      "noUsers": "Nenhum utilizador",
+      "name": "Nome",
+      "email": "E-mail",
+      "role": "Função",
+      "status": "Status",
+      "actions": "Ações",
+      "activate": "Ativar",
+      "deactivate": "Desativar",
+      "delete": "Eliminar"
+    },
+    "ongs": {
+      "title": "Gerir ONGs",
+      "noOngs": "Nenhuma ONG",
+      "approve": "Aprovar",
+      "reject": "Rejeitar"
+    },
+    "pets": {
+      "title": "Gerir Pets",
+      "noPets": "Nenhum pet"
+    },
+    "reports": {
+      "title": "Relatórios",
+      "generate": "Gerar Relatório",
+      "exportCsv": "Exportar CSV",
+      "exportPdf": "Exportar PDF"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Instalar Aubrigo",
+      "description": "Instale o app para acesso rápido",
+      "installButton": "Instalar App",
+      "iosInstructions": {
+        "title": "Instalar Aubrigo",
+        "subtitle": "Siga os passos abaixo para adicionar o app à sua tela inicial",
+        "step1": {
+          "title": "Toque no botão Compartilhar",
+          "description": "Procure pelo ícone na parte inferior da tela"
+        },
+        "step2": {
+          "title": "Role para baixo",
+          "description": "No menu que aparecer, role até encontrar a opção"
+        },
+        "step3": {
+          "title": "Adicionar à Tela de Início",
+          "description": "Toque em \"Adicionar à Tela de Início\" ou \"Add to Home Screen\""
+        },
+        "step4": {
+          "title": "Confirme",
+          "description": "Toque em \"Adicionar\" no canto superior direito"
+        },
+        "footer": "✨ Pronto! O ícone do Aubrigo estará na sua tela inicial"
+      },
+      "installed": "App instalado! Acesse pelo ícone na tela inicial",
+      "alreadyInstalled": "App já instalado"
+    },
+    "update": {
+      "title": "Atualização Disponível",
+      "description": "Uma nova versão está disponível",
+      "updateButton": "Atualizar",
+      "laterButton": "Mais tarde"
+    },
+    "offline": {
+      "title": "Sem Conexão",
+      "description": "Você está offline. Algumas funcionalidades podem estar limitadas.",
+      "reconnected": "Conexão restaurada!"
+    },
+    "sync": {
+      "syncing": "Sincronizando...",
+      "synced": "Sincronizado",
+      "error": "Erro ao sincronizar"
+    }
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "email": "E-mail inválido",
+    "minLength": "Mínimo de {{length}} caracteres",
+    "maxLength": "Máximo de {{length}} caracteres",
+    "min": "Valor mínimo: {{min}}",
+    "max": "Valor máximo: {{max}}",
+    "pattern": "Formato inválido",
+    "passwordMismatch": "As senhas não coincidem",
+    "invalidPhone": "Telefone inválido",
+    "invalidCpf": "CPF inválido",
+    "invalidDate": "Data inválida"
+  },
+  "errors": {
+    "generic": "Ocorreu um erro",
+    "network": "Erro de conexão",
+    "unauthorized": "Não autorizado",
+    "forbidden": "Acesso negado",
+    "notFound": "Não encontrado",
+    "serverError": "Erro no servidor",
+    "timeout": "Tempo esgotado",
+    "unknown": "Erro desconhecido"
+  },
+  "success": {
+    "saved": "Salvo com sucesso!",
+    "deleted": "Eliminado com sucesso!",
+    "updated": "Atualizado com sucesso!",
+    "created": "Criado com sucesso!",
+    "sent": "Enviado com sucesso!"
+  },
+  "footer": {
+    "developedBy": "Desenvolvido por",
+    "designedBy": "Design por"
+  }
+}
