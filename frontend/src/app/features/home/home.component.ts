@@ -1427,7 +1427,9 @@ import { UsersService, ONG } from "../../core/services/users.service";
           padding: 32px 48px;
         }
 
-        .login-button {
+        .login-button,
+        .profile-button,
+        .donate-button {
           display: none;
         }
 

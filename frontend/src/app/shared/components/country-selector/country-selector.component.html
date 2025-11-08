@@ -1,0 +1,65 @@
+<div class="country-selector">
+  <div class="country-selector__header">
+    <label class="country-selector__label">País / Country</label>
+    <button
+      class="country-selector__reset"
+      (click)="resetToAutoDetect()"
+      title="Detectar automaticamente baseado na sua localização">
+      🔄 Auto-detectar
+    </button>
+  </div>
+
+  <div class="country-selector__input-wrapper">
+    <input
+      type="text"
+      class="country-selector__input"
+      [value]="isDropdownOpen() ? searchQuery() : displayValue()"
+      (input)="searchQuery.set($any($event.target).value); onSearchChange()"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown)="onKeyDown($event)"
+      placeholder="Pesquisar país..."
+      autocomplete="off"
+    />
+
+    <svg
+      class="country-selector__icon"
+      [class.country-selector__icon--open]="isDropdownOpen()"
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+    >
+      <path
+        d="M5 7.5L10 12.5L15 7.5"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </div>
+
+  @if (isDropdownOpen() && filteredCountries().length > 0) {
+    <ul class="country-selector__dropdown">
+      @for (country of filteredCountries(); track country.code; let i = $index) {
+        <li
+          class="country-selector__item"
+          [class.country-selector__item--focused]="isFocused(i)"
+          [class.country-selector__item--selected]="selectedCountry()?.code === country.code"
+          (click)="selectCountry(country)"
+        >
+          <span class="country-selector__flag">{{ country.flag }}</span>
+          <span class="country-selector__name">{{ country.name }}</span>
+          <span class="country-selector__code">({{ country.code }})</span>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (isDropdownOpen() && searchQuery() && filteredCountries().length === 0) {
+    <div class="country-selector__empty">
+      Nenhum país encontrado
+    </div>
+  }
+</div>

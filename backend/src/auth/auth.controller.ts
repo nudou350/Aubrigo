@@ -1,5 +1,6 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -25,16 +26,16 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new regular user account' })
   @ApiResponse({ status: 201, description: 'User registration successful' })
   @ApiResponse({ status: 409, description: 'Email already registered' })
-  async registerUser(@Body() registerUserDto: RegisterUserDto) {
-    return this.authService.registerUser(registerUserDto);
+  async registerUser(@Body() registerUserDto: RegisterUserDto, @Req() req: Request) {
+    return this.authService.registerUser(registerUserDto, req);
   }
 
   @Post('register/ong')
   @ApiOperation({ summary: 'Register a new ONG account' })
   @ApiResponse({ status: 201, description: 'ONG registration successful. Awaiting admin approval.' })
   @ApiResponse({ status: 409, description: 'Email already registered' })
-  async registerOng(@Body() registerOngDto: RegisterOngDto) {
-    return this.authService.registerOng(registerOngDto);
+  async registerOng(@Body() registerOngDto: RegisterOngDto, @Req() req: Request) {
+    return this.authService.registerOng(registerOngDto, req);
   }
 
   @Post('login')

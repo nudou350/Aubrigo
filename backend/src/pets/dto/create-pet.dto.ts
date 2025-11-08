@@ -73,4 +73,9 @@ export class CreatePetDto {
   @IsOptional()
   @IsString()
   location?: string;
+
+  @ApiProperty({ example: 'PT', required: false, description: 'ISO 3166-1 alpha-2 country code' })
+  @IsOptional()
+  @IsString()
+  countryCode?: string;
 }

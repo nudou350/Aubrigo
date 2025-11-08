@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AdminService, Ong } from '../../../core/services/admin.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { CountryService, Country } from '../../../core/services/country.service';
 
 @Component({
   selector: 'app-admin-ongs',
@@ -36,12 +37,23 @@ import { ToastService } from '../../../core/services/toast.service';
         </div>
 
         <div class="filters">
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Buscar por nome, email ou localização..."
-            (input)="onSearch($event)"
-          >
+          <div class="filter-row">
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Buscar por nome, email ou localização..."
+              (input)="onSearch($event)"
+            >
+            <select
+              class="country-filter"
+              [value]="selectedCountry()"
+              (change)="onCountryFilterChange($event)">
+              <option value="">Todos os países</option>
+              @for (country of countries(); track country.code) {
+                <option [value]="country.code">{{ country.flag }} {{ country.name }}</option>
+              }
+            </select>
+          </div>
         </div>
 
         @if (filteredOngs().length === 0) {
@@ -55,7 +67,14 @@ import { ToastService } from '../../../core/services/toast.service';
                 <div class="ong-header">
                   <div class="ong-avatar">{{ getInitials(ong) }}</div>
                   <div class="ong-info">
-                    <h3>{{ ong.ongName }}</h3>
+                    <div class="ong-name-row">
+                      <h3>{{ ong.ongName }}</h3>
+                      @if (ong.countryCode) {
+                        <span class="country-badge" [title]="getCountryName(ong.countryCode)">
+                          {{ getCountryFlag(ong.countryCode) }}
+                        </span>
+                      }
+                    </div>
                     <p class="ong-email">{{ ong.email }}</p>
                   </div>
                 </div>
@@ -200,8 +219,15 @@ import { ToastService } from '../../../core/services/toast.service';
       margin-bottom: 24px;
     }
 
+    .filter-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
     .search-input {
-      width: 100%;
+      flex: 1;
+      min-width: 250px;
       padding: 12px 16px;
       border: 2px solid #B8E3E1;
       border-radius: 8px;
@@ -210,6 +236,25 @@ import { ToastService } from '../../../core/services/toast.service';
 
       &:focus {
         border-color: #4ca8a0;
+      }
+    }
+
+    .country-filter {
+      min-width: 200px;
+      padding: 12px 16px;
+      border: 2px solid #B8E3E1;
+      border-radius: 8px;
+      font-size: 16px;
+      background: white;
+      cursor: pointer;
+      outline: none;
+
+      &:focus {
+        border-color: #4ca8a0;
+      }
+
+      &:hover {
+        border-color: #5CB5B0;
       }
     }
 
@@ -265,14 +310,27 @@ import { ToastService } from '../../../core/services/toast.service';
       flex: 1;
       min-width: 0;
 
+      .ong-name-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+
       h3 {
-        margin: 0 0 4px 0;
+        margin: 0;
         color: #2C2C2C;
         font-size: 18px;
         font-weight: 600;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      .country-badge {
+        font-size: 16px;
+        flex-shrink: 0;
+        cursor: help;
       }
 
       .ong-email {
@@ -360,20 +418,36 @@ import { ToastService } from '../../../core/services/toast.service';
 export class AdminOngsComponent implements OnInit {
   private adminService = inject(AdminService);
   private toastService = inject(ToastService);
+  private countryService = inject(CountryService);
 
   isLoading = signal(true);
   ongs = signal<Ong[]>([]);
   filteredOngs = signal<Ong[]>([]);
+  countries = signal<Country[]>([]);
+  selectedCountry = signal<string>('');
   searchTerm = '';
 
   ngOnInit() {
+    this.loadCountries();
     this.loadOngs();
+  }
+
+  loadCountries() {
+    this.countryService.getAllCountries().subscribe({
+      next: (countries) => {
+        this.countries.set(countries);
+      },
+      error: (error) => {
+        console.error('Error loading countries:', error);
+      }
+    });
   }
 
   loadOngs() {
     this.isLoading.set(true);
+    const countryFilter = this.selectedCountry() || undefined;
 
-    this.adminService.getOngs().subscribe({
+    this.adminService.getOngs(countryFilter).subscribe({
       next: (ongs) => {
         this.ongs.set(ongs);
         this.filteredOngs.set(ongs);
@@ -385,6 +459,12 @@ export class AdminOngsComponent implements OnInit {
         this.toastService.error('Erro ao carregar ONGs: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
+  }
+
+  onCountryFilterChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.selectedCountry.set(select.value);
+    this.loadOngs();
   }
 
   getOngsWithPets(): number {
@@ -445,5 +525,15 @@ export class AdminOngsComponent implements OnInit {
         this.toastService.error('Erro ao excluir ONG: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
+  }
+
+  getCountryFlag(countryCode: string): string {
+    const country = this.countries().find(c => c.code === countryCode);
+    return country?.flag || '🌍';
+  }
+
+  getCountryName(countryCode: string): string {
+    const country = this.countries().find(c => c.code === countryCode);
+    return country?.name || countryCode;
   }
 }

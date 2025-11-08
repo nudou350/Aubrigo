@@ -8,6 +8,11 @@ export class SearchPetsDto {
   @IsString()
   location?: string;
 
+  @ApiProperty({ required: false, example: 'PT', description: 'ISO 3166-1 alpha-2 country code' })
+  @IsOptional()
+  @IsString()
+  countryCode?: string;
+
   @ApiProperty({ required: false, example: 'uuid-of-ong' })
   @IsOptional()
   @IsString()

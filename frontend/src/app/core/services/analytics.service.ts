@@ -89,6 +89,7 @@ export class AnalyticsService {
   private db: IDBDatabase | null = null;
   private sessionId: string;
   private syncInProgress = false;
+  private dbInitializing = false;
 
   constructor() {
     this.sessionId = this.generateSessionId();
@@ -103,18 +104,33 @@ export class AnalyticsService {
    * Initialize IndexedDB
    */
   private async initDatabase(): Promise<void> {
+    if (this.dbInitializing) {
+      return;
+    }
+
+    this.dbInitializing = true;
+
     try {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 
         request.onerror = () => {
           console.error('❌ Failed to open analytics DB:', request.error);
+          this.dbInitializing = false;
           // Don't reject - allow app to work without analytics
           resolve();
         };
 
         request.onsuccess = () => {
           this.db = request.result;
+          this.dbInitializing = false;
+
+          // Handle unexpected close
+          this.db.onclose = () => {
+            console.warn('⚠️ Analytics DB connection closed unexpectedly');
+            this.db = null;
+          };
+
           console.log('✅ Analytics DB opened successfully');
           resolve();
         };
@@ -139,7 +155,31 @@ export class AnalyticsService {
       });
     } catch (error) {
       console.error('❌ Failed to initialize analytics DB:', error);
+      this.dbInitializing = false;
       // Don't throw - allow app to work without analytics
+    }
+  }
+
+  /**
+   * Ensure database is ready
+   */
+  private async ensureDatabase(): Promise<boolean> {
+    if (this.db && !this.dbInitializing) {
+      return true;
+    }
+
+    if (this.dbInitializing) {
+      // Wait for initialization to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return this.ensureDatabase();
+    }
+
+    try {
+      await this.initDatabase();
+      return this.db !== null;
+    } catch (error) {
+      console.error('❌ Failed to ensure analytics database:', error);
+      return false;
     }
   }
 
@@ -223,8 +263,9 @@ export class AnalyticsService {
    * Save event to IndexedDB
    */
   private async saveEvent(event: AnalyticsEvent): Promise<void> {
-    if (!this.db) {
-      console.warn('⚠️ Analytics DB not initialized');
+    const isReady = await this.ensureDatabase();
+    if (!isReady) {
+      console.warn('⚠️ Analytics DB not available');
       return;
     }
 
@@ -234,7 +275,7 @@ export class AnalyticsService {
       sent: event.sent === true ? true : false
     };
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
         const store = transaction.objectStore(this.STORE_NAME);
@@ -244,6 +285,11 @@ export class AnalyticsService {
         request.onerror = () => {
           console.error('❌ Failed to save event:', request.error);
           // Don't reject to prevent app crashes - just log and resolve
+          resolve();
+        };
+
+        transaction.onerror = () => {
+          console.error('❌ Transaction error in saveEvent:', transaction.error);
           resolve();
         };
       } catch (error) {
@@ -258,9 +304,10 @@ export class AnalyticsService {
    * Get pending events (not sent)
    */
   private async getPendingEvents(): Promise<AnalyticsEvent[]> {
-    if (!this.db) return [];
+    const isReady = await this.ensureDatabase();
+    if (!isReady) return [];
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
         const store = transaction.objectStore(this.STORE_NAME);
@@ -278,6 +325,11 @@ export class AnalyticsService {
           // Don't reject, just return empty array to prevent app crashes
           resolve([]);
         };
+
+        transaction.onerror = () => {
+          console.error('❌ Transaction error in getPendingEvents:', transaction.error);
+          resolve([]);
+        };
       } catch (error) {
         console.error('❌ Exception in getPendingEvents:', error);
         // Return empty array on any error
@@ -290,9 +342,10 @@ export class AnalyticsService {
    * Mark event as sent
    */
   private async markAsSent(eventId: string): Promise<void> {
-    if (!this.db) return;
+    const isReady = await this.ensureDatabase();
+    if (!isReady) return;
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
         const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
         const store = transaction.objectStore(this.STORE_NAME);
@@ -318,6 +371,11 @@ export class AnalyticsService {
           console.error('❌ Failed to get event for update:', getRequest.error);
           resolve(); // Don't reject to prevent app crashes
         };
+
+        transaction.onerror = () => {
+          console.error('❌ Transaction error in markAsSent:', transaction.error);
+          resolve();
+        };
       } catch (error) {
         console.error('❌ Exception in markAsSent:', error);
         resolve(); // Fail silently
@@ -329,15 +387,29 @@ export class AnalyticsService {
    * Delete event
    */
   private async deleteEvent(eventId: string): Promise<void> {
-    if (!this.db) return;
+    const isReady = await this.ensureDatabase();
+    if (!isReady) return;
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const request = store.delete(eventId);
+    return new Promise((resolve) => {
+      try {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.delete(eventId);
 
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve();
+        request.onerror = () => {
+          console.error('❌ Failed to delete event:', request.error);
+          resolve();
+        };
+
+        transaction.onerror = () => {
+          console.error('❌ Transaction error in deleteEvent:', transaction.error);
+          resolve();
+        };
+      } catch (error) {
+        console.error('❌ Exception in deleteEvent:', error);
+        resolve();
+      }
     });
   }
 
@@ -412,37 +484,51 @@ export class AnalyticsService {
    * Clean up old sent events
    */
   private async cleanupOldEvents(): Promise<void> {
-    if (!this.db) return;
+    const isReady = await this.ensureDatabase();
+    if (!isReady) return;
 
     const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
 
     return new Promise((resolve) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const index = store.index('timestamp');
-      const range = IDBKeyRange.upperBound(thirtyDaysAgo);
-      const request = index.openCursor(range);
+      try {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const index = store.index('timestamp');
+        const range = IDBKeyRange.upperBound(thirtyDaysAgo);
+        const request = index.openCursor(range);
 
-      let deletedCount = 0;
+        let deletedCount = 0;
 
-      request.onsuccess = (event) => {
-        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-        if (cursor) {
-          const eventData = cursor.value;
-          if (eventData.sent) {
-            cursor.delete();
-            deletedCount++;
+        request.onsuccess = (event) => {
+          const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+          if (cursor) {
+            const eventData = cursor.value;
+            if (eventData.sent) {
+              cursor.delete();
+              deletedCount++;
+            }
+            cursor.continue();
+          } else {
+            if (deletedCount > 0) {
+              console.log(`🗑️ Cleaned up ${deletedCount} old analytics events`);
+            }
+            resolve();
           }
-          cursor.continue();
-        } else {
-          if (deletedCount > 0) {
-            console.log(`🗑️ Cleaned up ${deletedCount} old analytics events`);
-          }
+        };
+
+        request.onerror = () => {
+          console.error('❌ Failed to cleanup old events:', request.error);
           resolve();
-        }
-      };
+        };
 
-      request.onerror = () => resolve();
+        transaction.onerror = () => {
+          console.error('❌ Transaction error in cleanupOldEvents:', transaction.error);
+          resolve();
+        };
+      } catch (error) {
+        console.error('❌ Exception in cleanupOldEvents:', error);
+        resolve();
+      }
     });
   }
 
@@ -474,7 +560,10 @@ export class AnalyticsService {
    * Sync using sendBeacon (for page unload)
    */
   private async syncWithBeacon(): Promise<void> {
-    if (!navigator.sendBeacon || !this.db) return;
+    if (!navigator.sendBeacon) return;
+
+    const isReady = await this.ensureDatabase();
+    if (!isReady) return;
 
     try {
       const pendingEvents = await this.getPendingEvents();
@@ -499,43 +588,54 @@ export class AnalyticsService {
     pendingEvents: number;
     eventsByType: Record<string, number>;
   }> {
-    if (!this.db) {
+    const isReady = await this.ensureDatabase();
+    if (!isReady) {
       return { totalEvents: 0, pendingEvents: 0, eventsByType: {} };
     }
 
     try {
       return new Promise((resolve) => {
-        const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
-        const store = transaction.objectStore(this.STORE_NAME);
-        const getAllRequest = store.getAll();
+        try {
+          const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
+          const store = transaction.objectStore(this.STORE_NAME);
+          const getAllRequest = store.getAll();
 
-        getAllRequest.onsuccess = () => {
-          try {
-            const events = getAllRequest.result || [];
-            const pending = events.filter(e => e.sent === false);
+          getAllRequest.onsuccess = () => {
+            try {
+              const events = getAllRequest.result || [];
+              const pending = events.filter(e => e.sent === false);
 
-            const eventsByType: Record<string, number> = {};
-            events.forEach(event => {
-              if (event.type) {
-                eventsByType[event.type] = (eventsByType[event.type] || 0) + 1;
-              }
-            });
+              const eventsByType: Record<string, number> = {};
+              events.forEach(event => {
+                if (event.type) {
+                  eventsByType[event.type] = (eventsByType[event.type] || 0) + 1;
+                }
+              });
 
-            resolve({
-              totalEvents: events.length,
-              pendingEvents: pending.length,
-              eventsByType
-            });
-          } catch (error) {
-            console.error('❌ Error processing local stats:', error);
+              resolve({
+                totalEvents: events.length,
+                pendingEvents: pending.length,
+                eventsByType
+              });
+            } catch (error) {
+              console.error('❌ Error processing local stats:', error);
+              resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
+            }
+          };
+
+          getAllRequest.onerror = () => {
+            console.error('❌ Failed to get local stats:', getAllRequest.error);
             resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
-          }
-        };
+          };
 
-        getAllRequest.onerror = () => {
-          console.error('❌ Failed to get local stats:', getAllRequest.error);
+          transaction.onerror = () => {
+            console.error('❌ Transaction error in getLocalStats:', transaction.error);
+            resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
+          };
+        } catch (error) {
+          console.error('❌ Exception creating transaction in getLocalStats:', error);
           resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
-        };
+        }
       });
     } catch (error) {
       console.error('❌ Exception in getLocalStats:', error);

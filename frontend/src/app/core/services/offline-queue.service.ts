@@ -45,6 +45,7 @@ export class OfflineQueueService {
 
   private db: IDBDatabase | null = null;
   private syncInProgress = false;
+  private dbInitializing = false;
 
   constructor() {
     this.initDatabase();
@@ -56,16 +57,31 @@ export class OfflineQueueService {
    * Initialize IndexedDB
    */
   private async initDatabase(): Promise<void> {
+    if (this.dbInitializing) {
+      return;
+    }
+
+    this.dbInitializing = true;
+
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 
       request.onerror = () => {
         console.error('❌ Failed to open IndexedDB:', request.error);
+        this.dbInitializing = false;
         reject(request.error);
       };
 
       request.onsuccess = () => {
         this.db = request.result;
+        this.dbInitializing = false;
+
+        // Handle unexpected close
+        this.db.onclose = () => {
+          console.warn('⚠️ IndexedDB connection closed unexpectedly');
+          this.db = null;
+        };
+
         console.log('✅ IndexedDB opened successfully');
         resolve();
       };
@@ -82,6 +98,29 @@ export class OfflineQueueService {
         }
       };
     });
+  }
+
+  /**
+   * Ensure database is ready
+   */
+  private async ensureDatabase(): Promise<boolean> {
+    if (this.db && !this.dbInitializing) {
+      return true;
+    }
+
+    if (this.dbInitializing) {
+      // Wait for initialization to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return this.ensureDatabase();
+    }
+
+    try {
+      await this.initDatabase();
+      return this.db !== null;
+    } catch (error) {
+      console.error('❌ Failed to ensure database:', error);
+      return false;
+    }
   }
 
   /**
@@ -104,8 +143,9 @@ export class OfflineQueueService {
    * Add an action to the offline queue
    */
   async addToQueue(type: OfflineActionType, payload: any): Promise<string> {
-    if (!this.db) {
-      throw new Error('IndexedDB not initialized');
+    const isReady = await this.ensureDatabase();
+    if (!isReady) {
+      throw new Error('IndexedDB not available');
     }
 
     const action: OfflineAction = {
@@ -118,19 +158,29 @@ export class OfflineQueueService {
     };
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const request = store.add(action);
+      try {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.add(action);
 
-      request.onsuccess = () => {
-        console.log('✅ Action added to offline queue:', type);
-        resolve(action.id);
-      };
+        request.onsuccess = () => {
+          console.log('✅ Action added to offline queue:', type);
+          resolve(action.id);
+        };
 
-      request.onerror = () => {
-        console.error('❌ Failed to add action to queue:', request.error);
-        reject(request.error);
-      };
+        request.onerror = () => {
+          console.error('❌ Failed to add action to queue:', request.error);
+          reject(request.error);
+        };
+
+        transaction.onerror = () => {
+          console.error('❌ Transaction error:', transaction.error);
+          reject(transaction.error);
+        };
+      } catch (error) {
+        console.error('❌ Exception in addToQueue:', error);
+        reject(error);
+      }
     });
   }
 
@@ -138,24 +188,35 @@ export class OfflineQueueService {
    * Get all pending actions from the queue
    */
   async getPendingActions(): Promise<OfflineAction[]> {
-    if (!this.db) {
+    const isReady = await this.ensureDatabase();
+    if (!isReady) {
       return [];
     }
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const index = store.index('status');
-      const request = index.getAll('pending');
+    return new Promise((resolve) => {
+      try {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readonly');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const index = store.index('status');
+        const request = index.getAll('pending');
 
-      request.onsuccess = () => {
-        resolve(request.result);
-      };
+        request.onsuccess = () => {
+          resolve(request.result || []);
+        };
 
-      request.onerror = () => {
-        console.error('❌ Failed to get pending actions:', request.error);
-        reject(request.error);
-      };
+        request.onerror = () => {
+          console.error('❌ Failed to get pending actions:', request.error);
+          resolve([]);
+        };
+
+        transaction.onerror = () => {
+          console.error('❌ Transaction error in getPendingActions:', transaction.error);
+          resolve([]);
+        };
+      } catch (error) {
+        console.error('❌ Exception in getPendingActions:', error);
+        resolve([]);
+      }
     });
   }
 
@@ -163,23 +224,34 @@ export class OfflineQueueService {
    * Update an action in the queue
    */
   async updateAction(action: OfflineAction): Promise<void> {
-    if (!this.db) {
-      throw new Error('IndexedDB not initialized');
+    const isReady = await this.ensureDatabase();
+    if (!isReady) {
+      throw new Error('IndexedDB not available');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const request = store.put(action);
+      try {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.put(action);
 
-      request.onsuccess = () => {
-        resolve();
-      };
+        request.onsuccess = () => {
+          resolve();
+        };
 
-      request.onerror = () => {
-        console.error('❌ Failed to update action:', request.error);
-        reject(request.error);
-      };
+        request.onerror = () => {
+          console.error('❌ Failed to update action:', request.error);
+          reject(request.error);
+        };
+
+        transaction.onerror = () => {
+          console.error('❌ Transaction error in updateAction:', transaction.error);
+          reject(transaction.error);
+        };
+      } catch (error) {
+        console.error('❌ Exception in updateAction:', error);
+        reject(error);
+      }
     });
   }
 
@@ -187,24 +259,35 @@ export class OfflineQueueService {
    * Delete an action from the queue
    */
   async deleteAction(actionId: string): Promise<void> {
-    if (!this.db) {
-      throw new Error('IndexedDB not initialized');
+    const isReady = await this.ensureDatabase();
+    if (!isReady) {
+      throw new Error('IndexedDB not available');
     }
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(this.STORE_NAME);
-      const request = store.delete(actionId);
+      try {
+        const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(this.STORE_NAME);
+        const request = store.delete(actionId);
 
-      request.onsuccess = () => {
-        console.log('🗑️ Action deleted from queue:', actionId);
-        resolve();
-      };
+        request.onsuccess = () => {
+          console.log('🗑️ Action deleted from queue:', actionId);
+          resolve();
+        };
 
-      request.onerror = () => {
-        console.error('❌ Failed to delete action:', request.error);
-        reject(request.error);
-      };
+        request.onerror = () => {
+          console.error('❌ Failed to delete action:', request.error);
+          reject(request.error);
+        };
+
+        transaction.onerror = () => {
+          console.error('❌ Transaction error in deleteAction:', transaction.error);
+          reject(transaction.error);
+        };
+      } catch (error) {
+        console.error('❌ Exception in deleteAction:', error);
+        reject(error);
+      }
     });
   }
 
@@ -304,22 +387,31 @@ export class OfflineQueueService {
    * Clear all completed actions
    */
   async clearCompleted(): Promise<void> {
-    if (!this.db) {
+    const isReady = await this.ensureDatabase();
+    if (!isReady) {
       return;
     }
 
-    const transaction = this.db.transaction([this.STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(this.STORE_NAME);
-    const index = store.index('status');
-    const request = index.openCursor(IDBKeyRange.only('completed'));
+    try {
+      const transaction = this.db!.transaction([this.STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(this.STORE_NAME);
+      const index = store.index('status');
+      const request = index.openCursor(IDBKeyRange.only('completed'));
 
-    request.onsuccess = (event) => {
-      const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-      if (cursor) {
-        store.delete(cursor.primaryKey);
-        cursor.continue();
-      }
-    };
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          store.delete(cursor.primaryKey);
+          cursor.continue();
+        }
+      };
+
+      request.onerror = () => {
+        console.error('❌ Failed to clear completed actions:', request.error);
+      };
+    } catch (error) {
+      console.error('❌ Exception in clearCompleted:', error);
+    }
   }
 
   /**

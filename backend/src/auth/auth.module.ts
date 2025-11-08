@@ -9,12 +9,14 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { EmailModule } from '../email/email.module';
+import { CountryModule } from '../country/country.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, PasswordResetToken]),
     PassportModule,
     EmailModule,
+    CountryModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -39,15 +39,15 @@ export class AdminController {
   @Get('ongs/pending')
   @ApiOperation({ summary: 'Get all pending ONGs awaiting approval' })
   @ApiResponse({ status: 200, description: 'List of pending ONGs' })
-  async getPendingONGs() {
-    return this.adminService.getPendingONGs();
+  async getPendingONGs(@Query('countryCode') countryCode?: string) {
+    return this.adminService.getPendingONGs(countryCode);
   }
 
   @Get('ongs')
-  @ApiOperation({ summary: 'Get all ONGs' })
+  @ApiOperation({ summary: 'Get all ONGs (optionally filtered by country)' })
   @ApiResponse({ status: 200, description: 'List of all ONGs' })
-  async getAllONGs() {
-    return this.adminService.getAllONGs();
+  async getAllONGs(@Query('countryCode') countryCode?: string) {
+    return this.adminService.getAllONGs(countryCode);
   }
 
   @Patch('ongs/:id/approve')

@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pet } from './entities/pet.entity';
 import { PetImage } from './entities/pet-image.entity';
+import { User } from '../users/entities/user.entity';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { SearchPetsDto } from './dto/search-pets.dto';
@@ -31,6 +32,11 @@ export class PetsService {
       .where('pet.status = :status', { status: 'available' });
 
     // Apply filters
+    // IMPORTANT: Filter by country code - pets are only visible in their country
+    if (filters.countryCode) {
+      query.andWhere('pet.countryCode = :countryCode', { countryCode: filters.countryCode });
+    }
+
     if (filters.ongId) {
       query.andWhere('pet.ongId = :ongId', { ongId: filters.ongId });
     }
@@ -141,10 +147,16 @@ export class PetsService {
   }
 
   async create(createPetDto: CreatePetDto, userId: string, imageUrls: string[] = []) {
-    // Create pet
+    // Get ONG's country code from userId
+    const ong = await this.petRepository.manager.findOne(User, {
+      where: { id: userId },
+    });
+
+    // Create pet with ONG's country code if not provided
     const pet = this.petRepository.create({
       ...createPetDto,
       ongId: userId,
+      countryCode: createPetDto.countryCode || ong?.countryCode || 'PT',
     });
 
     const savedPet = await this.petRepository.save(pet);
@@ -263,13 +275,20 @@ export class PetsService {
     });
   }
 
-  async getCitiesWithPets() {
-    const result = await this.petRepository
+  async getCitiesWithPets(countryCode?: string) {
+    const query = this.petRepository
       .createQueryBuilder('pet')
       .select('DISTINCT pet.location', 'location')
       .where('pet.status = :status', { status: 'available' })
       .andWhere('pet.location IS NOT NULL')
-      .andWhere("pet.location != ''")
+      .andWhere("pet.location != ''");
+
+    // Filter by country if provided
+    if (countryCode) {
+      query.andWhere('pet.countryCode = :countryCode', { countryCode });
+    }
+
+    const result = await query
       .orderBy('pet.location', 'ASC')
       .getRawMany();
 

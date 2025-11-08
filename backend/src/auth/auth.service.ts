@@ -20,6 +20,7 @@ import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { EmailService } from '../email/email.service';
+import { CountryService } from '../country/country.service';
 
 @Injectable()
 export class AuthService {
@@ -31,6 +32,7 @@ export class AuthService {
     private jwtService: JwtService,
     private emailService: EmailService,
     private configService: ConfigService,
+    private countryService: CountryService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -120,8 +122,8 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  async registerUser(registerUserDto: RegisterUserDto) {
-    const { email, password, confirmPassword, firstName, lastName, phone, location } = registerUserDto;
+  async registerUser(registerUserDto: RegisterUserDto, req?: any) {
+    const { email, password, confirmPassword, firstName, lastName, phone, location, countryCode } = registerUserDto;
 
     // Check if passwords match
     if (password !== confirmPassword) {
@@ -140,6 +142,9 @@ export class AuthService {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // Detect country from request if not provided
+    const detectedCountryCode = countryCode || (req ? this.countryService.detectCountryFromRequest(req) : 'PT');
+
     // Create user
     const user = this.userRepository.create({
       email,
@@ -149,6 +154,7 @@ export class AuthService {
       phone,
       location,
       role: UserRole.USER,
+      countryCode: detectedCountryCode,
     });
 
     await this.userRepository.save(user);
@@ -166,7 +172,7 @@ export class AuthService {
     };
   }
 
-  async registerOng(registerOngDto: RegisterOngDto) {
+  async registerOng(registerOngDto: RegisterOngDto, req?: any) {
     const {
       email,
       password,
@@ -177,6 +183,7 @@ export class AuthService {
       instagramHandle,
       city,
       location,
+      countryCode,
     } = registerOngDto;
 
     // Check if passwords match
@@ -199,6 +206,9 @@ export class AuthService {
     // Use city if location is not provided
     const finalLocation = location || city;
 
+    // Detect country from request if not provided
+    const detectedCountryCode = countryCode || (req ? this.countryService.detectCountryFromRequest(req) : 'PT');
+
     // Create ONG user (set status to PENDING for admin approval)
     const user = this.userRepository.create({
       email,
@@ -210,6 +220,7 @@ export class AuthService {
       instagramHandle,
       location: finalLocation,
       ongStatus: OngStatus.PENDING,
+      countryCode: detectedCountryCode,
     });
 
     const savedUser = await this.userRepository.save(user);

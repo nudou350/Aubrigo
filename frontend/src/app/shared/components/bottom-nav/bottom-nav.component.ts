@@ -211,6 +211,7 @@ import { PwaService } from "../../../core/services/pwa.service";
             <span>Adicionar Pet</span>
           </button>
           }
+          <button (click)="onLogout()" class="nav-logout">Sair</button>
           <button class="nav-profile" (click)="goToProfile()">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path
@@ -218,7 +219,6 @@ import { PwaService } from "../../../core/services/pwa.service";
               />
             </svg>
           </button>
-          <button (click)="onLogout()" class="nav-logout">Sair</button>
           } @else {
           <button (click)="goToLogin()" class="nav-login">
             Login / Registrar

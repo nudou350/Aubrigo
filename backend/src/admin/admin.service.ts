@@ -59,18 +59,30 @@ export class AdminService {
     };
   }
 
-  async getPendingONGs() {
+  async getPendingONGs(countryCode?: string) {
+    const where: any = { role: UserRole.ONG, ongStatus: OngStatus.PENDING };
+
+    if (countryCode) {
+      where.countryCode = countryCode.toUpperCase();
+    }
+
     return this.userRepository.find({
-      where: { role: UserRole.ONG, ongStatus: OngStatus.PENDING },
-      select: ['id', 'email', 'ongName', 'phone', 'location', 'instagramHandle', 'createdAt'],
+      where,
+      select: ['id', 'email', 'ongName', 'phone', 'location', 'instagramHandle', 'countryCode', 'createdAt'],
       order: { createdAt: 'DESC' },
     });
   }
 
-  async getAllONGs() {
+  async getAllONGs(countryCode?: string) {
+    const where: any = { role: UserRole.ONG };
+
+    if (countryCode) {
+      where.countryCode = countryCode.toUpperCase();
+    }
+
     return this.userRepository.find({
-      where: { role: UserRole.ONG },
-      select: ['id', 'email', 'ongName', 'phone', 'location', 'instagramHandle', 'createdAt'],
+      where,
+      select: ['id', 'email', 'ongName', 'phone', 'location', 'instagramHandle', 'countryCode', 'ongStatus', 'createdAt'],
       order: { createdAt: 'DESC' },
     });
   }

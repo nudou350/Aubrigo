@@ -45,8 +45,8 @@ export class PetsController {
   @Get('cities')
   @ApiOperation({ summary: 'Get cities with available pets' })
   @ApiResponse({ status: 200, description: 'Returns list of cities that have pets' })
-  async getCitiesWithPets() {
-    return this.petsService.getCitiesWithPets();
+  async getCitiesWithPets(@Query('countryCode') countryCode?: string) {
+    return this.petsService.getCitiesWithPets(countryCode);
   }
 
   @Get('my-pets')
