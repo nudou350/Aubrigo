@@ -370,8 +370,6 @@ export class ShareComponent implements OnInit {
     // You might need a backend endpoint to redirect GET request with query params
     // Or use service worker to intercept and transform
 
-    console.log('📥 Share page loaded');
-    console.log('Shared content:', this.sharedContent);
   }
 
   goHome(): void {
@@ -393,7 +391,6 @@ export class ShareComponent implements OnInit {
         this.router.navigateByUrl(path);
       }
     } catch (error) {
-      console.error('Invalid URL:', error);
     }
   }
 }

@@ -6,7 +6,6 @@ import { AppointmentsController } from './appointments.controller';
 import { AppointmentsService } from './appointments.service';
 import { OngsModule } from '../ongs/ongs.module';
 import { EmailModule } from '../email/email.module';
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([Appointment, Pet]),

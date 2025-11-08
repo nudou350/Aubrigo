@@ -428,16 +428,12 @@ export class DonationComponent implements OnInit {
     // IMPORTANT: Add country filter to show only ONGs from user's country
     filters.countryCode = this.countryService.getCountry();
 
-    console.log('🌍 País selecionado:', filters.countryCode);
-    console.log('🔍 Filtrando ONGs por país...');
 
     this.donationsService.getAllOngs(filters).subscribe({
       next: (ongs) => {
-        console.log(`✅ ${ongs.length} ONGs encontradas:`, ongs);
         this.ongs.set(ongs);
       },
       error: (error) => {
-        console.error('Error loading ONGs:', error);
         this.errorMessage.set('Erro ao carregar lista de ONGs');
       },
     });
@@ -551,7 +547,6 @@ export class DonationComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error checking payment status:', error);
       },
     });
   }

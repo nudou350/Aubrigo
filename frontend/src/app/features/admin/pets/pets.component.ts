@@ -468,7 +468,6 @@ export class AdminPetsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading pets:', error);
         this.isLoading.set(false);
         this.toastService.error('Erro ao carregar pets: ' + (error.error?.message || 'Erro desconhecido'));
       }
@@ -572,7 +571,6 @@ export class AdminPetsComponent implements OnInit {
         this.loadPets();
       },
       error: (error) => {
-        console.error('Error deleting pet:', error);
         this.toastService.error('Erro ao excluir pet: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });

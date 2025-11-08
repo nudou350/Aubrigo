@@ -13,7 +13,6 @@ import { UploadModule } from './upload/upload.module';
 import { ArticlesModule } from './articles/articles.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { CountryModule } from './country/country.module';
-
 @Module({
   imports: [
     // Configuration
@@ -21,7 +20,6 @@ import { CountryModule } from './country/country.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-
     // Database
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -34,7 +32,6 @@ import { CountryModule } from './country/country.module';
         ssl: configService.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
       }),
     }),
-
     // Feature modules
     AuthModule,
     UsersModule,

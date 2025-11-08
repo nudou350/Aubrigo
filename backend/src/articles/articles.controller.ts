@@ -23,12 +23,10 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { ArticleStatus } from './entities/article.entity';
-
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
-
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -42,21 +40,18 @@ export class ArticlesController {
   ) {
     return this.articlesService.create(user.id, createArticleDto);
   }
-
   @Get()
   @ApiOperation({ summary: 'Get all active articles' })
   @ApiResponse({ status: 200, description: 'Returns all active articles' })
   async findAll() {
     return this.articlesService.findAll();
   }
-
   @Get('ong/:ongId')
   @ApiOperation({ summary: 'Get active articles for a specific ONG (public)' })
   @ApiResponse({ status: 200, description: 'Returns active articles for the ONG' })
   async findByOng(@Param('ongId') ongId: string) {
     return this.articlesService.findByOng(ongId);
   }
-
   @Get('my-articles')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -65,7 +60,6 @@ export class ArticlesController {
   async findMyArticles(@CurrentUser() user: any) {
     return this.articlesService.findMyArticles(user.id);
   }
-
   @Get(':id')
   @ApiOperation({ summary: 'Get article by ID' })
   @ApiResponse({ status: 200, description: 'Returns article details' })
@@ -73,7 +67,6 @@ export class ArticlesController {
   async findOne(@Param('id') id: string) {
     return this.articlesService.findOne(id);
   }
-
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -88,7 +81,6 @@ export class ArticlesController {
   ) {
     return this.articlesService.update(id, user.id, updateArticleDto);
   }
-
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -100,7 +92,6 @@ export class ArticlesController {
   async remove(@Param('id') id: string, @CurrentUser() user: any) {
     return this.articlesService.remove(id, user.id);
   }
-
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

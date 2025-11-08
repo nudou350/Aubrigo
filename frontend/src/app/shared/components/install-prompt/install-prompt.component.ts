@@ -363,7 +363,6 @@ export class InstallPromptComponent implements OnInit {
     // Check if installable (or iOS, where we show instructions)
     if (this.pwaService.isInstallable() || this.isIOS) {
       this.showPrompt.set(true);
-      console.log('📱 Install prompt shown after', this.interactionCount, 'interactions');
     }
   }
 
@@ -378,17 +377,14 @@ export class InstallPromptComponent implements OnInit {
   }
 
   async install(): Promise<void> {
-    console.log('📥 User clicked install button');
     const accepted = await this.pwaService.promptInstall();
 
     if (accepted) {
-      console.log('✅ User accepted install prompt');
       this.showPrompt.set(false);
     }
   }
 
   dismiss(): void {
-    console.log('⏭️ User dismissed install prompt');
 
     // Save dismiss timestamp
     localStorage.setItem(this.DISMISSED_KEY, Date.now().toString());

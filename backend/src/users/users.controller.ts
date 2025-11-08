@@ -25,7 +25,6 @@ import { UsersService } from "./users.service";
 import { UpdateUserProfileDto } from "./dto/update-user-profile.dto";
 import { ChangeUserPasswordDto } from "./dto/change-user-password.dto";
 import { UploadService } from "../upload/upload.service";
-
 @ApiTags("Users")
 @Controller("users")
 export class UsersController {
@@ -33,7 +32,6 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly uploadService: UploadService
   ) {}
-
   @Get()
   @ApiOperation({ summary: "Get all ONGs with optional filters" })
   @ApiResponse({ status: 200, description: "List of all ONGs" })
@@ -44,7 +42,6 @@ export class UsersController {
   ) {
     return this.usersService.findAll({ search, location, countryCode });
   }
-
   // Profile routes must come before :id route to avoid matching "profile" as an id
   @Get("profile")
   @UseGuards(JwtAuthGuard)
@@ -56,7 +53,6 @@ export class UsersController {
   async getProfile(@CurrentUser() user: any) {
     return this.usersService.findOne(user.id);
   }
-
   @Put("profile")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -70,7 +66,6 @@ export class UsersController {
   ) {
     return this.usersService.updateProfile(user.id, updateProfileDto);
   }
-
   @Post("profile/image")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -90,19 +85,16 @@ export class UsersController {
     if (!file) {
       throw new BadRequestException("No file provided");
     }
-
     const imageUrl = await this.uploadService.uploadImage(file, "profiles");
     const updatedUser = await this.usersService.updateProfileImage(
       user.id,
       imageUrl
     );
-
     return {
       message: "Profile image uploaded successfully",
       profileImageUrl: updatedUser.profileImageUrl,
     };
   }
-
   @Put("profile/password")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -116,7 +108,6 @@ export class UsersController {
   ) {
     return this.usersService.changePassword(user.id, changePasswordDto);
   }
-
   @Get(":id")
   @ApiOperation({ summary: "Get ONG details by ID" })
   @ApiResponse({ status: 200, description: "ONG details retrieved" })

@@ -547,7 +547,6 @@ export class AdminReportsComponent implements OnInit {
         this.stats.set(stats);
       },
       error: (error) => {
-        console.error('Error loading stats:', error);
       }
     });
 
@@ -558,7 +557,6 @@ export class AdminReportsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading donations:', error);
         this.isLoading.set(false);
       }
     });

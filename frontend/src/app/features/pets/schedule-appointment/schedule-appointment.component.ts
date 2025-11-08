@@ -839,7 +839,6 @@ export class ScheduleAppointmentComponent implements OnInit {
         this.loadAvailableDates();
       },
       error: (error) => {
-        console.error('Error loading pet:', error);
         this.toastService.error('Erro ao carregar informações do pet');
         this.loading.set(false);
       }
@@ -861,7 +860,6 @@ export class ScheduleAppointmentComponent implements OnInit {
         this.loadingCalendar.set(false);
       },
       error: (error) => {
-        console.error('Error loading available dates:', error);
         this.toastService.error('Erro ao carregar datas disponíveis');
         this.loadingCalendar.set(false);
       }
@@ -887,7 +885,6 @@ export class ScheduleAppointmentComponent implements OnInit {
         this.loadingSlots.set(false);
       },
       error: (error) => {
-        console.error('Error loading slots:', error);
         this.toastService.error('Erro ao carregar horários disponíveis');
         this.loadingSlots.set(false);
       }
@@ -983,7 +980,6 @@ export class ScheduleAppointmentComponent implements OnInit {
         }, 2000);
       },
       error: (error) => {
-        console.error('Error scheduling appointment:', error);
         this.submitting.set(false);
         this.errorMessage.set(
           error.error?.message || 'Erro ao agendar visita. Por favor, tente novamente.'

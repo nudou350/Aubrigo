@@ -526,7 +526,6 @@ export class AdminDashboardComponent implements OnInit {
         this.stats.set(data);
       },
       error: (error) => {
-        console.error("Error loading stats:", error);
         this.toastService.error("Erro ao carregar estatísticas");
       },
     });
@@ -537,7 +536,6 @@ export class AdminDashboardComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error("Error loading pending ONGs:", error);
         this.toastService.error("Erro ao carregar ONGs pendentes");
         this.isLoading.set(false);
       },

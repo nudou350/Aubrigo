@@ -27,7 +27,6 @@ import { BulkOperatingHoursDto } from '../dto/bulk-operating-hours.dto';
 import { CreateAppointmentSettingsDto } from '../dto/create-appointment-settings.dto';
 import { UpdateAppointmentSettingsDto } from '../dto/update-appointment-settings.dto';
 import { CreateAvailabilityExceptionDto } from '../dto/create-availability-exception.dto';
-
 @ApiTags('ONG - Operating Hours & Settings')
 @Controller('ongs')
 export class OperatingHoursController {
@@ -37,9 +36,7 @@ export class OperatingHoursController {
     private readonly availableSlotsService: AvailableSlotsService,
     private readonly exceptionsService: AvailabilityExceptionsService,
   ) {}
-
   // ==================== OPERATING HOURS ====================
-
   @Get('my-ong/operating-hours')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -49,7 +46,6 @@ export class OperatingHoursController {
   async getMyOperatingHours(@CurrentUser() user: any) {
     return this.operatingHoursService.findByOng(user.id);
   }
-
   @Post('my-ong/operating-hours')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -59,7 +55,6 @@ export class OperatingHoursController {
   async createOperatingHours(@CurrentUser() user: any, @Body() dto: CreateOperatingHoursDto) {
     return this.operatingHoursService.create(user.id, dto);
   }
-
   @Post('my-ong/operating-hours/bulk')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -69,7 +64,6 @@ export class OperatingHoursController {
   async bulkUpsertOperatingHours(@CurrentUser() user: any, @Body() dto: BulkOperatingHoursDto) {
     return this.operatingHoursService.bulkUpsert(user.id, dto);
   }
-
   @Put('my-ong/operating-hours/:dayOfWeek')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -83,7 +77,6 @@ export class OperatingHoursController {
   ) {
     return this.operatingHoursService.update(user.id, dayOfWeek, dto);
   }
-
   @Delete('my-ong/operating-hours/:dayOfWeek')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -94,16 +87,13 @@ export class OperatingHoursController {
     await this.operatingHoursService.delete(user.id, dayOfWeek);
     return { message: 'Operating hours deleted successfully' };
   }
-
   @Get(':ongId/operating-hours')
   @ApiOperation({ summary: 'Get operating hours for any ONG (public)' })
   @ApiResponse({ status: 200, description: 'Operating hours retrieved successfully' })
   async getOngOperatingHours(@Param('ongId') ongId: string) {
     return this.operatingHoursService.findByOng(ongId);
   }
-
   // ==================== APPOINTMENT SETTINGS ====================
-
   @Get('my-ong/appointment-settings')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -113,7 +103,6 @@ export class OperatingHoursController {
   async getMySettings(@CurrentUser() user: any) {
     return this.settingsService.findByOng(user.id);
   }
-
   @Post('my-ong/appointment-settings')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -123,7 +112,6 @@ export class OperatingHoursController {
   async createOrUpdateSettings(@CurrentUser() user: any, @Body() dto: CreateAppointmentSettingsDto) {
     return this.settingsService.createOrUpdate(user.id, dto);
   }
-
   @Put('my-ong/appointment-settings')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -133,16 +121,13 @@ export class OperatingHoursController {
   async updateSettings(@CurrentUser() user: any, @Body() dto: UpdateAppointmentSettingsDto) {
     return this.settingsService.createOrUpdate(user.id, dto);
   }
-
   @Get(':ongId/appointment-settings')
   @ApiOperation({ summary: 'Get appointment settings for any ONG (public)' })
   @ApiResponse({ status: 200, description: 'Settings retrieved successfully' })
   async getOngSettings(@Param('ongId') ongId: string) {
     return this.settingsService.findByOng(ongId);
   }
-
   // ==================== AVAILABLE SLOTS ====================
-
   @Get(':ongId/available-slots')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   @Header('Pragma', 'no-cache')
@@ -153,7 +138,6 @@ export class OperatingHoursController {
     const date = new Date(dateString);
     return this.availableSlotsService.getAvailableSlots(ongId, date);
   }
-
   @Get(':ongId/available-dates')
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   @Header('Pragma', 'no-cache')
@@ -167,9 +151,7 @@ export class OperatingHoursController {
   ) {
     return this.availableSlotsService.getAvailableDates(ongId, year, month);
   }
-
   // ==================== AVAILABILITY EXCEPTIONS ====================
-
   @Get('my-ong/exceptions')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -179,7 +161,6 @@ export class OperatingHoursController {
   async getMyExceptions(@CurrentUser() user: any) {
     return this.exceptionsService.findByOng(user.id);
   }
-
   @Get('my-ong/exceptions/active')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -189,7 +170,6 @@ export class OperatingHoursController {
   async getMyActiveExceptions(@CurrentUser() user: any) {
     return this.exceptionsService.findActiveExceptions(user.id);
   }
-
   @Post('my-ong/exceptions')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -199,7 +179,6 @@ export class OperatingHoursController {
   async createException(@CurrentUser() user: any, @Body() dto: CreateAvailabilityExceptionDto) {
     return this.exceptionsService.create(user.id, dto);
   }
-
   @Post('my-ong/exceptions/holidays/:year')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -209,7 +188,6 @@ export class OperatingHoursController {
   async createHolidays(@CurrentUser() user: any, @Param('year', ParseIntPipe) year: number) {
     return this.exceptionsService.createHolidaysForYear(user.id, year);
   }
-
   @Put('my-ong/exceptions/:id')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -223,7 +201,6 @@ export class OperatingHoursController {
   ) {
     return this.exceptionsService.update(id, user.id, dto);
   }
-
   @Delete('my-ong/exceptions/:id')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -234,7 +211,6 @@ export class OperatingHoursController {
     await this.exceptionsService.delete(id, user.id);
     return { message: 'Exception deleted successfully' };
   }
-
   @Delete('my-ong/exceptions/cleanup/expired')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -245,7 +221,6 @@ export class OperatingHoursController {
     const count = await this.exceptionsService.deleteExpired(user.id);
     return { message: `${count} expired exceptions deleted` };
   }
-
   @Get(':ongId/exceptions')
   @ApiOperation({ summary: 'Get exceptions for any ONG (public)' })
   @ApiResponse({ status: 200, description: 'Exceptions retrieved successfully' })

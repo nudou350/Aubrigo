@@ -21,8 +21,6 @@ export interface ShareData {
 })
 export class ShareService {
   constructor() {
-    console.log('📤 Share Service initialized');
-    console.log('📱 Share API supported:', this.isShareSupported());
   }
 
   /**
@@ -52,25 +50,20 @@ export class ShareService {
    */
   async share(data: ShareData): Promise<boolean> {
     if (!this.isShareSupported()) {
-      console.warn('⚠️ Web Share API not supported');
       return false;
     }
 
     // Check if the data can be shared
     if (!navigator.canShare || !navigator.canShare(data)) {
-      console.warn('⚠️ Cannot share this data');
       return false;
     }
 
     try {
       await navigator.share(data);
-      console.log('✅ Content shared successfully');
       return true;
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        console.log('ℹ️ User cancelled share');
       } else {
-        console.error('❌ Error sharing:', error);
       }
       return false;
     }
@@ -174,16 +167,13 @@ export class ShareService {
    */
   async copyToClipboard(text: string): Promise<boolean> {
     if (!navigator.clipboard) {
-      console.warn('⚠️ Clipboard API not supported');
       return this.fallbackCopyToClipboard(text);
     }
 
     try {
       await navigator.clipboard.writeText(text);
-      console.log('✅ Link copied to clipboard');
       return true;
     } catch (error) {
-      console.error('❌ Failed to copy to clipboard:', error);
       return this.fallbackCopyToClipboard(text);
     }
   }
@@ -206,7 +196,6 @@ export class ShareService {
       document.body.removeChild(textArea);
       return successful;
     } catch (error) {
-      console.error('❌ Fallback copy failed:', error);
       document.body.removeChild(textArea);
       return false;
     }

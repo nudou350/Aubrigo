@@ -596,7 +596,6 @@ export class AnalyticsDashboardComponent implements OnInit {
         this.stats.set(response.data);
       }
     } catch (error) {
-      console.error('Failed to load stats:', error);
     } finally {
       this.loading.set(false);
     }

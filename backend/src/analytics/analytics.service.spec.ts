@@ -3,10 +3,8 @@ import { AnalyticsService } from './analytics.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AnalyticsEvent } from './entities/analytics-event.entity';
-
 describe('AnalyticsService', () => {
   let service: AnalyticsService;
-
   const mockAnalyticsEventRepository = {
     create: jest.fn(),
     save: jest.fn(),
@@ -14,7 +12,6 @@ describe('AnalyticsService', () => {
     find: jest.fn(),
     createQueryBuilder: jest.fn(),
   };
-
   const mockQueryBuilder = {
     select: jest.fn().mockReturnThis(),
     addSelect: jest.fn().mockReturnThis(),
@@ -27,7 +24,6 @@ describe('AnalyticsService', () => {
     getRawMany: jest.fn(),
     leftJoin: jest.fn().mockReturnThis(),
   };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -35,16 +31,13 @@ describe('AnalyticsService', () => {
         { provide: getRepositoryToken(AnalyticsEvent), useValue: mockAnalyticsEventRepository },
       ],
     }).compile();
-
     service = module.get<AnalyticsService>(AnalyticsService);
     mockAnalyticsEventRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
     jest.clearAllMocks();
   });
-
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-
   describe('trackEvent', () => {
     it('should track a single event', async () => {
       mockAnalyticsEventRepository.create.mockReturnValue({
@@ -55,7 +48,6 @@ describe('AnalyticsService', () => {
         id: 'event-1',
         eventType: 'pet_view',
       });
-
       const result = await service.trackEvent(
         {
           id: 'evt-1',
@@ -70,12 +62,10 @@ describe('AnalyticsService', () => {
         '192.168.1.1',
         'Mozilla/5.0',
       );
-
       expect(result).toBeDefined();
       expect(result.eventType).toBe('pet_view');
     });
   });
-
   describe('getOngStats', () => {
     it('should return ONG statistics', async () => {
       mockAnalyticsEventRepository.count
@@ -83,7 +73,6 @@ describe('AnalyticsService', () => {
         .mockResolvedValueOnce(20) // favorites
         .mockResolvedValueOnce(10) // appointments
         .mockResolvedValueOnce(5); // shares
-
       mockQueryBuilder.getRawMany
         .mockResolvedValueOnce([
           { date: '2024-01-01', count: '10' },
@@ -97,9 +86,7 @@ describe('AnalyticsService', () => {
           { eventType: 'pet_view', count: '100' },
           { eventType: 'pet_favorite', count: '20' },
         ]); // eventBreakdown
-
       const result = await service.getOngStats('ong-1', 30);
-
       expect(result.summary.petViews).toBe(100);
       expect(result.summary.favorites).toBe(20);
       expect(result.summary.appointments).toBe(10);

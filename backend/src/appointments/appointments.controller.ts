@@ -16,29 +16,24 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
-
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
-
   @Post()
   create(@Body() createAppointmentDto: CreateAppointmentDto) {
     return this.appointmentsService.create(createAppointmentDto);
   }
-
   @Get('ong')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
   findAllForOng(@Request() req) {
     return this.appointmentsService.findAllForOng(req.user.id);
   }
-
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string) {
     return this.appointmentsService.findOne(id);
   }
-
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -49,12 +44,10 @@ export class AppointmentsController {
   ) {
     return this.appointmentsService.updateStatus(id, updateStatusDto, req.user.id);
   }
-
   @Patch(':id/cancel')
   cancel(@Param('id') id: string, @Body('reason') reason?: string) {
     return this.appointmentsService.cancel(id, reason);
   }
-
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)

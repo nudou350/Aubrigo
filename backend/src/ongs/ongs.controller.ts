@@ -24,7 +24,6 @@ import { UpdateOngDto } from './dto/update-ong.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UploadService } from '../upload/upload.service';
-
 @ApiTags('ONGs')
 @Controller('ongs')
 export class OngsController {
@@ -32,14 +31,12 @@ export class OngsController {
     private readonly ongsService: OngsService,
     private readonly uploadService: UploadService,
   ) {}
-
   @Get()
   @ApiOperation({ summary: 'Get all approved ONGs' })
   @ApiResponse({ status: 200, description: 'List of approved ONGs' })
   async findAll() {
     return this.ongsService.findAll();
   }
-
   @Get('my-ong')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -50,7 +47,6 @@ export class OngsController {
   async getMyOng(@CurrentUser() user: any) {
     return this.ongsService.getMyOng(user.id);
   }
-
   @Get('my-ong/stats')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -62,7 +58,6 @@ export class OngsController {
     const ong = await this.ongsService.getMyOng(user.id);
     return this.ongsService.getOngStats(ong.id, user.id);
   }
-
   @Get('my-ongs')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -72,7 +67,6 @@ export class OngsController {
   async getMyOngs(@CurrentUser() user: any) {
     return this.ongsService.findByUserId(user.id);
   }
-
   @Get(':id')
   @ApiOperation({ summary: 'Get ONG by ID' })
   @ApiResponse({ status: 200, description: 'ONG details' })
@@ -80,7 +74,6 @@ export class OngsController {
   async findOne(@Param('id') id: string) {
     return this.ongsService.findOne(id);
   }
-
   @Get(':id/stats')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -91,7 +84,6 @@ export class OngsController {
   async getOngStats(@Param('id') id: string, @CurrentUser() user: any) {
     return this.ongsService.getOngStats(id, user.id);
   }
-
   @Put(':id')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG, UserRole.ADMIN)
@@ -107,7 +99,6 @@ export class OngsController {
   ) {
     return this.ongsService.update(id, updateOngDto, user.id);
   }
-
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG, UserRole.ADMIN)
@@ -119,7 +110,6 @@ export class OngsController {
   async remove(@Param('id') id: string, @CurrentUser() user: any) {
     return this.ongsService.remove(id, user.id);
   }
-
   @Put('my-ong/profile')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -132,13 +122,11 @@ export class OngsController {
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     const updatedOng = await this.ongsService.updateMyProfile(user.id, updateProfileDto);
-
     return {
       message: 'Profile updated successfully',
       ong: updatedOng,
     };
   }
-
   @Post('my-ong/profile-image')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -156,16 +144,13 @@ export class OngsController {
     if (!file) {
       throw new BadRequestException('No file provided');
     }
-
     const imageUrl = await this.uploadService.uploadImage(file, 'profiles');
     const updatedOng = await this.ongsService.updateProfileImage(user.id, imageUrl);
-
     return {
       message: 'Profile image uploaded successfully',
       profileImageUrl: updatedOng.profileImageUrl,
     };
   }
-
   @Put('my-ong/change-password')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
@@ -181,6 +166,5 @@ export class OngsController {
   ) {
     return this.ongsService.changePassword(user.id, changePasswordDto);
   }
-
   // Member management endpoints removed - not implemented in current architecture
 }

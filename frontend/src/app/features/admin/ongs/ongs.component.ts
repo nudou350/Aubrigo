@@ -438,7 +438,6 @@ export class AdminOngsComponent implements OnInit {
         this.countries.set(countries);
       },
       error: (error) => {
-        console.error('Error loading countries:', error);
       }
     });
   }
@@ -454,7 +453,6 @@ export class AdminOngsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading ONGs:', error);
         this.isLoading.set(false);
         this.toastService.error('Erro ao carregar ONGs: ' + (error.error?.message || 'Erro desconhecido'));
       }
@@ -521,7 +519,6 @@ export class AdminOngsComponent implements OnInit {
         this.loadOngs();
       },
       error: (error) => {
-        console.error('Error deleting ONG:', error);
         this.toastService.error('Erro ao excluir ONG: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });

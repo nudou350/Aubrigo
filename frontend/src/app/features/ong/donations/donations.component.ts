@@ -497,7 +497,6 @@ export class OngDonationsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading donations:', error);
         this.toastService.error('Erro ao carregar doações');
         this.isLoading.set(false);
       }

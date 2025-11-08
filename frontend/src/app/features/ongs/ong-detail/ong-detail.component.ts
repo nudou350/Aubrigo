@@ -91,7 +91,6 @@ export class OngDetailComponent implements OnInit {
           }
         },
         error: (error) => {
-          console.error('Error loading ONG details:', error);
           this.toastService.error('Erro ao carregar detalhes da ONG');
           this.loading.set(false);
           this.router.navigate(['/ongs']);

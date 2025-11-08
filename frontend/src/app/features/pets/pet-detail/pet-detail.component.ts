@@ -905,7 +905,6 @@ export class PetDetailComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error("Error checking favorite status:", error);
       },
     });
   }
@@ -935,7 +934,6 @@ export class PetDetailComponent implements OnInit {
             });
           },
           error: (error) => {
-            console.error("Error removing favorite:", error);
             this.toastService.error("Erro ao remover dos favoritos");
           },
         });
@@ -955,7 +953,6 @@ export class PetDetailComponent implements OnInit {
             });
           },
           error: (error) => {
-            console.error("Error adding favorite:", error);
             this.toastService.error("Erro ao adicionar aos favoritos");
           },
         });
@@ -999,7 +996,6 @@ export class PetDetailComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error("Error loading pet detail:", error);
         this.loading.set(false);
         this.pet.set(null);
       },
@@ -1012,7 +1008,6 @@ export class PetDetailComponent implements OnInit {
         this.ongArticles.set(articles);
       },
       error: (error) => {
-        console.error("Error loading ONG articles:", error);
       },
     });
   }
@@ -1033,7 +1028,6 @@ export class PetDetailComponent implements OnInit {
     const pet = this.pet();
     if (!pet) return;
 
-    console.log("📤 Pet shared via:", platform);
 
     // Track share analytics
     this.analyticsService.track(EventType.PET_SHARE, {
@@ -1160,7 +1154,6 @@ export class PetDetailComponent implements OnInit {
   }
 
   onImageError(event: Event) {
-    console.error("Image failed to load:", this.currentImage());
     this.imageLoadError.set(true);
   }
 

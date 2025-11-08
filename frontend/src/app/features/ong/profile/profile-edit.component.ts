@@ -501,7 +501,6 @@ export class ProfileEditComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading profile:', error);
         this.toastService.error('Erro ao carregar perfil');
         this.isLoading.set(false);
       }
@@ -565,7 +564,6 @@ export class ProfileEditComponent implements OnInit {
               resolve();
             },
             error: (error) => {
-              console.error('Error uploading image:', error);
               this.toastService.error('Erro ao atualizar imagem de perfil');
               reject(error);
             }
@@ -601,7 +599,6 @@ export class ProfileEditComponent implements OnInit {
             resolve();
           },
           error: (error) => {
-            console.error('Error updating profile:', error);
             this.toastService.error('Erro ao atualizar perfil');
             reject(error);
           }
@@ -621,7 +618,6 @@ export class ProfileEditComponent implements OnInit {
               resolve();
             },
             error: (error) => {
-              console.error('Error changing password:', error);
               this.toastService.error('Erro ao alterar senha: ' + (error.error?.message || 'senha atual incorreta'));
               reject(error);
             }
@@ -636,7 +632,6 @@ export class ProfileEditComponent implements OnInit {
       }, 1500);
 
     } catch (error) {
-      console.error('Error in form submission:', error);
       this.isSubmitting.set(false);
     }
   }

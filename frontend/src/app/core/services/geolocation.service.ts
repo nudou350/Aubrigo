@@ -25,7 +25,6 @@ export class GeolocationService {
    */
   async requestLocation(): Promise<Coordinates | null> {
     if (!navigator.geolocation) {
-      console.warn('Geolocation is not supported by this browser.');
       return null;
     }
 
@@ -41,7 +40,6 @@ export class GeolocationService {
           resolve(coords);
         },
         (error) => {
-          console.warn('Geolocation permission denied or error:', error);
           this.permissionGranted.set(false);
           resolve(null);
         },

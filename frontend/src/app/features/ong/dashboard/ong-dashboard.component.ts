@@ -630,14 +630,12 @@ export class OngDashboardComponent implements OnInit {
             this.isLoading.set(false);
           },
           error: (error) => {
-            console.error('Error loading stats:', error);
             this.toastService.error('Erro ao carregar estatísticas');
             this.isLoading.set(false);
           }
         });
       },
       error: (error) => {
-        console.error('Error loading ONG data:', error);
         this.toastService.error('Erro ao carregar dados da ONG');
         this.isLoading.set(false);
       }

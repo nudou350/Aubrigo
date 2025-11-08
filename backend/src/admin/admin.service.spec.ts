@@ -6,30 +6,24 @@ import { User, UserRole, OngStatus } from '../users/entities/user.entity';
 import { Pet } from '../pets/entities/pet.entity';
 import { Donation } from '../donations/entities/donation.entity';
 import { EmailService } from '../email/email.service';
-
 describe('AdminService', () => {
   let service: AdminService;
-
   const mockUserRepository = {
     find: jest.fn(),
     findOne: jest.fn(),
     save: jest.fn(),
     count: jest.fn(),
   };
-
   const mockPetRepository = {
     count: jest.fn(),
   };
-
   const mockDonationRepository = {
     find: jest.fn(),
   };
-
   const mockEmailService = {
     sendOngApprovalEmail: jest.fn(),
     sendOngRejectionEmail: jest.fn(),
   };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -40,25 +34,19 @@ describe('AdminService', () => {
         { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
-
     service = module.get<AdminService>(AdminService);
     jest.clearAllMocks();
   });
-
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-
   describe('getAllUsers', () => {
     it('should return all users', async () => {
       mockUserRepository.find.mockResolvedValue([{ id: '1' }, { id: '2' }]);
-
       const result = await service.getAllUsers();
-
       expect(result).toHaveLength(2);
     });
   });
-
   describe('approveOng', () => {
     it('should approve ONG', async () => {
       mockUserRepository.findOne.mockResolvedValue({
@@ -74,13 +62,10 @@ describe('AdminService', () => {
         email: 'ong@test.com',
       });
       mockEmailService.sendOngApprovalEmail.mockResolvedValue(true);
-
       const result = await service.approveOng('ong-1');
-
       expect(result.ong.status).toBe(OngStatus.APPROVED);
     });
   });
-
   describe('getDashboardStats', () => {
     it('should return dashboard statistics', async () => {
       mockUserRepository.count
@@ -91,9 +76,7 @@ describe('AdminService', () => {
         .mockResolvedValueOnce(50) // totalPets
         .mockResolvedValueOnce(30); // availablePets
       mockDonationRepository.find.mockResolvedValue([{ amount: 100 }, { amount: 200 }]);
-
       const result = await service.getDashboardStats();
-
       expect(result.totalUsers).toBe(10);
       expect(result.totalOngs).toBe(5);
       expect(result.pendingOngs).toBe(2);

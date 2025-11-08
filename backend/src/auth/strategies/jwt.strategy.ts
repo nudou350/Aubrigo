@@ -5,7 +5,6 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
@@ -19,16 +18,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: configService.get('JWT_SECRET') || 'default-secret-key',
     });
   }
-
   async validate(payload: any) {
     const user = await this.userRepository.findOne({
       where: { id: payload.sub },
     });
-
     if (!user) {
       throw new UnauthorizedException();
     }
-
     return {
       id: user.id,
       userId: user.id,

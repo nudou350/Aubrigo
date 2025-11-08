@@ -63,7 +63,6 @@ export class OngsComponent implements OnInit {
         this.allOngs.set(ongs);
       },
       error: (error) => {
-        console.error('Error loading ONGs for typeahead:', error);
       },
     });
   }
@@ -95,7 +94,6 @@ export class OngsComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading ONGs:', error);
         this.toastService.error('Erro ao carregar ONGs');
         this.loading.set(false);
         this.ongs.set([]);
@@ -110,7 +108,6 @@ export class OngsComponent implements OnInit {
         this.filteredLocations.set(this.availableLocations.slice(0, 5));
       },
       error: (error) => {
-        console.error('Error loading cities:', error);
       },
     });
   }

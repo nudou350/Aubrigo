@@ -323,7 +323,6 @@ export class FavoritesComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading favorites:', error);
         this.toastService.error('Erro ao carregar favoritos');
         this.loading.set(false);
       },
@@ -341,7 +340,6 @@ export class FavoritesComponent implements OnInit {
         this.toastService.success('Removido dos favoritos');
       },
       error: (error) => {
-        console.error('Error removing favorite:', error);
         this.toastService.error('Erro ao remover favorito');
       },
     });

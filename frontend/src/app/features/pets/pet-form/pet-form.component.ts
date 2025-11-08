@@ -723,7 +723,6 @@ export class PetFormComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error loading pet:', error);
         this.toastService.error('Erro ao carregar dados do pet');
         this.router.navigate(['/pets/manage']);
       }
@@ -998,7 +997,6 @@ export class PetFormComponent implements OnInit {
         this.router.navigate(['/pets/manage']);
       },
       error: (error) => {
-        console.error('Error saving pet:', error);
         this.toastService.error('Erro ao salvar pet: ' + (error.error?.message || 'Erro desconhecido'));
         this.isSubmitting.set(false);
       }

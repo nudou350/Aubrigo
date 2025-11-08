@@ -46,13 +46,8 @@ export class PwaService {
     // In debug mode or iOS, force installable to true for showing the button
     if (this.DEBUG_MODE && !this.isInstalled()) {
       this.isInstallable.set(true);
-      console.log('🔧 DEBUG MODE: Install button forced to show');
     }
 
-    console.log('🔧 PWA Service initialized');
-    console.log('📱 Is PWA Supported:', this.isPwaSupported);
-    console.log('🏠 Is Installed:', this.isInstalled());
-    console.log('✅ Is Installable:', this.isInstallable());
   }
 
   private initPwaPrompt() {
@@ -67,12 +62,10 @@ export class PwaService {
       // Update installable status
       this.isInstallable.set(true);
 
-      console.log('PWA: beforeinstallprompt event fired, app is installable');
     });
 
     // Listen for the app installed event
     window.addEventListener('appinstalled', () => {
-      console.log('PWA: App was installed successfully');
       this.isInstalled.set(true);
       this.isInstallable.set(false);
       this.deferredPrompt = null;
@@ -84,14 +77,12 @@ export class PwaService {
     if (window.matchMedia('(display-mode: standalone)').matches) {
       this.isInstalled.set(true);
       this.isInstallable.set(false);
-      console.log('PWA: App is running in standalone mode');
     }
 
     // Also check navigator.standalone for iOS Safari
     if ((navigator as any).standalone) {
       this.isInstalled.set(true);
       this.isInstallable.set(false);
-      console.log('PWA: App is running in standalone mode (iOS)');
     }
   }
 
@@ -102,13 +93,7 @@ export class PwaService {
   async promptInstall(): Promise<boolean> {
     if (!this.deferredPrompt) {
       if (this.DEBUG_MODE) {
-        console.warn('⚠️ PWA: Install prompt is not available (Service Worker not active)');
-        console.log('💡 To test PWA installation:');
-        console.log('   1. Build in production mode: ng build');
-        console.log('   2. Serve the build: npx http-server dist/pet-sos-frontend/browser -p 4200');
-        console.log('   3. Open https://localhost:4200 (or use ngrok for HTTPS)');
       } else {
-        console.warn('PWA: Install prompt is not available');
       }
       return false;
     }
@@ -120,7 +105,6 @@ export class PwaService {
       // Wait for the user to respond to the prompt
       const choiceResult = await this.deferredPrompt.userChoice;
 
-      console.log(`PWA: User ${choiceResult.outcome} the install prompt`);
 
       // Clear the deferred prompt
       this.deferredPrompt = null;
@@ -128,7 +112,6 @@ export class PwaService {
 
       return choiceResult.outcome === 'accepted';
     } catch (error) {
-      console.error('PWA: Error showing install prompt:', error);
       return false;
     }
   }
@@ -160,11 +143,9 @@ export class PwaService {
    */
   private initServiceWorkerUpdate() {
     if (!this.swUpdate.isEnabled) {
-      console.log('⚠️ PWA: Service Worker updates are not enabled (not running in production or HTTPS)');
       return;
     }
 
-    console.log('✅ PWA: Service Worker update detection enabled');
 
     // Subscribe to version updates
     this.swUpdate.versionUpdates
@@ -172,9 +153,6 @@ export class PwaService {
         filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY')
       )
       .subscribe(event => {
-        console.log('🔄 PWA: New version available!');
-        console.log('   Current version:', event.currentVersion);
-        console.log('   New version:', event.latestVersion);
 
         this.updateAvailable.set(true);
         this.currentVersion.set(
@@ -189,7 +167,6 @@ export class PwaService {
     this.appRef.isStable
       .pipe(first(stable => stable))
       .subscribe(() => {
-        console.log('🔍 PWA: Checking for updates on startup...');
         this.checkForUpdate();
       });
   }
@@ -206,7 +183,6 @@ export class PwaService {
     const everySixHours$ = interval(6 * 60 * 60 * 1000);
 
     concat(appIsStable$, everySixHours$).subscribe(() => {
-      console.log('🔍 PWA: Periodic update check...');
       this.checkForUpdate();
     });
   }
@@ -216,20 +192,16 @@ export class PwaService {
    */
   async checkForUpdate(): Promise<boolean> {
     if (!this.swUpdate.isEnabled) {
-      console.warn('⚠️ PWA: Service Worker is not enabled, cannot check for updates');
       return false;
     }
 
     try {
       const updateFound = await this.swUpdate.checkForUpdate();
       if (updateFound) {
-        console.log('✅ PWA: Update found and will be downloaded');
       } else {
-        console.log('ℹ️ PWA: Already on the latest version');
       }
       return updateFound;
     } catch (error) {
-      console.error('❌ PWA: Error checking for updates:', error);
       return false;
     }
   }
@@ -239,19 +211,15 @@ export class PwaService {
    */
   async applyUpdate(): Promise<void> {
     if (!this.swUpdate.isEnabled) {
-      console.warn('⚠️ PWA: Service Worker is not enabled, cannot apply update');
       return;
     }
 
     try {
-      console.log('🔄 PWA: Activating new version...');
       await this.swUpdate.activateUpdate();
-      console.log('✅ PWA: Update activated, reloading...');
 
       // Reload the page to show the new version
       document.location.reload();
     } catch (error) {
-      console.error('❌ PWA: Error applying update:', error);
     }
   }
 
@@ -270,7 +238,6 @@ export class PwaService {
         return this.currentVersion() || null;
       }
     } catch (error) {
-      console.error('❌ PWA: Error getting current version:', error);
     }
 
     return null;

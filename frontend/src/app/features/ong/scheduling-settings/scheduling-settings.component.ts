@@ -742,7 +742,6 @@ export class SchedulingSettingsComponent implements OnInit {
 
       this.loading.set(false);
     }).catch((error) => {
-      console.error('Error loading settings:', error);
       // If settings don't exist yet, that's okay - use defaults
       this.loading.set(false);
     });
@@ -788,7 +787,6 @@ export class SchedulingSettingsComponent implements OnInit {
         this.router.navigate(['/ong/dashboard']);
       }, 1500);
     }).catch((error) => {
-      console.error('Error saving settings:', error);
       this.errorMessage.set(error.error?.message || 'Erro ao salvar configurações. Tente novamente.');
       this.toastService.error(this.errorMessage());
       this.saving.set(false);

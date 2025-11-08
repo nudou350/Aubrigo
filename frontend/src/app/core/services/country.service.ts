@@ -135,7 +135,6 @@ export class CountryService {
         }
       },
       error: () => {
-        console.error('Country detection failed');
       }
     });
   }

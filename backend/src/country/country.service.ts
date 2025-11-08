@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
-
 export interface Country {
   code: string;
   name: string;
   flag: string;
 }
-
 @Injectable()
 export class CountryService {
   private readonly countries: Country[] = [
@@ -50,7 +48,6 @@ export class CountryService {
     { code: 'AO', name: 'Angola', flag: '🇦🇴' },
     { code: 'MZ', name: 'Mozambique', flag: '🇲🇿' },
   ];
-
   /**
    * Detect country from IP address or request headers
    * This is a simplified implementation - in production, you would use a service like
@@ -62,27 +59,22 @@ export class CountryService {
     if (cloudFrontCountry) {
       return cloudFrontCountry.toUpperCase();
     }
-
     // Try to get country from Cloudflare headers
     const cloudflareCountry = req.headers['cf-ipcountry'];
     if (cloudflareCountry) {
       return cloudflareCountry.toUpperCase();
     }
-
     // IMPORTANT: This platform is exclusively for Portugal
     // Always default to PT unless CDN headers explicitly indicate otherwise
     // Accept-Language is NOT reliable for geolocation and should be ignored
-
     return 'PT';
   }
-
   /**
    * Get all available countries
    */
   getAllCountries(): Country[] {
     return this.countries;
   }
-
   /**
    * Search countries by name
    */
@@ -95,14 +87,12 @@ export class CountryService {
       )
       .slice(0, limit);
   }
-
   /**
    * Get country by code
    */
   getCountryByCode(code: string): Country | undefined {
     return this.countries.find(c => c.code === code.toUpperCase());
   }
-
   /**
    * Check if country code is valid
    */

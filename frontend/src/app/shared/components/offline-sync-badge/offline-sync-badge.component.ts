@@ -162,7 +162,6 @@ export class OfflineSyncBadgeComponent implements OnInit {
       const count = await this.queueService.getPendingCount();
       this.pendingCount.set(count);
     } catch (error) {
-      console.error('❌ Failed to get pending count:', error);
     }
   }
 
@@ -176,9 +175,7 @@ export class OfflineSyncBadgeComponent implements OnInit {
     try {
       await this.queueService.syncOfflineActions();
       await this.updatePendingCount();
-      console.log('✅ Manual sync completed');
     } catch (error) {
-      console.error('❌ Manual sync failed:', error);
     } finally {
       this.isSyncing.set(false);
     }

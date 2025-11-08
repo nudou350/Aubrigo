@@ -22,8 +22,6 @@ export class NetworkStatusService {
 
   constructor() {
     this.initNetworkMonitoring();
-    console.log('🌐 Network Status Service initialized');
-    console.log('📶 Current status:', navigator.onLine ? 'ONLINE' : 'OFFLINE');
   }
 
   private initNetworkMonitoring(): void {
@@ -33,7 +31,6 @@ export class NetworkStatusService {
 
     // Handle online event
     online$.subscribe(() => {
-      console.log('✅ Network: ONLINE');
       this.isOnline.set(true);
       this.justWentOnline.set(true);
 
@@ -45,7 +42,6 @@ export class NetworkStatusService {
 
     // Handle offline event
     offline$.subscribe(() => {
-      console.log('❌ Network: OFFLINE');
       this.isOnline.set(false);
       this.justWentOffline.set(true);
 
@@ -75,6 +71,5 @@ export class NetworkStatusService {
    */
   refreshStatus(): void {
     this.isOnline.set(navigator.onLine);
-    console.log('🔄 Network status refreshed:', this.isOnline() ? 'ONLINE' : 'OFFLINE');
   }
 }

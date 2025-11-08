@@ -8,12 +8,10 @@ import { RegisterOngDto } from './dto/register-ong.dto';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
   @Post('register')
   @ApiOperation({ summary: 'Register a new NGO account (legacy endpoint)' })
   @ApiResponse({ status: 201, description: 'Registration successful' })
@@ -21,7 +19,6 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
-
   @Post('register/user')
   @ApiOperation({ summary: 'Register a new regular user account' })
   @ApiResponse({ status: 201, description: 'User registration successful' })
@@ -29,7 +26,6 @@ export class AuthController {
   async registerUser(@Body() registerUserDto: RegisterUserDto, @Req() req: Request) {
     return this.authService.registerUser(registerUserDto, req);
   }
-
   @Post('register/ong')
   @ApiOperation({ summary: 'Register a new ONG account' })
   @ApiResponse({ status: 201, description: 'ONG registration successful. Awaiting admin approval.' })
@@ -37,7 +33,6 @@ export class AuthController {
   async registerOng(@Body() registerOngDto: RegisterOngDto, @Req() req: Request) {
     return this.authService.registerOng(registerOngDto, req);
   }
-
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login to existing account' })
@@ -46,7 +41,6 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
-
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request password reset email' })
@@ -54,7 +48,6 @@ export class AuthController {
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
-
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password with token' })

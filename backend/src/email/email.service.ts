@@ -1,14 +1,12 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import * as nodemailer from "nodemailer";
-
 export interface EmailOptions {
   to: string;
   subject: string;
   html: string;
   text?: string;
 }
-
 @Injectable()
 export class EmailService {
   private transporter: nodemailer.Transporter;
@@ -16,7 +14,6 @@ export class EmailService {
   private readonly fromEmail: string;
   private readonly adminEmail: string;
   private readonly frontendUrl: string;
-
   constructor(private configService: ConfigService) {
     this.fromEmail = this.configService.get<string>(
       "EMAIL_FROM",
@@ -26,14 +23,12 @@ export class EmailService {
       "ADMIN_EMAIL",
       "admin@aubrigo.pt"
     );
-
     // Get first URL from FRONTEND_URL (it might be a comma-separated list)
     const frontendUrls = this.configService.get<string>(
       "FRONTEND_URL",
       "http://localhost:4200"
     );
     this.frontendUrl = frontendUrls.split(",")[0].trim();
-
     // Create transporter (using EMAIL_* env variables)
     const emailHost = this.configService.get<string>(
       "EMAIL_HOST",
@@ -42,14 +37,12 @@ export class EmailService {
     const emailPort = this.configService.get<number>("EMAIL_PORT", 587);
     const emailUser = this.configService.get<string>("EMAIL_USER");
     const emailPassword = this.configService.get<string>("EMAIL_PASSWORD");
-
     if (!emailUser || !emailPassword) {
       this.logger.warn(
         "Email credentials not configured. Email sending will be disabled."
       );
       return;
     }
-
     this.transporter = nodemailer.createTransport({
       host: emailHost,
       port: emailPort,
@@ -65,16 +58,13 @@ export class EmailService {
       connectionTimeout: 10000, // 10 seconds
       greetingTimeout: 10000, // 10 seconds
     });
-
     this.logger.log("Email service initialized");
   }
-
   async sendEmail(options: EmailOptions): Promise<boolean> {
     if (!this.transporter) {
       this.logger.warn(`Email not sent (no transporter): ${options.subject}`);
       return false;
     }
-
     try {
       await this.transporter.sendMail({
         from: this.fromEmail,
@@ -83,7 +73,6 @@ export class EmailService {
         html: options.html,
         text: options.text || this.stripHtml(options.html),
       });
-
       this.logger.log(
         `Email sent successfully to ${options.to}: ${options.subject}`
       );
@@ -93,7 +82,6 @@ export class EmailService {
       return false;
     }
   }
-
   async sendWelcomeEmail(email: string, name: string): Promise<boolean> {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -111,14 +99,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: email,
       subject: "Bem-vindo ao Aubrigo!",
       html,
     });
   }
-
   async sendPasswordResetEmail(
     email: string,
     token: string,
@@ -142,14 +128,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: email,
       subject: "Redefinir Senha - Aubrigo",
       html,
     });
   }
-
   async sendAppointmentConfirmationToVisitor(
     visitorEmail: string,
     visitorName: string,
@@ -175,14 +159,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: visitorEmail,
       subject: `Confirmação de Visita - ${petName}`,
       html,
     });
   }
-
   async sendAppointmentNotificationToOng(
     ongEmail: string,
     ongName: string,
@@ -214,14 +196,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: ongEmail,
       subject: `Nova Solicitação de Visita - ${petName}`,
       html,
     });
   }
-
   async sendDonationReceipt(
     donorEmail: string,
     donorName: string,
@@ -246,14 +226,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: donorEmail,
       subject: "Recibo de Doação - Aubrigo",
       html,
     });
   }
-
   async sendOngRegistrationNotificationToAdmin(
     ongName: string,
     ongEmail: string,
@@ -280,14 +258,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Sistema Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: this.adminEmail,
       subject: `Nova ONG Registrada: ${ongName}`,
       html,
     });
   }
-
   async sendWelcomeEmailToOng(
     ongEmail: string,
     ongName: string
@@ -312,14 +288,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: ongEmail,
       subject: "Bem-vindo ao Aubrigo!",
       html,
     });
   }
-
   async sendOngApprovalEmail(
     ongEmail: string,
     ongName: string
@@ -345,14 +319,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: ongEmail,
       subject: "Conta Aprovada - Aubrigo",
       html,
     });
   }
-
   async sendOngRejectionEmail(
     ongEmail: string,
     ongName: string,
@@ -377,14 +349,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: ongEmail,
       subject: "Atualização sobre sua Conta - Aubrigo",
       html,
     });
   }
-
   async sendAppointmentAutoConfirmedToVisitor(
     visitorEmail: string,
     visitorName: string,
@@ -404,7 +374,6 @@ export class EmailService {
       hour: "2-digit",
       minute: "2-digit",
     });
-
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #27ae60;">✅ Visita Confirmada - Aubrigo</h1>
@@ -431,14 +400,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: visitorEmail,
       subject: `✅ Visita Confirmada - ${petName}`,
       html,
     });
   }
-
   async sendAppointmentAutoConfirmedToOng(
     ongEmail: string,
     ongName: string,
@@ -459,7 +426,6 @@ export class EmailService {
       hour: "2-digit",
       minute: "2-digit",
     });
-
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #4ca8a0;">📅 Nova Visita Agendada - Aubrigo</h1>
@@ -482,14 +448,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: ongEmail,
       subject: `📅 Nova Visita Agendada - ${petName}`,
       html,
     });
   }
-
   async sendAppointmentCancellationToVisitor(
     visitorEmail: string,
     visitorName: string,
@@ -508,7 +472,6 @@ export class EmailService {
       hour: "2-digit",
       minute: "2-digit",
     });
-
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #e74c3c;">❌ Visita Cancelada - Aubrigo</h1>
@@ -534,14 +497,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: visitorEmail,
       subject: `Visita Cancelada - ${petName}`,
       html,
     });
   }
-
   async sendAppointmentCancellationToOng(
     ongEmail: string,
     ongName: string,
@@ -559,7 +520,6 @@ export class EmailService {
       hour: "2-digit",
       minute: "2-digit",
     });
-
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h1 style="color: #e74c3c;">❌ Visita Cancelada - Aubrigo</h1>
@@ -576,14 +536,12 @@ export class EmailService {
         <p>Atenciosamente,<br/>Equipe Aubrigo</p>
       </div>
     `;
-
     return this.sendEmail({
       to: ongEmail,
       subject: `Visita Cancelada - ${petName}`,
       html,
     });
   }
-
   private stripHtml(html: string): string {
     return html
       .replace(/<[^>]*>/g, "")

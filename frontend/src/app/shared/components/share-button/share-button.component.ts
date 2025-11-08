@@ -342,7 +342,6 @@ export class ShareButtonComponent {
   async handleNativeShare(): Promise<void> {
     const shared = await this.shareService.share(this.shareData || {});
     if (shared) {
-      console.log('📤 Native share success');
       this.shareSuccess.emit('native');
       this.closeMenu();
     }
@@ -361,7 +360,6 @@ export class ShareButtonComponent {
       if (platform === 'copy') {
         this.toastService.success('Link copiado!');
       } else {
-        console.log('📤 Share success via:', platform);
         this.shareSuccess.emit(platform);
       }
       this.closeMenu();

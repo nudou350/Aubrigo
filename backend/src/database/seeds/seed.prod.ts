@@ -13,10 +13,8 @@ import { PasswordResetToken } from '../../auth/entities/password-reset-token.ent
 import { OngOperatingHours } from '../../ongs/entities/ong-operating-hours.entity';
 import { AppointmentSettings } from '../../ongs/entities/appointment-settings.entity';
 import { OngAvailabilityException } from '../../ongs/entities/ong-availability-exception.entity';
-
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
-
 const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
@@ -36,7 +34,6 @@ const AppDataSource = new DataSource({
   synchronize: false,
   logging: false,
 });
-
 // Admin account - Production
 const adminData = {
   email: 'admin@aubrigo.pt',
@@ -45,7 +42,6 @@ const adminData = {
   lastName: 'Aubrigo',
   countryCode: 'PT',
 };
-
 // Production ONG accounts for Portugal (demo/showcase)
 const portugueseOngs = [
   {
@@ -73,7 +69,6 @@ const portugueseOngs = [
     longitude: -8.6291,
   },
 ];
-
 // Sample pets for Portugal (demo/showcase)
 const portuguesePets = [
   {
@@ -125,22 +120,13 @@ const portuguesePets = [
     images: ['https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800'],
   },
 ];
-
 async function seedProduction() {
   try {
-    console.log('========================================');
-    console.log('🌱 Starting Aubrigo PRODUCTION Seed (Portugal Only)');
-    console.log('========================================\n');
-
     await AppDataSource.initialize();
-    console.log('✅ Database connection established\n');
-
     const userRepository = AppDataSource.getRepository(User);
     const petRepository = AppDataSource.getRepository(Pet);
     const petImageRepository = AppDataSource.getRepository(PetImage);
-
     // Clean existing data
-    console.log('🗑️  Cleaning existing data...');
     await AppDataSource.query(`
       TRUNCATE TABLE
         "pet_images",
@@ -156,10 +142,7 @@ async function seedProduction() {
         "users"
       RESTART IDENTITY CASCADE
     `);
-    console.log('✅ Data cleaned\n');
-
     // Create Admin
-    console.log('👑 Creating Admin account...');
     const adminHashedPassword = await bcrypt.hash(adminData.password, 10);
     const admin = userRepository.create({
       email: adminData.email,
@@ -170,10 +153,7 @@ async function seedProduction() {
       countryCode: adminData.countryCode,
     });
     await userRepository.save(admin);
-    console.log(`✅ Admin created: ${adminData.email}\n`);
-
     // Create Portuguese ONGs
-    console.log('🇵🇹 Creating Portuguese ONGs...');
     const createdPtOngs: User[] = [];
     for (const ong of portugueseOngs) {
       const hashedPassword = await bcrypt.hash(ong.password, 10);
@@ -193,12 +173,8 @@ async function seedProduction() {
       });
       const saved = await userRepository.save(ongUser);
       createdPtOngs.push(saved);
-      console.log(`  ✅ ${ong.ongName} - ${ong.email}`);
     }
-    console.log('');
-
     // Create Portuguese Pets
-    console.log('🐾 Creating Portuguese Pets...');
     let petCount = 0;
     for (const petData of portuguesePets) {
       const ong = createdPtOngs[petCount % createdPtOngs.length];
@@ -211,7 +187,6 @@ async function seedProduction() {
         countryCode: ong.countryCode,
       });
       const savedPet = await petRepository.save(pet);
-
       for (let i = 0; i < images.length; i++) {
         const petImage = petImageRepository.create({
           petId: savedPet.id,
@@ -222,43 +197,13 @@ async function seedProduction() {
         await petImageRepository.save(petImage);
       }
       petCount++;
-      console.log(`  ✅ ${petData.name} (${petData.species})`);
     }
-    console.log('');
-
-    console.log('========================================');
-    console.log('✅ Production Seed Completed Successfully!');
-    console.log('========================================\n');
-
-    console.log('📊 Summary:');
-    console.log(`  🇵🇹 Portuguese ONGs: ${createdPtOngs.length}`);
-    console.log(`  🐾 Total Pets: ${petCount}\n`);
-
-    console.log('========================================');
-    console.log('🔐 PRODUCTION ACCOUNTS');
-    console.log('========================================\n');
-
-    console.log('👑 ADMIN:');
-    console.log(`  Email: ${adminData.email}`);
-    console.log(`  Password: ${adminData.password}\n`);
-
-    console.log('🇵🇹 PORTUGUESE ONGs:');
     portugueseOngs.forEach((ong) => {
-      console.log(`  📧 ${ong.email}`);
-      console.log(`     🏢 ${ong.ongName}`);
-      console.log(`     🔑 ${ong.password}\n`);
     });
-
-    console.log('========================================\n');
-    console.log('⚠️  IMPORTANT: Save these credentials securely!');
-    console.log('⚠️  Change ONG passwords after first login.\n');
-
     await AppDataSource.destroy();
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error during seeding:', error);
     process.exit(1);
   }
 }
-
 seedProduction();

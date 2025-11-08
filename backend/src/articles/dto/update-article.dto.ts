@@ -3,7 +3,6 @@ import { CreateArticleDto } from './create-article.dto';
 import { IsEnum, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ArticleStatus } from '../entities/article.entity';
-
 export class UpdateArticleDto extends PartialType(CreateArticleDto) {
   @ApiProperty({
     example: 'active',

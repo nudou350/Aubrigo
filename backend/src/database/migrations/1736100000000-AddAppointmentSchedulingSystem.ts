@@ -1,10 +1,8 @@
 import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey } from 'typeorm';
-
 export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // 1. Create ong_operating_hours table
     const operatingHoursTableExists = await queryRunner.hasTable('ong_operating_hours');
-
     if (!operatingHoursTableExists) {
       await queryRunner.createTable(
         new Table({
@@ -71,7 +69,6 @@ export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInt
         }),
         true,
       );
-
       await queryRunner.createForeignKey(
         'ong_operating_hours',
         new TableForeignKey({
@@ -82,10 +79,8 @@ export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInt
         }),
       );
     }
-
     // 2. Create appointment_settings table
     const appointmentSettingsTableExists = await queryRunner.hasTable('appointment_settings');
-
     if (!appointmentSettingsTableExists) {
       await queryRunner.createTable(
         new Table({
@@ -147,7 +142,6 @@ export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInt
         }),
         true,
       );
-
       await queryRunner.createForeignKey(
         'appointment_settings',
         new TableForeignKey({
@@ -158,10 +152,8 @@ export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInt
         }),
       );
     }
-
     // 3. Create ong_availability_exceptions table
     const exceptionsTableExists = await queryRunner.hasTable('ong_availability_exceptions');
-
     if (!exceptionsTableExists) {
       await queryRunner.createTable(
         new Table({
@@ -219,7 +211,6 @@ export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInt
         }),
         true,
       );
-
       await queryRunner.createForeignKey(
         'ong_availability_exceptions',
         new TableForeignKey({
@@ -230,10 +221,8 @@ export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInt
         }),
       );
     }
-
     // 4. Add new columns to appointments table
     const appointmentsTable = await queryRunner.getTable('appointments');
-
     if (appointmentsTable && !appointmentsTable.findColumnByName('scheduled_start_time')) {
       await queryRunner.addColumn(
         'appointments',
@@ -244,7 +233,6 @@ export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInt
         }),
       );
     }
-
     if (appointmentsTable && !appointmentsTable.findColumnByName('scheduled_end_time')) {
       await queryRunner.addColumn(
         'appointments',
@@ -255,7 +243,6 @@ export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInt
         }),
       );
     }
-
     if (appointmentsTable && !appointmentsTable.findColumnByName('timezone')) {
       await queryRunner.addColumn(
         'appointments',
@@ -268,13 +255,11 @@ export class AddAppointmentSchedulingSystem1736100000000 implements MigrationInt
       );
     }
   }
-
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Remove columns from appointments
     await queryRunner.dropColumn('appointments', 'timezone');
     await queryRunner.dropColumn('appointments', 'scheduled_end_time');
     await queryRunner.dropColumn('appointments', 'scheduled_start_time');
-
     // Drop tables in reverse order
     await queryRunner.dropTable('ong_availability_exceptions');
     await queryRunner.dropTable('appointment_settings');

@@ -1,10 +1,7 @@
 import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
-
 export class AddAllowAppointmentsToUser1762368114851 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         const usersTable = await queryRunner.getTable('users');
-
         if (usersTable && !usersTable.findColumnByName('allow_appointments')) {
             await queryRunner.addColumn(
                 'users',
@@ -17,13 +14,10 @@ export class AddAllowAppointmentsToUser1762368114851 implements MigrationInterfa
             );
         }
     }
-
     public async down(queryRunner: QueryRunner): Promise<void> {
         const usersTable = await queryRunner.getTable('users');
-
         if (usersTable && usersTable.findColumnByName('allow_appointments')) {
             await queryRunner.dropColumn('users', 'allow_appointments');
         }
     }
-
 }

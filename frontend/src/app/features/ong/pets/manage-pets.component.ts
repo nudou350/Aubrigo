@@ -445,7 +445,6 @@ export class ManagePetsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading pets:', error);
         this.toastService.error('Erro ao carregar pets');
         this.isLoading.set(false);
       }
@@ -489,7 +488,6 @@ export class ManagePetsComponent implements OnInit {
         this.toastService.success(`${name} removido com sucesso`);
       },
       error: (error) => {
-        console.error('Error deleting pet:', error);
         this.toastService.error('Erro ao remover pet: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });

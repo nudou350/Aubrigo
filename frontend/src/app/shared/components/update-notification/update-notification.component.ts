@@ -201,7 +201,6 @@ export class UpdateNotificationComponent implements OnInit {
   private watchForUpdates(): void {
     // Only check for updates in production
     if (!this.pwaService.isSwUpdateEnabled) {
-      console.log('⚠️ PWA updates disabled in development mode');
       return;
     }
 
@@ -209,7 +208,6 @@ export class UpdateNotificationComponent implements OnInit {
     const checkUpdate = () => {
       if (this.pwaService.updateAvailable() && !this.showNotification()) {
         this.showNotification.set(true);
-        console.log('📢 Update notification shown to user');
       }
     };
 
@@ -221,7 +219,6 @@ export class UpdateNotificationComponent implements OnInit {
    * Update the app immediately
    */
   async updateNow(): Promise<void> {
-    console.log('🔄 User clicked update - applying update...');
     this.showNotification.set(false);
 
     // Apply the update (this will reload the page)
@@ -232,7 +229,6 @@ export class UpdateNotificationComponent implements OnInit {
    * Dismiss the notification (will show again on next check)
    */
   dismiss(): void {
-    console.log('⏭️ User dismissed update notification');
     this.showNotification.set(false);
 
     // Reset the PWA service flag so it can show again later

@@ -12,11 +12,9 @@ import {
 import { Request } from 'express';
 import { AnalyticsService } from './analytics.service';
 import { TrackEventDto } from './dto/track-event.dto';
-
 @Controller('analytics')
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
-
   /**
    * Track events (batch endpoint)
    * POST /api/analytics/track
@@ -29,21 +27,18 @@ export class AnalyticsController {
   ) {
     const userIp = this.getClientIp(request);
     const userAgent = request.headers['user-agent'];
-
     try {
       await this.analyticsService.trackEvents(
         trackEventDto.events,
         userIp,
         userAgent,
       );
-
       return {
         success: true,
         message: 'Events tracked successfully',
         count: trackEventDto.events.length,
       };
     } catch (error) {
-      console.error('Error tracking events:', error);
       return {
         success: false,
         message: 'Failed to track events',
@@ -51,7 +46,6 @@ export class AnalyticsController {
       };
     }
   }
-
   /**
    * Get statistics for an ONG
    * GET /api/analytics/stats?ongId=xxx&days=30
@@ -62,23 +56,19 @@ export class AnalyticsController {
     @Query('days') days?: string,
   ) {
     const daysNumber = days ? parseInt(days, 10) : 30;
-
     if (!ongId) {
       return {
         success: false,
         message: 'ongId is required',
       };
     }
-
     try {
       const stats = await this.analyticsService.getOngStats(ongId, daysNumber);
-
       return {
         success: true,
         data: stats,
       };
     } catch (error) {
-      console.error('Error getting stats:', error);
       return {
         success: false,
         message: 'Failed to get stats',
@@ -86,7 +76,6 @@ export class AnalyticsController {
       };
     }
   }
-
   /**
    * Get top pets for an ONG
    * GET /api/analytics/top-pets?ongId=xxx&limit=10
@@ -97,26 +86,22 @@ export class AnalyticsController {
     @Query('limit') limit?: string,
   ) {
     const limitNumber = limit ? parseInt(limit, 10) : 10;
-
     if (!ongId) {
       return {
         success: false,
         message: 'ongId is required',
       };
     }
-
     try {
       const topPets = await this.analyticsService.getTopPets(
         ongId,
         limitNumber,
       );
-
       return {
         success: true,
         data: topPets,
       };
     } catch (error) {
-      console.error('Error getting top pets:', error);
       return {
         success: false,
         message: 'Failed to get top pets',
@@ -124,7 +109,6 @@ export class AnalyticsController {
       };
     }
   }
-
   /**
    * Get views by day
    * GET /api/analytics/views-by-day?ongId=xxx&days=30
@@ -135,26 +119,22 @@ export class AnalyticsController {
     @Query('days') days?: string,
   ) {
     const daysNumber = days ? parseInt(days, 10) : 30;
-
     if (!ongId) {
       return {
         success: false,
         message: 'ongId is required',
       };
     }
-
     try {
       const viewsByDay = await this.analyticsService.getViewsByDay(
         ongId,
         daysNumber,
       );
-
       return {
         success: true,
         data: viewsByDay,
       };
     } catch (error) {
-      console.error('Error getting views by day:', error);
       return {
         success: false,
         message: 'Failed to get views by day',
@@ -162,7 +142,6 @@ export class AnalyticsController {
       };
     }
   }
-
   /**
    * Get total events count (admin only)
    * GET /api/analytics/total
@@ -171,13 +150,11 @@ export class AnalyticsController {
   async getTotalEvents() {
     try {
       const total = await this.analyticsService.getTotalEvents();
-
       return {
         success: true,
         total,
       };
     } catch (error) {
-      console.error('Error getting total events:', error);
       return {
         success: false,
         message: 'Failed to get total events',
@@ -185,7 +162,6 @@ export class AnalyticsController {
       };
     }
   }
-
   /**
    * Extract client IP from request
    */
@@ -196,12 +172,10 @@ export class AnalyticsController {
       const ips = (forwarded as string).split(',');
       return ips[0].trim();
     }
-
     const realIp = request.headers['x-real-ip'];
     if (realIp) {
       return realIp as string;
     }
-
     return request.ip;
   }
 }

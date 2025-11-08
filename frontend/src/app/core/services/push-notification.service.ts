@@ -56,7 +56,6 @@ export class PushNotificationService {
 
   constructor() {
     this.initPushNotifications();
-    console.log("🔔 Push Notification Service initialized");
   }
 
   /**
@@ -65,32 +64,26 @@ export class PushNotificationService {
   private initPushNotifications(): void {
     // Check if push notifications are supported
     if (!this.swPush.isEnabled) {
-      console.warn(
         "⚠️ Push notifications are not enabled (Service Worker not active or not supported)"
       );
       return;
     }
 
-    console.log("✅ Push notifications are supported");
 
     // Check if already subscribed
     this.swPush.subscription.subscribe((subscription) => {
       if (subscription) {
-        console.log("✅ Already subscribed to push notifications");
       } else {
-        console.log("ℹ️ Not subscribed to push notifications yet");
       }
     });
 
     // Listen for push notification messages
     this.swPush.messages.subscribe((message: any) => {
-      console.log("📬 Push notification received:", message);
       this.handleNotification(message);
     });
 
     // Listen for notification clicks
     this.swPush.notificationClicks.subscribe(({ action, notification }) => {
-      console.log("🖱️ Notification clicked:", action, notification);
       this.handleNotificationClick(action, notification);
     });
   }
@@ -100,7 +93,6 @@ export class PushNotificationService {
    */
   async subscribe(userEmail?: string): Promise<boolean> {
     if (!this.swPush.isEnabled) {
-      console.warn("⚠️ Cannot subscribe: Push notifications not enabled");
       return false;
     }
 
@@ -108,7 +100,6 @@ export class PushNotificationService {
       // Check if already subscribed
       const existingSubscription = await this.swPush.subscription.toPromise();
       if (existingSubscription) {
-        console.log("ℹ️ Already subscribed, returning existing subscription");
         return true;
       }
 
@@ -116,25 +107,21 @@ export class PushNotificationService {
       const permission = await Notification.requestPermission();
 
       if (permission !== "granted") {
-        console.warn("⚠️ Notification permission denied");
         return false;
       }
 
-      console.log("✅ Notification permission granted");
 
       // Subscribe to push notifications
       const subscription = await this.swPush.requestSubscription({
         serverPublicKey: this.VAPID_PUBLIC_KEY,
       });
 
-      console.log("✅ Push subscription created:", subscription);
 
       // Send subscription to backend
       await this.sendSubscriptionToBackend(subscription, userEmail);
 
       return true;
     } catch (error) {
-      console.error("❌ Failed to subscribe to push notifications:", error);
       return false;
     }
   }
@@ -151,20 +138,17 @@ export class PushNotificationService {
       const subscription = await this.swPush.subscription.toPromise();
 
       if (!subscription) {
-        console.log("ℹ️ Not subscribed, nothing to unsubscribe");
         return true;
       }
 
       // Unsubscribe
       await this.swPush.unsubscribe();
-      console.log("✅ Unsubscribed from push notifications");
 
       // Notify backend
       await this.removeSubscriptionFromBackend(subscription);
 
       return true;
     } catch (error) {
-      console.error("❌ Failed to unsubscribe from push notifications:", error);
       return false;
     }
   }
@@ -222,9 +206,7 @@ export class PushNotificationService {
       };
 
       await this.http.post(`${this.API_URL}/subscribe`, payload).toPromise();
-      console.log("✅ Subscription sent to backend");
     } catch (error) {
-      console.error("❌ Failed to send subscription to backend:", error);
       // Don't throw - subscription is still valid locally
     }
   }
@@ -242,9 +224,7 @@ export class PushNotificationService {
           body: { endpoint },
         })
         .toPromise();
-      console.log("✅ Subscription removed from backend");
     } catch (error) {
-      console.error("❌ Failed to remove subscription from backend:", error);
     }
   }
 
@@ -257,27 +237,21 @@ export class PushNotificationService {
 
     switch (type) {
       case PushNotificationType.NEW_PET_IN_AREA:
-        console.log("🐶 New pet in your area:", data);
         break;
 
       case PushNotificationType.APPOINTMENT_CONFIRMED:
-        console.log("✅ Appointment confirmed:", data);
         break;
 
       case PushNotificationType.APPOINTMENT_REMINDER:
-        console.log("⏰ Appointment reminder:", data);
         break;
 
       case PushNotificationType.FAVORITE_PET_UPDATED:
-        console.log("❤️ Favorite pet updated:", data);
         break;
 
       case PushNotificationType.DONATION_CAMPAIGN:
-        console.log("💰 Donation campaign:", data);
         break;
 
       default:
-        console.log("📬 Unknown notification type:", type);
     }
   }
 
@@ -285,7 +259,6 @@ export class PushNotificationService {
    * Handle notification click
    */
   private handleNotificationClick(action: string, notification: any): void {
-    console.log("🖱️ Handling notification action:", action);
 
     // Navigate to appropriate page based on action
     switch (action) {
@@ -312,12 +285,10 @@ export class PushNotificationService {
    */
   async sendTestNotification(): Promise<void> {
     if (!this.isSupported()) {
-      console.warn("⚠️ Notifications not supported");
       return;
     }
 
     if (Notification.permission !== "granted") {
-      console.warn("⚠️ Notification permission not granted");
       return;
     }
 
@@ -348,6 +319,5 @@ export class PushNotificationService {
       ],
     });
 
-    console.log("✅ Test notification sent");
   }
 }

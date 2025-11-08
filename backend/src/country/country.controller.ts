@@ -2,12 +2,10 @@ import { Controller, Get, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { CountryService } from './country.service';
 import { Request } from 'express';
-
 @ApiTags('Country')
 @Controller('country')
 export class CountryController {
   constructor(private readonly countryService: CountryService) {}
-
   @Get('detect')
   @ApiOperation({ summary: 'Detect user country from request' })
   @ApiResponse({ status: 200, description: 'Returns detected country code' })
@@ -19,14 +17,12 @@ export class CountryController {
       country,
     };
   }
-
   @Get('all')
   @ApiOperation({ summary: 'Get all available countries' })
   @ApiResponse({ status: 200, description: 'Returns list of all countries' })
   getAllCountries() {
     return this.countryService.getAllCountries();
   }
-
   @Get('search')
   @ApiOperation({ summary: 'Search countries by name or code' })
   @ApiQuery({ name: 'q', required: true, description: 'Search query' })

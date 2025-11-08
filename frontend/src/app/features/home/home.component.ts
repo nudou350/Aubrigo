@@ -1749,7 +1749,6 @@ export class HomeComponent implements OnInit {
         this.favoritePetIds.set(petIds);
       },
       error: (error) => {
-        console.error("Error loading favorites:", error);
       },
     });
   }
@@ -1777,7 +1776,6 @@ export class HomeComponent implements OnInit {
             this.toastService.success("Removido dos favoritos");
           },
           error: (error) => {
-            console.error("Error removing favorite:", error);
             this.toastService.error("Erro ao remover dos favoritos");
           },
         });
@@ -1791,7 +1789,6 @@ export class HomeComponent implements OnInit {
           this.toastService.success("Adicionado aos favoritos");
         },
         error: (error) => {
-          console.error("Error adding favorite:", error);
           this.toastService.error("Erro ao adicionar aos favoritos");
         },
       });
@@ -1857,7 +1854,6 @@ export class HomeComponent implements OnInit {
         });
       },
       error: (error) => {
-        console.error("Error loading pets:", error);
         this.toastService.error("Erro ao carregar pets");
         this.loading.set(false);
         this.pets.set([]);
@@ -1952,7 +1948,6 @@ export class HomeComponent implements OnInit {
         this.filteredLocations.set(this.availableLocations.slice(0, 5));
       },
       error: (error) => {
-        console.error("Error loading cities:", error);
         // Keep default if error
       },
     });
@@ -2093,7 +2088,6 @@ export class HomeComponent implements OnInit {
         this.filteredOngs.set(ongs.slice(0, 5));
       },
       error: (error) => {
-        console.error("Error loading ONGs:", error);
       },
     });
   }

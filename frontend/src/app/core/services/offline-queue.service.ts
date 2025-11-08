@@ -50,7 +50,6 @@ export class OfflineQueueService {
   constructor() {
     this.initDatabase();
     this.watchNetworkStatus();
-    console.log('📦 Offline Queue Service initialized');
   }
 
   /**
@@ -67,7 +66,6 @@ export class OfflineQueueService {
       const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 
       request.onerror = () => {
-        console.error('❌ Failed to open IndexedDB:', request.error);
         this.dbInitializing = false;
         reject(request.error);
       };
@@ -78,11 +76,9 @@ export class OfflineQueueService {
 
         // Handle unexpected close
         this.db.onclose = () => {
-          console.warn('⚠️ IndexedDB connection closed unexpectedly');
           this.db = null;
         };
 
-        console.log('✅ IndexedDB opened successfully');
         resolve();
       };
 
@@ -94,7 +90,6 @@ export class OfflineQueueService {
           const objectStore = db.createObjectStore(this.STORE_NAME, { keyPath: 'id' });
           objectStore.createIndex('status', 'status', { unique: false });
           objectStore.createIndex('timestamp', 'timestamp', { unique: false });
-          console.log('📊 IndexedDB object store created');
         }
       };
     });
@@ -118,7 +113,6 @@ export class OfflineQueueService {
       await this.initDatabase();
       return this.db !== null;
     } catch (error) {
-      console.error('❌ Failed to ensure database:', error);
       return false;
     }
   }
@@ -130,7 +124,6 @@ export class OfflineQueueService {
     // Wait for db to be ready
     const checkAndSync = () => {
       if (this.db && this.networkStatus.isOnline() && !this.syncInProgress) {
-        console.log('🔄 Network is back online, syncing offline actions...');
         this.syncOfflineActions();
       }
     };
@@ -164,21 +157,17 @@ export class OfflineQueueService {
         const request = store.add(action);
 
         request.onsuccess = () => {
-          console.log('✅ Action added to offline queue:', type);
           resolve(action.id);
         };
 
         request.onerror = () => {
-          console.error('❌ Failed to add action to queue:', request.error);
           reject(request.error);
         };
 
         transaction.onerror = () => {
-          console.error('❌ Transaction error:', transaction.error);
           reject(transaction.error);
         };
       } catch (error) {
-        console.error('❌ Exception in addToQueue:', error);
         reject(error);
       }
     });
@@ -205,16 +194,13 @@ export class OfflineQueueService {
         };
 
         request.onerror = () => {
-          console.error('❌ Failed to get pending actions:', request.error);
           resolve([]);
         };
 
         transaction.onerror = () => {
-          console.error('❌ Transaction error in getPendingActions:', transaction.error);
           resolve([]);
         };
       } catch (error) {
-        console.error('❌ Exception in getPendingActions:', error);
         resolve([]);
       }
     });
@@ -240,16 +226,13 @@ export class OfflineQueueService {
         };
 
         request.onerror = () => {
-          console.error('❌ Failed to update action:', request.error);
           reject(request.error);
         };
 
         transaction.onerror = () => {
-          console.error('❌ Transaction error in updateAction:', transaction.error);
           reject(transaction.error);
         };
       } catch (error) {
-        console.error('❌ Exception in updateAction:', error);
         reject(error);
       }
     });
@@ -271,21 +254,17 @@ export class OfflineQueueService {
         const request = store.delete(actionId);
 
         request.onsuccess = () => {
-          console.log('🗑️ Action deleted from queue:', actionId);
           resolve();
         };
 
         request.onerror = () => {
-          console.error('❌ Failed to delete action:', request.error);
           reject(request.error);
         };
 
         transaction.onerror = () => {
-          console.error('❌ Transaction error in deleteAction:', transaction.error);
           reject(transaction.error);
         };
       } catch (error) {
-        console.error('❌ Exception in deleteAction:', error);
         reject(error);
       }
     });
@@ -296,12 +275,10 @@ export class OfflineQueueService {
    */
   async syncOfflineActions(): Promise<void> {
     if (this.syncInProgress) {
-      console.log('⚠️ Sync already in progress, skipping...');
       return;
     }
 
     if (!this.networkStatus.isOnline()) {
-      console.log('⚠️ Cannot sync: network is offline');
       return;
     }
 
@@ -311,20 +288,16 @@ export class OfflineQueueService {
       const pendingActions = await this.getPendingActions();
 
       if (pendingActions.length === 0) {
-        console.log('ℹ️ No pending actions to sync');
         this.syncInProgress = false;
         return;
       }
 
-      console.log(`🔄 Syncing ${pendingActions.length} offline actions...`);
 
       for (const action of pendingActions) {
         try {
           await this.processAction(action);
           await this.deleteAction(action.id);
-          console.log('✅ Action synced successfully:', action.type);
         } catch (error) {
-          console.error('❌ Failed to sync action:', action.type, error);
 
           // Update retry count and status
           action.retryCount++;
@@ -333,7 +306,6 @@ export class OfflineQueueService {
 
           // Delete if too many retries (max 3)
           if (action.retryCount >= 3) {
-            console.warn('⚠️ Max retries reached, deleting action:', action.id);
             await this.deleteAction(action.id);
           } else {
             // Reset to pending for next retry
@@ -343,7 +315,6 @@ export class OfflineQueueService {
         }
       }
 
-      console.log('✅ Offline sync completed');
     } finally {
       this.syncInProgress = false;
     }
@@ -355,7 +326,6 @@ export class OfflineQueueService {
   private async processAction(action: OfflineAction): Promise<void> {
     // This method should be overridden or handled by specific services
     // For now, we'll just log it
-    console.log('📤 Processing action:', action.type, action.payload);
 
     // In a real implementation, this would call the appropriate API endpoint
     // based on the action type
@@ -407,10 +377,8 @@ export class OfflineQueueService {
       };
 
       request.onerror = () => {
-        console.error('❌ Failed to clear completed actions:', request.error);
       };
     } catch (error) {
-      console.error('❌ Exception in clearCompleted:', error);
     }
   }
 

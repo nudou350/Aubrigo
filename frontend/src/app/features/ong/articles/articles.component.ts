@@ -600,7 +600,6 @@ export class ArticlesComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading articles:', error);
         this.toastService.error('Erro ao carregar necessidades');
         this.isLoading.set(false);
       }
@@ -653,7 +652,6 @@ export class ArticlesComponent implements OnInit {
           this.isSaving.set(false);
         },
         error: (error) => {
-          console.error('Error updating article:', error);
           this.toastService.error('Erro ao atualizar necessidade');
           this.isSaving.set(false);
         }
@@ -667,7 +665,6 @@ export class ArticlesComponent implements OnInit {
           this.isSaving.set(false);
         },
         error: (error) => {
-          console.error('Error creating article:', error);
           this.toastService.error('Erro ao criar necessidade');
           this.isSaving.set(false);
         }
@@ -688,7 +685,6 @@ export class ArticlesComponent implements OnInit {
         this.loadArticles();
       },
       error: (error) => {
-        console.error('Error updating status:', error);
         this.toastService.error('Erro ao atualizar status');
       }
     });
@@ -705,7 +701,6 @@ export class ArticlesComponent implements OnInit {
         this.loadArticles();
       },
       error: (error) => {
-        console.error('Error deleting article:', error);
         this.toastService.error('Erro ao excluir necessidade');
       }
     });

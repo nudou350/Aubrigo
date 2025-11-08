@@ -96,8 +96,6 @@ export class AnalyticsService {
     this.initDatabase();
     this.setupAutoSync();
 
-    console.log('📊 Analytics Service initialized');
-    console.log('📝 Session ID:', this.sessionId);
   }
 
   /**
@@ -115,7 +113,6 @@ export class AnalyticsService {
         const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 
         request.onerror = () => {
-          console.error('❌ Failed to open analytics DB:', request.error);
           this.dbInitializing = false;
           // Don't reject - allow app to work without analytics
           resolve();
@@ -127,11 +124,9 @@ export class AnalyticsService {
 
           // Handle unexpected close
           this.db.onclose = () => {
-            console.warn('⚠️ Analytics DB connection closed unexpectedly');
             this.db = null;
           };
 
-          console.log('✅ Analytics DB opened successfully');
           resolve();
         };
 
@@ -145,16 +140,13 @@ export class AnalyticsService {
               objectStore.createIndex('timestamp', 'timestamp', { unique: false });
               objectStore.createIndex('type', 'type', { unique: false });
               objectStore.createIndex('sessionId', 'sessionId', { unique: false });
-              console.log('📊 Analytics object store created');
             }
           } catch (error) {
-            console.error('❌ Error in onupgradeneeded:', error);
             resolve();
           }
         };
       });
     } catch (error) {
-      console.error('❌ Failed to initialize analytics DB:', error);
       this.dbInitializing = false;
       // Don't throw - allow app to work without analytics
     }
@@ -178,7 +170,6 @@ export class AnalyticsService {
       await this.initDatabase();
       return this.db !== null;
     } catch (error) {
-      console.error('❌ Failed to ensure analytics database:', error);
       return false;
     }
   }
@@ -211,16 +202,13 @@ export class AnalyticsService {
       // Always save locally first
       await this.saveEvent(event);
 
-      console.log('📊 Event tracked:', type, data);
 
       // Try to sync if online
       if (this.networkStatus.isOnline() && !this.syncInProgress) {
         this.syncEvents().catch(err => {
-          console.error('Failed to sync events:', err);
         });
       }
     } catch (error) {
-      console.error('❌ Failed to track event:', type, error);
       // Fail silently to not break the app
     }
   }
@@ -265,7 +253,6 @@ export class AnalyticsService {
   private async saveEvent(event: AnalyticsEvent): Promise<void> {
     const isReady = await this.ensureDatabase();
     if (!isReady) {
-      console.warn('⚠️ Analytics DB not available');
       return;
     }
 
@@ -283,17 +270,14 @@ export class AnalyticsService {
 
         request.onsuccess = () => resolve();
         request.onerror = () => {
-          console.error('❌ Failed to save event:', request.error);
           // Don't reject to prevent app crashes - just log and resolve
           resolve();
         };
 
         transaction.onerror = () => {
-          console.error('❌ Transaction error in saveEvent:', transaction.error);
           resolve();
         };
       } catch (error) {
-        console.error('❌ Exception in saveEvent:', error);
         // Fail silently to not break the app
         resolve();
       }
@@ -321,17 +305,14 @@ export class AnalyticsService {
         };
 
         request.onerror = () => {
-          console.error('❌ Failed to get pending events:', request.error);
           // Don't reject, just return empty array to prevent app crashes
           resolve([]);
         };
 
         transaction.onerror = () => {
-          console.error('❌ Transaction error in getPendingEvents:', transaction.error);
           resolve([]);
         };
       } catch (error) {
-        console.error('❌ Exception in getPendingEvents:', error);
         // Return empty array on any error
         resolve([]);
       }
@@ -359,7 +340,6 @@ export class AnalyticsService {
             const updateRequest = store.put(event);
             updateRequest.onsuccess = () => resolve();
             updateRequest.onerror = () => {
-              console.error('❌ Failed to update event:', updateRequest.error);
               resolve(); // Don't reject to prevent app crashes
             };
           } else {
@@ -368,16 +348,13 @@ export class AnalyticsService {
         };
 
         getRequest.onerror = () => {
-          console.error('❌ Failed to get event for update:', getRequest.error);
           resolve(); // Don't reject to prevent app crashes
         };
 
         transaction.onerror = () => {
-          console.error('❌ Transaction error in markAsSent:', transaction.error);
           resolve();
         };
       } catch (error) {
-        console.error('❌ Exception in markAsSent:', error);
         resolve(); // Fail silently
       }
     });
@@ -398,16 +375,13 @@ export class AnalyticsService {
 
         request.onsuccess = () => resolve();
         request.onerror = () => {
-          console.error('❌ Failed to delete event:', request.error);
           resolve();
         };
 
         transaction.onerror = () => {
-          console.error('❌ Transaction error in deleteEvent:', transaction.error);
           resolve();
         };
       } catch (error) {
-        console.error('❌ Exception in deleteEvent:', error);
         resolve();
       }
     });
@@ -418,12 +392,10 @@ export class AnalyticsService {
    */
   async syncEvents(): Promise<void> {
     if (this.syncInProgress) {
-      console.log('⚠️ Sync already in progress');
       return;
     }
 
     if (!this.networkStatus.isOnline()) {
-      console.log('⚠️ Cannot sync: offline');
       return;
     }
 
@@ -433,11 +405,9 @@ export class AnalyticsService {
       const pendingEvents = await this.getPendingEvents();
 
       if (pendingEvents.length === 0) {
-        console.log('ℹ️ No pending analytics events');
         return;
       }
 
-      console.log(`🔄 Syncing ${pendingEvents.length} analytics events...`);
 
       // Send in batches of 50
       const batches = this.chunkArray(pendingEvents, 50);
@@ -451,14 +421,11 @@ export class AnalyticsService {
             try {
               await this.markAsSent(event.id);
             } catch (error) {
-              console.error('❌ Failed to mark event as sent:', event.id, error);
               // Continue with next event
             }
           }
 
-          console.log(`✅ Batch of ${batch.length} events synced`);
         } catch (error) {
-          console.error('❌ Failed to sync batch:', error);
           // Don't break - continue with next batch
         }
       }
@@ -467,13 +434,10 @@ export class AnalyticsService {
       try {
         await this.cleanupOldEvents();
       } catch (error) {
-        console.error('❌ Failed to cleanup old events:', error);
         // Non-critical, continue
       }
 
-      console.log('✅ Analytics sync completed');
     } catch (error) {
-      console.error('❌ Failed to sync events:', error);
       // Fail silently to not break the app
     } finally {
       this.syncInProgress = false;
@@ -510,23 +474,19 @@ export class AnalyticsService {
             cursor.continue();
           } else {
             if (deletedCount > 0) {
-              console.log(`🗑️ Cleaned up ${deletedCount} old analytics events`);
             }
             resolve();
           }
         };
 
         request.onerror = () => {
-          console.error('❌ Failed to cleanup old events:', request.error);
           resolve();
         };
 
         transaction.onerror = () => {
-          console.error('❌ Transaction error in cleanupOldEvents:', transaction.error);
           resolve();
         };
       } catch (error) {
-        console.error('❌ Exception in cleanupOldEvents:', error);
         resolve();
       }
     });
@@ -538,7 +498,6 @@ export class AnalyticsService {
   private setupAutoSync(): void {
     // Sync when coming back online
     window.addEventListener('online', () => {
-      console.log('🌐 Back online, syncing analytics...');
       this.syncEvents();
     });
 
@@ -575,7 +534,6 @@ export class AnalyticsService {
 
       navigator.sendBeacon(`${this.API_URL}/track`, blob);
     } catch (error) {
-      console.error('Failed to sync with beacon:', error);
       // Fail silently - page is unloading anyway
     }
   }
@@ -618,27 +576,22 @@ export class AnalyticsService {
                 eventsByType
               });
             } catch (error) {
-              console.error('❌ Error processing local stats:', error);
               resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
             }
           };
 
           getAllRequest.onerror = () => {
-            console.error('❌ Failed to get local stats:', getAllRequest.error);
             resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
           };
 
           transaction.onerror = () => {
-            console.error('❌ Transaction error in getLocalStats:', transaction.error);
             resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
           };
         } catch (error) {
-          console.error('❌ Exception creating transaction in getLocalStats:', error);
           resolve({ totalEvents: 0, pendingEvents: 0, eventsByType: {} });
         }
       });
     } catch (error) {
-      console.error('❌ Exception in getLocalStats:', error);
       return { totalEvents: 0, pendingEvents: 0, eventsByType: {} };
     }
   }

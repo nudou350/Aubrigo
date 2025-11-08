@@ -26,7 +26,6 @@ import { UpdatePetDto } from './dto/update-pet.dto';
 import { SearchPetsDto } from './dto/search-pets.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UploadService } from '../upload/upload.service';
-
 @ApiTags('Pets')
 @Controller('pets')
 export class PetsController {
@@ -34,21 +33,18 @@ export class PetsController {
     private readonly petsService: PetsService,
     private readonly uploadService: UploadService,
   ) {}
-
   @Get()
   @ApiOperation({ summary: 'Search and filter pets' })
   @ApiResponse({ status: 200, description: 'Returns list of pets' })
   async search(@Query() searchDto: SearchPetsDto) {
     return this.petsService.search(searchDto);
   }
-
   @Get('cities')
   @ApiOperation({ summary: 'Get cities with available pets' })
   @ApiResponse({ status: 200, description: 'Returns list of cities that have pets' })
   async getCitiesWithPets(@Query('countryCode') countryCode?: string) {
     return this.petsService.getCitiesWithPets(countryCode);
   }
-
   @Get('my-pets')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -58,7 +54,6 @@ export class PetsController {
   async findMyPets(@Request() req) {
     return this.petsService.findByOng(req.user.userId);
   }
-
   @Get(':id')
   @ApiOperation({ summary: 'Get pet by ID' })
   @ApiResponse({ status: 200, description: 'Returns pet details' })
@@ -66,7 +61,6 @@ export class PetsController {
   async findOne(@Param('id') id: string) {
     return this.petsService.findOne(id);
   }
-
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -85,10 +79,8 @@ export class PetsController {
     if (files && files.length > 0) {
       imageUrls = await this.uploadService.uploadMultipleImages(files, 'pets');
     }
-
     return this.petsService.create(createPetDto, req.user.userId, imageUrls);
   }
-
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -109,24 +101,19 @@ export class PetsController {
     if (files && files.length > 0) {
       imageUrls = await this.uploadService.uploadMultipleImages(files, 'pets');
     }
-
     // Get deleted image IDs from body (sent as comma-separated string)
     const deletedImageIds = updatePetDto['deletedImageIds']
       ? String(updatePetDto['deletedImageIds']).split(',').filter(id => id.trim())
       : [];
-
     // Get primary image ID from body
     const primaryImageId = updatePetDto['primaryImageId']
       ? String(updatePetDto['primaryImageId']).trim()
       : undefined;
-
     // Remove non-entity properties from DTO
     delete updatePetDto['deletedImageIds'];
     delete updatePetDto['primaryImageId'];
-
     return this.petsService.update(id, updatePetDto, req.user.userId, imageUrls, deletedImageIds, primaryImageId);
   }
-
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

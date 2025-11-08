@@ -15,7 +15,6 @@ import { AvailabilityExceptionsService } from './services/availability-exception
 import { OngsController } from './ongs.controller';
 import { OperatingHoursController } from './controllers/operating-hours.controller';
 import { UploadModule } from '../upload/upload.module';
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([

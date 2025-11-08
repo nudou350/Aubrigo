@@ -4,7 +4,6 @@ export class AvailableSlotDto {
   available: boolean;
   reason?: string; // If not available, why?
 }
-
 export class AvailableSlotsResponseDto {
   date: string;
   slots: AvailableSlotDto[];
@@ -16,7 +15,6 @@ export class AvailableSlotsResponseDto {
     lunchBreakEnd?: string;
   };
 }
-
 export class AvailableDatesResponseDto {
   year: number;
   month: number;

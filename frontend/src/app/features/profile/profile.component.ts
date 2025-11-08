@@ -670,7 +670,6 @@ export class ProfileComponent implements OnInit {
           this.loading.set(false);
         },
         error: (error) => {
-          console.error('Error loading ONG profile:', error);
           this.toastService.error('Erro ao carregar perfil');
           this.loading.set(false);
         },
@@ -689,7 +688,6 @@ export class ProfileComponent implements OnInit {
           this.loading.set(false);
         },
         error: (error) => {
-          console.error('Error loading user profile:', error);
           this.toastService.error('Erro ao carregar perfil');
           this.loading.set(false);
         },
@@ -741,7 +739,6 @@ export class ProfileComponent implements OnInit {
           this.editMode.set(false);
         },
         error: (error) => {
-          console.error('Error updating ONG profile:', error);
           this.toastService.error('Erro ao atualizar perfil');
         },
       });
@@ -767,7 +764,6 @@ export class ProfileComponent implements OnInit {
           this.editMode.set(false);
         },
         error: (error) => {
-          console.error('Error updating user profile:', error);
           this.toastService.error('Erro ao atualizar perfil');
         },
       });
@@ -794,7 +790,6 @@ export class ProfileComponent implements OnInit {
             this.toastService.success('Imagem atualizada com sucesso');
           },
           error: (error) => {
-            console.error('Error uploading image:', error);
             this.toastService.error('Erro ao fazer upload da imagem');
           },
         });
@@ -813,7 +808,6 @@ export class ProfileComponent implements OnInit {
             this.toastService.success('Imagem atualizada com sucesso');
           },
           error: (error) => {
-            console.error('Error uploading image:', error);
             this.toastService.error('Erro ao fazer upload da imagem');
           },
         });
@@ -849,7 +843,6 @@ export class ProfileComponent implements OnInit {
         this.togglePasswordForm();
       },
       error: (error) => {
-        console.error('Error changing password:', error);
         this.toastService.error('Erro ao alterar senha. Verifique a senha atual.');
       },
     });

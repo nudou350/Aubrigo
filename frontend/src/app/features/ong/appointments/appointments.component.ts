@@ -475,7 +475,6 @@ export class OngAppointmentsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading appointments:', error);
         this.toastService.error('Erro ao carregar agendamentos');
         this.isLoading.set(false);
       }
@@ -541,7 +540,6 @@ export class OngAppointmentsComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error updating appointment status:', error);
         this.toastService.error('Erro ao atualizar status da visita');
       }
     });

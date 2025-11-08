@@ -12,12 +12,10 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { DonationsService } from './donations.service';
 import { CreateDonationDto } from './dto/create-donation.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-
 @ApiTags('Donations')
 @Controller('donations')
 export class DonationsController {
   constructor(private readonly donationsService: DonationsService) {}
-
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a donation (MB Way, Stripe, or Multibanco)' })
@@ -29,7 +27,6 @@ export class DonationsController {
   async createDonation(@Body() createDonationDto: CreateDonationDto) {
     return this.donationsService.createDonation(createDonationDto);
   }
-
   @Get(':id/status')
   @ApiOperation({ summary: 'Check donation payment status' })
   @ApiResponse({ status: 200, description: 'Returns payment status' })
@@ -37,7 +34,6 @@ export class DonationsController {
   async checkPaymentStatus(@Param('id') id: string) {
     return this.donationsService.checkPaymentStatus(id);
   }
-
   @Post('mbway/confirm/:transactionId')
   @ApiOperation({
     summary: 'Confirm MB Way payment (webhook endpoint)',
@@ -47,7 +43,6 @@ export class DonationsController {
   async confirmMBWayPayment(@Param('transactionId') transactionId: string) {
     return this.donationsService.confirmMBWayPayment(transactionId);
   }
-
   @Get('ong/:ongId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

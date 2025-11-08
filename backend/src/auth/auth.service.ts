@@ -21,7 +21,6 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { EmailService } from '../email/email.service';
 import { CountryService } from '../country/country.service';
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -34,85 +33,65 @@ export class AuthService {
     private configService: ConfigService,
     private countryService: CountryService,
   ) {}
-
   async register(registerDto: RegisterDto) {
     const { email, password, confirmPassword, ongName } = registerDto;
-
     // Check if passwords match
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
-
     // Check if user already exists
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
-
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }
-
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
-
     // Create user
     const user = this.userRepository.create({
       email,
       passwordHash,
       ongName,
     });
-
     await this.userRepository.save(user);
-
     // Generate token
     const accessToken = this.generateToken(user);
-
     // Remove password from response
     delete user.passwordHash;
-
     return {
       message: 'Registration successful',
       user,
       accessToken,
     };
   }
-
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
-
     // Find user
     const user = await this.userRepository.findOne({
       where: { email },
     });
-
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
     // Check if ONG account was rejected
     if (user.role === UserRole.ONG && user.ongStatus === OngStatus.REJECTED) {
       throw new UnauthorizedException('Your account request was not approved. Please contact admin@aubrigo.pt if you believe this was an error.');
     }
-
     // Generate token
     const accessToken = this.generateToken(user);
-
     // Remove password from response
     delete user.passwordHash;
-
     return {
       user,
       accessToken,
     };
   }
-
   private generateToken(user: User): string {
     const payload = {
       sub: user.id,
@@ -121,30 +100,23 @@ export class AuthService {
     };
     return this.jwtService.sign(payload);
   }
-
   async registerUser(registerUserDto: RegisterUserDto, req?: any) {
     const { email, password, confirmPassword, firstName, lastName, phone, location, countryCode } = registerUserDto;
-
     // Check if passwords match
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
-
     // Check if user already exists
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
-
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }
-
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
-
     // Detect country from request if not provided
     const detectedCountryCode = countryCode || (req ? this.countryService.detectCountryFromRequest(req) : 'PT');
-
     // Create user
     const user = this.userRepository.create({
       email,
@@ -156,22 +128,17 @@ export class AuthService {
       role: UserRole.USER,
       countryCode: detectedCountryCode,
     });
-
     await this.userRepository.save(user);
-
     // Generate token
     const accessToken = this.generateToken(user);
-
     // Remove password from response
     delete user.passwordHash;
-
     return {
       message: 'User registration successful',
       user,
       accessToken,
     };
   }
-
   async registerOng(registerOngDto: RegisterOngDto, req?: any) {
     const {
       email,
@@ -185,30 +152,23 @@ export class AuthService {
       location,
       countryCode,
     } = registerOngDto;
-
     // Check if passwords match
     if (password !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
-
     // Check if email already exists
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
-
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }
-
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
-
     // Use city if location is not provided
     const finalLocation = location || city;
-
     // Detect country from request if not provided
     const detectedCountryCode = countryCode || (req ? this.countryService.detectCountryFromRequest(req) : 'PT');
-
     // Create ONG user (set status to PENDING for admin approval)
     const user = this.userRepository.create({
       email,
@@ -222,15 +182,12 @@ export class AuthService {
       ongStatus: OngStatus.PENDING,
       countryCode: detectedCountryCode,
     });
-
     const savedUser = await this.userRepository.save(user);
-
     // Send welcome email to ONG
     await this.emailService.sendWelcomeEmailToOng(
       savedUser.email,
       savedUser.ongName,
     );
-
     // Send notification to admin
     await this.emailService.sendOngRegistrationNotificationToAdmin(
       savedUser.ongName,
@@ -239,51 +196,40 @@ export class AuthService {
       savedUser.location,
       savedUser.instagramHandle,
     );
-
     // Generate token
     const accessToken = this.generateToken(savedUser);
-
     // Remove password from response
     delete savedUser.passwordHash;
-
     return {
       message: 'ONG registration successful.',
       user: savedUser,
       accessToken,
     };
   }
-
   async validateUser(userId: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
-
     if (!user) {
       throw new UnauthorizedException();
     }
-
     delete user.passwordHash;
     return user;
   }
-
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     const { email } = forgotPasswordDto;
-
     // Find user
     const user = await this.userRepository.findOne({ where: { email } });
-
     if (!user) {
       // Don't reveal if email exists or not for security
       return {
         message: 'If this email exists, a password reset link will be sent.',
       };
     }
-
     // Generate reset token
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1); // Expires in 1 hour
-
     // Save token
     const resetToken = this.resetTokenRepository.create({
       token,
@@ -291,26 +237,20 @@ export class AuthService {
       expiresAt,
     });
     await this.resetTokenRepository.save(resetToken);
-
     // Send email
     const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:4200');
     const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
-
     await this.emailService.sendPasswordResetEmail(email, token, resetUrl);
-
     return {
       message: 'If this email exists, a password reset link will be sent.',
     };
   }
-
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { token, newPassword, confirmPassword } = resetPasswordDto;
-
     // Check if passwords match
     if (newPassword !== confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
-
     // Find valid token
     const resetToken = await this.resetTokenRepository.findOne({
       where: {
@@ -320,22 +260,17 @@ export class AuthService {
       },
       relations: ['user'],
     });
-
     if (!resetToken) {
       throw new BadRequestException('Invalid or expired reset token');
     }
-
     // Hash new password
     const passwordHash = await bcrypt.hash(newPassword, 10);
-
     // Update user password
     resetToken.user.passwordHash = passwordHash;
     await this.userRepository.save(resetToken.user);
-
     // Mark token as used
     resetToken.used = true;
     await this.resetTokenRepository.save(resetToken);
-
     return {
       message: 'Password reset successful. You can now login with your new password.',
     };

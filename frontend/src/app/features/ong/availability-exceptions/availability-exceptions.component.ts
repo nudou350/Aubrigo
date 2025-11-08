@@ -592,7 +592,6 @@ export class AvailabilityExceptionsComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading exceptions:', error);
         this.toastService.error('Erro ao carregar bloqueios');
         this.loading.set(false);
       }
@@ -643,7 +642,6 @@ export class AvailabilityExceptionsComponent implements OnInit {
         this.loadExceptions();
       },
       error: (error) => {
-        console.error('Error creating exception:', error);
         this.modalError.set(error.error?.message || 'Erro ao criar bloqueio');
         this.submitting.set(false);
       }
@@ -661,7 +659,6 @@ export class AvailabilityExceptionsComponent implements OnInit {
         this.loadExceptions();
       },
       error: (error) => {
-        console.error('Error deleting exception:', error);
         this.toastService.error('Erro ao remover bloqueio');
       }
     });
@@ -678,7 +675,6 @@ export class AvailabilityExceptionsComponent implements OnInit {
         this.loadExceptions();
       },
       error: (error) => {
-        console.error('Error creating holidays:', error);
         this.toastService.error(error.error?.message || 'Erro ao criar feriados');
       }
     });
@@ -695,7 +691,6 @@ export class AvailabilityExceptionsComponent implements OnInit {
         this.loadExceptions();
       },
       error: (error) => {
-        console.error('Error cleaning up:', error);
         this.toastService.error('Erro ao limpar bloqueios expirados');
       }
     });

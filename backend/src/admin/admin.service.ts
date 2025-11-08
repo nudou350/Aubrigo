@@ -11,7 +11,6 @@ import { PetImage } from '../pets/entities/pet-image.entity';
 import { Donation } from '../donations/entities/donation.entity';
 import { EmailService } from '../email/email.service';
 import { UploadService } from '../upload/upload.service';
-
 @Injectable()
 export class AdminService {
   constructor(
@@ -26,7 +25,6 @@ export class AdminService {
     private emailService: EmailService,
     private uploadService: UploadService,
   ) {}
-
   async getDashboardStats() {
     const [
       totalUsers,
@@ -41,7 +39,6 @@ export class AdminService {
       this.petRepository.count(),
       this.petRepository.count({ where: { status: 'available' } }),
     ]);
-
     const donations = await this.donationRepository.find({
       where: { paymentStatus: 'completed' },
     });
@@ -49,7 +46,6 @@ export class AdminService {
       (sum, donation) => sum + Number(donation.amount),
       0,
     );
-
     return {
       totalUsers,
       totalOngs,
@@ -58,55 +54,43 @@ export class AdminService {
       totalDonations: totalDonationAmount,
     };
   }
-
   async getPendingONGs(countryCode?: string) {
     const where: any = { role: UserRole.ONG, ongStatus: OngStatus.PENDING };
-
     if (countryCode) {
       where.countryCode = countryCode.toUpperCase();
     }
-
     return this.userRepository.find({
       where,
       select: ['id', 'email', 'ongName', 'phone', 'location', 'instagramHandle', 'countryCode', 'createdAt'],
       order: { createdAt: 'DESC' },
     });
   }
-
   async getAllONGs(countryCode?: string) {
     const where: any = { role: UserRole.ONG };
-
     if (countryCode) {
       where.countryCode = countryCode.toUpperCase();
     }
-
     return this.userRepository.find({
       where,
       select: ['id', 'email', 'ongName', 'phone', 'location', 'instagramHandle', 'countryCode', 'ongStatus', 'createdAt'],
       order: { createdAt: 'DESC' },
     });
   }
-
   async approveOng(ongId: string) {
     const ong = await this.userRepository.findOne({
       where: { id: ongId, role: UserRole.ONG },
     });
-
     if (!ong) {
       throw new NotFoundException('ONG not found');
     }
-
     if (ong.ongStatus === OngStatus.APPROVED) {
       throw new BadRequestException('ONG is already approved');
     }
-
     // Update status to approved
     ong.ongStatus = OngStatus.APPROVED;
     await this.userRepository.save(ong);
-
     // Send approval email
     await this.emailService.sendOngApprovalEmail(ong.email, ong.ongName);
-
     return {
       message: 'ONG approved successfully',
       ong: {
@@ -117,27 +101,21 @@ export class AdminService {
       },
     };
   }
-
   async rejectOng(ongId: string, reason?: string) {
     const ong = await this.userRepository.findOne({
       where: { id: ongId, role: UserRole.ONG },
     });
-
     if (!ong) {
       throw new NotFoundException('ONG not found');
     }
-
     if (ong.ongStatus === OngStatus.REJECTED) {
       throw new BadRequestException('ONG is already rejected');
     }
-
     // Update status to rejected
     ong.ongStatus = OngStatus.REJECTED;
     await this.userRepository.save(ong);
-
     // Send rejection email
     await this.emailService.sendOngRejectionEmail(ong.email, ong.ongName, reason);
-
     return {
       message: 'ONG rejected successfully',
       ong: {
@@ -148,59 +126,47 @@ export class AdminService {
       },
     };
   }
-
   async getAllUsers() {
     return this.userRepository.find({
       select: ['id', 'email', 'role', 'firstName', 'lastName', 'ongName', 'createdAt'],
       order: { createdAt: 'DESC' },
     });
   }
-
   async getUserDetails(userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
-
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
     delete user.passwordHash;
     return user;
   }
-
   async deleteUser(userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
     });
-
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
     // If user is an ONG, delete all associated physical files before deletion
     if (user.role === UserRole.ONG) {
       // 1. Find all pets belonging to this ONG
       const pets = await this.petRepository.find({
         where: { ongId: userId },
       });
-
       // 2. Collect all pet image URLs
       const imageUrlsToDelete: string[] = [];
-
       for (const pet of pets) {
         const petImages = await this.petImageRepository.find({
           where: { petId: pet.id },
         });
-
         imageUrlsToDelete.push(...petImages.map(img => img.imageUrl));
       }
-
       // 3. Add ONG profile image if exists
       if (user.profileImageUrl) {
         imageUrlsToDelete.push(user.profileImageUrl);
       }
-
       // 4. Delete all physical files
       if (imageUrlsToDelete.length > 0) {
         await this.uploadService.deleteMultipleImages(imageUrlsToDelete);
@@ -211,15 +177,12 @@ export class AdminService {
         await this.uploadService.deleteImage(user.profileImageUrl);
       }
     }
-
     // 5. Delete user (CASCADE will handle database records)
     await this.userRepository.remove(user);
-
     return {
       message: 'User deleted successfully',
     };
   }
-
   async getRecentDonations(limit: number = 50) {
     return this.donationRepository.find({
       relations: ['ong'],
@@ -227,25 +190,20 @@ export class AdminService {
       take: limit,
     });
   }
-
   async getAllPets() {
     return this.petRepository.find({
       relations: ['ong', 'images'],
       order: { createdAt: 'DESC' },
     });
   }
-
   async deletePet(petId: string) {
     const pet = await this.petRepository.findOne({
       where: { id: petId },
     });
-
     if (!pet) {
       throw new NotFoundException('Pet not found');
     }
-
     await this.petRepository.remove(pet);
-
     return {
       message: 'Pet deleted successfully',
     };

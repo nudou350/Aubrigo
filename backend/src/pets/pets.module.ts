@@ -5,7 +5,6 @@ import { PetImage } from './entities/pet-image.entity';
 import { PetsService } from './pets.service';
 import { PetsController } from './pets.controller';
 import { UploadModule } from '../upload/upload.module';
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([Pet, PetImage]),

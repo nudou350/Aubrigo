@@ -4,7 +4,6 @@ import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UploadModule } from '../upload/upload.module';
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),

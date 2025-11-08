@@ -165,6 +165,5 @@ export class NetworkStatusComponent implements OnInit {
   public networkService = inject(NetworkStatusService);
 
   ngOnInit(): void {
-    console.log('🌐 Network Status Component initialized');
   }
 }

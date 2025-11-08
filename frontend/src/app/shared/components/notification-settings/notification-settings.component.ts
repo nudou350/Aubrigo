@@ -451,7 +451,6 @@ export class NotificationSettingsComponent implements OnInit {
         const success = await this.pushService.unsubscribe();
         if (success) {
           this.isSubscribed.set(false);
-          console.log('✅ Unsubscribed from notifications');
         }
       } else {
         // Subscribe
@@ -459,11 +458,9 @@ export class NotificationSettingsComponent implements OnInit {
         if (success) {
           this.isSubscribed.set(true);
           this.permissionStatus.set(this.pushService.getPermissionStatus());
-          console.log('✅ Subscribed to notifications');
         }
       }
     } catch (error) {
-      console.error('❌ Failed to toggle notifications:', error);
     } finally {
       this.isLoading.set(false);
     }
@@ -471,7 +468,6 @@ export class NotificationSettingsComponent implements OnInit {
 
   savePreferences(): void {
     localStorage.setItem('notification_preferences', JSON.stringify(this.preferences));
-    console.log('✅ Notification preferences saved:', this.preferences);
   }
 
   private loadPreferences(): void {
@@ -480,7 +476,6 @@ export class NotificationSettingsComponent implements OnInit {
       try {
         this.preferences = JSON.parse(saved);
       } catch (error) {
-        console.error('Failed to load preferences:', error);
       }
     }
   }

@@ -1,10 +1,7 @@
 import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
-
 export class AddPixKeyToUser1736400000000 implements MigrationInterface {
-
     public async up(queryRunner: QueryRunner): Promise<void> {
         const usersTable = await queryRunner.getTable('users');
-
         if (usersTable && !usersTable.findColumnByName('pix_key')) {
             await queryRunner.addColumn(
                 'users',
@@ -17,13 +14,10 @@ export class AddPixKeyToUser1736400000000 implements MigrationInterface {
             );
         }
     }
-
     public async down(queryRunner: QueryRunner): Promise<void> {
         const usersTable = await queryRunner.getTable('users');
-
         if (usersTable && usersTable.findColumnByName('pix_key')) {
             await queryRunner.dropColumn('users', 'pix_key');
         }
     }
-
 }

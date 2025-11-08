@@ -426,7 +426,6 @@ export class AdminUsersComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading users:', error);
         this.isLoading.set(false);
         this.toastService.error('Erro ao carregar usuários: ' + (error.error?.message || 'Erro desconhecido'));
       }
@@ -525,7 +524,6 @@ export class AdminUsersComponent implements OnInit {
         this.loadUsers();
       },
       error: (error) => {
-        console.error('Error deleting user:', error);
         this.toastService.error('Erro ao excluir usuário: ' + (error.error?.message || 'Erro desconhecido'));
       }
     });
