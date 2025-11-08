@@ -15,16 +15,21 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const CONFIG_PATH = path.join(__dirname, '..', 'ngsw-config.json');
+const PACKAGE_PATH = path.join(__dirname, '..', 'package.json');
 
 function updatePwaVersion() {
   try {
+    // Read package.json for base version
+    const packageContent = fs.readFileSync(PACKAGE_PATH, 'utf-8');
+    const packageJson = JSON.parse(packageContent);
+
     // Read current config
     const configContent = fs.readFileSync(CONFIG_PATH, 'utf-8');
     const config = JSON.parse(configContent);
 
     // Generate new version with timestamp
     const timestamp = Date.now();
-    const baseVersion = config.appData.version.split('.').slice(0, 2).join('.'); // Keep major.minor
+    const baseVersion = packageJson.version; // Use package.json version (e.g., "1.1.0")
     const newVersion = `${baseVersion}.${timestamp}`;
 
     // Try to get git commit hash for additional context
