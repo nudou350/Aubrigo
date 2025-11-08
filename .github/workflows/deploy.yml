@@ -114,13 +114,36 @@ jobs:
           mkdir -p logs
 
           # Run database migrations
-          echo "Running database migrations..."
-          npm run migration:run:prod || echo "Warning: Migration failed or no pending migrations"
+          echo "============================================"
+          echo "📊 Checking database migrations..."
+          echo "============================================"
+
+          # Show migration status
+          echo "Current migration status:"
+          npm run migration:show:prod || echo "Unable to show migration status"
+          echo ""
+
+          # Run pending migrations
+          echo "Running pending migrations..."
+          if npm run migration:run:prod; then
+            echo "✅ Migrations completed successfully"
+          else
+            MIGRATION_EXIT_CODE=\$?
+            if [ \$MIGRATION_EXIT_CODE -eq 0 ]; then
+              echo "ℹ️  No pending migrations"
+            else
+              echo "⚠️  Migration failed with exit code: \$MIGRATION_EXIT_CODE"
+              echo "⚠️  Continuing deployment, but please check database state"
+            fi
+          fi
+          echo "============================================"
 
           # Restart backend with PM2
+          echo "Restarting backend service..."
           pm2 delete aubrigo-backend || true
           pm2 start ecosystem.config.js
           pm2 save
+          echo "✅ Backend service restarted"
 
           # Update nginx configuration if needed
           sudo systemctl reload nginx

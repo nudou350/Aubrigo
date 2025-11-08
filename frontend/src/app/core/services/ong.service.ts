@@ -10,6 +10,7 @@ export interface OngProfile {
   email: string;
   ongName: string;
   phone?: string;
+  pixKey?: string;
   instagramHandle?: string;
   location?: string;
   profileImageUrl?: string;
@@ -17,6 +18,7 @@ export interface OngProfile {
   longitude?: number;
   rating?: number;
   allowAppointments?: boolean;
+  countryCode?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -24,6 +26,7 @@ export interface OngProfile {
 export interface UpdateOngProfileDto {
   ongName?: string;
   phone?: string;
+  pixKey?: string;
   instagramHandle?: string;
   location?: string;
   latitude?: number;

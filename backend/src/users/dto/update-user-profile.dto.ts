@@ -19,6 +19,11 @@ export class UpdateUserProfileDto {
   @IsString()
   phone?: string;
 
+  @ApiProperty({ example: 'user@example.com', required: false, description: 'PIX key for Brazilian ONGs (can be email, CPF/CNPJ, phone, or random key)' })
+  @IsOptional()
+  @IsString()
+  pixKey?: string;
+
   @ApiProperty({ example: 'Lisboa, Portugal', required: false })
   @IsOptional()
   @IsString()

@@ -7,6 +7,7 @@ import { UsersService } from '../../core/services/users.service';
 import { OngService } from '../../core/services/ong.service';
 import { ToastService } from '../../core/services/toast.service';
 import { FavoritesService } from '../../core/services/favorites.service';
+import { CountryService } from '../../core/services/country.service';
 import { CountrySelectorComponent } from '../../shared/components/country-selector/country-selector.component';
 
 @Component({
@@ -144,6 +145,23 @@ import { CountrySelectorComponent } from '../../shared/components/country-select
                 <div class="form-value">{{ profileForm.get('phone')?.value || 'Não informado' }}</div>
               }
             </div>
+
+            @if (isOng && isBrazil()) {
+              <div class="form-group">
+                <label>Chave PIX</label>
+                @if (editMode()) {
+                  <input
+                    type="text"
+                    formControlName="pixKey"
+                    class="form-control"
+                    placeholder="CPF/CNPJ, Email, Telefone ou Chave Aleatória"
+                  >
+                  <small class="form-hint">Chave PIX para receber doações no Brasil</small>
+                } @else {
+                  <div class="form-value">{{ profileForm.get('pixKey')?.value || 'Não configurada' }}</div>
+                }
+              </div>
+            }
 
             <div class="form-group">
               <label>Localização</label>
@@ -584,16 +602,23 @@ export class ProfileComponent implements OnInit {
   private ongService = inject(OngService);
   private toastService = inject(ToastService);
   private favoritesService = inject(FavoritesService);
+  private countryService = inject(CountryService);
   private router = inject(Router);
 
   loading = signal(false);
   editMode = signal(false);
   showPasswordForm = signal(false);
   profileImageUrl = signal<string | null>(null);
+  ongCountryCode = signal<string>('PT'); // Store ONG's country code
   isOng = false;
 
   profileForm!: FormGroup;
   passwordForm!: FormGroup;
+
+  // Helper method to check if ONG is from Brazil
+  isBrazil(): boolean {
+    return this.ongCountryCode() === 'BR';
+  }
 
   ngOnInit(): void {
     this.initForms();
@@ -608,6 +633,7 @@ export class ProfileComponent implements OnInit {
       ongName: [''],
       email: [{ value: '', disabled: true }],
       phone: [''],
+      pixKey: [''],
       location: [''],
       instagramHandle: [''],
     });
@@ -634,10 +660,13 @@ export class ProfileComponent implements OnInit {
             ongName: ong.ongName,
             email: ong.email,
             phone: ong.phone || '',
+            pixKey: ong.pixKey || '',
             location: ong.location || '',
             instagramHandle: ong.instagramHandle || '',
           });
           this.profileImageUrl.set(ong.profileImageUrl || null);
+          // Store ONG's country code to determine if PIX field should be shown
+          this.ongCountryCode.set(ong.countryCode || 'PT');
           this.loading.set(false);
         },
         error: (error) => {
@@ -689,6 +718,7 @@ export class ProfileComponent implements OnInit {
       const updateData = {
         ongName: formValue.ongName,
         phone: formValue.phone,
+        pixKey: formValue.pixKey,
         location: formValue.location,
         instagramHandle: formValue.instagramHandle,
       };

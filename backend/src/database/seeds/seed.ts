@@ -81,6 +81,7 @@ const brazilianOngs = [
     password: 'Password123!',
     ongName: 'ONG São Paulo',
     phone: '+55 11 98765-4321',
+    pixKey: '+5511987654321', // PIX key using phone
     hasWhatsapp: true,
     instagramHandle: '@ongsaopaulo',
     location: 'São Paulo',
@@ -93,6 +94,7 @@ const brazilianOngs = [
     password: 'Password123!',
     ongName: 'ONG Rio de Janeiro',
     phone: '+55 21 98765-4321',
+    pixKey: 'ong.rio@test.br', // PIX key using email
     hasWhatsapp: true,
     instagramHandle: '@ongrio',
     location: 'Rio de Janeiro',

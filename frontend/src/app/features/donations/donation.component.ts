@@ -51,9 +51,9 @@ import { AnalyticsService, EventType } from '../../core/services/analytics.servi
 
                 <!-- Brazil: Show PIX -->
                 @if (isBrazil()) {
-                  @if (selectedOng()!.phone) {
+                  @if (selectedOng()!.pixKey) {
                     <app-pix-payment
-                      [pixKey]="selectedOng()!.phone"
+                      [pixKey]="selectedOng()!.pixKey"
                     />
                   } @else {
                     <div class="no-phone-message">
@@ -428,8 +428,12 @@ export class DonationComponent implements OnInit {
     // IMPORTANT: Add country filter to show only ONGs from user's country
     filters.countryCode = this.countryService.getCountry();
 
+    console.log('🌍 País selecionado:', filters.countryCode);
+    console.log('🔍 Filtrando ONGs por país...');
+
     this.donationsService.getAllOngs(filters).subscribe({
       next: (ongs) => {
+        console.log(`✅ ${ongs.length} ONGs encontradas:`, ongs);
         this.ongs.set(ongs);
       },
       error: (error) => {

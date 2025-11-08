@@ -47,6 +47,7 @@ export interface Ong {
   profileImageUrl?: string;
   location?: string;
   phone?: string;
+  pixKey?: string;
   countryCode?: string;
 }
 

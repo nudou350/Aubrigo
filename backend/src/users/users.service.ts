@@ -83,6 +83,7 @@ export class UsersService {
         'user.profileImageUrl',
         'user.location',
         'user.phone',
+        'user.pixKey',
         'user.instagramHandle',
         'user.countryCode',
       ])
@@ -142,6 +143,7 @@ export class UsersService {
           profileImageUrl: user.profileImageUrl,
           location: user.location,
           phone: user.phone,
+          pixKey: user.pixKey,
           instagramHandle: user.instagramHandle,
           urgencyLevel: mostUrgentArticle?.article_priority || 'none',
           urgencyCategory: mostUrgentArticle?.article_category || null,

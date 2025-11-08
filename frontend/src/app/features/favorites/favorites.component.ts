@@ -40,9 +40,9 @@ import { ToastService } from '../../core/services/toast.service';
           <div class="favorites-grid">
             @for (favorite of favorites(); track favorite.id) {
               <div class="pet-card">
-                <div class="pet-image" [routerLink]="['/pets', favorite.pet?.id]">
-                  @if (favorite.pet?.primaryImage) {
-                    <img [src]="favorite.pet?.primaryImage" [alt]="favorite.pet?.name || 'Pet'">
+                <div class="pet-image" [routerLink]="['/pets', favorite.pet.id]">
+                  @if (favorite.pet.primaryImage) {
+                    <img [src]="favorite.pet.primaryImage" [alt]="favorite.pet.name || 'Pet'">
                   } @else {
                     <div class="placeholder-image">
                       <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -51,21 +51,21 @@ import { ToastService } from '../../core/services/toast.service';
                     </div>
                   }
                 </div>
-                <div class="pet-info" [routerLink]="['/pets', favorite.pet?.id]">
-                  <h3 class="pet-name">{{ favorite.pet?.name || 'Pet' }}</h3>
+                <div class="pet-info" [routerLink]="['/pets', favorite.pet.id]">
+                  <h3 class="pet-name">{{ favorite.pet.name || 'Pet' }}</h3>
                   <div class="pet-details">
                     <span class="detail-item">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
-                      {{ favorite.pet?.location || 'Localização não informada' }}
+                      {{ favorite.pet.location || 'Localização não informada' }}
                     </span>
-                    @if (favorite.pet?.breed) {
-                      <span class="detail-item">{{ favorite.pet?.breed }}</span>
+                    @if (favorite.pet.breed) {
+                      <span class="detail-item">{{ favorite.pet.breed }}</span>
                     }
-                    @if (favorite.pet?.age !== undefined) {
-                      <span class="detail-item">{{ favorite.pet?.age }} anos</span>
+                    @if (favorite.pet.age !== undefined) {
+                      <span class="detail-item">{{ favorite.pet.age }} anos</span>
                     }
                   </div>
                 </div>

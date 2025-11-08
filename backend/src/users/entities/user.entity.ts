@@ -59,6 +59,9 @@ export class User {
   @Column({ name: 'has_whatsapp', default: false })
   hasWhatsapp: boolean;
 
+  @Column({ name: 'pix_key', nullable: true })
+  pixKey: string;
+
   @Column({ nullable: true })
   location: string;
 
