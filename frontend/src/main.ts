@@ -28,7 +28,7 @@ bootstrapApplication(AppComponent, {
     provideAnimations(),
     provideServiceWorker("ngsw-worker.js", {
       enabled: !isDevMode(),
-      registrationStrategy: "registerWhenStable:30000",
+      registrationStrategy: "registerWhenStable:1000",
     }),
     importProvidersFrom(
       TranslateModule.forRoot({
