@@ -6,7 +6,7 @@ async function generateFavicon() {
   const size = 32;
   const tealColor = { r: 76, g: 168, b: 160 }; // #4ca8a0
 
-  const inputPath = path.join(__dirname, '../src/assets/icon_nav.png');
+  const inputPath = path.join(__dirname, '../src/assets/icon.PNG');
   const outputPath = path.join(__dirname, '../src/favicon.ico');
 
   try {
