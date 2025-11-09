@@ -2,11 +2,11 @@
   "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
   "appData": {
-    "version": "1.2.1.1762690166149.1762693068771",
+    "version": "1.2.1.1762690166149.1762693337812",
     "name": "Aubrigo",
     "build": {
-      "timestamp": "2025-11-09T12:57:48.792Z",
-      "commit": "6f186b9"
+      "timestamp": "2025-11-09T13:02:17.834Z",
+      "commit": "cb9c1fb"
     }
   },
   "navigationFallback": {
@@ -21,7 +21,6 @@
       "resources": {
         "files": [
           "/favicon.ico",
-          "/favicon.svg",
           "/index.html",
           "/offline.html",
           "/manifest.webmanifest",
