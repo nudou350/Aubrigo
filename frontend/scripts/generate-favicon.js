@@ -4,33 +4,41 @@ const path = require('path');
 
 async function generateFavicon() {
   const size = 32;
-  const tealColor = '#4ca8a0';
+  const tealColor = { r: 76, g: 168, b: 160 }; // #4ca8a0
 
-  // Create SVG with solid teal background
-  const svg = `
-    <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
-      <!-- Solid teal background -->
-      <rect width="${size}" height="${size}" fill="${tealColor}"/>
-
-      <!-- Simple white paw print -->
-      <circle cx="16" cy="18" r="5" fill="white"/>
-      <circle cx="11" cy="12" r="3" fill="white"/>
-      <circle cx="21" cy="12" r="3" fill="white"/>
-      <circle cx="11" cy="20" r="2.5" fill="white"/>
-      <circle cx="21" cy="20" r="2.5" fill="white"/>
-    </svg>
-  `;
-
+  const inputPath = path.join(__dirname, '../src/assets/icon.PNG');
   const outputPath = path.join(__dirname, '../src/favicon.ico');
 
   try {
-    // Generate 32x32 PNG and save as ICO
-    await sharp(Buffer.from(svg))
-      .resize(32, 32)
+    // Create solid teal background
+    const background = await sharp({
+      create: {
+        width: size,
+        height: size,
+        channels: 4,
+        background: tealColor
+      }
+    })
+      .png()
+      .toBuffer();
+
+    // Resize the icon and composite it over the solid background
+    await sharp(inputPath)
+      .resize(size, size, {
+        fit: 'contain',
+        background: tealColor
+      })
+      .composite([
+        {
+          input: background,
+          blend: 'dest-over'
+        }
+      ])
       .png()
       .toFile(outputPath);
 
     console.log('✅ Favicon generated successfully at:', outputPath);
+    console.log('   Source:', inputPath);
   } catch (error) {
     console.error('❌ Error generating favicon:', error);
     process.exit(1);
