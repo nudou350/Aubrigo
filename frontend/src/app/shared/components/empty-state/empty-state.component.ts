@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export type EmptyStateIcon = 'pets' | 'favorites' | 'appointments' | 'search' | 'notifications' | 'generic';
@@ -6,6 +6,7 @@ export type EmptyStateIcon = 'pets' | 'favorites' | 'appointments' | 'search' | 
 @Component({
   selector: 'app-empty-state',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     <div class="empty-state">
@@ -175,7 +176,7 @@ export type EmptyStateIcon = 'pets' | 'favorites' | 'appointments' | 'search' | 
 })
 export class EmptyStateComponent {
   @Input() icon: EmptyStateIcon = 'generic';
-  @Input() title: string = 'Nenhum item encontrado';
+  @Input() title: string = '';
   @Input() description?: string;
   @Input() buttonText?: string;
   @Input() secondaryButtonText?: string;

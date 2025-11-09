@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from "@angular/core";
+import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink } from "@angular/router";
 import {
@@ -11,6 +11,7 @@ import { ToastService } from "../../../core/services/toast.service";
 @Component({
   selector: "app-admin-dashboard",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterLink],
   template: `
     <div class="admin-dashboard">

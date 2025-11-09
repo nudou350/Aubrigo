@@ -1,11 +1,12 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
 import { ToastService } from '../../../core/services/toast.service';
-import { PORTUGAL_CITIES } from '../../../core/constants/portugal-cities';
+import { CityService } from '../../../core/services/city.service';
 import { normalizeImageUrl } from '../../../core/utils/image-url.util';
 
 interface PetImage {
@@ -19,22 +20,23 @@ interface PetImage {
 @Component({
   selector: 'app-pet-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="pet-form-page">
       <div class="form-header">
         <a routerLink="/pets/manage" class="back-link">
-          ← Voltar
+          ← {{ 'common.back' | translate }}
         </a>
-        <h1>{{ isEditMode() ? 'Editar Pet' : 'Adicionar Novo Pet' }}</h1>
-        <p>{{ isEditMode() ? 'Atualize as informações do pet' : 'Preencha os dados do novo animal' }}</p>
+        <h1>{{ (isEditMode() ? 'pets.form.editPet' : 'pets.form.addPet') | translate }}</h1>
+        <p>{{ (isEditMode() ? 'pets.form.editPet' : 'pets.form.addPet') | translate }}</p>
       </div>
 
       <form [formGroup]="petForm" (ngSubmit)="onSubmit()" class="pet-form">
         <!-- Images Section -->
         <div class="form-section">
-          <h2>📸 Fotos do Pet</h2>
-          <p class="section-desc">Adicione fotos de qualidade para aumentar as chances de adoção</p>
+          <h2>📸 {{ 'pets.form.images' | translate }}</h2>
+          <p class="section-desc">{{ 'pets.form.uploadImages' | translate }}</p>
 
           <div class="images-grid">
             @for (image of images(); track $index) {
@@ -43,15 +45,15 @@ interface PetImage {
                 <div class="image-overlay">
                   @if (!image.isPrimary) {
                     <button type="button" class="btn-icon" (click)="setPrimaryImage($index)">
-                      ⭐ Principal
+                      ⭐ {{ 'pets.form.primaryImage' | translate }}
                     </button>
                   }
                   <button type="button" class="btn-icon danger" (click)="removeImage($index)">
-                    🗑️ Remover
+                    🗑️ {{ 'common.remove' | translate }}
                     </button>
                 </div>
                 @if (image.isPrimary) {
-                  <div class="primary-badge">★ Principal</div>
+                  <div class="primary-badge">★ {{ 'pets.form.primaryImage' | translate }}</div>
                 }
               </div>
             }
@@ -64,8 +66,8 @@ interface PetImage {
                   hidden
                 />
                 <div class="upload-icon">📷</div>
-                <span>Adicionar Foto</span>
-                <small>Max 5 fotos</small>
+                <span>{{ 'common.add' | translate }}</span>
+                <small>Max 5</small>
               </label>
             }
           </div>
@@ -73,106 +75,106 @@ interface PetImage {
 
         <!-- Basic Info -->
         <div class="form-section">
-          <h2>🐾 Informações Básicas</h2>
+          <h2>🐾 {{ 'pets.form.name' | translate }}</h2>
           <div class="form-grid">
             <div class="form-group">
-              <label for="name">Nome do Pet *</label>
+              <label for="name">{{ 'pets.form.name' | translate }} *</label>
               <input
                 id="name"
                 type="text"
                 formControlName="name"
-                placeholder="Ex: Plutão"
+                [placeholder]="'pets.form.namePlaceholder' | translate"
                 class="form-control"
               />
               @if (petForm.get('name')?.invalid && petForm.get('name')?.touched) {
-                <span class="error">Nome é obrigatório</span>
+                <span class="error">{{ 'validation.required' | translate }}</span>
               }
             </div>
 
             <div class="form-group">
-              <label for="species">Espécie *</label>
+              <label for="species">{{ 'pets.form.species' | translate }} *</label>
               <select id="species" formControlName="species" class="form-control">
-                <option value="">Selecione...</option>
-                <option value="dog">Cachorro</option>
-                <option value="cat">Gato</option>
-                <option value="fish">Peixe</option>
-                <option value="hamster">Hamster</option>
+                <option value="">{{ 'common.all' | translate }}...</option>
+                <option value="dog">{{ 'home.species.dog' | translate }}</option>
+                <option value="cat">{{ 'home.species.cat' | translate }}</option>
+                <option value="fish">{{ 'home.species.fish' | translate }}</option>
+                <option value="hamster">{{ 'home.species.hamster' | translate }}</option>
               </select>
               @if (petForm.get('species')?.invalid && petForm.get('species')?.touched) {
-                <span class="error">Espécie é obrigatória</span>
+                <span class="error">{{ 'validation.required' | translate }}</span>
               }
             </div>
 
             <div class="form-group">
-              <label for="breed">Raça</label>
+              <label for="breed">{{ 'pets.form.breed' | translate }}</label>
               <input
                 id="breed"
                 type="text"
                 formControlName="breed"
-                placeholder="Ex: Border Collie"
+                [placeholder]="'pets.form.breedPlaceholder' | translate"
                 class="form-control"
               />
             </div>
 
             <div class="form-group">
-              <label for="age">Idade (anos) *</label>
+              <label for="age">{{ 'pets.form.age' | translate }} *</label>
               <input
                 id="age"
                 type="number"
                 formControlName="age"
-                placeholder="Ex: 3"
+                [placeholder]="'pets.form.agePlaceholder' | translate"
                 min="0"
                 max="30"
                 class="form-control"
               />
               @if (petForm.get('age')?.invalid && petForm.get('age')?.touched) {
-                <span class="error">Idade é obrigatória</span>
+                <span class="error">{{ 'validation.required' | translate }}</span>
               }
             </div>
 
             <div class="form-group">
-              <label for="gender">Gênero *</label>
+              <label for="gender">{{ 'pets.form.gender' | translate }} *</label>
               <select id="gender" formControlName="gender" class="form-control">
-                <option value="">Selecione...</option>
-                <option value="male">Macho</option>
-                <option value="female">Fêmea</option>
+                <option value="">{{ 'common.all' | translate }}...</option>
+                <option value="male">{{ 'home.filters.male' | translate }}</option>
+                <option value="female">{{ 'home.filters.female' | translate }}</option>
               </select>
               @if (petForm.get('gender')?.invalid && petForm.get('gender')?.touched) {
-                <span class="error">Gênero é obrigatório</span>
+                <span class="error">{{ 'validation.required' | translate }}</span>
               }
             </div>
 
             <div class="form-group">
-              <label for="size">Porte *</label>
+              <label for="size">{{ 'pets.form.size' | translate }} *</label>
               <select id="size" formControlName="size" class="form-control">
-                <option value="">Selecione...</option>
-                <option value="small">Pequeno</option>
-                <option value="medium">Médio</option>
-                <option value="large">Grande</option>
+                <option value="">{{ 'common.all' | translate }}...</option>
+                <option value="small">{{ 'home.filters.small' | translate }}</option>
+                <option value="medium">{{ 'home.filters.medium' | translate }}</option>
+                <option value="large">{{ 'home.filters.large' | translate }}</option>
               </select>
               @if (petForm.get('size')?.invalid && petForm.get('size')?.touched) {
-                <span class="error">Porte é obrigatório</span>
+                <span class="error">{{ 'validation.required' | translate }}</span>
               }
             </div>
 
             <div class="form-group">
-              <label for="color">Cor</label>
+              <label for="color">{{ 'pets.form.color' | translate }}</label>
               <input
                 id="color"
                 type="text"
                 formControlName="color"
-                placeholder="Ex: Preto e branco"
+                [placeholder]="'pets.form.colorPlaceholder' | translate"
                 class="form-control"
               />
             </div>
 
             <div class="form-group">
-              <label for="weight">Peso (kg)</label>
+              <label for="weight">{{ 'pets.form.weight' | translate }}</label>
               <input
                 id="weight"
                 type="number"
                 formControlName="weight"
-                placeholder="Ex: 18.5"
+                [placeholder]="'pets.form.weightPlaceholder' | translate"
                 step="0.1"
                 min="0"
                 class="form-control"
@@ -183,14 +185,14 @@ interface PetImage {
 
         <!-- Description -->
         <div class="form-section">
-          <h2>📝 Descrição</h2>
+          <h2>📝 {{ 'pets.form.description' | translate }}</h2>
           <div class="form-group">
-            <label for="description">Conte sobre a personalidade e história do pet</label>
+            <label for="description">{{ 'pets.form.description' | translate }}</label>
             <textarea
               id="description"
               formControlName="description"
               rows="6"
-              placeholder="Ex: O Plutão é um Border Collie muito inteligente e enérgico! Adora brincar e aprender novos truques..."
+              [placeholder]="'pets.form.descriptionPlaceholder' | translate"
               class="form-control"
             ></textarea>
             <small class="hint">{{ petForm.get('description')?.value?.length || 0 }} / 1000 caracteres</small>
@@ -199,10 +201,10 @@ interface PetImage {
 
         <!-- Location & Status -->
         <div class="form-section">
-          <h2>📍 Localização e Status</h2>
+          <h2>📍 {{ 'pets.form.location' | translate }}</h2>
           <div class="form-grid">
             <div class="form-group">
-              <label for="location">Cidade *</label>
+              <label for="location">{{ 'pets.form.location' | translate }} *</label>
               <div class="location-typeahead-container" style="position: relative;">
                 <input
                   id="location"
@@ -211,7 +213,7 @@ interface PetImage {
                   (input)="onLocationInput($event)"
                   (focus)="onLocationFocus()"
                   (keydown)="onLocationKeydown($event)"
-                  placeholder="Digite uma cidade..."
+                  [placeholder]="'pets.form.locationPlaceholder' | translate"
                   class="form-control"
                   autocomplete="off"
                 />
@@ -231,13 +233,13 @@ interface PetImage {
                 }
               </div>
               @if (petForm.get('location')?.invalid && petForm.get('location')?.touched) {
-                <span class="error">Cidade é obrigatória</span>
+                <span class="error">{{ 'validation.required' | translate }}</span>
               }
             </div>
 
             @if (isEditMode()) {
               <div class="form-group">
-                <label for="status">Status</label>
+                <label for="status">{{ 'pets.form.status' | translate }}</label>
                 <div class="status-typeahead-container" style="position: relative;">
                   <input
                     id="status"
@@ -246,7 +248,7 @@ interface PetImage {
                     (input)="onStatusInput($event)"
                     (focus)="onStatusFocus()"
                     (keydown)="onStatusKeydown($event)"
-                    placeholder="Selecione o status..."
+                    [placeholder]="'pets.form.statusPlaceholder' | translate"
                     class="form-control"
                     autocomplete="off"
                   />
@@ -273,14 +275,14 @@ interface PetImage {
         <!-- Submit -->
         <div class="form-actions">
           <button type="button" routerLink="/pets/manage" class="btn-cancel">
-            Cancelar
+            {{ 'common.cancel' | translate }}
           </button>
           <button type="submit" class="btn-submit" [disabled]="isSubmitting()">
             @if (isSubmitting()) {
               <span class="spinner-small"></span>
-              <span>Salvando...</span>
+              <span>{{ 'common.loading' | translate }}</span>
             } @else {
-              <span>{{ isEditMode() ? 'Atualizar Pet' : 'Cadastrar Pet' }}</span>
+              <span>{{ 'pets.form.saveButton' | translate }}</span>
             }
           </button>
         </div>
@@ -631,7 +633,10 @@ export class PetFormComponent implements OnInit {
   images = signal<PetImage[]>([]);
   deletedImageIds = signal<string[]>([]);
   petId: string | null = null;
-  cities = PORTUGAL_CITIES;
+
+  // CityService integration
+  private cityService = inject(CityService);
+  cities = this.cityService.cities;
 
   // Location typeahead
   showLocationDropdown = signal(false);
@@ -644,13 +649,17 @@ export class PetFormComponent implements OnInit {
   filteredStatuses = signal<{value: string, label: string}[]>([]);
   statusInput = signal('');
   selectedStatusIndex = signal(-1);
-  availableStatuses = [
-    { value: 'available', label: 'Disponível' },
-    { value: 'pending', label: 'Pendente' },
-    { value: 'adopted', label: 'Adotado' }
-  ];
+
+  get availableStatuses() {
+    return [
+      { value: 'available', label: this.translate.instant('pets.form.available') },
+      { value: 'pending', label: this.translate.instant('pets.form.pending') },
+      { value: 'adopted', label: this.translate.instant('pets.form.adopted') }
+    ];
+  }
 
   private toastService = inject(ToastService);
+  private translate = inject(TranslateService);
 
   constructor(
     private fb: FormBuilder,
@@ -723,7 +732,7 @@ export class PetFormComponent implements OnInit {
         }
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar dados do pet');
+        this.toastService.error(this.translate.instant('pets.form.error'));
         this.router.navigate(['/pets/manage']);
       }
     });
@@ -738,12 +747,12 @@ export class PetFormComponent implements OnInit {
     // Validate image type (PNG, JPEG, WebP)
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
     if (!allowedTypes.includes(file.type.toLowerCase())) {
-      this.toastService.warning('Por favor, selecione apenas imagens PNG, JPG ou WebP');
+      this.toastService.warning(this.translate.instant('validation.pattern'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      this.toastService.warning('Imagem muito grande. Tamanho máximo: 5MB');
+      this.toastService.warning(this.translate.instant('validation.max'));
       return;
     }
 
@@ -788,7 +797,7 @@ export class PetFormComponent implements OnInit {
 
   // Location typeahead methods
   onLocationFocus() {
-    this.filteredCities.set(this.cities.slice(0, 5));
+    this.filteredCities.set(this.cityService.filterCities('', 5));
     this.showLocationDropdown.set(true);
     this.selectedLocationIndex.set(-1);
   }
@@ -798,13 +807,10 @@ export class PetFormComponent implements OnInit {
     this.locationInput.set(input);
 
     if (!input) {
-      this.filteredCities.set(this.cities.slice(0, 5));
+      this.filteredCities.set(this.cityService.filterCities('', 5));
       this.petForm.patchValue({ location: '' });
     } else {
-      const filtered = this.cities
-        .filter(city => city.toLowerCase().includes(input.toLowerCase()))
-        .slice(0, 5);
-      this.filteredCities.set(filtered);
+      this.filteredCities.set(this.cityService.filterCities(input, 5));
     }
 
     this.showLocationDropdown.set(true);
@@ -931,7 +937,7 @@ export class PetFormComponent implements OnInit {
     }
 
     if (this.images().length === 0) {
-      this.toastService.warning('Por favor, adicione pelo menos uma foto do pet');
+      this.toastService.warning(this.translate.instant('validation.required'));
       return;
     }
 
@@ -993,11 +999,11 @@ export class PetFormComponent implements OnInit {
 
     request.subscribe({
       next: () => {
-        this.toastService.success(this.isEditMode() ? 'Pet atualizado com sucesso!' : 'Pet cadastrado com sucesso!');
+        this.toastService.success(this.translate.instant(this.isEditMode() ? 'pets.form.successEdit' : 'pets.form.successAdd'));
         this.router.navigate(['/pets/manage']);
       },
       error: (error) => {
-        this.toastService.error('Erro ao salvar pet: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error(this.translate.instant('pets.form.error'));
         this.isSubmitting.set(false);
       }
     });

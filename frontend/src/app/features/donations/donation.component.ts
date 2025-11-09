@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { DonationsService, MBWayPaymentResponse, Ong } from '../../core/services/donations.service';
@@ -6,23 +6,25 @@ import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway
 import { PixPaymentComponent } from '../../shared/components/pix-payment/pix-payment.component';
 import { CountryService } from '../../core/services/country.service';
 import { AnalyticsService, EventType } from '../../core/services/analytics.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-donation',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, MbwayQrcodeComponent, PixPaymentComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, MbwayQrcodeComponent, PixPaymentComponent, TranslateModule],
   template: `
     <div class="screen">
       <div class="container">
         <div class="donation-header">
-          <h1>Fazer uma Doação</h1>
-          <p class="subtitle">Ajude-nos a cuidar dos animais 🐾</p>
+          <h1>{{ 'donations.title' | translate }}</h1>
+          <p class="subtitle">{{ 'donations.subtitle' | translate }}</p>
         </div>
 
         <div class="donation-form">
           <!-- ONG Selection -->
           <div class="form-group">
-            <label class="form-label" for="ongId">Selecione a ONG</label>
+            <label class="form-label" for="ongId">{{ 'donations.selectOng' | translate }}</label>
             @if (ongs().length > 0) {
               <select
                 id="ongId"
@@ -30,15 +32,15 @@ import { AnalyticsService, EventType } from '../../core/services/analytics.servi
                 (ngModelChange)="onOngSelect()"
                 class="form-input"
               >
-                <option value="">Escolha uma ONG...</option>
+                <option value="">{{ 'donations.chooseOng' | translate }}</option>
                 @for (ong of ongs(); track ong.id) {
                   <option [value]="ong.id">{{ ong.ongName }}</option>
                 }
               </select>
             } @else {
               <div class="no-ongs-message">
-                <p>⚠️ Não há ONGs disponíveis no seu país neste momento.</p>
-                <p>As doações são processadas localmente para garantir segurança e conformidade com regulamentações locais.</p>
+                <p>{{ 'donations.noOngsAvailable' | translate }}</p>
+                <p>{{ 'donations.donationsProcessedLocally' | translate }}</p>
               </div>
             }
           </div>
@@ -57,8 +59,8 @@ import { AnalyticsService, EventType } from '../../core/services/analytics.servi
                     />
                   } @else {
                     <div class="no-phone-message">
-                      <p>Esta ONG ainda não configurou uma chave PIX para doações.</p>
-                      <p>Por favor, entre em contato diretamente com a ONG para outras formas de doação.</p>
+                      <p>{{ 'donations.noPix' | translate }}</p>
+                      <p>{{ 'donations.contactOng' | translate }}</p>
                     </div>
                   }
                 } @else {
@@ -67,24 +69,24 @@ import { AnalyticsService, EventType } from '../../core/services/analytics.servi
                     <div class="phone-info">
                       <span class="icon">📱</span>
                       <div>
-                        <p class="phone-label">Número MB Way para doações:</p>
+                        <p class="phone-label">{{ 'donations.mbwayNumber' | translate }}</p>
                         <p class="phone-number">{{ selectedOng()!.phone }}</p>
                       </div>
                     </div>
                     <div class="instructions-text">
-                      <p>Para fazer uma doação:</p>
+                      <p>{{ 'donations.howToDonate' | translate }}</p>
                       <ol>
-                        <li>Abra o app MB Way no seu telemóvel</li>
-                        <li>Selecione "Transferir" ou "Enviar Dinheiro"</li>
-                        <li>Insira o número acima</li>
-                        <li>Digite o valor que deseja doar</li>
-                        <li>Confirme a transação</li>
+                        <li>{{ 'donations.steps.step1' | translate }}</li>
+                        <li>{{ 'donations.steps.step2' | translate }}</li>
+                        <li>{{ 'donations.steps.step3' | translate }}</li>
+                        <li>{{ 'donations.steps.step4' | translate }}</li>
+                        <li>{{ 'donations.steps.step5' | translate }}</li>
                       </ol>
                     </div>
                   } @else {
                     <div class="no-phone-message">
-                      <p>Esta ONG ainda não configurou um número para doações MB Way.</p>
-                      <p>Por favor, entre em contato diretamente com a ONG para outras formas de doação.</p>
+                      <p>{{ 'donations.noMbway' | translate }}</p>
+                      <p>{{ 'donations.contactOng' | translate }}</p>
                     </div>
                   }
                 }
@@ -97,24 +99,24 @@ import { AnalyticsService, EventType } from '../../core/services/analytics.servi
         <div style="display: none;">
           <form [formGroup]="donationForm" (ngSubmit)="onSubmit()">
             <div class="form-section">
-              <label class="form-label">Método de Pagamento</label>
+              <label class="form-label">{{ 'donations.paymentMethod' | translate }}</label>
               <div class="payment-methods">
                 <button type="button" class="payment-method-btn" [class.active]="donationForm.get('paymentMethod')?.value === 'mbway'" (click)="selectPaymentMethod('mbway')">
                   <span class="payment-icon">📱</span>
-                  <span>MB Way</span>
+                  <span>{{ 'donations.mbway' | translate }}</span>
                 </button>
                 <button type="button" class="payment-method-btn" [class.active]="donationForm.get('paymentMethod')?.value === 'stripe'" (click)="selectPaymentMethod('stripe')">
                   <span class="payment-icon">💳</span>
-                  <span>Cartão</span>
+                  <span>{{ 'donations.card' | translate }}</span>
                 </button>
                 <button type="button" class="payment-method-btn" [class.active]="donationForm.get('paymentMethod')?.value === 'multibanco'" (click)="selectPaymentMethod('multibanco')">
                   <span class="payment-icon">🏦</span>
-                  <span>Multibanco</span>
+                  <span>{{ 'donations.multibanco' | translate }}</span>
                 </button>
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label" for="amount">Valor da Contribuição (€)</label>
+              <label class="form-label" for="amount">{{ 'donations.amount' | translate }}</label>
               <input id="amount" type="number" formControlName="amount" class="form-input" placeholder="50.00" min="0.05" step="0.01" />
             </div>
             <app-mbway-qrcode
@@ -384,6 +386,7 @@ export class DonationComponent implements OnInit {
   private donationsService = inject(DonationsService);
   private countryService = inject(CountryService);
   private analytics = inject(AnalyticsService);
+  private translate = inject(TranslateService);
 
   loading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -434,7 +437,7 @@ export class DonationComponent implements OnInit {
         this.ongs.set(ongs);
       },
       error: (error) => {
-        this.errorMessage.set('Erro ao carregar lista de ONGs');
+        this.errorMessage.set(this.translate.instant('donations.errorLoadOngs'));
       },
     });
   }
@@ -493,8 +496,8 @@ export class DonationComponent implements OnInit {
     // For MBWay, set default values for optional fields if not provided
     const donationData = {
       ...formValue,
-      donorName: formValue.donorName || 'Doador Anônimo',
-      donorEmail: formValue.donorEmail || 'anonimo@petsos.pt',
+      donorName: formValue.donorName || this.translate.instant('donations.anonymousDonor'),
+      donorEmail: formValue.donorEmail || this.translate.instant('donations.anonymousEmail'),
     };
 
     this.donationsService.createDonation(donationData as any).subscribe({
@@ -514,7 +517,7 @@ export class DonationComponent implements OnInit {
         });
       },
       error: (error) => {
-        this.errorMessage.set(error.error?.message || 'Erro ao processar doação');
+        this.errorMessage.set(error.error?.message || this.translate.instant('donations.errorProcessing'));
         this.loading.set(false);
       },
     });
@@ -543,7 +546,7 @@ export class DonationComponent implements OnInit {
           });
 
           // Payment successful - show success message or redirect
-          alert('Pagamento confirmado! Obrigado pela sua doação! 🎉');
+          alert(this.translate.instant('donations.paymentSuccess'));
         }
       },
       error: (error) => {

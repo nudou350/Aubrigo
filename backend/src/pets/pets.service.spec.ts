@@ -114,7 +114,7 @@ describe('PetsService', () => {
       };
       mockQueryBuilder.getCount.mockResolvedValue(1);
       mockQueryBuilder.getMany.mockResolvedValue([mockPet]);
-      const result = await service.search(searchDto);
+      const result = await service.search(searchDto) as any;
       expect(result.data).toHaveLength(1);
       expect(result.pagination.total).toBe(1);
       expect(result.pagination.page).toBe(1);

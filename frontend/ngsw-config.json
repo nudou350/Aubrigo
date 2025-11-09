@@ -2,11 +2,11 @@
   "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
   "appData": {
-    "version": "1.1.8.1762624654237",
+    "version": "1.2.2",
     "name": "Aubrigo",
     "build": {
-      "timestamp": "2025-11-08T17:57:34.260Z",
-      "commit": "70a4576"
+      "timestamp": "2025-11-09T14:19:06.469Z",
+      "commit": "c4d65e0"
     }
   },
   "navigationFallback": {
@@ -30,12 +30,37 @@
       }
     },
     {
-      "name": "assets",
-      "installMode": "lazy",
+      "name": "assets-critical",
+      "installMode": "prefetch",
       "updateMode": "prefetch",
       "resources": {
         "files": [
+          "/assets/dog_home.webp",
+          "/assets/cat_home.webp",
+          "/assets/fish_home.webp",
+          "/assets/hamster_home.webp",
+          "/assets/paw_home.webp",
+          "/assets/icon-optimized.webp",
+          "/assets/icon_nav-optimized.webp",
+          "/assets/icons/*.png"
+        ]
+      }
+    },
+    {
+      "name": "assets-lazy",
+      "installMode": "lazy",
+      "updateMode": "lazy",
+      "resources": {
+        "files": [
           "/assets/**",
+          "!/assets/dog_home.webp",
+          "!/assets/cat_home.webp",
+          "!/assets/fish_home.webp",
+          "!/assets/hamster_home.webp",
+          "!/assets/paw_home.webp",
+          "!/assets/icon-optimized.webp",
+          "!/assets/icon_nav-optimized.webp",
+          "!/assets/icons/*.png",
           "/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
         ]
       }
@@ -43,7 +68,7 @@
   ],
   "dataGroups": [
     {
-      "name": "api-pets",
+      "name": "api-pets-fresh",
       "urls": [
         "/api/pets",
         "/api/pets/*"
@@ -51,8 +76,9 @@
       "cacheConfig": {
         "strategy": "freshness",
         "maxSize": 100,
-        "maxAge": "6h",
-        "timeout": "5s"
+        "maxAge": "3h",
+        "timeout": "3s",
+        "networkTimeoutStrategy": "cache"
       }
     },
     {
@@ -69,7 +95,7 @@
       }
     },
     {
-      "name": "api-ongs",
+      "name": "api-ongs-performance",
       "urls": [
         "/api/ongs",
         "/api/ongs/*"
@@ -77,12 +103,12 @@
       "cacheConfig": {
         "strategy": "performance",
         "maxSize": 50,
-        "maxAge": "12h",
-        "timeout": "3s"
+        "maxAge": "24h",
+        "timeout": "2s"
       }
     },
     {
-      "name": "pet-images",
+      "name": "pet-images-cdn",
       "urls": [
         "https://*.cloudinary.com/**",
         "https://*.amazonaws.com/**",
@@ -90,8 +116,8 @@
       ],
       "cacheConfig": {
         "strategy": "performance",
-        "maxSize": 200,
-        "maxAge": "7d",
+        "maxSize": 300,
+        "maxAge": "30d",
         "timeout": "10s"
       }
     },
@@ -105,6 +131,32 @@
         "strategy": "freshness",
         "maxSize": 100,
         "maxAge": "30m",
+        "timeout": "3s"
+      }
+    },
+    {
+      "name": "api-appointments",
+      "urls": [
+        "/api/appointments",
+        "/api/appointments/*"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 50,
+        "maxAge": "1h",
+        "timeout": "3s"
+      }
+    },
+    {
+      "name": "api-donations",
+      "urls": [
+        "/api/donations",
+        "/api/donations/*"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 50,
+        "maxAge": "2h",
         "timeout": "3s"
       }
     }

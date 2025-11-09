@@ -1,6 +1,8 @@
-import { Component, OnInit, inject, signal } from "@angular/core";
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { CommonModule, NgOptimizedImage } from "@angular/common";
 import { Router } from "@angular/router";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
+import { ScrollingModule } from "@angular/cdk/scrolling";
 import { AuthService } from "../../core/services/auth.service";
 import { FavoritesService } from "../../core/services/favorites.service";
 import { ToastService } from "../../core/services/toast.service";
@@ -15,29 +17,30 @@ import {
   EventType,
 } from "../../core/services/analytics.service";
 import { UsersService, ONG } from "../../core/services/users.service";
+import { LanguageSelectorComponent } from "../../shared/components/language-selector/language-selector.component";
+import { PetCardSkeletonComponent } from "../../shared/components/pet-card-skeleton/pet-card-skeleton.component";
 
 @Component({
   selector: "app-home",
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage],
+  imports: [CommonModule, NgOptimizedImage, TranslateModule, LanguageSelectorComponent, PetCardSkeletonComponent, ScrollingModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="home-screen">
       <!-- Header Section -->
       <div class="header-section">
-        <div class="greeting">
-          <h1 class="greeting-text">{{ getGreeting() }}</h1>
+        <!-- Top Actions Row (Mobile) -->
+        <div class="top-actions-row">
+          <button class="donate-button" (click)="goToDonate()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span class="donate-text">Doar</span>
+          </button>
+
           <div class="header-actions">
-            @if (!authService.isOng() && !authService.isAdmin()) {
-            <button
-              class="donate-button"
-              (click)="goToDonate()"
-              title="Doar"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
-              </svg>
-            </button>
-            } @if (authService.isAuthenticated()) {
+            <app-language-selector></app-language-selector>
+            @if (authService.isAuthenticated()) {
             <button class="profile-button" (click)="goToProfile()">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path
@@ -47,10 +50,17 @@ import { UsersService, ONG } from "../../core/services/users.service";
             </button>
             } @else {
             <button class="login-button" (click)="goToLogin()">
-              Login / Registrar
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
             </button>
             }
           </div>
+        </div>
+
+        <!-- Greeting Row -->
+        <div class="greeting-row">
+          <h1 class="greeting-text">{{ getGreeting() }}</h1>
         </div>
 
         <!-- Location & Species Filter Bar -->
@@ -116,7 +126,7 @@ import { UsersService, ONG } from "../../core/services/users.service";
             <button
               class="clear-ong-button"
               (click)="clearOngFilter()"
-              title="Limpar filtro"
+              [title]="'common.clearFilter' | translate"
             >
               ✕
             </button>
@@ -157,9 +167,9 @@ import { UsersService, ONG } from "../../core/services/users.service";
               [value]="sortBy()"
               (change)="onSortChange($event)"
             >
-              <option value="urgent">Urgência</option>
-              <option value="oldest">Mais antigos</option>
-              <option value="">Mais recentes</option>
+              <option value="urgent">{{ 'home.filters.urgent' | translate }}</option>
+              <option value="oldest">{{ 'home.filters.oldest' | translate }}</option>
+              <option value="">{{ 'home.filters.newest' | translate }}</option>
             </select>
 
             <!-- Gender Filter -->
@@ -168,9 +178,9 @@ import { UsersService, ONG } from "../../core/services/users.service";
               [value]="selectedGender()"
               (change)="onGenderChange($event)"
             >
-              <option value="">Gênero</option>
-              <option value="male">Macho</option>
-              <option value="female">Fêmea</option>
+              <option value="">{{ 'home.filters.gender' | translate }}</option>
+              <option value="male">{{ 'home.filters.male' | translate }}</option>
+              <option value="female">{{ 'home.filters.female' | translate }}</option>
             </select>
 
             <!-- Size Filter -->
@@ -179,10 +189,10 @@ import { UsersService, ONG } from "../../core/services/users.service";
               [value]="selectedSize()"
               (change)="onSizeChange($event)"
             >
-              <option value="">Porte</option>
-              <option value="small">Pequeno</option>
-              <option value="medium">Médio</option>
-              <option value="large">Grande</option>
+              <option value="">{{ 'home.filters.size' | translate }}</option>
+              <option value="small">{{ 'home.filters.small' | translate }}</option>
+              <option value="medium">{{ 'home.filters.medium' | translate }}</option>
+              <option value="large">{{ 'home.filters.large' | translate }}</option>
             </select>
 
             <!-- Age Range Filter -->
@@ -191,12 +201,12 @@ import { UsersService, ONG } from "../../core/services/users.service";
               [value]="selectedAgeRange()"
               (change)="onAgeRangeChange($event)"
             >
-              <option value="">Idade</option>
-              <option value="0-1">0-1 anos</option>
-              <option value="2-3">2-3 anos</option>
-              <option value="4-6">4-6 anos</option>
-              <option value="7-10">7-10 anos</option>
-              <option value="10+">10+ anos</option>
+              <option value="">{{ 'home.filters.age' | translate }}</option>
+              <option value="0-1">{{ 'home.filters.ageRange_0_1' | translate }}</option>
+              <option value="2-3">{{ 'home.filters.ageRange_2_3' | translate }}</option>
+              <option value="4-6">{{ 'home.filters.ageRange_4_6' | translate }}</option>
+              <option value="7-10">{{ 'home.filters.ageRange_7_10' | translate }}</option>
+              <option value="10+">{{ 'home.filters.ageRange_10_plus' | translate }}</option>
             </select>
           </div>
 
@@ -211,7 +221,7 @@ import { UsersService, ONG } from "../../core/services/users.service";
                   d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"
                 />
               </svg>
-              Filtros
+              {{ 'home.filters.filtersButton' | translate }}
               <svg
                 class="chevron-icon"
                 [class.rotated]="showFiltersDropdown()"
@@ -230,64 +240,64 @@ import { UsersService, ONG } from "../../core/services/users.service";
             <div class="filters-dropdown" (click)="$event.stopPropagation()">
               <div class="filters-dropdown-content">
                 <div class="filter-group">
-                  <label class="filter-label">Ordenar por</label>
+                  <label class="filter-label">{{ 'home.filters.sort' | translate }}</label>
                   <select
                     class="filter-select-dropdown"
                     [value]="sortBy()"
                     (change)="onSortChange($event)"
                   >
-                    <option value="urgent">Urgência</option>
-                    <option value="oldest">Mais antigos</option>
-                    <option value="">Mais recentes</option>
+                    <option value="urgent">{{ 'home.filters.urgent' | translate }}</option>
+                    <option value="oldest">{{ 'home.filters.oldest' | translate }}</option>
+                    <option value="">{{ 'home.filters.newest' | translate }}</option>
                   </select>
                 </div>
 
                 <div class="filter-group">
-                  <label class="filter-label">Gênero</label>
+                  <label class="filter-label">{{ 'home.filters.gender' | translate }}</label>
                   <select
                     class="filter-select-dropdown"
                     [value]="selectedGender()"
                     (change)="onGenderChange($event)"
                   >
-                    <option value="">Todos</option>
-                    <option value="male">Macho</option>
-                    <option value="female">Fêmea</option>
+                    <option value="">{{ 'common.all' | translate }}</option>
+                    <option value="male">{{ 'home.filters.male' | translate }}</option>
+                    <option value="female">{{ 'home.filters.female' | translate }}</option>
                   </select>
                 </div>
 
                 <div class="filter-group">
-                  <label class="filter-label">Porte</label>
+                  <label class="filter-label">{{ 'home.filters.size' | translate }}</label>
                   <select
                     class="filter-select-dropdown"
                     [value]="selectedSize()"
                     (change)="onSizeChange($event)"
                   >
-                    <option value="">Todos</option>
-                    <option value="small">Pequeno</option>
-                    <option value="medium">Médio</option>
-                    <option value="large">Grande</option>
+                    <option value="">{{ 'common.all' | translate }}</option>
+                    <option value="small">{{ 'home.filters.small' | translate }}</option>
+                    <option value="medium">{{ 'home.filters.medium' | translate }}</option>
+                    <option value="large">{{ 'home.filters.large' | translate }}</option>
                   </select>
                 </div>
 
                 <div class="filter-group">
-                  <label class="filter-label">Idade</label>
+                  <label class="filter-label">{{ 'home.filters.age' | translate }}</label>
                   <select
                     class="filter-select-dropdown"
                     [value]="selectedAgeRange()"
                     (change)="onAgeRangeChange($event)"
                   >
-                    <option value="">Todas</option>
-                    <option value="0-1">0-1 anos</option>
-                    <option value="2-3">2-3 anos</option>
-                    <option value="4-6">4-6 anos</option>
-                    <option value="7-10">7-10 anos</option>
-                    <option value="10+">10+ anos</option>
+                    <option value="">{{ 'home.filters.allAges' | translate }}</option>
+                    <option value="0-1">{{ 'home.filters.ageRange_0_1' | translate }}</option>
+                    <option value="2-3">{{ 'home.filters.ageRange_2_3' | translate }}</option>
+                    <option value="4-6">{{ 'home.filters.ageRange_4_6' | translate }}</option>
+                    <option value="7-10">{{ 'home.filters.ageRange_7_10' | translate }}</option>
+                    <option value="10+">{{ 'home.filters.ageRange_10_plus' | translate }}</option>
                   </select>
                 </div>
 
                 @if (hasActiveFilters()) {
                 <button class="clear-filters-button" (click)="clearAllFilters(); $event.stopPropagation()">
-                  Limpar filtros
+                  {{ 'common.clearFilters' | translate }}
                 </button>
                 }
               </div>
@@ -362,16 +372,20 @@ import { UsersService, ONG } from "../../core/services/users.service";
       <div class="loading">
         <div class="loading-content">
           <div class="loading-spinner"></div>
-          <span class="loading-text">Carregando pets...</span>
+          <span class="loading-text">{{ 'home.loadingPets' | translate }}</span>
         </div>
       </div>
       }
 
       <!-- Pet List -->
       <div class="pet-list">
-        @if (pets().length === 0 && !loading()) {
-        <div class="no-pets">Nenhum pet encontrado</div>
-        } @else { @for (pet of pets(); track pet.id) {
+        @if (loading()) {
+          <!-- Show skeleton loaders while loading -->
+          <app-pet-card-skeleton *ngFor="let _ of [1,2,3,4,5,6]" />
+        } @else if (pets().length === 0) {
+          <div class="no-pets">{{ 'home.noPetsFound' | translate }}</div>
+        } @else {
+          @for (pet of pets(); track pet.id) {
         <div class="pet-card" (click)="viewPetDetail(pet.id)">
           <div class="pet-image-container">
             @if (pet.primaryImage) {
@@ -390,7 +404,7 @@ import { UsersService, ONG } from "../../core/services/users.service";
               class="favorite-button"
               [class.favorited]="favoritePetIds().has(pet.id)"
               (click)="toggleFavorite(pet.id, $event)"
-              title="Adicionar aos favoritos"
+              [title]="'home.petCard.addToFavorites' | translate"
             >
               <svg
                 width="24"
@@ -443,7 +457,7 @@ import { UsersService, ONG } from "../../core/services/users.service";
                   }
                 </svg>
                 <span>{{
-                  pet.gender === "male" ? "Masculino" : "Feminino"
+                  pet.gender === "male" ? ('home.filters.male' | translate) : ('home.filters.female' | translate)
                 }}</span>
               </div>
 
@@ -468,7 +482,7 @@ import { UsersService, ONG } from "../../core/services/users.service";
                     d="M12 6c1.11 0 2-.9 2-2 0-.38-.1-.73-.29-1.03L12 0l-1.71 2.97c-.19.3-.29.65-.29 1.03 0 1.1.9 2 2 2zm4.6 9.99l-1.07-1.07-1.08 1.07c-1.3 1.3-3.58 1.31-4.89 0l-1.07-1.07-1.09 1.07C6.75 16.64 5.88 17 4.96 17c-.73 0-1.4-.23-1.96-.61V21c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-4.61c-.56.38-1.23.61-1.96.61-.92 0-1.79-.36-2.44-1.01zM18 9h-5V7h-2v2H6c-1.66 0-3 1.34-3 3v1.54c0 1.08.88 1.96 1.96 1.96.52 0 1.02-.2 1.38-.57l2.14-2.13 2.13 2.13c.74.74 2.03.74 2.77 0l2.14-2.13 2.13 2.13c.37.37.86.57 1.38.57 1.08 0 1.96-.88 1.96-1.96V12C21 10.34 19.66 9 18 9z"
                   />
                 </svg>
-                <span>{{ pet.age }} anos</span>
+                <span>{{ 'home.petCard.years' | translate:{age: pet.age} }}</span>
               </div>
             </div>
 
@@ -485,10 +499,11 @@ import { UsersService, ONG } from "../../core/services/users.service";
 
             <p class="pet-description">{{ pet.description }}</p>
 
-            <button class="learn-more-button">SABER MAIS</button>
+            <button class="learn-more-button">{{ 'common.learnMore' | translate }}</button>
           </div>
         </div>
-        } }
+          }
+        }
       </div>
     </div>
 
@@ -504,68 +519,46 @@ import { UsersService, ONG } from "../../core/services/users.service";
               <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
             </svg>
           </span>
-          <h2>Instalar Aubrigo</h2>
-          <p>Siga os passos abaixo para adicionar o app à sua tela inicial</p>
+          <h2>{{ 'pwa.install.iosInstructions.title' | translate }}</h2>
+          <p>{{ 'pwa.install.iosInstructions.subtitle' | translate }}</p>
         </div>
 
         <div class="instructions">
           <div class="step">
             <div class="step-number">1</div>
             <div class="step-content">
-              <h3>Toque no botão Compartilhar</h3>
-              <p>
-                Procure pelo ícone
-                <strong>
-                  <svg
-                    width="16"
-                    height="20"
-                    viewBox="0 0 16 20"
-                    fill="currentColor"
-                    style="display: inline; vertical-align: middle;"
-                  >
-                    <path
-                      d="M8 0L6.59 1.41L12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8-8-8z"
-                      transform="rotate(-90 8 8)"
-                    />
-                  </svg>
-                </strong>
-                na parte inferior da tela
-              </p>
+              <h3>{{ 'pwa.install.iosInstructions.step1Title' | translate }}</h3>
+              <p [innerHTML]="'pwa.install.iosInstructions.step1Description' | translate"></p>
             </div>
           </div>
 
           <div class="step">
             <div class="step-number">2</div>
             <div class="step-content">
-              <h3>Role para baixo</h3>
-              <p>No menu que aparecer, role até encontrar a opção</p>
+              <h3>{{ 'pwa.install.iosInstructions.step2Title' | translate }}</h3>
+              <p>{{ 'pwa.install.iosInstructions.step2Description' | translate }}</p>
             </div>
           </div>
 
           <div class="step">
             <div class="step-number">3</div>
             <div class="step-content">
-              <h3>Adicionar à Tela de Início</h3>
-              <p>
-                Toque em <strong>"Adicionar à Tela de Início"</strong> ou
-                <strong>"Add to Home Screen"</strong>
-              </p>
+              <h3>{{ 'pwa.install.iosInstructions.step3Title' | translate }}</h3>
+              <p [innerHTML]="'pwa.install.iosInstructions.step3Description' | translate"></p>
             </div>
           </div>
 
           <div class="step">
             <div class="step-number">4</div>
             <div class="step-content">
-              <h3>Confirme</h3>
-              <p>
-                Toque em <strong>"Adicionar"</strong> no canto superior direito
-              </p>
+              <h3>{{ 'pwa.install.iosInstructions.step4Title' | translate }}</h3>
+              <p [innerHTML]="'pwa.install.iosInstructions.step4Description' | translate"></p>
             </div>
           </div>
         </div>
 
         <div class="modal-footer">
-          <p>✨ Pronto! O ícone do Aubrigo estará na sua tela inicial</p>
+          <p>{{ 'pwa.install.iosInstructions.footer' | translate }}</p>
         </div>
       </div>
     </div>
@@ -588,10 +581,57 @@ import { UsersService, ONG } from "../../core/services/users.service";
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       }
 
-      .greeting {
+      /* Top Actions Row - Mobile */
+      .top-actions-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .donate-button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #4ca8a0;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(76, 168, 160, 0.3);
+      }
+
+      .donate-button svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .donate-button:hover {
+        background: #3d9690;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(76, 168, 160, 0.4);
+      }
+
+      .donate-button:active {
+        transform: translateY(0);
+      }
+
+      .donate-text {
+        font-weight: 600;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Greeting Row */
+      .greeting-row {
         margin-bottom: 16px;
       }
 
@@ -602,38 +642,12 @@ import { UsersService, ONG } from "../../core/services/users.service";
         margin: 0;
       }
 
-      .header-actions {
-        display: flex;
+      /* Old greeting class - keep for backwards compatibility on desktop */
+      .greeting {
+        display: none; /* Hidden on mobile, shown on desktop */
+        justify-content: space-between;
         align-items: center;
-        gap: 8px;
-      }
-
-      .donate-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(184, 227, 225, 0.3);
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .donate-button svg {
-        width: 24px;
-        height: 24px;
-        color: #5cb5b0;
-      }
-
-      .donate-button:hover {
-        background: rgba(76, 168, 160, 0.2);
-        transform: scale(1.05);
-      }
-
-      .donate-button:active {
-        transform: scale(0.95);
+        margin-bottom: 16px;
       }
 
       .profile-button {
@@ -660,22 +674,27 @@ import { UsersService, ONG } from "../../core/services/users.service";
       }
 
       .login-button {
-        background: #4ca8a0;
-        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(184, 227, 225, 0.3);
         border: none;
-        border-radius: 20px;
-        padding: 8px 16px;
-        font-size: 14px;
-        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
         transition: all 0.2s ease;
-        white-space: nowrap;
+        padding: 0;
+      }
+
+      .login-button svg {
+        width: 24px;
+        height: 24px;
+        color: #4ca8a0;
       }
 
       .login-button:hover {
-        background: #3d9690;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(76, 168, 160, 0.3);
+        background: rgba(184, 227, 225, 0.5);
       }
 
       .filter-bar {
@@ -1427,6 +1446,20 @@ import { UsersService, ONG } from "../../core/services/users.service";
           padding: 32px 48px;
         }
 
+        /* Hide mobile layout on desktop */
+        .top-actions-row {
+          display: none;
+        }
+
+        .greeting-row {
+          display: none;
+        }
+
+        /* Show desktop layout */
+        .greeting {
+          display: flex;
+        }
+
         .login-button,
         .profile-button,
         .donate-button {
@@ -1679,6 +1712,7 @@ export class HomeComponent implements OnInit {
   pwaService = inject(PwaService);
   private analytics = inject(AnalyticsService);
   private usersService = inject(UsersService);
+  private translate = inject(TranslateService);
 
   pets = signal<Pet[]>([]);
   loading = signal(true);
@@ -1689,13 +1723,13 @@ export class HomeComponent implements OnInit {
   selectedAgeRange = signal<string>("");
   showFiltersDropdown = signal(false);
   showIosInstructions = signal(false);
-  currentLocation = signal("Todas as cidades");
+  currentLocation = signal(this.translate.instant('home.filters.allCities'));
   favoritePetIds = signal<Set<string>>(new Set());
   visitorEmail: string | null = null;
 
   // Location typeahead
   showLocationDropdown = signal(false);
-  availableLocations: string[] = ["Todas as cidades"];
+  availableLocations: string[] = [this.translate.instant('home.filters.allCities')];
   filteredLocations = signal<string[]>(this.availableLocations);
   selectedLocationIndex = signal(-1);
 
@@ -1757,7 +1791,7 @@ export class HomeComponent implements OnInit {
     event.stopPropagation(); // Prevent navigation to pet detail
 
     if (!this.visitorEmail) {
-      this.toastService.warning("Por favor, configure seu e-mail primeiro");
+      this.toastService.warning(this.translate.instant('favorites.configureEmail'));
       return;
     }
 
@@ -1773,10 +1807,10 @@ export class HomeComponent implements OnInit {
             const newFavorites = new Set(favorites);
             newFavorites.delete(petId);
             this.favoritePetIds.set(newFavorites);
-            this.toastService.success("Removido dos favoritos");
+            this.toastService.success(this.translate.instant('favorites.removedFromFavorites'));
           },
           error: (error) => {
-            this.toastService.error("Erro ao remover dos favoritos");
+            this.toastService.error(this.translate.instant('favorites.errorRemove'));
           },
         });
     } else {
@@ -1786,10 +1820,10 @@ export class HomeComponent implements OnInit {
           const newFavorites = new Set(favorites);
           newFavorites.add(petId);
           this.favoritePetIds.set(newFavorites);
-          this.toastService.success("Adicionado aos favoritos");
+          this.toastService.success(this.translate.instant('favorites.addedToFavorites'));
         },
         error: (error) => {
-          this.toastService.error("Erro ao adicionar aos favoritos");
+          this.toastService.error(this.translate.instant('favorites.errorAdd'));
         },
       });
     }
@@ -1813,7 +1847,7 @@ export class HomeComponent implements OnInit {
     // Add location filter if selected and not "Todas as cidades"
     if (
       this.currentLocation() &&
-      this.currentLocation() !== "Todas as cidades"
+      this.currentLocation() !== this.translate.instant('home.filters.allCities')
     ) {
       params.location = this.currentLocation();
     }
@@ -1854,7 +1888,7 @@ export class HomeComponent implements OnInit {
         });
       },
       error: (error) => {
-        this.toastService.error("Erro ao carregar pets");
+        this.toastService.error(this.translate.instant('errors.generic'));
         this.loading.set(false);
         this.pets.set([]);
       },
@@ -1877,12 +1911,8 @@ export class HomeComponent implements OnInit {
 
   getSizeLabel(size?: string): string {
     if (!size) return "N/A";
-    const labels: any = {
-      small: "Pequeno",
-      medium: "Médio",
-      large: "Grande",
-    };
-    return labels[size] || size;
+    const key = `home.filters.${size}`;
+    return this.translate.instant(key);
   }
 
   viewPetDetail(petId: string) {
@@ -1894,15 +1924,15 @@ export class HomeComponent implements OnInit {
     if (user) {
       // Check for firstName first (regular users and admins)
       if (user.firstName) {
-        return `Olá, ${user.firstName}!`;
+        return this.translate.instant('home.greetingWithName', { name: user.firstName });
       }
       // Fall back to ongName (for ONG accounts)
       if (user.ongName) {
-        return `Olá, ${user.ongName}!`;
+        return this.translate.instant('home.greetingWithName', { name: user.ongName });
       }
     }
     // If no name is available, just show greeting
-    return "Olá!";
+    return this.translate.instant('home.greeting');
   }
 
   goToProfile() {
@@ -1944,7 +1974,7 @@ export class HomeComponent implements OnInit {
   loadCitiesWithPets() {
     this.petsService.getCitiesWithPets().subscribe({
       next: (cities) => {
-        this.availableLocations = ["Todas as cidades", ...cities];
+        this.availableLocations = [this.translate.instant('home.filters.allCities'), ...cities];
         this.filteredLocations.set(this.availableLocations.slice(0, 5));
       },
       error: (error) => {
@@ -1956,15 +1986,15 @@ export class HomeComponent implements OnInit {
   getLocationInputValue(): string {
     // If "Todas as cidades" is selected, return empty string (placeholder will show)
     const location = this.currentLocation();
-    return location === "Todas as cidades" ? "" : location;
+    return location === this.translate.instant('home.filters.allCities') ? "" : location;
   }
 
   getLocationPlaceholder(): string {
     // Show current location as placeholder if "Todas as cidades" is selected
     const location = this.currentLocation();
-    return location === "Todas as cidades"
-      ? "Todas as cidades"
-      : "Digite uma cidade...";
+    return location === this.translate.instant('home.filters.allCities')
+      ? this.translate.instant('home.filters.allCities')
+      : this.translate.instant('home.filters.typeCityName');
   }
 
   onLocationFocus() {
@@ -1985,7 +2015,7 @@ export class HomeComponent implements OnInit {
 
     // If empty, reset to "Todas as cidades"
     if (!input) {
-      this.currentLocation.set("Todas as cidades");
+      this.currentLocation.set(this.translate.instant('home.filters.allCities'));
       this.filteredLocations.set(this.availableLocations.slice(0, 5));
       this.showLocationDropdown.set(true);
       this.selectedLocationIndex.set(-1);
@@ -2055,8 +2085,8 @@ export class HomeComponent implements OnInit {
 
     // If input is empty or matches no cities, search with "Todas as cidades"
     const input = this.currentLocation();
-    if (!input || input === "Todas as cidades") {
-      this.currentLocation.set("Todas as cidades");
+    if (!input || input === this.translate.instant('home.filters.allCities')) {
+      this.currentLocation.set(this.translate.instant('home.filters.allCities'));
     }
 
     this.loadPets();
@@ -2101,7 +2131,9 @@ export class HomeComponent implements OnInit {
   }
 
   getOngPlaceholder(): string {
-    return this.currentOng() ? "Digite o nome da ONG..." : "Todas as ONGs";
+    return this.currentOng()
+      ? this.translate.instant('home.filters.typeOngName')
+      : this.translate.instant('home.filters.allOngs');
   }
 
   onOngFocus() {
@@ -2116,7 +2148,7 @@ export class HomeComponent implements OnInit {
 
     // Clear location filter when searching by ONG (exclusive filters)
     if (input) {
-      this.currentLocation.set('Todas as cidades');
+      this.currentLocation.set(this.translate.instant('home.filters.allCities'));
     }
 
     if (!input) {

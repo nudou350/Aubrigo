@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ShareButtonComponent } from '../../../shared/components/share-button/share-button.component';
+import { LanguageSelectorComponent } from '../../../shared/components/language-selector/language-selector.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { GeolocationService } from '../../../core/services/geolocation.service';
 import { environment } from '../../../../environments/environment';
@@ -36,7 +37,8 @@ export interface OngDetail {
 @Component({
   selector: 'app-ong-detail',
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage, ShareButtonComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, NgOptimizedImage, ShareButtonComponent, LanguageSelectorComponent],
   templateUrl: './ong-detail.component.html',
   styleUrl: './ong-detail.component.scss',
 })

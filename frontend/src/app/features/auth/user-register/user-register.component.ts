@@ -1,20 +1,22 @@
-import { Component, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="register-container">
       <div class="register-card">
         <div class="register-header">
           <div class="icon">❤️</div>
-          <h1>Criar Conta de Usuário</h1>
-          <p>Comece sua jornada para adotar um novo amigo</p>
+          <h1>{{ 'auth.register.userTitle' | translate }}</h1>
+          <p>{{ 'auth.register.userSubtitle' | translate }}</p>
         </div>
 
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
@@ -26,73 +28,73 @@ import { AuthService } from '../../../core/services/auth.service';
 
           <div class="form-row">
             <div class="form-group">
-              <label for="firstName">Nome</label>
+              <label for="firstName">{{ 'auth.register.firstName' | translate }}</label>
               <input
                 id="firstName"
                 type="text"
                 formControlName="firstName"
-                placeholder="João"
+                [placeholder]="'auth.register.firstNamePlaceholder' | translate"
                 [class.error]="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched"
               />
               @if (registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched) {
-                <span class="error-text">Nome é obrigatório</span>
+                <span class="error-text">{{ 'auth.register.firstNameRequired' | translate }}</span>
               }
             </div>
 
             <div class="form-group">
-              <label for="lastName">Sobrenome</label>
+              <label for="lastName">{{ 'auth.register.lastName' | translate }}</label>
               <input
                 id="lastName"
                 type="text"
                 formControlName="lastName"
-                placeholder="Silva"
+                [placeholder]="'auth.register.lastNamePlaceholder' | translate"
                 [class.error]="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched"
               />
               @if (registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched) {
-                <span class="error-text">Sobrenome é obrigatório</span>
+                <span class="error-text">{{ 'auth.register.lastNameRequired' | translate }}</span>
               }
             </div>
           </div>
 
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email">{{ 'auth.register.email' | translate }}</label>
             <input
               id="email"
               type="email"
               formControlName="email"
-              placeholder="joao@example.com"
+              [placeholder]="'auth.register.emailPlaceholder' | translate"
               [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
             />
             @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
-              <span class="error-text">Email válido é obrigatório</span>
+              <span class="error-text">{{ 'auth.register.emailRequired' | translate }}</span>
             }
           </div>
 
           <div class="form-group">
-            <label for="password">Senha</label>
+            <label for="password">{{ 'auth.register.password' | translate }}</label>
             <input
               id="password"
               type="password"
               formControlName="password"
-              placeholder="Mínimo 8 caracteres"
+              [placeholder]="'auth.register.passwordPlaceholder' | translate"
               [class.error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
             />
             @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
-              <span class="error-text">Senha deve ter no mínimo 8 caracteres</span>
+              <span class="error-text">{{ 'auth.register.passwordRequired' | translate }}</span>
             }
           </div>
 
           <div class="form-group">
-            <label for="confirmPassword">Confirmar Senha</label>
+            <label for="confirmPassword">{{ 'auth.register.confirmPassword' | translate }}</label>
             <input
               id="confirmPassword"
               type="password"
               formControlName="confirmPassword"
-              placeholder="Repita sua senha"
+              [placeholder]="'auth.register.confirmPasswordPlaceholder' | translate"
               [class.error]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
             />
             @if (registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) {
-              <span class="error-text">Senhas não coincidem</span>
+              <span class="error-text">{{ 'auth.register.passwordMismatch' | translate }}</span>
             }
           </div>
 
@@ -104,12 +106,12 @@ import { AuthService } from '../../../core/services/auth.service';
             @if (isLoading()) {
               <span class="spinner"></span>
             }
-            {{ isLoading() ? 'Criando conta...' : 'CRIAR CONTA' }}
+            {{ isLoading() ? ('auth.register.creatingAccount' | translate) : ('auth.register.createAccountButton' | translate) }}
           </button>
 
           <div class="footer-links">
-            <p>Já tem uma conta? <a routerLink="/login">Entrar</a></p>
-            <p><a routerLink="/account-type">← Voltar para escolha de conta</a></p>
+            <p>{{ 'auth.register.alreadyHaveAccount' | translate }} <a routerLink="/login">{{ 'auth.register.loginHere' | translate }}</a></p>
+            <p><a routerLink="/account-type">{{ 'auth.register.backToAccountType' | translate }}</a></p>
           </div>
         </form>
       </div>
@@ -291,6 +293,8 @@ import { AuthService } from '../../../core/services/auth.service';
   `]
 })
 export class UserRegisterComponent {
+  private translate = inject(TranslateService);
+
   registerForm: FormGroup;
   isLoading = signal(false);
   errorMessage = signal('');
@@ -337,7 +341,7 @@ export class UserRegisterComponent {
       },
       error: (error) => {
         this.isLoading.set(false);
-        this.errorMessage.set(error.error?.message || 'Erro ao criar conta. Tente novamente.');
+        this.errorMessage.set(error.error?.message || this.translate.instant('auth.register.registerError'));
       }
     });
   }

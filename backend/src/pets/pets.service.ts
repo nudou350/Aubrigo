@@ -11,6 +11,8 @@ import { User } from '../users/entities/user.entity';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { SearchPetsDto } from './dto/search-pets.dto';
+import { CacheService } from '../common/cache/cache.service';
+
 @Injectable()
 export class PetsService {
   constructor(
@@ -18,9 +20,18 @@ export class PetsService {
     private petRepository: Repository<Pet>,
     @InjectRepository(PetImage)
     private petImageRepository: Repository<PetImage>,
+    private cacheService: CacheService,
   ) {}
   async search(searchDto: SearchPetsDto) {
     const { page = 1, limit = 10, ...filters } = searchDto;
+
+    // Check cache first
+    const cacheKey = this.cacheService.getPetsCacheKey(searchDto);
+    const cached = await this.cacheService.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const skip = (page - 1) * limit;
     const query = this.petRepository
       .createQueryBuilder('pet')
@@ -106,7 +117,7 @@ export class PetsService {
       ...pet,
       primaryImage: pet.images.find((img) => img.isPrimary)?.imageUrl || pet.images[0]?.imageUrl,
     }));
-    return {
+    const result = {
       data: formattedPets,
       pagination: {
         total,
@@ -115,6 +126,11 @@ export class PetsService {
         totalPages: Math.ceil(total / limit),
       },
     };
+
+    // Cache the result for 3 hours (10800 seconds)
+    await this.cacheService.set(cacheKey, result, 10800);
+
+    return result;
   }
   async findOne(id: string) {
     const pet = await this.petRepository.findOne({

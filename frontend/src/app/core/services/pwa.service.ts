@@ -42,6 +42,7 @@ export class PwaService {
     this.initPwaPrompt();
     this.checkIfInstalled();
     this.initServiceWorkerUpdate();
+    this.initVisibilityChangeListener();
 
     // In debug mode or iOS, force installable to true for showing the button
     if (this.DEBUG_MODE && !this.isInstalled()) {
@@ -172,18 +173,34 @@ export class PwaService {
   }
 
   /**
-   * Check for updates regularly (every 6 hours)
+   * Check for updates regularly (every 30 minutes)
    */
   private checkForUpdatesRegularly() {
     const appIsStable$ = this.appRef.isStable.pipe(
       first(isStable => isStable)
     );
 
-    // Check every 6 hours after app stabilizes
-    const everySixHours$ = interval(6 * 60 * 60 * 1000);
+    // Check every 30 minutes after app stabilizes for faster update detection
+    const everyThirtyMinutes$ = interval(30 * 60 * 1000);
 
-    concat(appIsStable$, everySixHours$).subscribe(() => {
+    concat(appIsStable$, everyThirtyMinutes$).subscribe(() => {
       this.checkForUpdate();
+    });
+  }
+
+  /**
+   * Check for updates when user returns to the app
+   */
+  private initVisibilityChangeListener() {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.swUpdate.isEnabled) {
+        // User returned to the tab, check for updates
+        this.checkForUpdate();
+      }
     });
   }
 

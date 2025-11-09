@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <style>
+      .cls-1 { fill: #4ca8a0; }
+      .cls-2 { fill: #ffffff; }
+    </style>
+  </defs>
+
+  <!-- Background rectangle with teal color - fills entire viewBox -->
+  <rect class="cls-1" x="0" y="0" width="192" height="192"/>
+
+  <!-- Dog (left side) -->
+  <path class="cls-2" d="M65,80 Q55,75 50,85 Q45,95 50,100 L55,95 Q52,88 58,85 Z"/>
+  <circle class="cls-2" cx="60" cy="95" r="18"/>
+  <circle class="cls-1" cx="55" cy="92" r="4"/>
+  <path class="cls-2" d="M50,105 Q48,110 52,112 Q56,110 54,105 Z"/>
+  <path class="cls-2" d="M45,115 Q40,125 35,130 Q45,135 48,125 Z"/>
+
+  <!-- Cat (right side) -->
+  <path class="cls-2" d="M130,70 Q135,65 140,72 L138,78 Q135,73 132,75 Z"/>
+  <path class="cls-2" d="M145,75 Q150,70 155,77 L153,83 Q150,78 147,80 Z"/>
+  <ellipse class="cls-2" cx="135" cy="95" rx="22" ry="20"/>
+  <circle class="cls-1" cx="140" cy="92" r="3"/>
+  <circle class="cls-1" cx="128" cy="92" r="3"/>
+  <path class="cls-2" d="M130,100 Q135,103 140,100 L135,102 Z"/>
+  <path class="cls-2" d="M150,110 Q155,115 158,120 Q153,125 148,118 Z"/>
+
+  <!-- Heart or paw in center -->
+  <circle class="cls-2" cx="96" cy="115" r="8" opacity="0.9"/>
+  <circle class="cls-2" cx="88" cy="120" r="5" opacity="0.9"/>
+  <circle class="cls-2" cx="104" cy="120" r="5" opacity="0.9"/>
+</svg>

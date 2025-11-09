@@ -93,6 +93,12 @@
   flex: 1;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .share-button-header {
   width: 44px;
   height: 44px;

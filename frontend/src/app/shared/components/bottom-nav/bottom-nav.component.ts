@@ -1,14 +1,17 @@
-import { Component, signal, computed, inject } from "@angular/core";
+import { Component, ChangeDetectionStrategy, signal, computed, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink, NavigationEnd } from "@angular/router";
 import { filter } from "rxjs/operators";
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from "../../../core/services/auth.service";
 import { PwaService } from "../../../core/services/pwa.service";
+import { LanguageSelectorComponent } from "../language-selector/language-selector.component";
 
 @Component({
   selector: "app-bottom-nav",
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterLink, TranslateModule, LanguageSelectorComponent],
   template: `
     <!-- Install PWA button - floating bottom right (mobile only) -->
     @if (shouldShowNav() && !authService.isOng() && !authService.isAdmin() &&
@@ -30,7 +33,7 @@ import { PwaService } from "../../../core/services/pwa.service";
         <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
         </svg>
-        <span class="nav-label">HOME</span>
+        <span class="nav-label">{{ 'navigation.home' | translate }}</span>
       </a>
 
       <!-- Central button: Toggle between ONGs and Pets -->
@@ -40,7 +43,7 @@ import { PwaService } from "../../../core/services/pwa.service";
         <div class="paw-button">
           <img src="assets/paw_home.webp" alt="Pets" class="paw-image" />
         </div>
-        <span class="nav-label">PETS</span>
+        <span class="nav-label">{{ 'navigation.pets' | translate }}</span>
       </a>
       } @else {
       <!-- Show ONGs button when NOT on ONGs page -->
@@ -54,7 +57,7 @@ import { PwaService } from "../../../core/services/pwa.service";
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
           </svg>
         </div>
-        <span class="nav-label">ONGS</span>
+        <span class="nav-label">{{ 'navigation.ongs' | translate }}</span>
       </a>
       }
 
@@ -70,7 +73,7 @@ import { PwaService } from "../../../core/services/pwa.service";
             d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
           />
         </svg>
-        <span class="nav-label">FAVORITOS</span>
+        <span class="nav-label">{{ 'navigation.favorites' | translate }}</span>
       </a>
       } @else if (authService.isOng()) {
       <a routerLink="/ong" class="nav-item" [class.active]="isActive('/ong')">
@@ -79,7 +82,7 @@ import { PwaService } from "../../../core/services/pwa.service";
             d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
           />
         </svg>
-        <span class="nav-label">DASHBOARD</span>
+        <span class="nav-label">{{ 'navigation.dashboard' | translate }}</span>
       </a>
       } @else {
       <a
@@ -92,7 +95,7 @@ import { PwaService } from "../../../core/services/pwa.service";
             d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"
           />
         </svg>
-        <span class="nav-label">DASHBOARD</span>
+        <span class="nav-label">{{ 'navigation.dashboard' | translate }}</span>
       </a>
       }
     </nav>
@@ -102,7 +105,10 @@ import { PwaService } from "../../../core/services/pwa.service";
       <div class="top-nav-container">
         <div class="nav-brand">
           <div class="brand-logo">
-            <img src="assets/icon.PNG" alt="Aubrigo" class="brand-icon" />
+            <picture>
+              <source srcset="assets/icon-optimized.webp" type="image/webp">
+              <img src="assets/icon-optimized.png" alt="Aubrigo" class="brand-icon" />
+            </picture>
           </div>
           <span class="brand-name">Aubrigo</span>
         </div>
@@ -116,7 +122,7 @@ import { PwaService } from "../../../core/services/pwa.service";
             <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
-            <span>Home</span>
+            <span>{{ 'navigation.home' | translate }}</span>
           </a>
 
           <!-- ONGs Link -->
@@ -128,7 +134,7 @@ import { PwaService } from "../../../core/services/pwa.service";
             <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
-            <span>ONGs</span>
+            <span>{{ 'navigation.ongs' | translate }}</span>
           </a>
 
           <!-- Admin Dashboard Link -->
@@ -143,7 +149,7 @@ import { PwaService } from "../../../core/services/pwa.service";
                 d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"
               />
             </svg>
-            <span>Admin</span>
+            <span>{{ 'navigation.admin' | translate }}</span>
           </a>
           }
 
@@ -159,7 +165,7 @@ import { PwaService } from "../../../core/services/pwa.service";
                 d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
               />
             </svg>
-            <span>Dashboard</span>
+            <span>{{ 'navigation.dashboard' | translate }}</span>
           </a>
           }
 
@@ -175,7 +181,7 @@ import { PwaService } from "../../../core/services/pwa.service";
                 d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
               />
             </svg>
-            <span>Favoritos</span>
+            <span>{{ 'navigation.favorites' | translate }}</span>
           </a>
           }
 
@@ -187,7 +193,7 @@ import { PwaService } from "../../../core/services/pwa.service";
             <svg class="link-icon" viewBox="0 0 24 24" fill="currentColor">
               <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
             </svg>
-            <span>Doar</span>
+            <span>{{ 'navigation.donate' | translate }}</span>
           </a>
 
           <!-- @if (authService.isAuthenticated()) {
@@ -201,6 +207,9 @@ import { PwaService } from "../../../core/services/pwa.service";
         </div>
 
         <div class="nav-actions">
+          <!-- Language Selector -->
+          <app-language-selector></app-language-selector>
+
           @if (authService.isAuthenticated()) {
           <!-- Only show Add Pet button for ONG users -->
           @if (authService.isOng()) {
@@ -208,10 +217,10 @@ import { PwaService } from "../../../core/services/pwa.service";
             <svg class="cta-icon" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
-            <span>Adicionar Pet</span>
+            <span>{{ 'navigation.addPet' | translate }}</span>
           </button>
           }
-          <button (click)="onLogout()" class="nav-logout">Sair</button>
+          <button (click)="onLogout()" class="nav-logout">{{ 'navigation.logout' | translate }}</button>
           <button class="nav-profile" (click)="goToProfile()">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path
@@ -221,7 +230,7 @@ import { PwaService } from "../../../core/services/pwa.service";
           </button>
           } @else {
           <button (click)="goToLogin()" class="nav-login">
-            Login / Registrar
+            {{ 'auth.login.loginButton' | translate }} / {{ 'navigation.register' | translate }}
           </button>
           }
         </div>

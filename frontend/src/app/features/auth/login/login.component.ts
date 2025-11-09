@@ -1,20 +1,22 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage, TranslateModule],
   template: `
     <div class="login-screen">
       <div class="login-content">
         <div class="login-card">
           <!-- Login Title -->
           <div class="login-title-section">
-            <h2 class="login-title">Login</h2>
+            <h2 class="login-title">{{ 'auth.login.title' | translate }}</h2>
           </div>
 
           <!-- Logo with Paw Print and Dogs -->
@@ -34,7 +36,7 @@ import { AuthService } from '../../../core/services/auth.service';
             }
 
             <div class="form-group">
-              <label class="form-label" for="email">Email</label>
+              <label class="form-label" for="email">{{ 'auth.login.email' | translate }}</label>
               <input
                 id="email"
                 type="email"
@@ -43,12 +45,12 @@ import { AuthService } from '../../../core/services/auth.service';
                 [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
               />
               @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-                <span class="form-error">Email inválido</span>
+                <span class="form-error">{{ 'auth.login.invalidEmail' | translate }}</span>
               }
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="password">Senha</label>
+              <label class="form-label" for="password">{{ 'auth.login.password' | translate }}</label>
               <input
                 id="password"
                 type="password"
@@ -57,12 +59,12 @@ import { AuthService } from '../../../core/services/auth.service';
                 [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
               />
               @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-                <span class="form-error">Senha é obrigatória</span>
+                <span class="form-error">{{ 'auth.login.passwordRequired' | translate }}</span>
               }
             </div>
 
             <div class="forgot-password-link">
-              <a routerLink="/forgot-password">Esqueceu sua senha?</a>
+              <a routerLink="/forgot-password">{{ 'auth.login.forgotPassword' | translate }}</a>
             </div>
 
             <button
@@ -73,12 +75,12 @@ import { AuthService } from '../../../core/services/auth.service';
               @if (loading()) {
                 <span class="spinner"></span>
               } @else {
-                LOGIN
+                {{ 'auth.login.loginButton' | translate }}
               }
             </button>
 
             <div class="signup-link">
-              Ainda não tem uma conta? <a routerLink="/register">Cadastre aqui</a>
+              {{ 'auth.login.noAccount' | translate }} <a routerLink="/register">{{ 'auth.login.registerHere' | translate }}</a>
             </div>
           </form>
         </div>
@@ -505,6 +507,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private translate = inject(TranslateService);
 
   loading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -528,7 +531,7 @@ export class LoginComponent {
         this.router.navigate(['/home']);
       },
       error: (error) => {
-        this.errorMessage.set(error.error?.message || 'Erro ao fazer login');
+        this.errorMessage.set(error.error?.message || this.translate.instant('auth.login.loginError'));
         this.loading.set(false);
       },
       complete: () => {

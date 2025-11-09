@@ -1,16 +1,19 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UsersService, ONG } from '../../core/services/users.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
 import { PetsService } from '../../core/services/pets.service';
 import { CountryService } from '../../core/services/country.service';
+import { LanguageSelectorComponent } from '../../shared/components/language-selector/language-selector.component';
 
 @Component({
   selector: 'app-ongs',
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, NgOptimizedImage, LanguageSelectorComponent, TranslateModule],
   templateUrl: './ongs.component.html',
   styleUrl: './ongs.component.scss',
 })
@@ -20,17 +23,18 @@ export class OngsComponent implements OnInit {
   private router = inject(Router);
   private toastService = inject(ToastService);
   private countryService = inject(CountryService);
+  private translate = inject(TranslateService);
   authService = inject(AuthService);
 
   ongs = signal<ONG[]>([]);
   allOngs = signal<ONG[]>([]); // Store all ONGs for search typeahead
   loading = signal(true);
   searchQuery = signal('');
-  currentLocation = signal('Todas as cidades');
+  currentLocation = signal('');
 
   // Location typeahead
   showLocationDropdown = signal(false);
-  availableLocations: string[] = ['Todas as cidades'];
+  availableLocations: string[] = [];
   filteredLocations = signal<string[]>(this.availableLocations);
   selectedLocationIndex = signal(-1);
 
@@ -40,6 +44,13 @@ export class OngsComponent implements OnInit {
   selectedOngIndex = signal(-1);
 
   ngOnInit() {
+    // Initialize with translated "all cities" value
+    this.translate.get('ongs.allCities').subscribe(translation => {
+      this.currentLocation.set(translation);
+      this.availableLocations = [translation];
+      this.filteredLocations.set([translation]);
+    });
+
     this.loadCitiesWithPets();
     this.loadAllOngsForTypeahead();
     this.loadOngs();
@@ -80,32 +91,38 @@ export class OngsComponent implements OnInit {
       filters.search = this.searchQuery();
     }
 
-    // Add location filter if selected and not "Todas as cidades"
-    if (
-      this.currentLocation() &&
-      this.currentLocation() !== 'Todas as cidades'
-    ) {
-      filters.location = this.currentLocation();
-    }
+    // Add location filter if selected and not "all cities"
+    this.translate.get('ongs.allCities').subscribe(allCitiesTranslation => {
+      if (
+        this.currentLocation() &&
+        this.currentLocation() !== allCitiesTranslation
+      ) {
+        filters.location = this.currentLocation();
+      }
 
-    this.usersService.getAllOngs(filters).subscribe({
-      next: (ongs) => {
-        this.ongs.set(ongs);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        this.toastService.error('Erro ao carregar ONGs');
-        this.loading.set(false);
-        this.ongs.set([]);
-      },
+      this.usersService.getAllOngs(filters).subscribe({
+        next: (ongs) => {
+          this.ongs.set(ongs);
+          this.loading.set(false);
+        },
+        error: (error) => {
+          this.translate.get('ongs.errorLoadOngs').subscribe(msg => {
+            this.toastService.error(msg);
+          });
+          this.loading.set(false);
+          this.ongs.set([]);
+        },
+      });
     });
   }
 
   loadCitiesWithPets() {
     this.petsService.getCitiesWithPets().subscribe({
       next: (cities) => {
-        this.availableLocations = ['Todas as cidades', ...cities];
-        this.filteredLocations.set(this.availableLocations.slice(0, 5));
+        this.translate.get('ongs.allCities').subscribe(allCitiesTranslation => {
+          this.availableLocations = [allCitiesTranslation, ...cities];
+          this.filteredLocations.set(this.availableLocations.slice(0, 5));
+        });
       },
       error: (error) => {
       },
@@ -118,7 +135,9 @@ export class OngsComponent implements OnInit {
 
     // Clear location filter when searching by ONG name
     if (input) {
-      this.currentLocation.set('Todas as cidades');
+      this.translate.get('ongs.allCities').subscribe(allCitiesTranslation => {
+        this.currentLocation.set(allCitiesTranslation);
+      });
     }
 
     if (!input) {
@@ -216,15 +235,25 @@ export class OngsComponent implements OnInit {
   }
 
   getLocationInputValue(): string {
+    let allCitiesValue = '';
+    this.translate.get('ongs.allCities').subscribe(translation => {
+      allCitiesValue = translation;
+    });
     const location = this.currentLocation();
-    return location === 'Todas as cidades' ? '' : location;
+    return location === allCitiesValue ? '' : location;
   }
 
   getLocationPlaceholder(): string {
+    let allCitiesValue = '';
+    let typeCityValue = '';
+    this.translate.get('ongs.allCities').subscribe(translation => {
+      allCitiesValue = translation;
+    });
+    this.translate.get('ongs.typeCityName').subscribe(translation => {
+      typeCityValue = translation;
+    });
     const location = this.currentLocation();
-    return location === 'Todas as cidades'
-      ? 'Todas as cidades'
-      : 'Digite uma cidade...';
+    return location === allCitiesValue ? allCitiesValue : typeCityValue;
   }
 
   onLocationFocus() {
@@ -242,10 +271,12 @@ export class OngsComponent implements OnInit {
     }
 
     if (!input) {
-      this.currentLocation.set('Todas as cidades');
-      this.filteredLocations.set(this.availableLocations.slice(0, 5));
-      this.showLocationDropdown.set(true);
-      this.selectedLocationIndex.set(-1);
+      this.translate.get('ongs.allCities').subscribe(allCitiesTranslation => {
+        this.currentLocation.set(allCitiesTranslation);
+        this.filteredLocations.set(this.availableLocations.slice(0, 5));
+        this.showLocationDropdown.set(true);
+        this.selectedLocationIndex.set(-1);
+      });
       return;
     }
 
@@ -307,12 +338,14 @@ export class OngsComponent implements OnInit {
     this.showLocationDropdown.set(false);
     this.selectedLocationIndex.set(-1);
 
-    const input = this.currentLocation();
-    if (!input || input === 'Todas as cidades') {
-      this.currentLocation.set('Todas as cidades');
-    }
+    this.translate.get('ongs.allCities').subscribe(allCitiesTranslation => {
+      const input = this.currentLocation();
+      if (!input || input === allCitiesTranslation) {
+        this.currentLocation.set(allCitiesTranslation);
+      }
 
-    this.loadOngs();
+      this.loadOngs();
+    });
   }
 
   selectLocation(location: string) {
@@ -328,14 +361,8 @@ export class OngsComponent implements OnInit {
   }
 
   getCategoryLabel(category: string): string {
-    const labels: any = {
-      food: 'Alimentos',
-      medicine: 'Medicamentos',
-      debt: 'Dívidas',
-      supplies: 'Suprimentos',
-      other: 'Outros',
-    };
-    return labels[category] || 'Outros';
+    const key = `ongs.categories.${category}`;
+    return this.translate.instant(key) || this.translate.instant('ongs.categories.other');
   }
 
   getUrgencyColor(urgencyLevel?: string): string {
@@ -353,13 +380,13 @@ export class OngsComponent implements OnInit {
     const user = this.authService.currentUser();
     if (user) {
       if (user.firstName) {
-        return `Olá, ${user.firstName}!`;
+        return this.translate.instant('ongs.greetingWithName', { name: user.firstName });
       }
       if (user.ongName) {
-        return `Olá, ${user.ongName}!`;
+        return this.translate.instant('ongs.greetingWithName', { name: user.ongName });
       }
     }
-    return 'Olá!';
+    return this.translate.instant('ongs.greeting');
   }
 
   goToProfile() {
@@ -368,5 +395,9 @@ export class OngsComponent implements OnInit {
 
   goToLogin() {
     this.router.navigate(['/login']);
+  }
+
+  goToDonate() {
+    this.router.navigate(['/donations']);
   }
 }

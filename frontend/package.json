@@ -1,6 +1,6 @@
 {
   "name": "pet-sos-frontend",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Aubrigo Frontend - Progressive Web App for Animal Adoption",
   "scripts": {
     "ng": "ng",
@@ -15,6 +15,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^17.0.0",
+    "@angular/cdk": "^17.3.10",
     "@angular/common": "^17.0.0",
     "@angular/compiler": "^17.0.0",
     "@angular/core": "^17.0.0",
@@ -23,6 +24,8 @@
     "@angular/platform-browser-dynamic": "^17.0.0",
     "@angular/router": "^17.0.0",
     "@angular/service-worker": "^17.0.0",
+    "@ngx-translate/core": "^15.0.0",
+    "@ngx-translate/http-loader": "^8.0.0",
     "@stripe/stripe-js": "^2.2.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
@@ -41,6 +44,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "pwa-asset-generator": "^8.1.2",
     "sharp": "^0.34.5",
+    "sharp-cli": "^5.2.0",
     "typescript": "~5.2.2"
   }
 }

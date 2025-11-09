@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export type SkeletonType = 'text' | 'circle' | 'rectangle' | 'card' | 'pet-card';
@@ -6,6 +6,7 @@ export type SkeletonType = 'text' | 'circle' | 'rectangle' | 'card' | 'pet-card'
 @Component({
   selector: 'app-skeleton',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     <div class="skeleton-wrapper">

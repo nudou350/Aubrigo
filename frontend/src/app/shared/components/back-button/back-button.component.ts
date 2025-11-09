@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-back-button',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     <button class="back-button-overlay" (click)="goBack()" [attr.aria-label]="ariaLabel">
@@ -52,7 +53,7 @@ import { Router } from '@angular/router';
     /* Desktop adjustments */
     @media (min-width: 1024px) {
       .back-button-overlay {
-        top: 80px; /* Below desktop navbar */
+        top: 120px; /* Below desktop navbar */
       }
     }
   `]

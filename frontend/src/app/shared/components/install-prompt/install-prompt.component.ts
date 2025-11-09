@@ -1,5 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { PwaService } from '../../../core/services/pwa.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 
@@ -16,13 +17,14 @@ import { trigger, transition, style, animate } from '@angular/animations';
 @Component({
   selector: 'app-install-prompt',
   standalone: true,
-  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, TranslateModule],
   template: `
     @if (showPrompt()) {
       <div class="install-backdrop" (click)="dismiss()" [@fadeIn]>
         <div class="install-modal" (click)="$event.stopPropagation()" [@slideUp]>
           <!-- Close button -->
-          <button class="close-btn" (click)="dismiss()" aria-label="Fechar">
+          <button class="close-btn" (click)="dismiss()" [attr.aria-label]="'pwa.install.close' | translate">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -34,8 +36,8 @@ import { trigger, transition, style, animate } from '@angular/animations';
           </div>
 
           <!-- Title and description -->
-          <h2>Instalar Aubrigo</h2>
-          <p class="subtitle">Tenha acesso rápido e recursos offline</p>
+          <h2>{{ 'pwa.install.title' | translate }}</h2>
+          <p class="subtitle">{{ 'pwa.install.subtitle' | translate }}</p>
 
           <!-- Benefits list -->
           <ul class="benefits">
@@ -43,34 +45,31 @@ import { trigger, transition, style, animate } from '@angular/animations';
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <span>Acesso instantâneo da tela inicial</span>
+              <span>{{ 'pwa.install.benefit1' | translate }}</span>
             </li>
             <li>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
               </svg>
-              <span>Funciona mesmo sem internet</span>
+              <span>{{ 'pwa.install.benefit2' | translate }}</span>
             </li>
             <li>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Mais rápido e otimizado</span>
+              <span>{{ 'pwa.install.benefit3' | translate }}</span>
             </li>
           </ul>
 
           <!-- iOS instructions (only on iOS) -->
           @if (isIOS) {
             <div class="ios-instructions">
-              <p class="ios-title">Para instalar no iPhone/iPad:</p>
+              <p class="ios-title">{{ 'pwa.install.iosTitle' | translate }}</p>
               <ol>
-                <li>Toque no botão <strong>Compartilhar</strong>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="display: inline; vertical-align: middle;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
+                <li [innerHTML]="'pwa.install.iosStep1' | translate">
                 </li>
-                <li>Selecione <strong>"Adicionar à Tela de Início"</strong></li>
-                <li>Toque em <strong>"Adicionar"</strong></li>
+                <li [innerHTML]="'pwa.install.iosStep2' | translate"></li>
+                <li [innerHTML]="'pwa.install.iosStep3' | translate"></li>
               </ol>
             </div>
           }
@@ -82,11 +81,11 @@ import { trigger, transition, style, animate } from '@angular/animations';
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                Instalar Agora
+                {{ 'pwa.install.installNow' | translate }}
               </button>
             }
             <button class="btn-later" (click)="dismiss()">
-              {{ isIOS ? 'Entendi' : 'Talvez Depois' }}
+              {{ isIOS ? ('pwa.install.understood' | translate) : ('pwa.install.maybeLater' | translate) }}
             </button>
           </div>
         </div>

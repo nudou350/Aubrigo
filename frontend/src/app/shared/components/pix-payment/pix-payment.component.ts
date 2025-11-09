@@ -1,10 +1,12 @@
-import { Component, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-pix-payment',
   standalone: true,
-  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, TranslateModule],
   template: `
     <div class="pix-container">
       <div class="pix-header">
@@ -13,7 +15,7 @@ import { CommonModule } from '@angular/common';
             <text x="5" y="30" font-size="24" font-weight="bold" fill="#32BCAD">PIX</text>
           </svg>
         </div>
-        <h3>Pagamento PIX</h3>
+        <h3>{{ 'payment.pix.title' | translate }}</h3>
       </div>
 
       <div class="pix-info-section">
@@ -22,40 +24,40 @@ import { CommonModule } from '@angular/common';
             <div class="key-header">
               <span class="icon">📱</span>
               <div>
-                <p class="key-label">Chave PIX (Celular):</p>
+                <p class="key-label">{{ 'payment.pix.keyLabel' | translate }}</p>
                 <p class="key-value">{{ pixKey() }}</p>
               </div>
             </div>
 
             @if (amount()) {
               <div class="amount-display">
-                <span class="amount-label">Valor:</span>
+                <span class="amount-label">{{ 'payment.pix.amount' | translate }}</span>
                 <span class="amount-value">R$ {{ amount() | number:'1.2-2' }}</span>
               </div>
             }
           </div>
         } @else {
           <div class="no-key-message">
-            <p>Esta ONG ainda não configurou uma chave PIX para doações.</p>
-            <p>Por favor, entre em contato diretamente com a ONG para outras formas de doação.</p>
+            <p>{{ 'payment.pix.noKey' | translate }}</p>
+            <p>{{ 'payment.pix.contactOng' | translate }}</p>
           </div>
         }
       </div>
 
       <div class="instructions">
-        <h4>Como fazer a doação via PIX:</h4>
+        <h4>{{ 'payment.pix.howToDonate' | translate }}</h4>
         <ol>
-          <li>Abra o aplicativo do seu banco</li>
-          <li>Selecione a opção "PIX"</li>
-          <li>Escolha "Pix Copia e Cola" ou "Chave PIX"</li>
-          <li>Insira a chave PIX acima (número de celular)</li>
-          <li>Digite o valor que deseja doar</li>
-          <li>Confirme os dados e finalize o pagamento</li>
+          <li>{{ 'payment.pix.step1' | translate }}</li>
+          <li>{{ 'payment.pix.step2' | translate }}</li>
+          <li>{{ 'payment.pix.step3' | translate }}</li>
+          <li>{{ 'payment.pix.step4' | translate }}</li>
+          <li>{{ 'payment.pix.step5' | translate }}</li>
+          <li>{{ 'payment.pix.step6' | translate }}</li>
         </ol>
       </div>
 
       <div class="info-box">
-        <p><strong>📌 Importante:</strong> O pagamento via PIX é instantâneo e seguro. Certifique-se de verificar os dados antes de confirmar a transação.</p>
+        <p><strong>{{ 'payment.pix.importantLabel' | translate }}</strong> {{ 'payment.pix.importantMessage' | translate }}</p>
       </div>
     </div>
   `,

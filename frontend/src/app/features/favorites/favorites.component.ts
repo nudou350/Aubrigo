@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BackButtonComponent } from '../../shared/components/back-button/back-button.component';
 import { FavoritesService, Favorite } from '../../core/services/favorites.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -8,19 +9,20 @@ import { ToastService } from '../../core/services/toast.service';
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [CommonModule, RouterLink, BackButtonComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterLink, BackButtonComponent, TranslateModule],
   template: `
     <app-back-button [fallbackRoute]="'/home'"></app-back-button>
 
     <div class="favorites-container">
       <header class="favorites-header">
-        <h1>Meus Favoritos</h1>
+        <h1>{{ 'favorites.title' | translate }}</h1>
       </header>
 
       @if (loading()) {
         <div class="loading-container">
           <div class="spinner"></div>
-          <p>Carregando favoritos...</p>
+          <p>{{ 'favorites.loading' | translate }}</p>
         </div>
       } @else {
         @if (favorites().length === 0) {
@@ -30,10 +32,10 @@ import { ToastService } from '../../core/services/toast.service';
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </div>
-            <h2>Nenhum favorito ainda</h2>
-            <p>Comece a adicionar pets aos seus favoritos para vê-los aqui!</p>
+            <h2>{{ 'favorites.empty.title' | translate }}</h2>
+            <p>{{ 'favorites.empty.description' | translate }}</p>
             <button class="btn-primary" routerLink="/home">
-              Explorar Pets
+              {{ 'favorites.empty.explorePets' | translate }}
             </button>
           </div>
         } @else {
@@ -59,20 +61,20 @@ import { ToastService } from '../../core/services/toast.service';
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
-                      {{ favorite.pet.location || 'Localização não informada' }}
+                      {{ favorite.pet.location || ('favorites.noLocation' | translate) }}
                     </span>
                     @if (favorite.pet.breed) {
                       <span class="detail-item">{{ favorite.pet.breed }}</span>
                     }
                     @if (favorite.pet.age !== undefined) {
-                      <span class="detail-item">{{ favorite.pet.age }} anos</span>
+                      <span class="detail-item">{{ 'home.petCard.years' | translate:{age: favorite.pet.age} }}</span>
                     }
                   </div>
                 </div>
                 <button
                   class="remove-button"
                   (click)="removeFavorite(favorite.id, $event)"
-                  title="Remover dos favoritos"
+                  [title]="'favorites.removeFromFavorites' | translate"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                     <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -107,7 +109,7 @@ import { ToastService } from '../../core/services/toast.service';
     /* Desktop adjustments */
     @media (min-width: 1024px) {
       .favorites-header {
-        padding: 120px 20px 20px 20px;
+        padding: 140px 20px 20px 20px;
       }
     }
 
@@ -289,6 +291,7 @@ export class FavoritesComponent implements OnInit {
   private favoritesService = inject(FavoritesService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  private translate = inject(TranslateService);
 
   favorites = signal<Favorite[]>([]);
   loading = signal(false);
@@ -299,13 +302,13 @@ export class FavoritesComponent implements OnInit {
 
     if (!this.visitorEmail) {
       // Prompt user to enter email
-      const email = prompt('Por favor, insira seu e-mail para ver seus favoritos:');
+      const email = prompt(this.translate.instant('favorites.emailPrompt'));
       if (email) {
         this.favoritesService.setVisitorEmail(email);
         this.visitorEmail = email;
         this.loadFavorites();
       } else {
-        this.toastService.warning('E-mail necessário para ver favoritos');
+        this.toastService.warning(this.translate.instant('favorites.emailRequired'));
         this.router.navigate(['/home']);
       }
     } else {
@@ -323,7 +326,7 @@ export class FavoritesComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar favoritos');
+        this.toastService.error(this.translate.instant('favorites.errorLoad'));
         this.loading.set(false);
       },
     });
@@ -337,10 +340,10 @@ export class FavoritesComponent implements OnInit {
     this.favoritesService.removeFavorite(id, this.visitorEmail).subscribe({
       next: () => {
         this.favorites.set(this.favorites().filter((f) => f.id !== id));
-        this.toastService.success('Removido dos favoritos');
+        this.toastService.success(this.translate.instant('favorites.removedFromFavorites'));
       },
       error: (error) => {
-        this.toastService.error('Erro ao remover favorito');
+        this.toastService.error(this.translate.instant('favorites.errorRemove'));
       },
     });
   }

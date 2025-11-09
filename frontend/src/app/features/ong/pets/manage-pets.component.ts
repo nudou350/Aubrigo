@@ -1,9 +1,10 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { OngService } from '../../../core/services/ong.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Pet } from '../../../core/services/pets.service';
@@ -11,57 +12,58 @@ import { Pet } from '../../../core/services/pets.service';
 @Component({
   selector: 'app-manage-pets',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterLink, FormsModule, TranslateModule],
   template: `
     <div class="manage-pets">
       <a routerLink="/ong/dashboard" class="back-link">
-        ← Voltar
+        {{ 'ong.common.back' | translate }}
       </a>
       <header class="page-header">
         <div>
-          <h1>Gerenciar Pets</h1>
-          <p>Visualize, edite ou remova seus animais cadastrados</p>
+          <h1>{{ 'ong.pets.pageTitle' | translate }}</h1>
+          <p>{{ 'ong.pets.subtitle' | translate }}</p>
         </div>
         <a routerLink="/pets/add" class="btn-add">
-          ➕ Adicionar Novo Pet
+          {{ 'ong.pets.addNewButton' | translate }}
         </a>
       </header>
 
       <div class="filters">
         <input
           type="text"
-          placeholder="🔍 Buscar por nome..."
+          [placeholder]="'ong.pets.searchPlaceholder' | translate"
           class="search-input"
           [(ngModel)]="searchTerm"
           (input)="filterPets()"
         />
         <select class="filter-select" [(ngModel)]="filterStatus" (change)="filterPets()">
-          <option value="">Todos os status</option>
-          <option value="available">Disponível</option>
-          <option value="pending">Pendente</option>
-          <option value="adopted">Adotado</option>
+          <option value="">{{ 'ong.pets.filters.allStatus' | translate }}</option>
+          <option value="available">{{ 'ong.pets.filters.available' | translate }}</option>
+          <option value="pending">{{ 'ong.pets.filters.pending' | translate }}</option>
+          <option value="adopted">{{ 'ong.pets.filters.adopted' | translate }}</option>
         </select>
         <select class="filter-select" [(ngModel)]="filterSpecies" (change)="filterPets()">
-          <option value="">Todas as espécies</option>
-          <option value="dog">Cachorro</option>
-          <option value="cat">Gato</option>
-          <option value="fish">Peixe</option>
-          <option value="hamster">Hamster</option>
+          <option value="">{{ 'ong.pets.filters.allSpecies' | translate }}</option>
+          <option value="dog">{{ 'ong.pets.filters.dog' | translate }}</option>
+          <option value="cat">{{ 'ong.pets.filters.cat' | translate }}</option>
+          <option value="fish">{{ 'ong.pets.filters.fish' | translate }}</option>
+          <option value="hamster">{{ 'ong.pets.filters.hamster' | translate }}</option>
         </select>
       </div>
 
       @if (isLoading()) {
         <div class="loading">
           <div class="spinner"></div>
-          <p>Carregando pets...</p>
+          <p>{{ 'ong.pets.loadingPets' | translate }}</p>
         </div>
       } @else if (filteredPets().length === 0) {
         <div class="empty-state">
           <div class="empty-icon">🐾</div>
-          <h3>Nenhum pet encontrado</h3>
-          <p>Adicione seu primeiro pet para começar</p>
+          <h3>{{ 'ong.pets.noPetsFound' | translate }}</h3>
+          <p>{{ 'ong.pets.noPetsDescription' | translate }}</p>
           <a routerLink="/pets/add" class="btn-primary">
-            Adicionar Pet
+            {{ 'ong.pets.addPetButton' | translate }}
           </a>
         </div>
       } @else {
@@ -83,7 +85,7 @@ import { Pet } from '../../../core/services/pets.service';
                 <div class="pet-details">
                   <span class="detail-badge">{{ getSpeciesLabel(pet.species) }}</span>
                   <span class="detail-badge">{{ pet.breed }}</span>
-                  <span class="detail-badge">{{ pet.age }} {{ pet.age === 1 ? 'ano' : 'anos' }}</span>
+                  <span class="detail-badge">{{ pet.age }} {{ pet.age === 1 ? ('ong.common.year' | translate) : ('ong.common.years' | translate) }}</span>
                 </div>
                 <div class="pet-meta">
                   <span>{{ getGenderLabel(pet.gender || '') }}</span>
@@ -93,10 +95,10 @@ import { Pet } from '../../../core/services/pets.service';
               </div>
               <div class="pet-actions">
                 <a [routerLink]="['/pets/edit', pet.id]" class="btn-edit">
-                  ✏️ Editar
+                  {{ 'ong.pets.editButton' | translate }}
                 </a>
                 <button class="btn-delete" (click)="deletePet(pet.id, pet.name)">
-                  🗑️ Remover
+                  {{ 'ong.pets.removeButton' | translate }}
                 </button>
               </div>
             </div>
@@ -423,6 +425,7 @@ export class ManagePetsComponent implements OnInit {
   private http = inject(HttpClient);
   private ongService = inject(OngService);
   private toastService = inject(ToastService);
+  private translate = inject(TranslateService);
 
   isLoading = signal(true);
   pets = signal<Pet[]>([]);
@@ -445,7 +448,7 @@ export class ManagePetsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar pets');
+        this.toastService.error(this.translate.instant('ong.pets.errorLoad'));
         this.isLoading.set(false);
       }
     });
@@ -477,7 +480,8 @@ export class ManagePetsComponent implements OnInit {
   }
 
   deletePet(id: string, name: string) {
-    if (!confirm(`Tem certeza que deseja remover ${name}?`)) {
+    const confirmMsg = this.translate.instant('ong.pets.confirmRemove', { name });
+    if (!confirm(confirmMsg)) {
       return;
     }
 
@@ -485,10 +489,10 @@ export class ManagePetsComponent implements OnInit {
       next: () => {
         this.pets.update(list => list.filter(p => p.id !== id));
         this.filterPets();
-        this.toastService.success(`${name} removido com sucesso`);
+        this.toastService.success(this.translate.instant('ong.pets.removeSuccess', { name }));
       },
       error: (error) => {
-        this.toastService.error('Erro ao remover pet: ' + (error.error?.message || 'Erro desconhecido'));
+        this.toastService.error(this.translate.instant('ong.pets.removeError', { error: error.error?.message || '' }));
       }
     });
   }
@@ -503,38 +507,38 @@ export class ManagePetsComponent implements OnInit {
   }
 
   getStatusLabel(status: string): string {
-    const labels: any = {
-      available: 'Disponível',
-      pending: 'Pendente',
-      adopted: 'Adotado'
+    const keys: any = {
+      available: 'ong.pets.filters.available',
+      pending: 'ong.pets.filters.pending',
+      adopted: 'ong.pets.filters.adopted'
     };
-    return labels[status] || status;
+    return this.translate.instant(keys[status] || status);
   }
 
   getSpeciesLabel(species: string): string {
-    const labels: any = {
-      dog: 'Cachorro',
-      cat: 'Gato',
-      fish: 'Peixe',
-      hamster: 'Hamster'
+    const keys: any = {
+      dog: 'ong.pets.filters.dog',
+      cat: 'ong.pets.filters.cat',
+      fish: 'ong.pets.filters.fish',
+      hamster: 'ong.pets.filters.hamster'
     };
-    return labels[species] || species;
+    return this.translate.instant(keys[species] || species);
   }
 
   getGenderLabel(gender: string): string {
-    const labels: any = {
-      male: 'Macho',
-      female: 'Fêmea'
+    const keys: any = {
+      male: 'ong.pets.labels.male',
+      female: 'ong.pets.labels.female'
     };
-    return labels[gender] || gender;
+    return this.translate.instant(keys[gender] || gender);
   }
 
   getSizeLabel(size: string): string {
-    const labels: any = {
-      small: 'Pequeno',
-      medium: 'Médio',
-      large: 'Grande'
+    const keys: any = {
+      small: 'ong.pets.labels.small',
+      medium: 'ong.pets.labels.medium',
+      large: 'ong.pets.labels.large'
     };
-    return labels[size] || size;
+    return this.translate.instant(keys[size] || size);
   }
 }

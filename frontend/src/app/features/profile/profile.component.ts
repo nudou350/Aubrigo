@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
 import { UsersService } from '../../core/services/users.service';
 import { OngService } from '../../core/services/ong.service';
@@ -13,7 +14,8 @@ import { CountrySelectorComponent } from '../../shared/components/country-select
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CountrySelectorComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ReactiveFormsModule, CountrySelectorComponent, TranslateModule],
   template: `
     <div class="profile-container">
       <header class="profile-header">
@@ -22,14 +24,14 @@ import { CountrySelectorComponent } from '../../shared/components/country-select
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1>Meu Perfil</h1>
+        <h1>{{ 'profile.title' | translate }}</h1>
         <div class="spacer"></div>
       </header>
 
       @if (loading()) {
         <div class="loading-container">
           <div class="spinner"></div>
-          <p>Carregando perfil...</p>
+          <p>{{ 'profile.loading' | translate }}</p>
         </div>
       } @else {
         <div class="profile-content">
@@ -68,14 +70,14 @@ import { CountrySelectorComponent } from '../../shared/components/country-select
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-                Editar Perfil
+                {{ 'profile.editProfile' | translate }}
               </button>
             } @else {
               <button class="btn-secondary" (click)="cancelEdit()">
-                Cancelar
+                {{ 'profile.cancel' | translate }}
               </button>
               <button class="btn-primary" (click)="saveProfile()">
-                Salvar Alterações
+                {{ 'profile.saveChanges' | translate }}
               </button>
             }
           </div>
@@ -84,13 +86,13 @@ import { CountrySelectorComponent } from '../../shared/components/country-select
           <form [formGroup]="profileForm" class="profile-form">
             @if (isOng) {
               <div class="form-group">
-                <label>Nome da ONG</label>
+                <label>{{ 'profile.ongName' | translate }}</label>
                 @if (editMode()) {
                   <input
                     type="text"
                     formControlName="ongName"
                     class="form-control"
-                    placeholder="Digite o nome da ONG"
+                    [placeholder]="'profile.ongNamePlaceholder' | translate"
                   >
                 } @else {
                   <div class="form-value">{{ getDisplayName() }}</div>
@@ -98,97 +100,97 @@ import { CountrySelectorComponent } from '../../shared/components/country-select
               </div>
             } @else {
               <div class="form-group">
-                <label>Nome</label>
+                <label>{{ 'profile.firstName' | translate }}</label>
                 @if (editMode()) {
                   <input
                     type="text"
                     formControlName="firstName"
                     class="form-control"
-                    placeholder="Digite seu nome"
+                    [placeholder]="'profile.firstNamePlaceholder' | translate"
                   >
                 } @else {
-                  <div class="form-value">{{ profileForm.get('firstName')?.value || 'Não informado' }}</div>
+                  <div class="form-value">{{ profileForm.get('firstName')?.value || ('profile.notInformed' | translate) }}</div>
                 }
               </div>
 
               <div class="form-group">
-                <label>Sobrenome</label>
+                <label>{{ 'profile.lastName' | translate }}</label>
                 @if (editMode()) {
                   <input
                     type="text"
                     formControlName="lastName"
                     class="form-control"
-                    placeholder="Digite seu sobrenome"
+                    [placeholder]="'profile.lastNamePlaceholder' | translate"
                   >
                 } @else {
-                  <div class="form-value">{{ profileForm.get('lastName')?.value || 'Não informado' }}</div>
+                  <div class="form-value">{{ profileForm.get('lastName')?.value || ('profile.notInformed' | translate) }}</div>
                 }
               </div>
             }
 
             <div class="form-group">
-              <label>E-mail</label>
+              <label>{{ 'profile.email' | translate }}</label>
               <div class="form-value">{{ profileForm.get('email')?.value }}</div>
-              <small class="form-hint">O e-mail não pode ser alterado</small>
+              <small class="form-hint">{{ 'profile.emailHint' | translate }}</small>
             </div>
 
             <div class="form-group">
-              <label>Telefone</label>
+              <label>{{ 'profile.phone' | translate }}</label>
               @if (editMode()) {
                 <input
                   type="tel"
                   formControlName="phone"
                   class="form-control"
-                  placeholder="Digite seu telefone"
+                  [placeholder]="'profile.phonePlaceholder' | translate"
                 >
               } @else {
-                <div class="form-value">{{ profileForm.get('phone')?.value || 'Não informado' }}</div>
+                <div class="form-value">{{ profileForm.get('phone')?.value || ('profile.notInformed' | translate) }}</div>
               }
             </div>
 
             @if (isOng && isBrazil()) {
               <div class="form-group">
-                <label>Chave PIX</label>
+                <label>{{ 'profile.pixKey' | translate }}</label>
                 @if (editMode()) {
                   <input
                     type="text"
                     formControlName="pixKey"
                     class="form-control"
-                    placeholder="CPF/CNPJ, Email, Telefone ou Chave Aleatória"
+                    [placeholder]="'profile.pixKeyPlaceholder' | translate"
                   >
-                  <small class="form-hint">Chave PIX para receber doações no Brasil</small>
+                  <small class="form-hint">{{ 'profile.pixKeyHint' | translate }}</small>
                 } @else {
-                  <div class="form-value">{{ profileForm.get('pixKey')?.value || 'Não configurada' }}</div>
+                  <div class="form-value">{{ profileForm.get('pixKey')?.value || ('profile.pixKeyNotConfigured' | translate) }}</div>
                 }
               </div>
             }
 
             <div class="form-group">
-              <label>Localização</label>
+              <label>{{ 'profile.location' | translate }}</label>
               @if (editMode()) {
                 <input
                   type="text"
                   formControlName="location"
                   class="form-control"
-                  placeholder="Cidade, Estado"
+                  [placeholder]="'profile.locationPlaceholder' | translate"
                 >
               } @else {
-                <div class="form-value">{{ profileForm.get('location')?.value || 'Não informada' }}</div>
+                <div class="form-value">{{ profileForm.get('location')?.value || ('profile.locationNotInformed' | translate) }}</div>
               }
             </div>
 
             @if (isOng) {
               <div class="form-group">
-                <label>Instagram</label>
+                <label>{{ 'profile.instagram' | translate }}</label>
                 @if (editMode()) {
                   <input
                     type="text"
                     formControlName="instagramHandle"
                     class="form-control"
-                    placeholder="@seu_instagram"
+                    [placeholder]="'profile.instagramPlaceholder' | translate"
                   >
                 } @else {
-                  <div class="form-value">{{ profileForm.get('instagramHandle')?.value || 'Não informado' }}</div>
+                  <div class="form-value">{{ profileForm.get('instagramHandle')?.value || ('profile.notInformed' | translate) }}</div>
                 }
               </div>
             }
@@ -197,9 +199,9 @@ import { CountrySelectorComponent } from '../../shared/components/country-select
           <!-- My Favorites Section (for regular users) -->
           @if (!isOng) {
             <div class="favorites-section">
-              <h3>Meus Favoritos</h3>
+              <h3>{{ 'profile.myFavorites' | translate }}</h3>
               <button class="btn-link" (click)="viewFavorites()">
-                Ver todos os favoritos
+                {{ 'profile.viewAllFavorites' | translate }}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -209,56 +211,56 @@ import { CountrySelectorComponent } from '../../shared/components/country-select
 
           <!-- Country Selector Section -->
           <div class="country-section">
-            <h3>País / Country</h3>
-            <p class="section-description">Selecione o país para visualizar animais e ONGs disponíveis.</p>
+            <h3>{{ 'profile.countrySection' | translate }}</h3>
+            <p class="section-description">{{ 'profile.countryDescription' | translate }}</p>
             <app-country-selector></app-country-selector>
           </div>
 
           <!-- Change Password Section -->
           <div class="password-section">
-            <h3>Alterar Senha</h3>
+            <h3>{{ 'profile.changePasswordSection' | translate }}</h3>
             @if (!showPasswordForm()) {
               <button class="btn-link" (click)="togglePasswordForm()">
-                Alterar minha senha
+                {{ 'profile.changeMyPassword' | translate }}
               </button>
             } @else {
               <form [formGroup]="passwordForm" class="password-form" (ngSubmit)="changePassword()">
                 <div class="form-group">
-                  <label>Senha Atual</label>
+                  <label>{{ 'profile.currentPassword' | translate }}</label>
                   <input
                     type="password"
                     formControlName="currentPassword"
                     class="form-control"
-                    placeholder="Digite sua senha atual"
+                    [placeholder]="'profile.currentPasswordPlaceholder' | translate"
                   >
                 </div>
 
                 <div class="form-group">
-                  <label>Nova Senha</label>
+                  <label>{{ 'profile.newPassword' | translate }}</label>
                   <input
                     type="password"
                     formControlName="newPassword"
                     class="form-control"
-                    placeholder="Digite a nova senha"
+                    [placeholder]="'profile.newPasswordPlaceholder' | translate"
                   >
                 </div>
 
                 <div class="form-group">
-                  <label>Confirmar Nova Senha</label>
+                  <label>{{ 'profile.confirmPassword' | translate }}</label>
                   <input
                     type="password"
                     formControlName="confirmPassword"
                     class="form-control"
-                    placeholder="Confirme a nova senha"
+                    [placeholder]="'profile.confirmPasswordPlaceholder' | translate"
                   >
                 </div>
 
                 <div class="form-actions">
                   <button type="button" class="btn-secondary" (click)="togglePasswordForm()">
-                    Cancelar
+                    {{ 'profile.cancel' | translate }}
                   </button>
                   <button type="submit" class="btn-primary" [disabled]="!passwordForm.valid">
-                    Alterar Senha
+                    {{ 'profile.changePasswordSection' | translate }}
                   </button>
                 </div>
               </form>
@@ -271,7 +273,7 @@ import { CountrySelectorComponent } from '../../shared/components/country-select
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              Sair da Conta
+              {{ 'profile.logout' | translate }}
             </button>
           </div>
         </div>
@@ -604,6 +606,7 @@ export class ProfileComponent implements OnInit {
   private favoritesService = inject(FavoritesService);
   private countryService = inject(CountryService);
   private router = inject(Router);
+  private translate = inject(TranslateService);
 
   loading = signal(false);
   editMode = signal(false);
@@ -670,7 +673,9 @@ export class ProfileComponent implements OnInit {
           this.loading.set(false);
         },
         error: (error) => {
-          this.toastService.error('Erro ao carregar perfil');
+          this.translate.get('profile.errorLoad').subscribe(msg => {
+            this.toastService.error(msg);
+          });
           this.loading.set(false);
         },
       });
@@ -688,7 +693,9 @@ export class ProfileComponent implements OnInit {
           this.loading.set(false);
         },
         error: (error) => {
-          this.toastService.error('Erro ao carregar perfil');
+          this.translate.get('profile.errorLoad').subscribe(msg => {
+            this.toastService.error(msg);
+          });
           this.loading.set(false);
         },
       });
@@ -706,7 +713,9 @@ export class ProfileComponent implements OnInit {
 
   saveProfile(): void {
     if (this.profileForm.invalid) {
-      this.toastService.warning('Por favor, preencha todos os campos obrigatórios');
+      this.translate.get('profile.fillRequired').subscribe(msg => {
+        this.toastService.warning(msg);
+      });
       return;
     }
 
@@ -735,11 +744,15 @@ export class ProfileComponent implements OnInit {
               profileImageUrl: response.ong.profileImageUrl,
             });
           }
-          this.toastService.success('Perfil atualizado com sucesso');
+          this.translate.get('profile.successUpdate').subscribe(msg => {
+            this.toastService.success(msg);
+          });
           this.editMode.set(false);
         },
         error: (error) => {
-          this.toastService.error('Erro ao atualizar perfil');
+          this.translate.get('profile.errorUpdate').subscribe(msg => {
+            this.toastService.error(msg);
+          });
         },
       });
     } else {
@@ -760,11 +773,15 @@ export class ProfileComponent implements OnInit {
               ...response.user
             });
           }
-          this.toastService.success('Perfil atualizado com sucesso');
+          this.translate.get('profile.successUpdate').subscribe(msg => {
+            this.toastService.success(msg);
+          });
           this.editMode.set(false);
         },
         error: (error) => {
-          this.toastService.error('Erro ao atualizar perfil');
+          this.translate.get('profile.errorUpdate').subscribe(msg => {
+            this.toastService.error(msg);
+          });
         },
       });
     }
@@ -787,10 +804,14 @@ export class ProfileComponent implements OnInit {
                 profileImageUrl: response.profileImageUrl
               });
             }
-            this.toastService.success('Imagem atualizada com sucesso');
+            this.translate.get('profile.successImageUpdate').subscribe(msg => {
+              this.toastService.success(msg);
+            });
           },
           error: (error) => {
-            this.toastService.error('Erro ao fazer upload da imagem');
+            this.translate.get('profile.errorImageUpload').subscribe(msg => {
+              this.toastService.error(msg);
+            });
           },
         });
       } else {
@@ -805,10 +826,14 @@ export class ProfileComponent implements OnInit {
                 profileImageUrl: response.profileImageUrl
               });
             }
-            this.toastService.success('Imagem atualizada com sucesso');
+            this.translate.get('profile.successImageUpdate').subscribe(msg => {
+              this.toastService.success(msg);
+            });
           },
           error: (error) => {
-            this.toastService.error('Erro ao fazer upload da imagem');
+            this.translate.get('profile.errorImageUpload').subscribe(msg => {
+              this.toastService.error(msg);
+            });
           },
         });
       }
@@ -824,14 +849,18 @@ export class ProfileComponent implements OnInit {
 
   changePassword(): void {
     if (this.passwordForm.invalid) {
-      this.toastService.warning('Por favor, preencha todos os campos');
+      this.translate.get('profile.fillAllFields').subscribe(msg => {
+        this.toastService.warning(msg);
+      });
       return;
     }
 
     const { currentPassword, newPassword, confirmPassword } = this.passwordForm.value;
 
     if (newPassword !== confirmPassword) {
-      this.toastService.error('As senhas não coincidem');
+      this.translate.get('profile.passwordMismatch').subscribe(msg => {
+        this.toastService.error(msg);
+      });
       return;
     }
 
@@ -839,11 +868,15 @@ export class ProfileComponent implements OnInit {
 
     service.changePassword({ currentPassword, newPassword, confirmPassword }).subscribe({
       next: () => {
-        this.toastService.success('Senha alterada com sucesso');
+        this.translate.get('profile.successPasswordChange').subscribe(msg => {
+          this.toastService.success(msg);
+        });
         this.togglePasswordForm();
       },
       error: (error) => {
-        this.toastService.error('Erro ao alterar senha. Verifique a senha atual.');
+        this.translate.get('profile.errorPasswordChange').subscribe(msg => {
+          this.toastService.error(msg);
+        });
       },
     });
   }
@@ -853,11 +886,15 @@ export class ProfileComponent implements OnInit {
   }
 
   logout(): void {
-    if (confirm('Tem certeza que deseja sair?')) {
-      this.authService.logout();
-      this.toastService.success('Você saiu da sua conta');
-      this.router.navigate(['/login']);
-    }
+    this.translate.get('profile.logoutConfirm').subscribe(confirmMsg => {
+      if (confirm(confirmMsg)) {
+        this.authService.logout();
+        this.translate.get('profile.logoutSuccess').subscribe(msg => {
+          this.toastService.success(msg);
+        });
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   goBack(): void {
@@ -865,13 +902,18 @@ export class ProfileComponent implements OnInit {
   }
 
   getDisplayName(): string {
+    let notInformedText = '';
+    this.translate.get('profile.notInformed').subscribe(text => {
+      notInformedText = text;
+    });
+
     if (this.isOng) {
-      return this.profileForm.get('ongName')?.value || 'Não informado';
+      return this.profileForm.get('ongName')?.value || notInformedText;
     } else {
       const firstName = this.profileForm.get('firstName')?.value || '';
       const lastName = this.profileForm.get('lastName')?.value || '';
       const fullName = `${firstName} ${lastName}`.trim();
-      return fullName || 'Não informado';
+      return fullName || notInformedText;
     }
   }
 }

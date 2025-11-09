@@ -1,10 +1,12 @@
-import { Component, input, signal, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-mbway-qrcode',
   standalone: true,
-  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, TranslateModule],
   template: `
     <div class="mbway-container">
       <div class="mbway-header">
@@ -13,7 +15,7 @@ import { CommonModule } from '@angular/common';
             <text x="5" y="30" font-size="24" font-weight="bold" fill="#00a0e3">MB WAY</text>
           </svg>
         </div>
-        <h3>Pagamento MB Way</h3>
+        <h3>{{ 'payment.mbway.title' | translate }}</h3>
       </div>
 
       <div class="qrcode-section">
@@ -23,7 +25,7 @@ import { CommonModule } from '@angular/common';
           } @else {
             <div class="qrcode-loading">
               <div class="spinner"></div>
-              <p>A gerar código QR...</p>
+              <p>{{ 'payment.mbway.generating' | translate }}</p>
             </div>
           }
         </div>
@@ -31,25 +33,25 @@ import { CommonModule } from '@angular/common';
         <div class="payment-info">
           @if (reference()) {
             <div class="info-item">
-              <span class="label">Referência:</span>
+              <span class="label">{{ 'payment.mbway.reference' | translate }}</span>
               <span class="value">{{ reference() }}</span>
             </div>
           }
           @if (amount()) {
             <div class="info-item amount">
-              <span class="label">Valor:</span>
+              <span class="label">{{ 'payment.mbway.amount' | translate }}</span>
               <span class="value">{{ amount() | number:'1.2-2' }}€</span>
             </div>
           }
           @if (phoneNumber()) {
             <div class="info-item">
-              <span class="label">Telemóvel:</span>
+              <span class="label">{{ 'payment.mbway.phone' | translate }}</span>
               <span class="value">{{ phoneNumber() }}</span>
             </div>
           }
           @if (expiresAt()) {
             <div class="info-item expires">
-              <span class="label">Expira em:</span>
+              <span class="label">{{ 'payment.mbway.expires' | translate }}</span>
               <span class="value">{{ formatExpiration(expiresAt()!) }}</span>
             </div>
           }
@@ -57,12 +59,12 @@ import { CommonModule } from '@angular/common';
       </div>
 
       <div class="instructions">
-        <h4>Como pagar:</h4>
+        <h4>{{ 'payment.mbway.howToPay' | translate }}</h4>
         <ol>
-          <li>Abra a aplicação MB Way no seu telemóvel</li>
-          <li>Escaneie o código QR apresentado acima</li>
-          <li>Confirme o pagamento na aplicação</li>
-          <li>Aguarde a confirmação do pagamento</li>
+          <li>{{ 'payment.mbway.step1' | translate }}</li>
+          <li>{{ 'payment.mbway.step2' | translate }}</li>
+          <li>{{ 'payment.mbway.step3' | translate }}</li>
+          <li>{{ 'payment.mbway.step4' | translate }}</li>
         </ol>
       </div>
 
@@ -71,19 +73,19 @@ import { CommonModule } from '@angular/common';
           @switch (status()) {
             @case ('pending') {
               <span class="status-icon">⏳</span>
-              <span>Aguardando pagamento...</span>
+              <span>{{ 'payment.mbway.statusPending' | translate }}</span>
             }
             @case ('paid') {
               <span class="status-icon">✅</span>
-              <span>Pagamento confirmado!</span>
+              <span>{{ 'payment.mbway.statusPaid' | translate }}</span>
             }
             @case ('expired') {
               <span class="status-icon">⏰</span>
-              <span>Pagamento expirado</span>
+              <span>{{ 'payment.mbway.statusExpired' | translate }}</span>
             }
             @case ('cancelled') {
               <span class="status-icon">❌</span>
-              <span>Pagamento cancelado</span>
+              <span>{{ 'payment.mbway.statusCancelled' | translate }}</span>
             }
           }
         </div>
@@ -251,6 +253,8 @@ import { CommonModule } from '@angular/common';
   `]
 })
 export class MbwayQrcodeComponent {
+  private translate = inject(TranslateService);
+
   qrCodeDataUrl = input<string>();
   reference = input<string>();
   amount = input<number>();
@@ -265,9 +269,12 @@ export class MbwayQrcodeComponent {
     const minutes = Math.floor(diff / 60000);
 
     if (minutes <= 0) {
-      return 'Expirado';
+      return this.translate.instant('payment.mbway.expired');
     }
 
-    return `${minutes} minuto${minutes !== 1 ? 's' : ''}`;
+    const minuteWord = minutes === 1 ?
+      this.translate.instant('payment.mbway.minute') :
+      this.translate.instant('payment.mbway.minutes');
+    return `${minutes} ${minuteWord}`;
   }
 }

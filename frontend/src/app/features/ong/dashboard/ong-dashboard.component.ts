@@ -1,6 +1,7 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { OngService, OngDashboardStats, OngProfile } from '../../../core/services/ong.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -8,7 +9,8 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-ong-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterLink, TranslateModule],
   template: `
     <div class="ong-dashboard">
       @if (isPendingApproval()) {
@@ -16,40 +18,39 @@ import { ToastService } from '../../../core/services/toast.service';
         <div class="pending-approval">
           <div class="pending-card">
             <div class="pending-icon">⏳</div>
-            <h1>Aguardando Aprovação</h1>
+            <h1>{{ 'ong.dashboard.pendingApproval.title' | translate }}</h1>
             <p class="pending-message">
-              Olá, <strong>{{ authService.currentUser()?.ongName }}</strong>!
+              {{ 'ong.dashboard.greeting' | translate:{ name: authService.currentUser()?.ongName } }}
             </p>
             <p class="pending-description">
-              Sua conta foi criada com sucesso e está aguardando aprovação do nosso time administrativo.
-              Este processo geralmente leva até 24 horas.
+              {{ 'ong.dashboard.pendingApproval.description' | translate }}
             </p>
             <div class="pending-info">
               <div class="info-item">
                 <span class="info-icon">📧</span>
                 <div class="info-text">
-                  <strong>Email cadastrado:</strong>
+                  <strong>{{ 'ong.dashboard.pendingApproval.emailLabel' | translate }}</strong>
                   <p>{{ authService.currentUser()?.email }}</p>
                 </div>
               </div>
               <div class="info-item">
                 <span class="info-icon">🏢</span>
                 <div class="info-text">
-                  <strong>Nome da ONG:</strong>
+                  <strong>{{ 'ong.dashboard.pendingApproval.ongNameLabel' | translate }}</strong>
                   <p>{{ authService.currentUser()?.ongName }}</p>
                 </div>
               </div>
             </div>
             <div class="pending-steps">
-              <h3>O que acontece agora?</h3>
+              <h3>{{ 'ong.dashboard.pendingApproval.whatHappensTitle' | translate }}</h3>
               <ol>
-                <li>Nossa equipe irá revisar suas informações</li>
-                <li>Você receberá um email assim que sua conta for aprovada</li>
-                <li>Após a aprovação, você terá acesso completo ao painel</li>
+                <li>{{ 'ong.dashboard.pendingApproval.step1' | translate }}</li>
+                <li>{{ 'ong.dashboard.pendingApproval.step2' | translate }}</li>
+                <li>{{ 'ong.dashboard.pendingApproval.step3' | translate }}</li>
               </ol>
             </div>
             <p class="pending-footer">
-              Você receberá um email em <strong>{{ authService.currentUser()?.email }}</strong> assim que sua conta for aprovada.
+              {{ 'ong.dashboard.pendingApproval.footerMessage' | translate:{ email: authService.currentUser()?.email } }}
             </p>
           </div>
         </div>
@@ -57,15 +58,15 @@ import { ToastService } from '../../../core/services/toast.service';
         <!-- Normal Dashboard -->
         <header class="dashboard-header">
           <div class="header-content">
-            <h1>{{ ongDetails()?.ongName || 'Painel ONG' }}</h1>
+            <h1>{{ ongDetails()?.ongName || ('ong.dashboard.title' | translate) }}</h1>
           </div>
-          <p>Gerencie sua organização e ajude animais a encontrarem um lar</p>
+          <p>{{ 'ong.dashboard.subtitle' | translate }}</p>
         </header>
 
         @if (isLoading()) {
           <div class="loading">
             <div class="spinner"></div>
-            <p>Carregando dados...</p>
+            <p>{{ 'ong.dashboard.loadingData' | translate }}</p>
           </div>
         } @else {
         <div class="stats-grid">
@@ -73,8 +74,8 @@ import { ToastService } from '../../../core/services/toast.service';
             <div class="stat-icon pets">🐾</div>
             <div class="stat-content">
               <h3>{{ stats().totalPets }}</h3>
-              <p>Pets Cadastrados</p>
-              <span class="subtext">{{ stats().availablePets }} disponíveis</span>
+              <p>{{ 'ong.dashboard.petsRegistered' | translate }}</p>
+              <span class="subtext">{{ 'ong.dashboard.available' | translate:{ count: stats().availablePets } }}</span>
             </div>
           </div>
 
@@ -82,8 +83,8 @@ import { ToastService } from '../../../core/services/toast.service';
             <div class="stat-icon adopted">❤️</div>
             <div class="stat-content">
               <h3>{{ stats().adoptedPets }}</h3>
-              <p>Pets Adotados</p>
-              <span class="subtext">Total histórico</span>
+              <p>{{ 'ong.dashboard.adoptedPets' | translate }}</p>
+              <span class="subtext">{{ 'ong.dashboard.totalHistoric' | translate }}</span>
             </div>
           </div>
 
@@ -91,8 +92,8 @@ import { ToastService } from '../../../core/services/toast.service';
             <div class="stat-icon appointments">📅</div>
             <div class="stat-content">
               <h3>{{ stats().pendingAppointments }}</h3>
-              <p>Visitas Pendentes</p>
-              <span class="subtext">Aguardando resposta</span>
+              <p>{{ 'ong.dashboard.pendingVisits' | translate }}</p>
+              <span class="subtext">{{ 'ong.dashboard.awaitingResponse' | translate }}</span>
             </div>
           </div>
 
@@ -100,87 +101,87 @@ import { ToastService } from '../../../core/services/toast.service';
             <div class="stat-icon donations">💰</div>
             <div class="stat-content">
               <h3>€{{ stats().totalDonations.toFixed(2) }}</h3>
-              <p>Total Recebido</p>
-              <span class="subtext">€{{ stats().monthlyDonations.toFixed(2) }} este mês</span>
+              <p>{{ 'ong.dashboard.totalReceived' | translate }}</p>
+              <span class="subtext">{{ 'ong.dashboard.thisMonth' | translate:{ amount: stats().monthlyDonations.toFixed(2) } }}</span>
             </div>
           </div>
         </div>
 
         <div class="main-actions">
-          <h2>Ações Rápidas</h2>
+          <h2>{{ 'ong.dashboard.quickActions' | translate }}</h2>
           <div class="action-grid">
             <a routerLink="/pets/add" class="action-card primary">
               <div class="action-icon">➕</div>
-              <h3>Adicionar Pet</h3>
-              <p>Cadastre um novo animal para adoção</p>
+              <h3>{{ 'ong.dashboard.actions.addPet' | translate }}</h3>
+              <p>{{ 'ong.dashboard.actions.addPetDesc' | translate }}</p>
             </a>
             <a routerLink="/pets/manage" class="action-card">
               <div class="action-icon">🐾</div>
-              <h3>Gerenciar Pets</h3>
-              <p>Edite ou remova pets cadastrados</p>
+              <h3>{{ 'ong.dashboard.actions.managePets' | translate }}</h3>
+              <p>{{ 'ong.dashboard.actions.managePetsDesc' | translate }}</p>
             </a>
             <a routerLink="/ong/appointments" class="action-card">
               <div class="action-icon">📅</div>
-              <h3>Visitas Agendadas</h3>
-              <p>Veja e gerencie agendamentos</p>
+              <h3>{{ 'ong.dashboard.actions.scheduledVisits' | translate }}</h3>
+              <p>{{ 'ong.dashboard.actions.scheduledVisitsDesc' | translate }}</p>
             </a>
             <a routerLink="/ong/scheduling-settings" class="action-card">
               <div class="action-icon">⚙️</div>
-              <h3>Configurações de Agendamento</h3>
-              <p>Defina horários e regras de visitas</p>
+              <h3>{{ 'ong.dashboard.actions.schedulingSettings' | translate }}</h3>
+              <p>{{ 'ong.dashboard.actions.schedulingSettingsDesc' | translate }}</p>
             </a>
             <a routerLink="/ong/analytics" class="action-card">
               <div class="action-icon">📊</div>
-              <h3>Estatísticas</h3>
-              <p>Veja análises e métricas da sua ONG</p>
+              <h3>{{ 'ong.dashboard.actions.statistics' | translate }}</h3>
+              <p>{{ 'ong.dashboard.actions.statisticsDesc' | translate }}</p>
             </a>
             <a routerLink="/ong/availability-exceptions" class="action-card">
               <div class="action-icon">🚫</div>
-              <h3>Bloqueios e Férias</h3>
-              <p>Gerencie feriados e indisponibilidades</p>
+              <h3>{{ 'ong.dashboard.actions.blockages' | translate }}</h3>
+              <p>{{ 'ong.dashboard.actions.blockagesDesc' | translate }}</p>
             </a>
             <a routerLink="/ong/donations" class="action-card">
               <div class="action-icon">💸</div>
-              <h3>Histórico de Doações</h3>
-              <p>Veja todas as doações recebidas</p>
+              <h3>{{ 'ong.dashboard.actions.donationHistory' | translate }}</h3>
+              <p>{{ 'ong.dashboard.actions.donationHistoryDesc' | translate }}</p>
             </a>
             <a routerLink="/ong/articles" class="action-card">
               <div class="action-icon">📋</div>
-              <h3>Necessidades da ONG</h3>
-              <p>Gerencie artigos e necessidades</p>
+              <h3>{{ 'ong.dashboard.actions.needs' | translate }}</h3>
+              <p>{{ 'ong.dashboard.actions.needsDesc' | translate }}</p>
             </a>
           </div>
         </div>
 
         <div class="profile-section">
-          <h2>Perfil da ONG</h2>
+          <h2>{{ 'ong.dashboard.ongProfile' | translate }}</h2>
           <div class="profile-card">
             <div class="profile-info">
               <div class="info-row">
-                <span class="label">Nome:</span>
+                <span class="label">{{ 'ong.dashboard.name' | translate }}</span>
                 <span class="value">{{ ongDetails()?.ongName }}</span>
               </div>
               <div class="info-row">
-                <span class="label">Localização:</span>
+                <span class="label">{{ 'ong.dashboard.location' | translate }}</span>
                 <span class="value">{{ ongDetails()?.location }}</span>
               </div>
               <div class="info-row">
-                <span class="label">Email:</span>
+                <span class="label">{{ 'ong.dashboard.email' | translate }}</span>
                 <span class="value">{{ ongDetails()?.email }}</span>
               </div>
               <div class="info-row">
-                <span class="label">Telefone:</span>
-                <span class="value">{{ ongDetails()?.phone || 'Não informado' }}</span>
+                <span class="label">{{ 'ong.dashboard.phone' | translate }}</span>
+                <span class="value">{{ ongDetails()?.phone || ('ong.dashboard.notInformed' | translate) }}</span>
               </div>
               @if (ongDetails()?.instagramHandle) {
                 <div class="info-row">
-                  <span class="label">Instagram:</span>
+                  <span class="label">{{ 'ong.dashboard.instagram' | translate }}</span>
                   <span class="value">{{ ongDetails()?.instagramHandle }}</span>
                 </div>
               }
             </div>
             <a routerLink="/ong/profile/edit" class="btn-edit">
-              ✏️ Editar Perfil
+              {{ 'ong.dashboard.editProfile' | translate }}
             </a>
           </div>
         </div>
