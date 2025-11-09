@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { CacheService } from './cache.service';
 
 export interface User {
   id: string;
@@ -60,6 +61,7 @@ export interface UploadImageResponse {
 })
 export class UsersService {
   private http = inject(HttpClient);
+  private cacheService = inject(CacheService);
   private apiUrl = `${environment.apiUrl}/users`;
 
   // Keep track of current user profile
@@ -141,6 +143,33 @@ export class UsersService {
    * Get all ONGs with optional filters
    */
   getAllOngs(filters?: { search?: string; location?: string; countryCode?: string }): Observable<ONG[]> {
+    // Generate unique cache key based on filters
+    const cacheKey = this.cacheService.generateKey('ongs:list', filters);
+
+    // Try to get from cache
+    const cached = this.cacheService.get<ONG[]>(cacheKey);
+
+    // If we have fresh cached data, return it immediately
+    if (cached && !this.cacheService.isStale(cacheKey)) {
+      return of(cached);
+    }
+
+    // If data is stale but exists, return it and refresh in background
+    if (cached && this.cacheService.isStale(cacheKey)) {
+      // Return stale data immediately (stale-while-revalidate)
+      setTimeout(() => {
+        // Refresh in background
+        this.fetchOngs(filters, cacheKey).subscribe();
+      }, 0);
+
+      return of(cached);
+    }
+
+    // No cache, fetch fresh data
+    return this.fetchOngs(filters, cacheKey);
+  }
+
+  private fetchOngs(filters: { search?: string; location?: string; countryCode?: string } | undefined, cacheKey: string): Observable<ONG[]> {
     let url = this.apiUrl;
     const params = new URLSearchParams();
 
@@ -160,6 +189,8 @@ export class UsersService {
       url += `?${params.toString()}`;
     }
 
-    return this.http.get<ONG[]>(url);
+    return this.http.get<ONG[]>(url).pipe(
+      tap((ongs) => this.cacheService.set(cacheKey, ongs, 'ongs'))
+    );
   }
 }

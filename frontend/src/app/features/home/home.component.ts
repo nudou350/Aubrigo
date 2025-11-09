@@ -17,16 +17,18 @@ import {
   EventType,
 } from "../../core/services/analytics.service";
 import { UsersService, ONG } from "../../core/services/users.service";
+import { CacheService } from "../../core/services/cache.service";
 import { LanguageSelectorComponent } from "../../shared/components/language-selector/language-selector.component";
 import { PetCardSkeletonComponent } from "../../shared/components/pet-card-skeleton/pet-card-skeleton.component";
+import { PullToRefreshDirective } from "../../shared/directives/pull-to-refresh.directive";
 
 @Component({
   selector: "app-home",
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage, TranslateModule, LanguageSelectorComponent, PetCardSkeletonComponent, ScrollingModule],
+  imports: [CommonModule, NgOptimizedImage, TranslateModule, LanguageSelectorComponent, PetCardSkeletonComponent, ScrollingModule, PullToRefreshDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="home-screen">
+    <div class="home-screen" appPullToRefresh (refresh)="onRefresh()">
       <!-- Header Section -->
       <div class="header-section">
         <!-- Top Actions Row (Mobile) -->
@@ -1713,6 +1715,7 @@ export class HomeComponent implements OnInit {
   private analytics = inject(AnalyticsService);
   private usersService = inject(UsersService);
   private translate = inject(TranslateService);
+  private cacheService = inject(CacheService);
 
   pets = signal<Pet[]>([]);
   loading = signal(true);
@@ -1830,7 +1833,12 @@ export class HomeComponent implements OnInit {
   }
 
   loadPets() {
-    this.loading.set(true);
+    // Only show loading overlay if we don't have any cached data
+    const hasCachedData = this.pets().length > 0;
+
+    if (!hasCachedData) {
+      this.loading.set(true);
+    }
 
     const params: SearchPetsParams = {};
 
@@ -1876,7 +1884,11 @@ export class HomeComponent implements OnInit {
       next: (response) => {
         const results = response.data || [];
         this.pets.set(results);
-        this.loading.set(false);
+
+        // Only hide loading if it was showing
+        if (!hasCachedData) {
+          this.loading.set(false);
+        }
 
         // Track search/filter usage
         this.analytics.track(EventType.SEARCH, {
@@ -1893,6 +1905,25 @@ export class HomeComponent implements OnInit {
         this.pets.set([]);
       },
     });
+  }
+
+  /**
+   * Manual refresh method for pull-to-refresh
+   * Clears cache and reloads all data with loading indicator
+   */
+  onRefresh() {
+    // Clear all relevant caches
+    this.cacheService.invalidate('pets:*');
+    this.cacheService.invalidate('cities:*');
+    this.cacheService.invalidate('ongs:*');
+
+    // Show loading indicator for manual refresh
+    this.loading.set(true);
+
+    // Reload all data
+    this.loadCitiesWithPets();
+    this.loadOngs();
+    this.loadPets();
   }
 
   filterBySpecies(species: string) {
