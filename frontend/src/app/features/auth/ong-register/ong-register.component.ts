@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject } from "@angular/core";
+import { Component, ChangeDetectionStrategy, signal, computed, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   FormBuilder,
@@ -20,6 +20,7 @@ interface Country {
 @Component({
   selector: "app-ong-register",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="register-container">

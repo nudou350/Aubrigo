@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -37,6 +37,7 @@ export interface OngDetail {
 @Component({
   selector: 'app-ong-detail',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, NgOptimizedImage, ShareButtonComponent, LanguageSelectorComponent],
   templateUrl: './ong-detail.component.html',
   styleUrl: './ong-detail.component.scss',

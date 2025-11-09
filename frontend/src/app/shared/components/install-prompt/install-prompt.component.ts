@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { PwaService } from '../../../core/services/pwa.service';
@@ -17,6 +17,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 @Component({
   selector: 'app-install-prompt',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, TranslateModule],
   template: `
     @if (showPrompt()) {

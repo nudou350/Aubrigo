@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, signal } from "@angular/core";
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from "@angular/core";
 import { CommonModule, NgOptimizedImage } from "@angular/common";
 import { Router } from "@angular/router";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
+import { ScrollingModule } from "@angular/cdk/scrolling";
 import { AuthService } from "../../core/services/auth.service";
 import { FavoritesService } from "../../core/services/favorites.service";
 import { ToastService } from "../../core/services/toast.service";
@@ -17,11 +18,13 @@ import {
 } from "../../core/services/analytics.service";
 import { UsersService, ONG } from "../../core/services/users.service";
 import { LanguageSelectorComponent } from "../../shared/components/language-selector/language-selector.component";
+import { PetCardSkeletonComponent } from "../../shared/components/pet-card-skeleton/pet-card-skeleton.component";
 
 @Component({
   selector: "app-home",
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage, TranslateModule, LanguageSelectorComponent],
+  imports: [CommonModule, NgOptimizedImage, TranslateModule, LanguageSelectorComponent, PetCardSkeletonComponent, ScrollingModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="home-screen">
       <!-- Header Section -->
@@ -376,9 +379,13 @@ import { LanguageSelectorComponent } from "../../shared/components/language-sele
 
       <!-- Pet List -->
       <div class="pet-list">
-        @if (pets().length === 0 && !loading()) {
-        <div class="no-pets">{{ 'home.noPetsFound' | translate }}</div>
-        } @else { @for (pet of pets(); track pet.id) {
+        @if (loading()) {
+          <!-- Show skeleton loaders while loading -->
+          <app-pet-card-skeleton *ngFor="let _ of [1,2,3,4,5,6]" />
+        } @else if (pets().length === 0) {
+          <div class="no-pets">{{ 'home.noPetsFound' | translate }}</div>
+        } @else {
+          @for (pet of pets(); track pet.id) {
         <div class="pet-card" (click)="viewPetDetail(pet.id)">
           <div class="pet-image-container">
             @if (pet.primaryImage) {
@@ -495,7 +502,8 @@ import { LanguageSelectorComponent } from "../../shared/components/language-sele
             <button class="learn-more-button">{{ 'common.learnMore' | translate }}</button>
           </div>
         </div>
-        } }
+          }
+        }
       </div>
     </div>
 

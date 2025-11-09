@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject } from "@angular/core";
+import { Component, ChangeDetectionStrategy, signal, computed, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink, NavigationEnd } from "@angular/router";
 import { filter } from "rxjs/operators";
@@ -10,6 +10,7 @@ import { LanguageSelectorComponent } from "../language-selector/language-selecto
 @Component({
   selector: "app-bottom-nav",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterLink, TranslateModule, LanguageSelectorComponent],
   template: `
     <!-- Install PWA button - floating bottom right (mobile only) -->
@@ -104,7 +105,10 @@ import { LanguageSelectorComponent } from "../language-selector/language-selecto
       <div class="top-nav-container">
         <div class="nav-brand">
           <div class="brand-logo">
-            <img src="assets/icon.PNG" alt="Aubrigo" class="brand-icon" />
+            <picture>
+              <source srcset="assets/icon-optimized.webp" type="image/webp">
+              <img src="assets/icon-optimized.png" alt="Aubrigo" class="brand-icon" />
+            </picture>
           </div>
           <span class="brand-name">Aubrigo</span>
         </div>

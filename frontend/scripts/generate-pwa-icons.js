@@ -33,7 +33,7 @@ async function generateIcon(iconConfig) {
           background: tealColor
         }
       })
-        .png()
+        .png({ quality: 85, compressionLevel: 9, palette: true })
         .toBuffer();
 
       // Resize icon and composite centered
@@ -44,7 +44,7 @@ async function generateIcon(iconConfig) {
         })
         .toBuffer();
 
-      // Composite icon on teal background
+      // Composite icon on teal background with optimized PNG settings
       await sharp(background)
         .composite([
           {
@@ -53,16 +53,16 @@ async function generateIcon(iconConfig) {
             left: padding
           }
         ])
-        .png()
+        .png({ quality: 85, compressionLevel: 9, palette: true })
         .toFile(outputPath);
     } else {
-      // For standard icons, resize to fill the entire canvas
+      // For standard icons, resize to fill the entire canvas with optimized settings
       await sharp(inputPath)
         .resize(size, size, {
           fit: 'contain',
           background: tealColor
         })
-        .png()
+        .png({ quality: 85, compressionLevel: 9, palette: true })
         .toFile(outputPath);
     }
 

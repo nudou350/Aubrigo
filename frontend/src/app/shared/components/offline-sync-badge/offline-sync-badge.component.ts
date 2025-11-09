@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { OfflineQueueService } from '../../../core/services/offline-queue.service';
@@ -14,6 +14,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 @Component({
   selector: 'app-offline-sync-badge',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, TranslateModule],
   template: `
     @if (pendingCount() > 0) {

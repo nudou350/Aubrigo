@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from "@angular/core";
+import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import {
   LanguageService,
@@ -8,6 +8,7 @@ import {
 @Component({
   selector: "app-language-selector",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     <div class="language-selector" (click)="$event.stopPropagation()">

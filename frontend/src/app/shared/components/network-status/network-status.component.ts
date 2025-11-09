@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { NetworkStatusService } from '../../../core/services/network-status.service';
@@ -13,6 +13,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 @Component({
   selector: 'app-network-status',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, TranslateModule],
   template: `
     <!-- Offline notification -->

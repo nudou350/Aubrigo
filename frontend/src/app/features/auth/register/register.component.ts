@@ -1,4 +1,4 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, ChangeDetectionStrategy, inject, signal } from "@angular/core";
 import { CommonModule, NgOptimizedImage } from "@angular/common";
 import {
   FormControl,
@@ -12,6 +12,7 @@ import { AuthService } from "../../../core/services/auth.service";
 @Component({
   selector: "app-register",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage],
   template: `
     <div class="register-screen">

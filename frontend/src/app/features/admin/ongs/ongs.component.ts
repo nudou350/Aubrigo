@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AdminService, Ong } from '../../../core/services/admin.service';
@@ -8,6 +8,7 @@ import { CountryService, Country } from '../../../core/services/country.service'
 @Component({
   selector: 'app-admin-ongs',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterLink],
   template: `
     <div class="admin-ongs">

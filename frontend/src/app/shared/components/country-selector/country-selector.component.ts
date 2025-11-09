@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CountryService, Country } from '../../../core/services/country.service';
@@ -6,6 +6,7 @@ import { CountryService, Country } from '../../../core/services/country.service'
 @Component({
   selector: 'app-country-selector',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   templateUrl: './country-selector.component.html',
   styleUrls: ['./country-selector.component.scss']

@@ -1,10 +1,11 @@
-import { Component, input, signal, effect, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-mbway-qrcode',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, TranslateModule],
   template: `
     <div class="mbway-container">

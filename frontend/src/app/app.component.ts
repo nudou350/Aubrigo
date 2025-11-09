@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, inject, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -12,6 +12,7 @@ import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badg
 @Component({
   selector: 'app-root',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent, TranslateModule],
   template: `
     <div class="app-container">

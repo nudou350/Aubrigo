@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PushNotificationService } from '../../../core/services/push-notification.service';
@@ -13,6 +13,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 @Component({
   selector: 'app-notification-settings',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="notification-settings">

@@ -1,4 +1,4 @@
-import { Component, signal, inject } from "@angular/core";
+import { Component, ChangeDetectionStrategy, signal, inject } from "@angular/core";
 import { CommonModule, NgOptimizedImage } from "@angular/common";
 import {
   FormControl,
@@ -13,6 +13,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: "app-forgot-password",
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, NgOptimizedImage, TranslateModule],
   template: `
     <div class="forgot-password-screen">
