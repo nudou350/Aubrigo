@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { User, UserRole, OngStatus } from '../users/entities/user.entity';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { EmailService } from '../email/email.service';
+import { CountryService } from '../country/country.service';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RegisterOngDto } from './dto/register-ong.dto';
@@ -52,6 +53,9 @@ describe('AuthService', () => {
   const mockConfigService = {
     get: jest.fn(),
   };
+  const mockCountryService = {
+    detectCountryFromRequest: jest.fn().mockResolvedValue('PT'),
+  };
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -75,6 +79,10 @@ describe('AuthService', () => {
         {
           provide: ConfigService,
           useValue: mockConfigService,
+        },
+        {
+          provide: CountryService,
+          useValue: mockCountryService,
         },
       ],
     }).compile();

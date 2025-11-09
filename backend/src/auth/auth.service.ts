@@ -116,7 +116,7 @@ export class AuthService {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
     // Detect country from request if not provided
-    const detectedCountryCode = countryCode || (req ? this.countryService.detectCountryFromRequest(req) : 'PT');
+    const detectedCountryCode = countryCode || (req ? await this.countryService.detectCountryFromRequest(req) : 'PT');
     // Create user
     const user = this.userRepository.create({
       email,
@@ -168,7 +168,7 @@ export class AuthService {
     // Use city if location is not provided
     const finalLocation = location || city;
     // Detect country from request if not provided
-    const detectedCountryCode = countryCode || (req ? this.countryService.detectCountryFromRequest(req) : 'PT');
+    const detectedCountryCode = countryCode || (req ? await this.countryService.detectCountryFromRequest(req) : 'PT');
     // Create ONG user (set status to PENDING for admin approval)
     const user = this.userRepository.create({
       email,
