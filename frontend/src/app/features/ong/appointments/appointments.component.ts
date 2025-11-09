@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppointmentsService, Appointment } from '../../../core/services/appointments.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AnalyticsService, EventType } from '../../../core/services/analytics.service';
@@ -9,30 +10,30 @@ import { AnalyticsService, EventType } from '../../../core/services/analytics.se
 @Component({
   selector: 'app-ong-appointments',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslateModule],
   template: `
     <div class="appointments-page">
       <header class="page-header">
         <a routerLink="/ong/dashboard" class="back-link">
-          ← Voltar
+          {{ 'ong.common.back' | translate }}
         </a>
         <div>
-          <h1>Visitas Agendadas</h1>
-          <p>Gerencie os agendamentos de visitas aos pets</p>
+          <h1>{{ 'ong.appointments.pageTitle' | translate }}</h1>
+          <p>{{ 'ong.appointments.subtitle' | translate }}</p>
         </div>
       </header>
 
       <div class="filters">
         <select class="filter-select" [(ngModel)]="filterStatus" (change)="filterAppointments()">
-          <option value="">Todos os status</option>
-          <option value="pending">Pendentes</option>
-          <option value="confirmed">Confirmadas</option>
-          <option value="completed">Concluídas</option>
-          <option value="cancelled">Canceladas</option>
+          <option value="">{{ 'ong.appointments.filters.allStatus' | translate }}</option>
+          <option value="pending">{{ 'ong.appointments.filters.pending' | translate }}</option>
+          <option value="confirmed">{{ 'ong.appointments.filters.confirmed' | translate }}</option>
+          <option value="completed">{{ 'ong.appointments.filters.completed' | translate }}</option>
+          <option value="cancelled">{{ 'ong.appointments.filters.cancelled' | translate }}</option>
         </select>
         <input
           type="text"
-          placeholder="🔍 Buscar por nome do visitante..."
+          [placeholder]="'ong.appointments.searchPlaceholder' | translate"
           class="search-input"
           [(ngModel)]="searchTerm"
           (input)="filterAppointments()"
@@ -42,13 +43,13 @@ import { AnalyticsService, EventType } from '../../../core/services/analytics.se
       @if (isLoading()) {
         <div class="loading">
           <div class="spinner"></div>
-          <p>Carregando agendamentos...</p>
+          <p>{{ 'ong.appointments.loadingAppointments' | translate }}</p>
         </div>
       } @else if (filteredAppointments().length === 0) {
         <div class="empty-state">
           <div class="empty-icon">📅</div>
-          <h3>Nenhuma visita agendada</h3>
-          <p>{{ appointments().length === 0 ? 'Quando visitantes agendarem visitas, elas aparecerão aqui' : 'Nenhuma visita encontrada com esses filtros' }}</p>
+          <h3>{{ 'ong.appointments.noVisitsScheduled' | translate }}</h3>
+          <p>{{ appointments().length === 0 ? ('ong.appointments.noVisitsDescription' | translate) : ('ong.appointments.noVisitsFiltered' | translate) }}</p>
         </div>
       } @else {
         <div class="appointments-list">
@@ -69,18 +70,18 @@ import { AnalyticsService, EventType } from '../../../core/services/analytics.se
 
               <div class="appointment-details">
                 <div class="detail-row">
-                  <span class="label">👤 Visitante:</span>
+                  <span class="label">{{ 'ong.appointments.labels.visitor' | translate }}</span>
                   <span class="value">{{ appointment.visitorName }}</span>
                 </div>
                 <div class="detail-row">
-                  <span class="label">📧 Email:</span>
+                  <span class="label">{{ 'ong.appointments.labels.email' | translate }}</span>
                   <a [href]="'mailto:' + appointment.visitorEmail" class="value link">
                     {{ appointment.visitorEmail }}
                   </a>
                 </div>
                 @if (appointment.visitorPhone) {
                   <div class="detail-row">
-                    <span class="label">📞 Telefone:</span>
+                    <span class="label">{{ 'ong.appointments.labels.phone' | translate }}</span>
                     <a [href]="'tel:' + appointment.visitorPhone" class="value link">
                       {{ appointment.visitorPhone }}
                     </a>
@@ -88,27 +89,27 @@ import { AnalyticsService, EventType } from '../../../core/services/analytics.se
                 }
                 @if (appointment.scheduledStartTime) {
                   <div class="detail-row">
-                    <span class="label">📅 Data/Horário:</span>
+                    <span class="label">{{ 'ong.appointments.labels.dateTime' | translate }}</span>
                     <span class="value">{{ formatDateTime(appointment.scheduledStartTime) }}</span>
                   </div>
                 } @else {
                   <div class="detail-row">
-                    <span class="label">📅 Data:</span>
-                    <span class="value">{{ appointment.preferredDate ? formatDate(appointment.preferredDate) : 'Não definida' }}</span>
+                    <span class="label">{{ 'ong.appointments.labels.date' | translate }}</span>
+                    <span class="value">{{ appointment.preferredDate ? formatDate(appointment.preferredDate) : ('ong.appointments.notDefined' | translate) }}</span>
                   </div>
                   <div class="detail-row">
-                    <span class="label">🕒 Horário:</span>
-                    <span class="value">{{ appointment.preferredTime || 'Não definido' }}</span>
+                    <span class="label">{{ 'ong.appointments.labels.time' | translate }}</span>
+                    <span class="value">{{ appointment.preferredTime || ('ong.appointments.notDefined' | translate) }}</span>
                   </div>
                 }
                 @if (appointment.notes) {
                   <div class="detail-row">
-                    <span class="label">💬 Observações:</span>
+                    <span class="label">{{ 'ong.appointments.labels.notes' | translate }}</span>
                     <span class="value">{{ appointment.notes }}</span>
                   </div>
                 }
                 <div class="detail-row">
-                  <span class="label">📊 Status:</span>
+                  <span class="label">{{ 'ong.appointments.labels.status' | translate }}</span>
                   <span class="status-badge" [class]="appointment.status">
                     {{ getStatusLabel(appointment.status) }}
                   </span>
@@ -118,19 +119,19 @@ import { AnalyticsService, EventType } from '../../../core/services/analytics.se
               @if (appointment.status === 'pending') {
                 <div class="appointment-actions">
                   <button class="btn-action confirm" (click)="updateStatus(appointment.id, 'confirmed')">
-                    ✓ Confirmar
+                    {{ 'ong.appointments.actions.confirm' | translate }}
                   </button>
                   <button class="btn-action cancel" (click)="updateStatus(appointment.id, 'cancelled')">
-                    ✗ Cancelar
+                    {{ 'ong.appointments.actions.cancel' | translate }}
                   </button>
                 </div>
               } @else if (appointment.status === 'confirmed') {
                 <div class="appointment-actions">
                   <button class="btn-action complete" (click)="updateStatus(appointment.id, 'completed')">
-                    ✓ Marcar como Concluída
+                    {{ 'ong.appointments.actions.markComplete' | translate }}
                   </button>
                   <button class="btn-action cancel" (click)="updateStatus(appointment.id, 'cancelled')">
-                    ✗ Cancelar
+                    {{ 'ong.appointments.actions.cancel' | translate }}
                   </button>
                 </div>
               }
@@ -454,6 +455,7 @@ export class OngAppointmentsComponent implements OnInit {
   private appointmentsService = inject(AppointmentsService);
   private toastService = inject(ToastService);
   private analytics = inject(AnalyticsService);
+  private translate = inject(TranslateService);
 
   isLoading = signal(true);
   appointments = signal<Appointment[]>([]);
@@ -475,7 +477,7 @@ export class OngAppointmentsComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar agendamentos');
+        this.toastService.error(this.translate.instant('ong.appointments.errorLoad'));
         this.isLoading.set(false);
       }
     });
@@ -501,19 +503,19 @@ export class OngAppointmentsComponent implements OnInit {
   }
 
   updateStatus(id: string, status: 'pending' | 'confirmed' | 'completed' | 'cancelled') {
-    const messages: Record<string, string> = {
-      confirmed: 'Confirmar esta visita?',
-      cancelled: 'Cancelar esta visita?',
-      completed: 'Marcar esta visita como concluída?'
+    const messageKeys: Record<string, string> = {
+      confirmed: 'ong.appointments.confirmMessage',
+      cancelled: 'ong.appointments.cancelMessage',
+      completed: 'ong.appointments.completeMessage'
     };
 
-    const successMessages: Record<string, string> = {
-      confirmed: 'Visita confirmada com sucesso!',
-      cancelled: 'Visita cancelada',
-      completed: 'Visita marcada como concluída!'
+    const successKeys: Record<string, string> = {
+      confirmed: 'ong.appointments.confirmSuccess',
+      cancelled: 'ong.appointments.cancelSuccess',
+      completed: 'ong.appointments.completeSuccess'
     };
 
-    if (!confirm(messages[status])) {
+    if (!confirm(this.translate.instant(messageKeys[status]))) {
       return;
     }
 
@@ -525,7 +527,7 @@ export class OngAppointmentsComponent implements OnInit {
           list.map(apt => apt.id === id ? { ...apt, status } : apt)
         );
         this.filterAppointments();
-        this.toastService.success(successMessages[status]);
+        this.toastService.success(this.translate.instant(successKeys[status]));
 
         // Track appointment cancellation
         if (status === 'cancelled' && appointment) {
@@ -540,7 +542,7 @@ export class OngAppointmentsComponent implements OnInit {
         }
       },
       error: (error) => {
-        this.toastService.error('Erro ao atualizar status da visita');
+        this.toastService.error(this.translate.instant('ong.appointments.errorUpdate'));
       }
     });
   }
@@ -555,23 +557,23 @@ export class OngAppointmentsComponent implements OnInit {
   }
 
   getSpeciesLabel(species: string): string {
-    const labels: any = {
-      dog: 'Cachorro',
-      cat: 'Gato',
-      fish: 'Peixe',
-      hamster: 'Hamster'
+    const keys: any = {
+      dog: 'ong.pets.filters.dog',
+      cat: 'ong.pets.filters.cat',
+      fish: 'ong.pets.filters.fish',
+      hamster: 'ong.pets.filters.hamster'
     };
-    return labels[species] || species;
+    return this.translate.instant(keys[species] || species);
   }
 
   getStatusLabel(status: string): string {
-    const labels: any = {
-      pending: 'Pendente',
-      confirmed: 'Confirmada',
-      completed: 'Concluída',
-      cancelled: 'Cancelada'
+    const keys: any = {
+      pending: 'ong.appointments.pending',
+      confirmed: 'ong.appointments.confirmed',
+      completed: 'ong.appointments.completed',
+      cancelled: 'ong.appointments.cancelled'
     };
-    return labels[status] || status;
+    return this.translate.instant(keys[status] || status);
   }
 
   formatDate(date: string): string {

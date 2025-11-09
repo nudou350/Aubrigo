@@ -82,7 +82,7 @@ interface PetImage {
                 id="name"
                 type="text"
                 formControlName="name"
-                placeholder="Ex: Plutão"
+                [placeholder]="'pets.form.namePlaceholder' | translate"
                 class="form-control"
               />
               @if (petForm.get('name')?.invalid && petForm.get('name')?.touched) {
@@ -110,7 +110,7 @@ interface PetImage {
                 id="breed"
                 type="text"
                 formControlName="breed"
-                placeholder="Ex: Border Collie"
+                [placeholder]="'pets.form.breedPlaceholder' | translate"
                 class="form-control"
               />
             </div>
@@ -121,7 +121,7 @@ interface PetImage {
                 id="age"
                 type="number"
                 formControlName="age"
-                placeholder="Ex: 3"
+                [placeholder]="'pets.form.agePlaceholder' | translate"
                 min="0"
                 max="30"
                 class="form-control"
@@ -162,7 +162,7 @@ interface PetImage {
                 id="color"
                 type="text"
                 formControlName="color"
-                placeholder="Ex: Preto e branco"
+                [placeholder]="'pets.form.colorPlaceholder' | translate"
                 class="form-control"
               />
             </div>
@@ -173,7 +173,7 @@ interface PetImage {
                 id="weight"
                 type="number"
                 formControlName="weight"
-                placeholder="Ex: 18.5"
+                [placeholder]="'pets.form.weightPlaceholder' | translate"
                 step="0.1"
                 min="0"
                 class="form-control"
@@ -191,7 +191,7 @@ interface PetImage {
               id="description"
               formControlName="description"
               rows="6"
-              placeholder="Ex: O Plutão é um Border Collie muito inteligente e enérgico! Adora brincar e aprender novos truques..."
+              [placeholder]="'pets.form.descriptionPlaceholder' | translate"
               class="form-control"
             ></textarea>
             <small class="hint">{{ petForm.get('description')?.value?.length || 0 }} / 1000 caracteres</small>
@@ -212,7 +212,7 @@ interface PetImage {
                   (input)="onLocationInput($event)"
                   (focus)="onLocationFocus()"
                   (keydown)="onLocationKeydown($event)"
-                  placeholder="Digite uma cidade..."
+                  [placeholder]="'pets.form.locationPlaceholder' | translate"
                   class="form-control"
                   autocomplete="off"
                 />
@@ -247,7 +247,7 @@ interface PetImage {
                     (input)="onStatusInput($event)"
                     (focus)="onStatusFocus()"
                     (keydown)="onStatusKeydown($event)"
-                    placeholder="Selecione o status..."
+                    [placeholder]="'pets.form.statusPlaceholder' | translate"
                     class="form-control"
                     autocomplete="off"
                   />
