@@ -16,29 +16,28 @@ import {
   EventType,
 } from "../../core/services/analytics.service";
 import { UsersService, ONG } from "../../core/services/users.service";
+import { LanguageSelectorComponent } from "../../shared/components/language-selector/language-selector.component";
 
 @Component({
   selector: "app-home",
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage, TranslateModule],
+  imports: [CommonModule, NgOptimizedImage, TranslateModule, LanguageSelectorComponent],
   template: `
     <div class="home-screen">
       <!-- Header Section -->
       <div class="header-section">
-        <div class="greeting">
-          <h1 class="greeting-text">{{ getGreeting() }}</h1>
+        <!-- Top Actions Row (Mobile) -->
+        <div class="top-actions-row">
+          <button class="donate-button" (click)="goToDonate()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span class="donate-text">Doar</span>
+          </button>
+
           <div class="header-actions">
-            @if (!authService.isOng() && !authService.isAdmin()) {
-            <button
-              class="donate-button"
-              (click)="goToDonate()"
-              title="Doar"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
-              </svg>
-            </button>
-            } @if (authService.isAuthenticated()) {
+            <app-language-selector></app-language-selector>
+            @if (authService.isAuthenticated()) {
             <button class="profile-button" (click)="goToProfile()">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path
@@ -48,10 +47,17 @@ import { UsersService, ONG } from "../../core/services/users.service";
             </button>
             } @else {
             <button class="login-button" (click)="goToLogin()">
-              {{ 'home.loginRegister' | translate }}
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
             </button>
             }
           </div>
+        </div>
+
+        <!-- Greeting Row -->
+        <div class="greeting-row">
+          <h1 class="greeting-text">{{ getGreeting() }}</h1>
         </div>
 
         <!-- Location & Species Filter Bar -->
@@ -567,10 +573,57 @@ import { UsersService, ONG } from "../../core/services/users.service";
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       }
 
-      .greeting {
+      /* Top Actions Row - Mobile */
+      .top-actions-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .donate-button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #4ca8a0;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(76, 168, 160, 0.3);
+      }
+
+      .donate-button svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .donate-button:hover {
+        background: #3d9690;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(76, 168, 160, 0.4);
+      }
+
+      .donate-button:active {
+        transform: translateY(0);
+      }
+
+      .donate-text {
+        font-weight: 600;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Greeting Row */
+      .greeting-row {
         margin-bottom: 16px;
       }
 
@@ -581,38 +634,12 @@ import { UsersService, ONG } from "../../core/services/users.service";
         margin: 0;
       }
 
-      .header-actions {
-        display: flex;
+      /* Old greeting class - keep for backwards compatibility on desktop */
+      .greeting {
+        display: none; /* Hidden on mobile, shown on desktop */
+        justify-content: space-between;
         align-items: center;
-        gap: 8px;
-      }
-
-      .donate-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(184, 227, 225, 0.3);
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .donate-button svg {
-        width: 24px;
-        height: 24px;
-        color: #5cb5b0;
-      }
-
-      .donate-button:hover {
-        background: rgba(76, 168, 160, 0.2);
-        transform: scale(1.05);
-      }
-
-      .donate-button:active {
-        transform: scale(0.95);
+        margin-bottom: 16px;
       }
 
       .profile-button {
@@ -639,22 +666,27 @@ import { UsersService, ONG } from "../../core/services/users.service";
       }
 
       .login-button {
-        background: #4ca8a0;
-        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(184, 227, 225, 0.3);
         border: none;
-        border-radius: 20px;
-        padding: 8px 16px;
-        font-size: 14px;
-        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
         transition: all 0.2s ease;
-        white-space: nowrap;
+        padding: 0;
+      }
+
+      .login-button svg {
+        width: 24px;
+        height: 24px;
+        color: #4ca8a0;
       }
 
       .login-button:hover {
-        background: #3d9690;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(76, 168, 160, 0.3);
+        background: rgba(184, 227, 225, 0.5);
       }
 
       .filter-bar {
@@ -1404,6 +1436,20 @@ import { UsersService, ONG } from "../../core/services/users.service";
 
         .header-section {
           padding: 32px 48px;
+        }
+
+        /* Hide mobile layout on desktop */
+        .top-actions-row {
+          display: none;
+        }
+
+        .greeting-row {
+          display: none;
+        }
+
+        /* Show desktop layout */
+        .greeting {
+          display: flex;
         }
 
         .login-button,

@@ -1,9 +1,17 @@
 <div class="ongs-screen">
   <!-- Header Section -->
   <div class="header-section">
-    <div class="greeting">
-      <h1 class="greeting-text">{{ getGreeting() }}</h1>
+    <!-- Top Actions Row (Mobile) -->
+    <div class="top-actions-row">
+      <button class="donate-button" (click)="goToDonate()">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span class="donate-text">{{ 'ongs.donateButton' | translate }}</span>
+      </button>
+
       <div class="header-actions">
+        <app-language-selector></app-language-selector>
         @if (authService.isAuthenticated()) {
         <button class="profile-button" (click)="goToProfile()">
           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -14,10 +22,17 @@
         </button>
         } @else {
         <button class="login-button" (click)="goToLogin()">
-          Login / Registrar
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
         </button>
         }
       </div>
+    </div>
+
+    <!-- Greeting Row -->
+    <div class="greeting-row">
+      <h1 class="greeting-text">{{ getGreeting() }}</h1>
     </div>
 
     <!-- Filter Bar -->
@@ -32,7 +47,7 @@
         <input
           type="text"
           class="search-input"
-          placeholder="Pesquisar ONG..."
+          [placeholder]="'ongs.searchOngPlaceholder' | translate"
           [value]="searchQuery()"
           (input)="onSearchInput($event)"
           (focus)="onSearchFocus()"
@@ -106,7 +121,7 @@
   <div class="loading">
     <div class="loading-content">
       <div class="loading-spinner"></div>
-      <span class="loading-text">Carregando ONGs...</span>
+      <span class="loading-text">{{ 'ongs.loadingOngs' | translate }}</span>
     </div>
   </div>
   }
@@ -114,7 +129,7 @@
   <!-- ONGs List -->
   <div class="ongs-list">
     @if (ongs().length === 0 && !loading()) {
-    <div class="no-ongs">Nenhuma ONG encontrada</div>
+    <div class="no-ongs">{{ 'ongs.noOngsFound' | translate }}</div>
     } @else { @for (ong of ongs(); track ong.id) {
     <div class="ong-card" (click)="viewOngDetail(ong.id)">
       <div class="ong-image-container">
@@ -184,7 +199,7 @@
           }
         </div>
 
-        <button class="learn-more-button">SABER MAIS</button>
+        <button class="learn-more-button">{{ 'ongs.learnMoreButton' | translate }}</button>
       </div>
     </div>
     } }

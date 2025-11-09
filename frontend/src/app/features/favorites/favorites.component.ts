@@ -108,7 +108,7 @@ import { ToastService } from '../../core/services/toast.service';
     /* Desktop adjustments */
     @media (min-width: 1024px) {
       .favorites-header {
-        padding: 120px 20px 20px 20px;
+        padding: 140px 20px 20px 20px;
       }
     }
 

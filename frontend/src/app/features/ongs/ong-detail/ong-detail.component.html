@@ -17,15 +17,18 @@
       </svg>
     </button>
     <h1 class="title">Voltar</h1>
-    <!-- Share Button -->
-    <app-share-button
-      [shareData]="shareData()"
-      [compact]="true"
-      [buttonText]="''"
-      [ariaLabel]="'Compartilhar ' + ong()!.ongName"
-      (shareSuccess)="onShare($event)"
-      class="share-button-header">
-    </app-share-button>
+    <div class="header-actions">
+      <app-language-selector></app-language-selector>
+      <!-- Share Button -->
+      <app-share-button
+        [shareData]="shareData()"
+        [compact]="true"
+        [buttonText]="''"
+        [ariaLabel]="'Compartilhar ' + ong()!.ongName"
+        (shareSuccess)="onShare($event)"
+        class="share-button-header">
+      </app-share-button>
+    </div>
   </div>
 
   <!-- Header with Image -->

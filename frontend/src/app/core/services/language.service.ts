@@ -1,11 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { CountryService } from './country.service';
 
 export interface Language {
   code: string;
   name: string;
   flag: string;
+  flagSvg?: string; // SVG path for flag icon
 }
 
 @Injectable({
@@ -13,18 +15,55 @@ export interface Language {
 })
 export class LanguageService {
   private translate = inject(TranslateService);
+  private countryService = inject(CountryService);
   private currentLanguageSubject = new BehaviorSubject<string>('pt');
   public currentLanguage$: Observable<string> = this.currentLanguageSubject.asObservable();
-
-  private readonly languages: Language[] = [
-    { code: 'pt', name: 'Português (PT)', flag: '🇵🇹' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'en', name: 'English', flag: '🇬🇧' }
-  ];
 
   constructor() {
     const savedLanguage = localStorage.getItem('appLanguage') || 'pt';
     this.currentLanguageSubject.next(savedLanguage);
+  }
+
+  /**
+   * Get the correct Portuguese flag based on user's country
+   * Portugal (PT) -> 🇵🇹 Portugal flag
+   * Any other country -> 🇧🇷 Brazil flag
+   */
+  private getPortugueseFlag(): { emoji: string; svg: string } {
+    const userCountry = this.countryService.getCountry();
+    const isInPortugal = userCountry === 'PT';
+
+    return isInPortugal
+      ? { emoji: '🇵🇹', svg: 'https://flagcdn.com/w20/pt.png' }
+      : { emoji: '🇧🇷', svg: 'https://flagcdn.com/w20/br.png' };
+  }
+
+  /**
+   * Get available languages with dynamic Portuguese flag
+   */
+  getAvailableLanguages(): Language[] {
+    const ptFlag = this.getPortugueseFlag();
+
+    return [
+      {
+        code: 'pt',
+        name: 'PT',
+        flag: ptFlag.emoji,
+        flagSvg: ptFlag.svg
+      },
+      {
+        code: 'es',
+        name: 'ES',
+        flag: '🇪🇸',
+        flagSvg: 'https://flagcdn.com/w20/es.png'
+      },
+      {
+        code: 'en',
+        name: 'EN',
+        flag: '🇺🇸',
+        flagSvg: 'https://flagcdn.com/w20/us.png'
+      }
+    ];
   }
 
   /**
@@ -48,31 +87,25 @@ export class LanguageService {
   }
 
   /**
-   * Get all available languages
-   */
-  getAvailableLanguages(): Language[] {
-    return this.languages;
-  }
-
-  /**
    * Get language object by code
    */
   getLanguageByCode(code: string): Language | undefined {
-    return this.languages.find(lang => lang.code === code);
+    return this.getAvailableLanguages().find(lang => lang.code === code);
   }
 
   /**
    * Get current language object
    */
   getCurrentLanguageObject(): Language {
-    return this.getLanguageByCode(this.getCurrentLanguage()) || this.languages[0];
+    const languages = this.getAvailableLanguages();
+    return this.getLanguageByCode(this.getCurrentLanguage()) || languages[0];
   }
 
   /**
    * Check if a language is supported
    */
   isLanguageSupported(code: string): boolean {
-    return this.languages.some(lang => lang.code === code);
+    return this.getAvailableLanguages().some(lang => lang.code === code);
   }
 
   /**

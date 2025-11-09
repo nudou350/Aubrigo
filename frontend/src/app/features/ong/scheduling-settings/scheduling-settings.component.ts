@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SchedulingService, OngOperatingHours, AppointmentSettings } from '../../../core/services/scheduling.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { OngService } from '../../../core/services/ong.service';
@@ -20,7 +21,7 @@ interface DaySchedule {
 @Component({
   selector: 'app-scheduling-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="scheduling-settings">
       <!-- Header -->
@@ -30,20 +31,20 @@ interface DaySchedule {
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
           </svg>
         </button>
-        <h1 class="title">Configurações de Agendamento</h1>
+        <h1 class="title">{{ 'ong.schedulingSettings.title' | translate }}</h1>
       </div>
 
       @if (loading()) {
         <div class="loading-container">
-          <div class="loading">Carregando...</div>
+          <div class="loading">{{ 'ong.common.loading' | translate }}</div>
         </div>
       } @else {
         <div class="content">
           <!-- Operating Hours Section -->
           <div class="section">
             <div class="section-header">
-              <h2 class="section-title">Horários de Funcionamento</h2>
-              <p class="section-subtitle">Configure os dias e horários em que sua ONG atende visitantes</p>
+              <h2 class="section-title">{{ 'ong.schedulingSettings.operatingHours.title' | translate }}</h2>
+              <p class="section-subtitle">{{ 'ong.schedulingSettings.operatingHours.subtitle' | translate }}</p>
             </div>
 
             <div class="days-list">
@@ -61,7 +62,7 @@ interface DaySchedule {
                       </label>
                       <h3 class="day-name">{{ day.dayName }}</h3>
                       @if (!day.isOpen) {
-                        <span class="closed-badge">Fechado</span>
+                        <span class="closed-badge">{{ 'ong.schedulingSettings.operatingHours.closed' | translate }}</span>
                       }
                     </div>
                   </div>
@@ -70,14 +71,14 @@ interface DaySchedule {
                     <div class="day-times">
                       <div class="time-row">
                         <div class="time-group">
-                          <label>Abertura</label>
+                          <label>{{ 'ong.schedulingSettings.operatingHours.opening' | translate }}</label>
                           <input
                             type="time"
                             [(ngModel)]="day.openTime"
                           />
                         </div>
                         <div class="time-group">
-                          <label>Fechamento</label>
+                          <label>{{ 'ong.schedulingSettings.operatingHours.closing' | translate }}</label>
                           <input
                             type="time"
                             [(ngModel)]="day.closeTime"
@@ -90,20 +91,20 @@ interface DaySchedule {
                           type="checkbox"
                           [(ngModel)]="day.hasLunchBreak"
                         />
-                        <span>Intervalo de almoço</span>
+                        <span>{{ 'ong.schedulingSettings.operatingHours.lunchBreak' | translate }}</span>
                       </label>
 
                       @if (day.hasLunchBreak) {
                         <div class="time-row">
                           <div class="time-group">
-                            <label>Início Almoço</label>
+                            <label>{{ 'ong.schedulingSettings.operatingHours.lunchStart' | translate }}</label>
                             <input
                               type="time"
                               [(ngModel)]="day.lunchBreakStart"
                             />
                           </div>
                           <div class="time-group">
-                            <label>Fim Almoço</label>
+                            <label>{{ 'ong.schedulingSettings.operatingHours.lunchEnd' | translate }}</label>
                             <input
                               type="time"
                               [(ngModel)]="day.lunchBreakEnd"
@@ -121,16 +122,16 @@ interface DaySchedule {
           <!-- Appointment Settings Section -->
           <div class="section">
             <div class="section-header">
-              <h2 class="section-title">Configurações de Visitas</h2>
-              <p class="section-subtitle">Defina as regras para agendamento de visitas</p>
+              <h2 class="section-title">{{ 'ong.schedulingSettings.visitSettings.title' | translate }}</h2>
+              <p class="section-subtitle">{{ 'ong.schedulingSettings.visitSettings.subtitle' | translate }}</p>
             </div>
 
             <!-- Allow Appointments Toggle -->
             <div class="allow-appointments-toggle">
               <div class="toggle-content">
                 <div class="toggle-info">
-                  <h3>Permitir Agendamentos</h3>
-                  <p>Quando desativado, visitantes não poderão agendar visitas aos seus animais</p>
+                  <h3>{{ 'ong.schedulingSettings.visitSettings.allowAppointments' | translate }}</h3>
+                  <p>{{ 'ong.schedulingSettings.visitSettings.allowAppointmentsDesc' | translate }}</p>
                 </div>
                 <label class="main-toggle">
                   <input
@@ -146,58 +147,58 @@ interface DaySchedule {
 
             <div class="settings-grid">
               <div class="form-group">
-                <label>Duração da Visita (minutos)</label>
+                <label>{{ 'ong.schedulingSettings.visitSettings.visitDuration' | translate }}</label>
                 <input
                   type="number"
                   [(ngModel)]="appointmentSettings.visitDurationMinutes"
                   min="15"
                   step="15"
                 />
-                <p class="hint">Tempo médio de cada visita</p>
+                <p class="hint">{{ 'ong.schedulingSettings.visitSettings.visitDurationHint' | translate }}</p>
               </div>
 
               <div class="form-group">
-                <label>Visitas Simultâneas</label>
+                <label>{{ 'ong.schedulingSettings.visitSettings.concurrentVisits' | translate }}</label>
                 <input
                   type="number"
                   [(ngModel)]="appointmentSettings.maxConcurrentVisits"
                   min="1"
                   max="10"
                 />
-                <p class="hint">Quantas visitas ao mesmo tempo</p>
+                <p class="hint">{{ 'ong.schedulingSettings.visitSettings.concurrentVisitsHint' | translate }}</p>
               </div>
 
               <div class="form-group">
-                <label>Antecedência Mínima (horas)</label>
+                <label>{{ 'ong.schedulingSettings.visitSettings.minAdvance' | translate }}</label>
                 <input
                   type="number"
                   [(ngModel)]="appointmentSettings.minAdvanceBookingHours"
                   min="0"
                   max="168"
                 />
-                <p class="hint">Tempo mínimo para agendar</p>
+                <p class="hint">{{ 'ong.schedulingSettings.visitSettings.minAdvanceHint' | translate }}</p>
               </div>
 
               <div class="form-group">
-                <label>Agendamento Máximo (dias)</label>
+                <label>{{ 'ong.schedulingSettings.visitSettings.maxAdvance' | translate }}</label>
                 <input
                   type="number"
                   [(ngModel)]="appointmentSettings.maxAdvanceBookingDays"
                   min="1"
                   max="365"
                 />
-                <p class="hint">Máximo de dias no futuro</p>
+                <p class="hint">{{ 'ong.schedulingSettings.visitSettings.maxAdvanceHint' | translate }}</p>
               </div>
 
               <div class="form-group">
-                <label>Intervalo entre Slots (minutos)</label>
+                <label>{{ 'ong.schedulingSettings.visitSettings.slotInterval' | translate }}</label>
                 <input
                   type="number"
                   [(ngModel)]="appointmentSettings.slotIntervalMinutes"
                   min="15"
                   step="15"
                 />
-                <p class="hint">Espaçamento entre horários</p>
+                <p class="hint">{{ 'ong.schedulingSettings.visitSettings.slotIntervalHint' | translate }}</p>
               </div>
 
               <div class="form-group">
@@ -206,7 +207,7 @@ interface DaySchedule {
                     type="checkbox"
                     [(ngModel)]="appointmentSettings.allowWeekendBookings"
                   />
-                  <span>Permitir agendamentos em fins de semana</span>
+                  <span>{{ 'ong.schedulingSettings.visitSettings.allowWeekends' | translate }}</span>
                 </label>
               </div>
             </div>
@@ -227,7 +228,7 @@ interface DaySchedule {
               (click)="goBack()"
               [disabled]="saving()"
             >
-              Cancelar
+              {{ 'ong.common.cancel' | translate }}
             </button>
             <button
               type="button"
@@ -235,7 +236,7 @@ interface DaySchedule {
               (click)="saveAll()"
               [disabled]="saving()"
             >
-              {{ saving() ? 'Salvando...' : 'Salvar Configurações' }}
+              {{ saving() ? ('ong.common.saving' | translate) : ('ong.schedulingSettings.saveSettings' | translate) }}
             </button>
           </div>
         </div>
@@ -674,20 +675,13 @@ export class SchedulingSettingsComponent implements OnInit {
   private ongService = inject(OngService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  private translate = inject(TranslateService);
 
   loading = signal(true);
   saving = signal(false);
   errorMessage = signal('');
 
-  weekDays = signal<DaySchedule[]>([
-    { dayOfWeek: 0, dayName: 'Domingo', isOpen: false, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: false },
-    { dayOfWeek: 1, dayName: 'Segunda-feira', isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
-    { dayOfWeek: 2, dayName: 'Terça-feira', isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
-    { dayOfWeek: 3, dayName: 'Quarta-feira', isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
-    { dayOfWeek: 4, dayName: 'Quinta-feira', isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
-    { dayOfWeek: 5, dayName: 'Sexta-feira', isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
-    { dayOfWeek: 6, dayName: 'Sábado', isOpen: false, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: false },
-  ]);
+  weekDays = signal<DaySchedule[]>([]);
 
   allowAppointments = signal(true);
 
@@ -701,7 +695,20 @@ export class SchedulingSettingsComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.initializeWeekDays();
     this.loadExistingSettings();
+  }
+
+  initializeWeekDays() {
+    this.weekDays.set([
+      { dayOfWeek: 0, dayName: this.translate.instant('ong.schedulingSettings.days.sunday'), isOpen: false, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: false },
+      { dayOfWeek: 1, dayName: this.translate.instant('ong.schedulingSettings.days.monday'), isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
+      { dayOfWeek: 2, dayName: this.translate.instant('ong.schedulingSettings.days.tuesday'), isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
+      { dayOfWeek: 3, dayName: this.translate.instant('ong.schedulingSettings.days.wednesday'), isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
+      { dayOfWeek: 4, dayName: this.translate.instant('ong.schedulingSettings.days.thursday'), isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
+      { dayOfWeek: 5, dayName: this.translate.instant('ong.schedulingSettings.days.friday'), isOpen: true, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: true },
+      { dayOfWeek: 6, dayName: this.translate.instant('ong.schedulingSettings.days.saturday'), isOpen: false, openTime: '09:00', closeTime: '17:00', lunchBreakStart: '12:00', lunchBreakEnd: '13:00', hasLunchBreak: false },
+    ]);
   }
 
   loadExistingSettings() {
@@ -781,13 +788,13 @@ export class SchedulingSettingsComponent implements OnInit {
       this.schedulingService.updateAppointmentSettings(appointmentSettingsPayload).toPromise(),
       this.ongService.updateOngProfile({ allowAppointments: this.allowAppointments() }).toPromise()
     ]).then(() => {
-      this.toastService.success('Configurações salvas com sucesso!');
+      this.toastService.success(this.translate.instant('ong.schedulingSettings.saveSuccess'));
       this.saving.set(false);
       setTimeout(() => {
         this.router.navigate(['/ong/dashboard']);
       }, 1500);
     }).catch((error) => {
-      this.errorMessage.set(error.error?.message || 'Erro ao salvar configurações. Tente novamente.');
+      this.errorMessage.set(error.error?.message || this.translate.instant('ong.schedulingSettings.saveError'));
       this.toastService.error(this.errorMessage());
       this.saving.set(false);
     });

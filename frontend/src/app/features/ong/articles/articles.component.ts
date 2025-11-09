@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   ArticlesService,
   Article,
@@ -15,111 +16,111 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-ong-articles',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule, TranslateModule],
   template: `
     <div class="articles-page">
       <a routerLink="/ong/dashboard" class="back-link">
-        ← Voltar
+        {{ 'ong.common.back' | translate }}
       </a>
       <header class="page-header">
         <div>
-          <h1>Necessidades da ONG</h1>
-          <p>Gerencie os artigos e necessidades que sua ONG precisa</p>
+          <h1>{{ 'ong.articles.title' | translate }}</h1>
+          <p>{{ 'ong.articles.subtitle' | translate }}</p>
         </div>
         <button class="btn-primary" (click)="openCreateForm()">
-          ➕ Nova Necessidade
+          {{ 'ong.articles.newNeed' | translate }}
         </button>
       </header>
 
       @if (isLoading()) {
         <div class="loading">
           <div class="spinner"></div>
-          <p>Carregando necessidades...</p>
+          <p>{{ 'ong.articles.loadingNeeds' | translate }}</p>
         </div>
       } @else {
         @if (showForm()) {
           <div class="form-modal">
             <div class="form-container">
               <div class="form-header">
-                <h2>{{ isEditing() ? 'Editar Necessidade' : 'Nova Necessidade' }}</h2>
-                <button class="btn-close" (click)="closeForm()">✕</button>
+                <h2>{{ isEditing() ? ('ong.articles.editNeed' | translate) : ('ong.articles.newNeedTitle' | translate) }}</h2>
+                <button class="btn-close" (click)="closeForm()">{{ 'ong.articles.closeButton' | translate }}</button>
               </div>
 
               <form [formGroup]="articleForm" (ngSubmit)="onSubmit()">
                 <div class="form-group">
-                  <label for="title">Título *</label>
+                  <label for="title">{{ 'ong.articles.titleLabel' | translate }}</label>
                   <input
                     id="title"
                     type="text"
                     formControlName="title"
                     class="form-input"
-                    placeholder="Ex: Ração para cães"
+                    [placeholder]="'ong.articles.titlePlaceholder' | translate"
                   />
                   @if (articleForm.get('title')?.invalid && articleForm.get('title')?.touched) {
-                    <span class="form-error">Título é obrigatório</span>
+                    <span class="form-error">{{ 'ong.articles.titleRequired' | translate }}</span>
                   }
                 </div>
 
                 <div class="form-group">
-                  <label for="description">Descrição *</label>
+                  <label for="description">{{ 'ong.articles.descriptionLabel' | translate }}</label>
                   <textarea
                     id="description"
                     formControlName="description"
                     class="form-textarea"
                     rows="4"
-                    placeholder="Descreva a necessidade em detalhes..."
+                    [placeholder]="'ong.articles.descriptionPlaceholder' | translate"
                   ></textarea>
                   @if (articleForm.get('description')?.invalid && articleForm.get('description')?.touched) {
-                    <span class="form-error">Descrição é obrigatória</span>
+                    <span class="form-error">{{ 'ong.articles.descriptionRequired' | translate }}</span>
                   }
                 </div>
 
                 <div class="form-row">
                   <div class="form-group">
-                    <label for="category">Categoria</label>
+                    <label for="category">{{ 'ong.articles.categoryLabel' | translate }}</label>
                     <select id="category" formControlName="category" class="form-select">
-                      <option value="food">🍖 Alimentação</option>
-                      <option value="medicine">💊 Medicamentos</option>
-                      <option value="debt">💰 Dívidas</option>
-                      <option value="supplies">🛠️ Suprimentos</option>
-                      <option value="other">📦 Outro</option>
+                      <option value="food">{{ 'ong.articles.categories.food' | translate }}</option>
+                      <option value="medicine">{{ 'ong.articles.categories.medicine' | translate }}</option>
+                      <option value="debt">{{ 'ong.articles.categories.debt' | translate }}</option>
+                      <option value="supplies">{{ 'ong.articles.categories.supplies' | translate }}</option>
+                      <option value="other">{{ 'ong.articles.categories.other' | translate }}</option>
                     </select>
                   </div>
 
                   <div class="form-group">
-                    <label for="priority">Prioridade</label>
+                    <label for="priority">{{ 'ong.articles.priorityLabel' | translate }}</label>
                     <select id="priority" formControlName="priority" class="form-select">
-                      <option value="low">Baixa</option>
-                      <option value="medium">Média</option>
-                      <option value="high">Alta</option>
-                      <option value="urgent">🚨 Urgente</option>
+                      <option value="low">{{ 'ong.articles.priorities.low' | translate }}</option>
+                      <option value="medium">{{ 'ong.articles.priorities.medium' | translate }}</option>
+                      <option value="high">{{ 'ong.articles.priorities.high' | translate }}</option>
+                      <option value="urgent">{{ 'ong.articles.priorities.urgent' | translate }}</option>
                     </select>
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label for="targetAmount">Valor Alvo (€) - Opcional</label>
+                  <label for="targetAmount">{{ 'ong.articles.targetValue' | translate }}</label>
                   <input
                     id="targetAmount"
                     type="number"
                     formControlName="targetAmount"
                     class="form-input"
-                    placeholder="0.00"
+                    [placeholder]="'ong.articles.targetValuePlaceholder' | translate"
                     min="0"
                     step="0.01"
                   />
-                  <small class="form-hint">Para necessidades financeiras, informe o valor necessário</small>
+                  <small class="form-hint">{{ 'ong.articles.targetValueHint' | translate }}</small>
                 </div>
 
                 <div class="form-actions">
                   <button type="button" class="btn-secondary" (click)="closeForm()">
-                    Cancelar
+                    {{ 'ong.articles.cancelButton' | translate }}
                   </button>
                   <button type="submit" class="btn-primary" [disabled]="articleForm.invalid || isSaving()">
                     @if (isSaving()) {
                       <span class="spinner-small"></span>
                     } @else {
-                      {{ isEditing() ? 'Salvar Alterações' : 'Criar Necessidade' }}
+                      {{ isEditing() ? ('ong.articles.saveChanges' | translate) : ('ong.articles.createNeed' | translate) }}
                     }
                   </button>
                 </div>
@@ -131,10 +132,10 @@ import { ToastService } from '../../../core/services/toast.service';
         @if (articles().length === 0) {
           <div class="empty-state">
             <div class="empty-icon">📋</div>
-            <h3>Nenhuma necessidade cadastrada</h3>
-            <p>Comece criando sua primeira necessidade para que os visitantes saibam como podem ajudar</p>
+            <h3>{{ 'ong.articles.noNeeds' | translate }}</h3>
+            <p>{{ 'ong.articles.noNeedsDescription' | translate }}</p>
             <button class="btn-primary" (click)="openCreateForm()">
-              ➕ Criar Primeira Necessidade
+              {{ 'ong.articles.createFirstNeed' | translate }}
             </button>
           </div>
         } @else {
@@ -162,9 +163,9 @@ import { ToastService } from '../../../core/services/toast.service';
                 <div class="article-footer">
                   <div class="article-status">
                     @if (article.status === 'active') {
-                      <span class="status-badge active">✓ Ativo</span>
+                      <span class="status-badge active">{{ 'ong.articles.active' | translate }}</span>
                     } @else {
-                      <span class="status-badge inactive">✕ Inativo</span>
+                      <span class="status-badge inactive">{{ 'ong.articles.inactive' | translate }}</span>
                     }
                   </div>
 
@@ -172,21 +173,21 @@ import { ToastService } from '../../../core/services/toast.service';
                     <button
                       class="btn-icon"
                       (click)="toggleStatus(article)"
-                      [title]="article.status === 'active' ? 'Desativar' : 'Ativar'"
+                      [title]="article.status === 'active' ? ('ong.articles.deactivate' | translate) : ('ong.articles.activate' | translate)"
                     >
                       {{ article.status === 'active' ? '👁️' : '👁️‍🗨️' }}
                     </button>
                     <button
                       class="btn-icon"
                       (click)="editArticle(article)"
-                      title="Editar"
+                      [title]="'ong.articles.edit' | translate"
                     >
                       ✏️
                     </button>
                     <button
                       class="btn-icon danger"
                       (click)="deleteArticle(article)"
-                      title="Excluir"
+                      [title]="'ong.articles.delete' | translate"
                     >
                       🗑️
                     </button>
@@ -568,6 +569,7 @@ export class ArticlesComponent implements OnInit {
   private articlesService = inject(ArticlesService);
   private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
+  private translate = inject(TranslateService);
 
   articles = signal<Article[]>([]);
   isLoading = signal(false);
@@ -600,7 +602,7 @@ export class ArticlesComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar necessidades');
+        this.toastService.error(this.translate.instant('ong.articles.errorLoad'));
         this.isLoading.set(false);
       }
     });
@@ -646,26 +648,26 @@ export class ArticlesComponent implements OnInit {
     if (this.isEditing() && this.editingArticle()) {
       this.articlesService.update(this.editingArticle()!.id, formValue).subscribe({
         next: () => {
-          this.toastService.success('Necessidade atualizada com sucesso!');
+          this.toastService.success(this.translate.instant('ong.articles.successUpdate'));
           this.closeForm();
           this.loadArticles();
           this.isSaving.set(false);
         },
         error: (error) => {
-          this.toastService.error('Erro ao atualizar necessidade');
+          this.toastService.error(this.translate.instant('ong.articles.errorUpdate'));
           this.isSaving.set(false);
         }
       });
     } else {
       this.articlesService.create(formValue).subscribe({
         next: () => {
-          this.toastService.success('Necessidade criada com sucesso!');
+          this.toastService.success(this.translate.instant('ong.articles.successCreate'));
           this.closeForm();
           this.loadArticles();
           this.isSaving.set(false);
         },
         error: (error) => {
-          this.toastService.error('Erro ao criar necessidade');
+          this.toastService.error(this.translate.instant('ong.articles.errorCreate'));
           this.isSaving.set(false);
         }
       });
@@ -679,40 +681,42 @@ export class ArticlesComponent implements OnInit {
 
     this.articlesService.updateStatus(article.id, newStatus).subscribe({
       next: () => {
-        this.toastService.success(
-          `Necessidade ${newStatus === ArticleStatus.ACTIVE ? 'ativada' : 'desativada'}!`
-        );
+        const message = newStatus === ArticleStatus.ACTIVE
+          ? this.translate.instant('ong.articles.successActivate')
+          : this.translate.instant('ong.articles.successDeactivate');
+        this.toastService.success(message);
         this.loadArticles();
       },
       error: (error) => {
-        this.toastService.error('Erro ao atualizar status');
+        this.toastService.error(this.translate.instant('ong.articles.errorUpdateStatus'));
       }
     });
   }
 
   deleteArticle(article: Article): void {
-    if (!confirm(`Tem certeza que deseja excluir "${article.title}"?`)) {
+    const confirmMessage = this.translate.instant('ong.articles.confirmDelete', { title: article.title });
+    if (!confirm(confirmMessage)) {
       return;
     }
 
     this.articlesService.remove(article.id).subscribe({
       next: () => {
-        this.toastService.success('Necessidade excluída com sucesso!');
+        this.toastService.success(this.translate.instant('ong.articles.successDelete'));
         this.loadArticles();
       },
       error: (error) => {
-        this.toastService.error('Erro ao excluir necessidade');
+        this.toastService.error(this.translate.instant('ong.articles.errorDelete'));
       }
     });
   }
 
   getCategoryLabel(category: ArticleCategory): string {
     const labels: Record<ArticleCategory, string> = {
-      [ArticleCategory.FOOD]: 'Alimentação',
-      [ArticleCategory.MEDICINE]: 'Medicamentos',
-      [ArticleCategory.DEBT]: 'Dívidas',
-      [ArticleCategory.SUPPLIES]: 'Suprimentos',
-      [ArticleCategory.OTHER]: 'Outro'
+      [ArticleCategory.FOOD]: this.translate.instant('ong.articles.categories.foodLabel'),
+      [ArticleCategory.MEDICINE]: this.translate.instant('ong.articles.categories.medicineLabel'),
+      [ArticleCategory.DEBT]: this.translate.instant('ong.articles.categories.debtLabel'),
+      [ArticleCategory.SUPPLIES]: this.translate.instant('ong.articles.categories.suppliesLabel'),
+      [ArticleCategory.OTHER]: this.translate.instant('ong.articles.categories.otherLabel')
     };
     return labels[category];
   }
@@ -730,10 +734,10 @@ export class ArticlesComponent implements OnInit {
 
   getPriorityLabel(priority: ArticlePriority): string {
     const labels: Record<ArticlePriority, string> = {
-      [ArticlePriority.LOW]: 'Baixa',
-      [ArticlePriority.MEDIUM]: 'Média',
-      [ArticlePriority.HIGH]: 'Alta',
-      [ArticlePriority.URGENT]: '🚨 Urgente'
+      [ArticlePriority.LOW]: this.translate.instant('ong.articles.priorities.low'),
+      [ArticlePriority.MEDIUM]: this.translate.instant('ong.articles.priorities.medium'),
+      [ArticlePriority.HIGH]: this.translate.instant('ong.articles.priorities.high'),
+      [ArticlePriority.URGENT]: this.translate.instant('ong.articles.priorities.urgent')
     };
     return labels[priority];
   }

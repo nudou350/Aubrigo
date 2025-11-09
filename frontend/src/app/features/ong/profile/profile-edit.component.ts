@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { OngService } from '../../../core/services/ong.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -9,27 +10,27 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-profile-edit',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, TranslateModule],
   template: `
     <div class="profile-edit-page">
       <header class="page-header">
         <a routerLink="/ong/dashboard" class="back-link">
-          ← Voltar
+          {{ 'ong.common.back' | translate }}
         </a>
-        <h1>Editar Perfil da ONG</h1>
-        <p>Atualize as informações da sua organização</p>
+        <h1>{{ 'ong.profile.title' | translate }}</h1>
+        <p>{{ 'ong.profile.subtitle' | translate }}</p>
       </header>
 
       @if (isLoading()) {
         <div class="loading">
           <div class="spinner"></div>
-          <p>Carregando dados...</p>
+          <p>{{ 'ong.profile.loadingData' | translate }}</p>
         </div>
       } @else {
         <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
           <!-- Profile Image -->
           <div class="form-section">
-            <h2>📷 Foto de Perfil</h2>
+            <h2>{{ 'ong.profile.profilePhoto' | translate }}</h2>
             <div class="profile-image-section">
               <div class="current-image">
                 <img
@@ -46,76 +47,76 @@ import { ToastService } from '../../../core/services/toast.service';
                     (change)="onImageSelect($event)"
                     hidden
                   />
-                  📷 Alterar Foto
+                  {{ 'ong.profile.changePhoto' | translate }}
                 </label>
-                <p class="hint">JPG, PNG ou WebP (máx. 5MB, será convertido para WebP)</p>
+                <p class="hint">{{ 'ong.profile.photoHint' | translate }}</p>
               </div>
             </div>
           </div>
 
           <!-- Basic Info -->
           <div class="form-section">
-            <h2>📝 Informações Básicas</h2>
+            <h2>{{ 'ong.profile.basicInfo' | translate }}</h2>
             <div class="form-grid">
               <div class="form-group full-width">
-                <label for="ongName">Nome da ONG *</label>
+                <label for="ongName">{{ 'ong.profile.ongName' | translate }}</label>
                 <input
                   id="ongName"
                   type="text"
                   formControlName="ongName"
-                  placeholder="Ex: Cantinho dos Animais"
+                  [placeholder]="'ong.profile.ongNamePlaceholder' | translate"
                   class="form-control"
                 />
                 @if (profileForm.get('ongName')?.invalid && profileForm.get('ongName')?.touched) {
-                  <span class="error">Nome da ONG é obrigatório</span>
+                  <span class="error">{{ 'ong.profile.ongNameRequired' | translate }}</span>
                 }
               </div>
 
               <div class="form-group">
-                <label for="email">Email *</label>
+                <label for="email">{{ 'ong.profile.email' | translate }}</label>
                 <input
                   id="email"
                   type="email"
                   formControlName="email"
-                  placeholder="contato@ong.com"
+                  [placeholder]="'ong.profile.emailPlaceholder' | translate"
                   class="form-control"
                 />
                 @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
-                  <span class="error">Email válido é obrigatório</span>
+                  <span class="error">{{ 'ong.profile.emailRequired' | translate }}</span>
                 }
               </div>
 
               <div class="form-group">
-                <label for="phone">Telefone</label>
+                <label for="phone">{{ 'ong.profile.phone' | translate }}</label>
                 <input
                   id="phone"
                   type="tel"
                   formControlName="phone"
-                  placeholder="+351 912 345 678"
+                  [placeholder]="'ong.profile.phonePlaceholder' | translate"
                   class="form-control"
                 />
               </div>
 
               <div class="form-group">
-                <label for="location">Localização</label>
+                <label for="location">{{ 'ong.profile.location' | translate }}</label>
                 <input
                   id="location"
                   type="text"
                   formControlName="location"
-                  placeholder="Lisboa, Portugal"
+                  [placeholder]="'ong.profile.locationPlaceholder' | translate"
                   class="form-control"
                 />
               </div>
 
               <div class="form-group">
-                <label for="instagramHandle">Instagram</label>
+                <label for="instagramHandle">{{ 'ong.profile.instagram' | translate }}</label>
                 <div class="input-with-prefix">
-                  <span class="prefix">&#64;</span>
+                  <span class="prefix">{{ 'ong.profile.instagramPrefix' | translate }}</span>
                   <input
                     id="instagramHandle"
                     type="text"
                     formControlName="instagramHandle"
-                    placeholder="seuperfil"
+                    [placeholder]="'ong.profile.instagramPlaceholder' | translate"
                     class="form-control with-prefix"
                   />
                 </div>
@@ -125,42 +126,42 @@ import { ToastService } from '../../../core/services/toast.service';
 
           <!-- Password Change (Optional) -->
           <div class="form-section">
-            <h2>🔒 Alterar Senha (Opcional)</h2>
-            <p class="section-desc">Deixe em branco para manter a senha atual</p>
+            <h2>{{ 'ong.profile.changePassword' | translate }}</h2>
+            <p class="section-desc">{{ 'ong.profile.changePasswordHint' | translate }}</p>
             <div class="form-grid">
               <div class="form-group">
-                <label for="currentPassword">Senha Atual</label>
+                <label for="currentPassword">{{ 'ong.profile.currentPassword' | translate }}</label>
                 <input
                   id="currentPassword"
                   type="password"
                   formControlName="currentPassword"
-                  placeholder="••••••••"
+                  [placeholder]="'ong.profile.passwordPlaceholder' | translate"
                   class="form-control"
                 />
               </div>
 
               <div class="form-group">
-                <label for="newPassword">Nova Senha</label>
+                <label for="newPassword">{{ 'ong.profile.newPassword' | translate }}</label>
                 <input
                   id="newPassword"
                   type="password"
                   formControlName="newPassword"
-                  placeholder="••••••••"
+                  [placeholder]="'ong.profile.passwordPlaceholder' | translate"
                   class="form-control"
                 />
               </div>
 
               <div class="form-group">
-                <label for="confirmPassword">Confirmar Nova Senha</label>
+                <label for="confirmPassword">{{ 'ong.profile.confirmPassword' | translate }}</label>
                 <input
                   id="confirmPassword"
                   type="password"
                   formControlName="confirmPassword"
-                  placeholder="••••••••"
+                  [placeholder]="'ong.profile.passwordPlaceholder' | translate"
                   class="form-control"
                 />
                 @if (profileForm.hasError('passwordMismatch') && profileForm.get('confirmPassword')?.touched) {
-                  <span class="error">As senhas não coincidem</span>
+                  <span class="error">{{ 'ong.profile.passwordMismatch' | translate }}</span>
                 }
               </div>
             </div>
@@ -169,14 +170,14 @@ import { ToastService } from '../../../core/services/toast.service';
           <!-- Submit -->
           <div class="form-actions">
             <button type="button" routerLink="/ong/dashboard" class="btn-cancel">
-              Cancelar
+              {{ 'ong.profile.cancelButton' | translate }}
             </button>
             <button type="submit" class="btn-submit" [disabled]="isSubmitting()">
               @if (isSubmitting()) {
                 <span class="spinner-small"></span>
-                <span>Salvando...</span>
+                <span>{{ 'ong.profile.savingButton' | translate }}</span>
               } @else {
-                <span>Salvar Alterações</span>
+                <span>{{ 'ong.profile.saveButton' | translate }}</span>
               }
             </button>
           </div>
@@ -451,6 +452,7 @@ export class ProfileEditComponent implements OnInit {
   private ongService = inject(OngService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  private translate = inject(TranslateService);
 
   profileForm: FormGroup;
   isLoading = signal(true);
@@ -501,7 +503,7 @@ export class ProfileEditComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar perfil');
+        this.toastService.error(this.translate.instant('ong.profile.errorLoadProfile'));
         this.isLoading.set(false);
       }
     });
@@ -514,12 +516,12 @@ export class ProfileEditComponent implements OnInit {
     // Validate image type (PNG, JPEG, WebP)
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
     if (!allowedTypes.includes(file.type.toLowerCase())) {
-      this.toastService.error('Por favor, selecione apenas imagens PNG, JPG ou WebP');
+      this.toastService.error(this.translate.instant('ong.profile.errorInvalidImage'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      this.toastService.error('Imagem muito grande. Tamanho máximo: 5MB');
+      this.toastService.error(this.translate.instant('ong.profile.errorImageSize'));
       return;
     }
 
@@ -560,11 +562,11 @@ export class ProfileEditComponent implements OnInit {
                   profileImageUrl: response.profileImageUrl
                 });
               }
-              this.toastService.success('Imagem de perfil atualizada');
+              this.toastService.success(this.translate.instant('ong.profile.successUpdateImage'));
               resolve();
             },
             error: (error) => {
-              this.toastService.error('Erro ao atualizar imagem de perfil');
+              this.toastService.error(this.translate.instant('ong.profile.errorUpdateImage'));
               reject(error);
             }
           });
@@ -599,7 +601,7 @@ export class ProfileEditComponent implements OnInit {
             resolve();
           },
           error: (error) => {
-            this.toastService.error('Erro ao atualizar perfil');
+            this.toastService.error(this.translate.instant('ong.profile.errorUpdateProfile'));
             reject(error);
           }
         });
@@ -614,11 +616,14 @@ export class ProfileEditComponent implements OnInit {
             confirmPassword: this.profileForm.value.confirmPassword
           }).subscribe({
             next: () => {
-              this.toastService.success('Senha alterada com sucesso');
+              this.toastService.success(this.translate.instant('ong.profile.successChangePassword'));
               resolve();
             },
             error: (error) => {
-              this.toastService.error('Erro ao alterar senha: ' + (error.error?.message || 'senha atual incorreta'));
+              const errorMessage = this.translate.instant('ong.profile.errorChangePassword', {
+                error: error.error?.message || 'senha atual incorreta'
+              });
+              this.toastService.error(errorMessage);
               reject(error);
             }
           });
@@ -626,7 +631,7 @@ export class ProfileEditComponent implements OnInit {
       }
 
       // Success - navigate back
-      this.toastService.success('Perfil atualizado com sucesso!');
+      this.toastService.success(this.translate.instant('ong.profile.successUpdate'));
       setTimeout(() => {
         this.router.navigate(['/ong/dashboard']);
       }, 1500);

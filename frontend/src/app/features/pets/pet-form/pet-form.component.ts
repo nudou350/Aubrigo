@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
 import { ToastService } from '../../../core/services/toast.service';
-import { PORTUGAL_CITIES } from '../../../core/constants/portugal-cities';
+import { CityService } from '../../../core/services/city.service';
 import { normalizeImageUrl } from '../../../core/utils/image-url.util';
 
 interface PetImage {
@@ -632,7 +632,10 @@ export class PetFormComponent implements OnInit {
   images = signal<PetImage[]>([]);
   deletedImageIds = signal<string[]>([]);
   petId: string | null = null;
-  cities = PORTUGAL_CITIES;
+
+  // CityService integration
+  private cityService = inject(CityService);
+  cities = this.cityService.cities;
 
   // Location typeahead
   showLocationDropdown = signal(false);
@@ -793,7 +796,7 @@ export class PetFormComponent implements OnInit {
 
   // Location typeahead methods
   onLocationFocus() {
-    this.filteredCities.set(this.cities.slice(0, 5));
+    this.filteredCities.set(this.cityService.filterCities('', 5));
     this.showLocationDropdown.set(true);
     this.selectedLocationIndex.set(-1);
   }
@@ -803,13 +806,10 @@ export class PetFormComponent implements OnInit {
     this.locationInput.set(input);
 
     if (!input) {
-      this.filteredCities.set(this.cities.slice(0, 5));
+      this.filteredCities.set(this.cityService.filterCities('', 5));
       this.petForm.patchValue({ location: '' });
     } else {
-      const filtered = this.cities
-        .filter(city => city.toLowerCase().includes(input.toLowerCase()))
-        .slice(0, 5);
-      this.filteredCities.set(filtered);
+      this.filteredCities.set(this.cityService.filterCities(input, 5));
     }
 
     this.showLocationDropdown.set(true);

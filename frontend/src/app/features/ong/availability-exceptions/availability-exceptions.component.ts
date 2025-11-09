@@ -2,13 +2,14 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { SchedulingService, AvailabilityException } from '../../../core/services/scheduling.service';
 import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-availability-exceptions',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="exceptions-screen">
       <!-- Header -->
@@ -18,12 +19,12 @@ import { ToastService } from '../../../core/services/toast.service';
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
           </svg>
         </button>
-        <h1 class="title">Bloqueios e Férias</h1>
+        <h1 class="title">{{ 'ong.availability.title' | translate }}</h1>
       </div>
 
       @if (loading()) {
         <div class="loading-container">
-          <div class="loading">Carregando...</div>
+          <div class="loading">{{ 'ong.availability.loadingExceptions' | translate }}</div>
         </div>
       } @else {
         <div class="content">
@@ -33,33 +34,33 @@ import { ToastService } from '../../../core/services/toast.service';
               <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
               </svg>
-              Adicionar Bloqueio
+              {{ 'ong.availability.addBlock' | translate }}
             </button>
             <button class="btn-secondary" (click)="createHolidays()">
               <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                 <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
               </svg>
-              Auto-criar Feriados 2025
+              {{ 'ong.availability.autoCreateHolidays' | translate }}
             </button>
             <button class="btn-outline" (click)="cleanupExpired()">
               <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
               </svg>
-              Limpar Expirados
+              {{ 'ong.availability.clearExpired' | translate }}
             </button>
           </div>
 
           <!-- Active Exceptions List -->
           <div class="section">
-            <h2 class="section-title">Bloqueios Ativos</h2>
+            <h2 class="section-title">{{ 'ong.availability.activeBlocks' | translate }}</h2>
 
             @if (exceptions().length === 0) {
               <div class="empty-state">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
                   <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
                 </svg>
-                <p>Nenhum bloqueio configurado</p>
-                <p class="hint">Adicione bloqueios para férias, feriados ou manutenção</p>
+                <p>{{ 'ong.availability.noBlocks' | translate }}</p>
+                <p class="hint">{{ 'ong.availability.noBlocksHint' | translate }}</p>
               </div>
             } @else {
               <div class="exceptions-list">
@@ -80,10 +81,10 @@ import { ToastService } from '../../../core/services/toast.service';
                       <div class="exception-info">
                         <h3 class="exception-reason">{{ exception.reason }}</h3>
                         <p class="exception-type">
-                          {{ exception.exceptionType === 'blocked' ? 'Bloqueado' : 'Disponível' }}
+                          {{ exception.exceptionType === 'blocked' ? ('ong.availability.blocked' | translate) : ('ong.availability.available' | translate) }}
                         </p>
                       </div>
-                      <button class="btn-delete" (click)="deleteException(exception.id)" title="Remover">
+                      <button class="btn-delete" (click)="deleteException(exception.id)" [title]="'common.remove' | translate">
                         <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                           <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
                         </svg>
@@ -116,7 +117,7 @@ import { ToastService } from '../../../core/services/toast.service';
             <div class="modal-overlay" (click)="closeModal()">
               <div class="modal" (click)="$event.stopPropagation()">
                 <div class="modal-header">
-                  <h2>Adicionar Bloqueio</h2>
+                  <h2>{{ 'ong.availability.addBlockTitle' | translate }}</h2>
                   <button class="close-button" (click)="closeModal()">
                     <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
                       <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -126,19 +127,19 @@ import { ToastService } from '../../../core/services/toast.service';
 
                 <form class="modal-form" (ngSubmit)="submitException()">
                   <div class="form-group">
-                    <label>Motivo *</label>
+                    <label>{{ 'ong.availability.reason' | translate }}</label>
                     <input
                       type="text"
                       [(ngModel)]="newException.reason"
                       name="reason"
-                      placeholder="Ex: Férias, Feriado, Manutenção"
+                      [placeholder]="'ong.availability.reasonPlaceholder' | translate"
                       required
                     />
                   </div>
 
                   <div class="form-row">
                     <div class="form-group">
-                      <label>Data Início *</label>
+                      <label>{{ 'ong.availability.startDate' | translate }}</label>
                       <input
                         type="date"
                         [(ngModel)]="newException.startDate"
@@ -147,7 +148,7 @@ import { ToastService } from '../../../core/services/toast.service';
                       />
                     </div>
                     <div class="form-group">
-                      <label>Data Fim *</label>
+                      <label>{{ 'ong.availability.endDate' | translate }}</label>
                       <input
                         type="date"
                         [(ngModel)]="newException.endDate"
@@ -163,13 +164,13 @@ import { ToastService } from '../../../core/services/toast.service';
                       [(ngModel)]="newException.partialDay"
                       name="partialDay"
                     />
-                    <span>Bloquear apenas parte do dia</span>
+                    <span>{{ 'ong.availability.partialDay' | translate }}</span>
                   </label>
 
                   @if (newException.partialDay) {
                     <div class="form-row">
                       <div class="form-group">
-                        <label>Hora Início</label>
+                        <label>{{ 'ong.availability.startTime' | translate }}</label>
                         <input
                           type="time"
                           [(ngModel)]="newException.startTime"
@@ -177,7 +178,7 @@ import { ToastService } from '../../../core/services/toast.service';
                         />
                       </div>
                       <div class="form-group">
-                        <label>Hora Fim</label>
+                        <label>{{ 'ong.availability.endTime' | translate }}</label>
                         <input
                           type="time"
                           [(ngModel)]="newException.endTime"
@@ -195,10 +196,10 @@ import { ToastService } from '../../../core/services/toast.service';
 
                   <div class="modal-actions">
                     <button type="button" class="btn-secondary" (click)="closeModal()">
-                      Cancelar
+                      {{ 'ong.availability.cancelButton' | translate }}
                     </button>
                     <button type="submit" class="btn-primary" [disabled]="submitting()">
-                      {{ submitting() ? 'Salvando...' : 'Salvar Bloqueio' }}
+                      {{ submitting() ? ('ong.availability.savingButton' | translate) : ('ong.availability.saveButton' | translate) }}
                     </button>
                   </div>
                 </form>
@@ -564,6 +565,7 @@ export class AvailabilityExceptionsComponent implements OnInit {
   private schedulingService = inject(SchedulingService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  private translate = inject(TranslateService);
 
   loading = signal(true);
   submitting = signal(false);
@@ -592,7 +594,7 @@ export class AvailabilityExceptionsComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        this.toastService.error('Erro ao carregar bloqueios');
+        this.toastService.error(this.translate.instant('ong.availability.errorLoad'));
         this.loading.set(false);
       }
     });
@@ -619,7 +621,7 @@ export class AvailabilityExceptionsComponent implements OnInit {
     this.modalError.set('');
 
     if (!this.newException.reason || !this.newException.startDate || !this.newException.endDate) {
-      this.modalError.set('Por favor, preencha todos os campos obrigatórios');
+      this.modalError.set(this.translate.instant('ong.availability.errorRequiredFields'));
       return;
     }
 
@@ -636,62 +638,62 @@ export class AvailabilityExceptionsComponent implements OnInit {
 
     this.schedulingService.createException(payload).subscribe({
       next: () => {
-        this.toastService.success('Bloqueio criado com sucesso!');
+        this.toastService.success(this.translate.instant('ong.availability.successCreate'));
         this.submitting.set(false);
         this.closeModal();
         this.loadExceptions();
       },
       error: (error) => {
-        this.modalError.set(error.error?.message || 'Erro ao criar bloqueio');
+        this.modalError.set(error.error?.message || this.translate.instant('ong.availability.errorCreate'));
         this.submitting.set(false);
       }
     });
   }
 
   deleteException(id: string) {
-    if (!confirm('Tem certeza que deseja remover este bloqueio?')) {
+    if (!confirm(this.translate.instant('ong.availability.confirmRemove'))) {
       return;
     }
 
     this.schedulingService.deleteException(id).subscribe({
       next: () => {
-        this.toastService.success('Bloqueio removido com sucesso!');
+        this.toastService.success(this.translate.instant('ong.availability.successRemove'));
         this.loadExceptions();
       },
       error: (error) => {
-        this.toastService.error('Erro ao remover bloqueio');
+        this.toastService.error(this.translate.instant('ong.availability.errorRemove'));
       }
     });
   }
 
   createHolidays() {
-    if (!confirm('Deseja criar automaticamente todos os feriados nacionais de 2025?')) {
+    if (!confirm(this.translate.instant('ong.availability.confirmAutoHolidays'))) {
       return;
     }
 
     this.schedulingService.createHolidays(2025).subscribe({
       next: (response) => {
-        this.toastService.success(`${response.created} feriados criados com sucesso!`);
+        this.toastService.success(this.translate.instant('ong.availability.successAutoHolidays', { count: response.created }));
         this.loadExceptions();
       },
       error: (error) => {
-        this.toastService.error(error.error?.message || 'Erro ao criar feriados');
+        this.toastService.error(error.error?.message || this.translate.instant('ong.availability.errorAutoHolidays'));
       }
     });
   }
 
   cleanupExpired() {
-    if (!confirm('Deseja remover todos os bloqueios expirados?')) {
+    if (!confirm(this.translate.instant('ong.availability.confirmClearExpired'))) {
       return;
     }
 
     this.schedulingService.cleanupExpiredExceptions().subscribe({
       next: (response) => {
-        this.toastService.success(`${response.deleted} bloqueios expirados removidos!`);
+        this.toastService.success(this.translate.instant('ong.availability.successClearExpired', { count: response.deleted }));
         this.loadExceptions();
       },
       error: (error) => {
-        this.toastService.error('Erro ao limpar bloqueios expirados');
+        this.toastService.error(this.translate.instant('ong.availability.errorClearExpired'));
       }
     });
   }

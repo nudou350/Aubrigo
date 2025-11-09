@@ -52,7 +52,7 @@ import { Router } from '@angular/router';
     /* Desktop adjustments */
     @media (min-width: 1024px) {
       .back-button-overlay {
-        top: 80px; /* Below desktop navbar */
+        top: 120px; /* Below desktop navbar */
       }
     }
   `]
