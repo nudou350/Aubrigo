@@ -2,7 +2,7 @@ const sharp = require('sharp');
 const path = require('path');
 
 const tealColor = { r: 76, g: 168, b: 160 }; // #4ca8a0
-const inputPath = path.join(__dirname, '../src/assets/icon.PNG');
+const inputPath = path.join(__dirname, '../src/assets/icon_nav.png');
 const outputDir = path.join(__dirname, '../src/assets/icons');
 
 const icons = [
@@ -74,7 +74,7 @@ async function generateIcon(iconConfig) {
 }
 
 async function generateAllIcons() {
-  console.log('🎨 Generating PWA icons from icon.PNG...\n');
+  console.log('🎨 Generating PWA icons from icon_nav.png...\n');
 
   try {
     for (const iconConfig of icons) {
