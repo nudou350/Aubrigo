@@ -6,8 +6,8 @@
     </style>
   </defs>
 
-  <!-- Background circle with teal color -->
-  <circle class="cls-1" cx="96" cy="96" r="88"/>
+  <!-- Background rectangle with teal color - fills entire viewBox -->
+  <rect class="cls-1" x="0" y="0" width="192" height="192"/>
 
   <!-- Dog (left side) -->
   <path class="cls-2" d="M65,80 Q55,75 50,85 Q45,95 50,100 L55,95 Q52,88 58,85 Z"/>
