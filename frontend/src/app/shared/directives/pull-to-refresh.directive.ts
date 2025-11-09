@@ -31,13 +31,14 @@ export class PullToRefreshDirective implements OnInit, OnDestroy {
   private el = inject(ElementRef);
   private renderer = inject(Renderer2);
 
-  @Output() refresh = new EventEmitter<void>();
+  @Output() refresh = new EventEmitter<() => void>();
 
   private touchStartY = 0;
   private touchCurrentY = 0;
   private isPulling = false;
   private pullThreshold = 80; // pixels to pull before triggering refresh
   private refreshIndicator?: HTMLElement;
+  private isRefreshing = false;
 
   private listeners: Array<() => void> = [];
 
@@ -196,7 +197,9 @@ export class PullToRefreshDirective implements OnInit, OnDestroy {
   }
 
   private triggerRefresh(): void {
-    if (!this.refreshIndicator) return;
+    if (!this.refreshIndicator || this.isRefreshing) return;
+
+    this.isRefreshing = true;
 
     // Show spinning animation
     this.renderer.setStyle(this.refreshIndicator, 'opacity', '1');
@@ -222,13 +225,16 @@ export class PullToRefreshDirective implements OnInit, OnDestroy {
       }
     }
 
-    // Emit refresh event
-    this.refresh.emit();
+    // Emit refresh event with completion callback
+    const completeCallback = () => {
+      this.isRefreshing = false;
+      // Add a small delay to ensure smooth transition
+      setTimeout(() => {
+        this.resetIndicator();
+      }, 300);
+    };
 
-    // Hide indicator after a delay (assuming refresh completes)
-    setTimeout(() => {
-      this.resetIndicator();
-    }, 1500);
+    this.refresh.emit(completeCallback);
   }
 
   private resetIndicator(): void {

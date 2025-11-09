@@ -28,7 +28,7 @@ import { PullToRefreshDirective } from "../../shared/directives/pull-to-refresh.
   imports: [CommonModule, NgOptimizedImage, TranslateModule, LanguageSelectorComponent, PetCardSkeletonComponent, ScrollingModule, PullToRefreshDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="home-screen" appPullToRefresh (refresh)="onRefresh()">
+    <div class="home-screen" appPullToRefresh (refresh)="onRefresh($event)">
       <!-- Header Section -->
       <div class="header-section">
         <!-- Top Actions Row (Mobile) -->
@@ -1910,8 +1910,9 @@ export class HomeComponent implements OnInit {
   /**
    * Manual refresh method for pull-to-refresh
    * Clears cache and reloads all data with loading indicator
+   * @param complete Callback to signal refresh completion
    */
-  onRefresh() {
+  onRefresh(complete?: () => void) {
     // Clear all relevant caches
     this.cacheService.invalidate('pets:*');
     this.cacheService.invalidate('cities:*');
@@ -1920,10 +1921,71 @@ export class HomeComponent implements OnInit {
     // Show loading indicator for manual refresh
     this.loading.set(true);
 
-    // Reload all data
+    // Reload cities and ONGs (these complete in background)
     this.loadCitiesWithPets();
     this.loadOngs();
-    this.loadPets();
+
+    // Build search params
+    const params: SearchPetsParams = {};
+
+    if (this.currentOng()) {
+      params.ongId = this.currentOng()!;
+    }
+    if (this.selectedSpecies()) {
+      params.species = this.selectedSpecies();
+    }
+    if (
+      this.currentLocation() &&
+      this.currentLocation() !== this.translate.instant('home.filters.allCities')
+    ) {
+      params.location = this.currentLocation();
+    }
+    if (this.sortBy()) {
+      params.sortBy = this.sortBy();
+    }
+    if (this.selectedGender()) {
+      params.gender = this.selectedGender();
+    }
+    if (this.selectedSize()) {
+      params.size = this.selectedSize();
+    }
+    if (this.selectedAgeRange()) {
+      params.ageRange = this.selectedAgeRange();
+    }
+
+    // Load pets and call complete callback when done
+    this.petsService.searchPets(params).subscribe({
+      next: (response) => {
+        const results = response.data || [];
+        this.pets.set(results);
+        this.loading.set(false);
+
+        // Signal completion to pull-to-refresh directive
+        if (complete) {
+          complete();
+        }
+
+        // Track refresh
+        this.analytics.track(EventType.SEARCH, {
+          metadata: {
+            species: params.species || "all",
+            location: params.location || "all",
+            resultsCount: results.length,
+            source: "pull-to-refresh"
+          },
+        });
+      },
+      error: (error) => {
+        this.toastService.error(this.translate.instant('errors.generic'));
+        this.loading.set(false);
+        this.pets.set([]);
+
+        // Signal completion even on error
+        if (complete) {
+          complete();
+        }
+      },
+    });
   }
 
   filterBySpecies(species: string) {
