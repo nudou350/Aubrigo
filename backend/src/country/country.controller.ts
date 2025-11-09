@@ -9,8 +9,8 @@ export class CountryController {
   @Get('detect')
   @ApiOperation({ summary: 'Detect user country from request' })
   @ApiResponse({ status: 200, description: 'Returns detected country code' })
-  detectCountry(@Req() req: Request) {
-    const countryCode = this.countryService.detectCountryFromRequest(req);
+  async detectCountry(@Req() req: Request) {
+    const countryCode = await this.countryService.detectCountryFromRequest(req);
     const country = this.countryService.getCountryByCode(countryCode);
     return {
       countryCode,

@@ -2,11 +2,11 @@
   "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
   "appData": {
-    "version": "1.2.2.1762702187280",
+    "version": "1.2.3.1762707350359",
     "name": "Aubrigo",
     "build": {
-      "timestamp": "2025-11-09T15:29:47.302Z",
-      "commit": "59c3147"
+      "timestamp": "2025-11-09T16:55:50.382Z",
+      "commit": "99edd6e"
     }
   },
   "navigationFallback": {
@@ -76,8 +76,8 @@
       "cacheConfig": {
         "strategy": "freshness",
         "maxSize": 100,
-        "maxAge": "3h",
-        "timeout": "3s",
+        "maxAge": "1h",
+        "timeout": "2s",
         "networkTimeoutStrategy": "cache"
       }
     },

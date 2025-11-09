@@ -231,11 +231,13 @@ interface Country {
               formControlName="confirmPassword"
               [placeholder]="'auth.register.confirmPasswordPlaceholder' | translate"
               [class.error]="
-                registerForm.get('confirmPassword')?.invalid &&
+                (registerForm.get('confirmPassword')?.invalid ||
+                registerForm.errors?.['mismatch']) &&
                 registerForm.get('confirmPassword')?.touched
               "
             />
-            @if (registerForm.get('confirmPassword')?.invalid &&
+            @if ((registerForm.get('confirmPassword')?.invalid ||
+            registerForm.errors?.['mismatch']) &&
             registerForm.get('confirmPassword')?.touched) {
             <span class="error-text">{{ 'auth.register.passwordMismatch' | translate }}</span>
             }
@@ -692,6 +694,7 @@ export class OngRegisterComponent {
   selectedCountry = signal<Country | null>(null);
 
   countries: Country[] = [
+    { code: "BR", name: "Brasil", dialCode: "+55", flag: "🇧🇷" },
     { code: "PT", name: "Portugal", dialCode: "+351", flag: "🇵🇹" },
     { code: "ES", name: "Espanha", dialCode: "+34", flag: "🇪🇸" },
     { code: "FR", name: "França", dialCode: "+33", flag: "🇫🇷" },
@@ -702,7 +705,6 @@ export class OngRegisterComponent {
     { code: "BE", name: "Bélgica", dialCode: "+32", flag: "🇧🇪" },
     { code: "CH", name: "Suíça", dialCode: "+41", flag: "🇨🇭" },
     { code: "AT", name: "Áustria", dialCode: "+43", flag: "🇦🇹" },
-    { code: "BR", name: "Brasil", dialCode: "+55", flag: "🇧🇷" },
     { code: "US", name: "Estados Unidos", dialCode: "+1", flag: "🇺🇸" },
     { code: "CA", name: "Canadá", dialCode: "+1", flag: "🇨🇦" },
     { code: "IE", name: "Irlanda", dialCode: "+353", flag: "🇮🇪" },
@@ -746,8 +748,8 @@ export class OngRegisterComponent {
       { validators: this.passwordMatchValidator }
     );
 
-    // Set Portugal as default
-    this.selectedCountry.set(this.countries[0]);
+    // Set Brasil as default
+    this.selectedCountry.set(this.countries[0]); // Brasil is now at index 0
     this.registerForm.patchValue({ countryCode: this.countries[0].dialCode });
   }
 

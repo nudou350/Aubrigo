@@ -1,8 +1,9 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { CacheService } from './cache.service';
 
 export interface Country {
   code: string;
@@ -21,35 +22,60 @@ export class CountryService {
   public currentCountry = signal<string>('PT'); // Default to Portugal
   public currentCountryData = signal<Country | null>(null);
 
-  constructor(private http: HttpClient) {
+  private http = inject(HttpClient);
+  private cacheService = inject(CacheService);
+
+  constructor() {
     this.initializeCountry();
   }
 
   /**
    * Initialize country from storage or detect automatically
    * Priority: User selection (localStorage) > IP detection > Default (PT)
+   *
+   * IMPORTANT: If stored country is 'PT' (default), we force redetection
+   * to ensure users get the correct country based on their actual location
    */
   private initializeCountry(): void {
     const storedCountry = localStorage.getItem(this.STORAGE_KEY);
 
-    if (storedCountry) {
-      // User has previously selected a country - respect their choice
-      this.currentCountry.set(storedCountry);
-      this.loadCountryData(storedCountry);
-    } else {
-      // No stored country - detect from backend on first visit
+    // Force redetection if stored country is PT (could be stale default)
+    // OR if no country is stored
+    if (!storedCountry || storedCountry === 'PT') {
+      console.log('[CountryService] Forcing country redetection (stored:', storedCountry, ')');
+
+      // Set temporary PT while detecting
+      this.currentCountry.set('PT');
+
+      // Detect from backend
       this.detectCountry().subscribe({
         next: (result) => {
+          console.log('[CountryService] Country detected:', result);
           if (result?.countryCode) {
-            this.setCountry(result.countryCode);
-            this.currentCountryData.set(result.country);
+            // Only update if different from PT or if we have a real detection
+            if (result.countryCode !== 'PT' || !storedCountry) {
+              console.log('[CountryService] Updating country to:', result.countryCode);
+              this.setCountry(result.countryCode);
+              this.currentCountryData.set(result.country);
+            } else {
+              console.log('[CountryService] Confirmed PT is correct');
+              this.currentCountry.set('PT');
+              this.loadCountryData('PT');
+            }
           }
         },
-        error: () => {
-          // Fallback to PT if detection fails
-          this.setCountry('PT');
+        error: (err) => {
+          console.error('[CountryService] Detection failed, using PT:', err);
+          // Keep PT if detection fails
+          this.currentCountry.set('PT');
+          this.loadCountryData('PT');
         }
       });
+    } else {
+      console.log('[CountryService] Using explicitly selected country:', storedCountry);
+      // User has explicitly selected a country (not PT) - respect their choice
+      this.currentCountry.set(storedCountry);
+      this.loadCountryData(storedCountry);
     }
   }
 
@@ -82,8 +108,21 @@ export class CountryService {
    * Set current country
    */
   setCountry(countryCode: string): void {
-    this.currentCountry.set(countryCode.toUpperCase());
-    localStorage.setItem(this.STORAGE_KEY, countryCode.toUpperCase());
+    const newCountry = countryCode.toUpperCase();
+    const oldCountry = this.currentCountry();
+
+    console.log(`[CountryService] Setting country from ${oldCountry} to ${newCountry}`);
+
+    // Clear pets cache when country changes to prevent showing wrong data
+    if (oldCountry !== newCountry) {
+      console.log('[CountryService] Country changed, clearing pets cache');
+      this.cacheService.invalidate('pets:*');
+      this.cacheService.invalidate('ongs:*');
+      this.cacheService.invalidate('cities:*');
+    }
+
+    this.currentCountry.set(newCountry);
+    localStorage.setItem(this.STORAGE_KEY, newCountry);
     this.loadCountryData(countryCode);
   }
 

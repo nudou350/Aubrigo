@@ -91,9 +91,15 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
               type="password"
               formControlName="confirmPassword"
               [placeholder]="'auth.register.confirmPasswordPlaceholder' | translate"
-              [class.error]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched"
+              [class.error]="
+                (registerForm.get('confirmPassword')?.invalid ||
+                registerForm.errors?.['mismatch']) &&
+                registerForm.get('confirmPassword')?.touched
+              "
             />
-            @if (registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) {
+            @if ((registerForm.get('confirmPassword')?.invalid ||
+            registerForm.errors?.['mismatch']) &&
+            registerForm.get('confirmPassword')?.touched) {
               <span class="error-text">{{ 'auth.register.passwordMismatch' | translate }}</span>
             }
           </div>

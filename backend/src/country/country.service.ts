@@ -50,24 +50,100 @@ export class CountryService {
   ];
   /**
    * Detect country from IP address or request headers
-   * This is a simplified implementation - in production, you would use a service like
-   * ipapi.co, ip-api.com, or MaxMind GeoIP2
+   * Priority: Custom header (testing) > CDN headers > IP detection > Default (PT)
    */
-  detectCountryFromRequest(req: any): string {
-    // Try to get country from CloudFront or other CDN headers
+  async detectCountryFromRequest(req: any): Promise<string> {
+    // Priority 1: Custom header for testing (X-User-Country)
+    const customCountry = req.headers['x-user-country'];
+    if (customCountry) {
+      console.log('[CountryService] Using custom header country:', customCountry);
+      return customCountry.toUpperCase();
+    }
+
+    // Priority 2: CDN headers (CloudFront)
     const cloudFrontCountry = req.headers['cloudfront-viewer-country'];
     if (cloudFrontCountry) {
+      console.log('[CountryService] Using CloudFront country:', cloudFrontCountry);
       return cloudFrontCountry.toUpperCase();
     }
-    // Try to get country from Cloudflare headers
+
+    // Priority 3: CDN headers (Cloudflare)
     const cloudflareCountry = req.headers['cf-ipcountry'];
     if (cloudflareCountry) {
+      console.log('[CountryService] Using Cloudflare country:', cloudflareCountry);
       return cloudflareCountry.toUpperCase();
     }
-    // IMPORTANT: This platform is exclusively for Portugal
-    // Always default to PT unless CDN headers explicitly indicate otherwise
-    // Accept-Language is NOT reliable for geolocation and should be ignored
+
+    // Priority 4: Detect from IP address
+    const clientIp = this.getClientIp(req);
+    console.log('[CountryService] Client IP:', clientIp);
+
+    if (clientIp && clientIp !== '127.0.0.1' && clientIp !== '::1' && !clientIp.startsWith('192.168.') && !clientIp.startsWith('10.')) {
+      try {
+        const detectedCountry = await this.detectCountryFromIp(clientIp);
+        if (detectedCountry) {
+          console.log(`[CountryService] ✅ Detected country ${detectedCountry} from IP ${clientIp}`);
+          return detectedCountry;
+        }
+      } catch (error) {
+        console.error('[CountryService] IP detection failed:', error.message);
+      }
+    } else {
+      console.log('[CountryService] ⚠️ Local/private IP detected, cannot determine country from IP');
+    }
+
+    // Priority 5: Default to PT
+    console.log('[CountryService] No detection method available, defaulting to PT');
     return 'PT';
+  }
+
+  /**
+   * Extract client IP from request
+   */
+  private getClientIp(req: any): string | null {
+    const forwarded = req.headers['x-forwarded-for'];
+    if (forwarded) {
+      const ips = forwarded.split(',');
+      return ips[0].trim();
+    }
+    return req.ip || req.connection?.remoteAddress || null;
+  }
+
+  /**
+   * Detect country from IP using ipapi.co (free tier: 30k requests/month)
+   * Falls back to ip-api.com if ipapi.co fails
+   */
+  private async detectCountryFromIp(ip: string): Promise<string | null> {
+    try {
+      // Try ipapi.co first (no API key needed for basic usage)
+      const response = await fetch(`https://ipapi.co/${ip}/country/`, {
+        headers: { 'User-Agent': 'Aubrigo/1.0' },
+        signal: AbortSignal.timeout(3000), // 3 second timeout
+      });
+
+      if (response.ok) {
+        const countryCode = await response.text();
+        return countryCode.trim().toUpperCase();
+      }
+    } catch (error) {
+      console.warn('[CountryService] ipapi.co failed, trying fallback');
+    }
+
+    try {
+      // Fallback to ip-api.com (free, no key needed)
+      const response = await fetch(`http://ip-api.com/json/${ip}?fields=countryCode`, {
+        signal: AbortSignal.timeout(3000),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.countryCode?.toUpperCase() || null;
+      }
+    } catch (error) {
+      console.warn('[CountryService] ip-api.com fallback failed');
+    }
+
+    return null;
   }
   /**
    * Get all available countries

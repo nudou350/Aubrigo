@@ -18,6 +18,7 @@ import {
 } from "../../core/services/analytics.service";
 import { UsersService, ONG } from "../../core/services/users.service";
 import { CacheService } from "../../core/services/cache.service";
+import { CountryService } from "../../core/services/country.service";
 import { LanguageSelectorComponent } from "../../shared/components/language-selector/language-selector.component";
 import { PetCardSkeletonComponent } from "../../shared/components/pet-card-skeleton/pet-card-skeleton.component";
 import { PullToRefreshDirective } from "../../shared/directives/pull-to-refresh.directive";
@@ -1716,6 +1717,7 @@ export class HomeComponent implements OnInit {
   private usersService = inject(UsersService);
   private translate = inject(TranslateService);
   private cacheService = inject(CacheService);
+  private countryService = inject(CountryService);
 
   pets = signal<Pet[]>([]);
   loading = signal(true);
@@ -1842,6 +1844,13 @@ export class HomeComponent implements OnInit {
 
     const params: SearchPetsParams = {};
 
+    // Add country code to ensure proper filtering
+    const userCountry = this.countryService.getCountry();
+    console.log('[HomeComponent] Loading pets for country:', userCountry);
+    if (userCountry) {
+      params.countryCode = userCountry;
+    }
+
     // Add ONG filter if selected
     if (this.currentOng()) {
       params.ongId = this.currentOng()!;
@@ -1927,6 +1936,13 @@ export class HomeComponent implements OnInit {
 
     // Build search params
     const params: SearchPetsParams = {};
+
+    // Add country code to ensure proper filtering
+    const userCountry = this.countryService.getCountry();
+    console.log('[HomeComponent] Refreshing pets for country:', userCountry);
+    if (userCountry) {
+      params.countryCode = userCountry;
+    }
 
     if (this.currentOng()) {
       params.ongId = this.currentOng()!;

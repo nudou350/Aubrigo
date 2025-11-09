@@ -64,6 +64,7 @@ export class PushNotificationService {
   private initPushNotifications(): void {
     // Check if push notifications are supported
     if (!this.swPush.isEnabled) {
+      console.warn(
         "⚠️ Push notifications are not enabled (Service Worker not active or not supported)"
       );
       return;

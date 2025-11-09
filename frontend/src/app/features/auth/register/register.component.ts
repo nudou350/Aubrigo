@@ -167,11 +167,13 @@ import { AuthService } from "../../../core/services/auth.service";
                 formControlName="confirmPassword"
                 class="form-input"
                 [class.error]="
-                  registerForm.get('confirmPassword')?.invalid &&
+                  (registerForm.get('confirmPassword')?.invalid ||
+                  registerForm.errors?.['passwordMismatch']) &&
                   registerForm.get('confirmPassword')?.touched
                 "
               />
-              @if (registerForm.get('confirmPassword')?.invalid &&
+              @if ((registerForm.get('confirmPassword')?.invalid ||
+              registerForm.errors?.['passwordMismatch']) &&
               registerForm.get('confirmPassword')?.touched) {
               <span class="form-error">As senhas não coincidem</span>
               }
@@ -567,20 +569,17 @@ export class RegisterComponent {
       Validators.minLength(6),
     ]),
     confirmPassword: new FormControl("", [Validators.required]),
-  });
+  }, { validators: this.passwordMatchValidator.bind(this) });
 
-  constructor() {
-    // Add password match validation
-    this.registerForm.get("confirmPassword")?.addValidators([
-      (control) => {
-        const password = this.registerForm.get("password")?.value;
-        const confirmPassword = control.value;
-        if (password && confirmPassword && password !== confirmPassword) {
-          return { passwordMismatch: true };
-        }
-        return null;
-      },
-    ]);
+  passwordMatchValidator(form: FormGroup) {
+    const password = form.get("password");
+    const confirmPassword = form.get("confirmPassword");
+
+    if (!password || !confirmPassword) {
+      return null;
+    }
+
+    return password.value === confirmPassword.value ? null : { passwordMismatch: true };
   }
 
   onSubmit(): void {
