@@ -691,6 +691,48 @@
         "saturday": "Sábado"
       }
     },
+    "schedulingSettings": {
+      "title": "Configurações de Agendamento",
+      "operatingHours": {
+        "title": "Horários de Funcionamento",
+        "subtitle": "Configure os dias e horários em que sua ONG atende visitantes",
+        "closed": "Fechado",
+        "opening": "Abertura",
+        "closing": "Fechamento",
+        "lunchBreak": "Intervalo de almoço",
+        "lunchStart": "Início do Almoço",
+        "lunchEnd": "Fim do Almoço"
+      },
+      "visitSettings": {
+        "title": "Configurações de Visitas",
+        "subtitle": "Defina as regras para agendamento de visitas",
+        "allowAppointments": "Permitir Agendamentos",
+        "allowAppointmentsDesc": "Quando desativado, visitantes não poderão agendar visitas aos seus animais",
+        "visitDuration": "Duração da Visita (minutos)",
+        "visitDurationHint": "Tempo médio de cada visita",
+        "concurrentVisits": "Visitas Simultâneas",
+        "concurrentVisitsHint": "Quantas visitas ao mesmo tempo",
+        "minAdvance": "Antecedência Mínima (horas)",
+        "minAdvanceHint": "Tempo mínimo para agendar",
+        "maxAdvance": "Agendamento Máximo (dias)",
+        "maxAdvanceHint": "Máximo de dias no futuro",
+        "slotInterval": "Intervalo entre Horários (minutos)",
+        "slotIntervalHint": "Espaçamento entre horários disponíveis",
+        "allowWeekends": "Permitir agendamentos aos fins de semana"
+      },
+      "days": {
+        "sunday": "Domingo",
+        "monday": "Segunda-feira",
+        "tuesday": "Terça-feira",
+        "wednesday": "Quarta-feira",
+        "thursday": "Quinta-feira",
+        "friday": "Sexta-feira",
+        "saturday": "Sábado"
+      },
+      "saveSettings": "Salvar Configurações",
+      "saveSuccess": "Configurações salvas com sucesso!",
+      "saveError": "Erro ao salvar configurações. Tente novamente."
+    },
     "articles": {
       "title": "Necessidades da ONG",
       "subtitle": "Gerencie os artigos e necessidades que sua ONG precisa",

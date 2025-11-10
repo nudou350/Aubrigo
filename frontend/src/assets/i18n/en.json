@@ -703,6 +703,48 @@
         "saturday": "Saturday"
       }
     },
+    "schedulingSettings": {
+      "title": "Scheduling Settings",
+      "operatingHours": {
+        "title": "Operating Hours",
+        "subtitle": "Configure the days and times when your NGO receives visitors",
+        "closed": "Closed",
+        "opening": "Opening",
+        "closing": "Closing",
+        "lunchBreak": "Lunch break",
+        "lunchStart": "Lunch Start",
+        "lunchEnd": "Lunch End"
+      },
+      "visitSettings": {
+        "title": "Visit Settings",
+        "subtitle": "Define the rules for scheduling visits",
+        "allowAppointments": "Allow Appointments",
+        "allowAppointmentsDesc": "When disabled, visitors will not be able to schedule visits to your animals",
+        "visitDuration": "Visit Duration (minutes)",
+        "visitDurationHint": "Average time per visit",
+        "concurrentVisits": "Concurrent Visits",
+        "concurrentVisitsHint": "How many visits at the same time",
+        "minAdvance": "Minimum Advance Notice (hours)",
+        "minAdvanceHint": "Minimum time required to schedule",
+        "maxAdvance": "Maximum Advance Booking (days)",
+        "maxAdvanceHint": "Maximum days in the future",
+        "slotInterval": "Time Slot Interval (minutes)",
+        "slotIntervalHint": "Spacing between available time slots",
+        "allowWeekends": "Allow weekend appointments"
+      },
+      "days": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      },
+      "saveSettings": "Save Settings",
+      "saveSuccess": "Settings saved successfully!",
+      "saveError": "Error saving settings. Please try again."
+    },
     "articles": {
       "title": "NGO Needs",
       "subtitle": "Manage the articles and needs your NGO requires",
