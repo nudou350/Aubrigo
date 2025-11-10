@@ -440,6 +440,21 @@
     "errorPasswordChange": "Error al cambiar contraseña. Verifique su contraseña actual."
   },
   "ong": {
+    "common": {
+      "back": "← Volver",
+      "loading": "Cargando...",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "close": "Cerrar",
+      "saving": "Guardando...",
+      "all": "Todos",
+      "search": "Buscar",
+      "noData": "No hay datos disponibles",
+      "year": "año",
+      "years": "años"
+    },
     "dashboard": {
       "title": "Panel",
       "welcome": "¡Bienvenido, {{name}}!",
@@ -500,6 +515,48 @@
       "pending": "Pendiente",
       "failed": "Fallida",
       "errorLoad": "Error al cargar donaciones"
+    },
+    "schedulingSettings": {
+      "title": "Configuración de Agendamiento",
+      "operatingHours": {
+        "title": "Horarios de Funcionamiento",
+        "subtitle": "Configure los días y horarios en que su ONG recibe visitantes",
+        "closed": "Cerrado",
+        "opening": "Apertura",
+        "closing": "Cierre",
+        "lunchBreak": "Pausa para almuerzo",
+        "lunchStart": "Inicio del Almuerzo",
+        "lunchEnd": "Fin del Almuerzo"
+      },
+      "visitSettings": {
+        "title": "Configuración de Visitas",
+        "subtitle": "Defina las reglas para programar visitas",
+        "allowAppointments": "Permitir Agendamientos",
+        "allowAppointmentsDesc": "Cuando está deshabilitado, los visitantes no podrán programar visitas a sus animales",
+        "visitDuration": "Duración de la Visita (minutos)",
+        "visitDurationHint": "Tiempo promedio de cada visita",
+        "concurrentVisits": "Visitas Simultáneas",
+        "concurrentVisitsHint": "Cuántas visitas al mismo tiempo",
+        "minAdvance": "Aviso Mínimo (horas)",
+        "minAdvanceHint": "Tiempo mínimo para programar",
+        "maxAdvance": "Reserva Máxima (días)",
+        "maxAdvanceHint": "Máximo de días en el futuro",
+        "slotInterval": "Intervalo entre Horarios (minutos)",
+        "slotIntervalHint": "Espacio entre horarios disponibles",
+        "allowWeekends": "Permitir citas en fines de semana"
+      },
+      "days": {
+        "sunday": "Domingo",
+        "monday": "Lunes",
+        "tuesday": "Martes",
+        "wednesday": "Miércoles",
+        "thursday": "Jueves",
+        "friday": "Viernes",
+        "saturday": "Sábado"
+      },
+      "saveSettings": "Guardar Configuración",
+      "saveSuccess": "¡Configuración guardada con éxito!",
+      "saveError": "Error al guardar la configuración. Por favor, inténtelo de nuevo."
     }
   },
   "ongDashboard": {
