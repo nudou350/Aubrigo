@@ -1,0 +1,215 @@
+<div class="modal-backdrop">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Instruções de Pagamento</h2>
+      <button mat-icon-button (click)="close()" aria-label="Fechar" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Content -->
+    <div class="modal-body">
+      <div class="ong-info">
+        <h3>{{ instructions().ongName }}</h3>
+      </div>
+
+      <div class="amount-highlight">
+        <mat-icon class="amount-icon">attach_money</mat-icon>
+        <div class="amount-details">
+          <span class="amount-label">Valor da Doação</span>
+          <span class="amount-value">{{ formatCurrency(instructions().amount, instructions().currency) }}</span>
+        </div>
+      </div>
+
+      <!-- MB WAY Payment -->
+      @if (getPaymentMethodType() === 'mbway') {
+        <div class="payment-details">
+          <div class="payment-header">
+            <mat-icon class="payment-icon">phone_iphone</mat-icon>
+            <h3>Pagamento via MB WAY</h3>
+          </div>
+
+          <div class="highlight-box">
+            <p class="label">Enviar para o número:</p>
+            <div class="value-container">
+              <p class="value monospace">{{ instructions().mbwayPhone }}</p>
+              <button
+                mat-stroked-button
+                color="primary"
+                (click)="copyToClipboard(instructions().mbwayPhone!, 'Número')"
+                [class.copied]="isCopied('Número')"
+              >
+                <mat-icon>{{ isCopied('Número') ? 'check' : 'content_copy' }}</mat-icon>
+                {{ isCopied('Número') ? 'Copiado' : 'Copiar' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="instructions-list">
+            <h4>Como pagar:</h4>
+            <ol>
+              @for (step of instructions().instructions; track $index) {
+                <li>{{ step }}</li>
+              }
+            </ol>
+          </div>
+        </div>
+      }
+
+      <!-- Multibanco / Bank Transfer (Portugal) -->
+      @if (getPaymentMethodType() === 'multibanco') {
+        <div class="payment-details">
+          <div class="payment-header">
+            <mat-icon class="payment-icon">account_balance</mat-icon>
+            <h3>Transferência Bancária (Multibanco)</h3>
+          </div>
+
+          <div class="highlight-box">
+            <p class="label">IBAN:</p>
+            <div class="value-container">
+              <p class="value monospace">{{ instructions().iban }}</p>
+              <button
+                mat-stroked-button
+                color="primary"
+                (click)="copyToClipboard(instructions().iban!, 'IBAN')"
+                [class.copied]="isCopied('IBAN')"
+              >
+                <mat-icon>{{ isCopied('IBAN') ? 'check' : 'content_copy' }}</mat-icon>
+                {{ isCopied('IBAN') ? 'Copiado' : 'Copiar' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="instructions-list">
+            <h4>Como pagar:</h4>
+            <ol>
+              @for (step of instructions().instructions; track $index) {
+                <li>{{ step }}</li>
+              }
+            </ol>
+          </div>
+        </div>
+      }
+
+      <!-- PIX Payment (Brazil) -->
+      @if (getPaymentMethodType() === 'pix') {
+        <div class="payment-details">
+          <div class="payment-header">
+            <mat-icon class="payment-icon">qr_code</mat-icon>
+            <h3>Pagamento via PIX</h3>
+          </div>
+
+          @if (instructions().pixQrCode) {
+            <div class="qr-code-container">
+              <img [src]="instructions().pixQrCode" alt="QR Code PIX" class="qr-code-image">
+              <p class="qr-code-hint">Escaneie o QR Code com o app do seu banco</p>
+            </div>
+          }
+
+          <div class="highlight-box">
+            <p class="label">Chave PIX ({{ instructions().pixKeyType }}):</p>
+            <div class="value-container">
+              <p class="value monospace">{{ instructions().pixKey }}</p>
+              <button
+                mat-stroked-button
+                color="primary"
+                (click)="copyToClipboard(instructions().pixKey!, 'Chave PIX')"
+                [class.copied]="isCopied('Chave PIX')"
+              >
+                <mat-icon>{{ isCopied('Chave PIX') ? 'check' : 'content_copy' }}</mat-icon>
+                {{ isCopied('Chave PIX') ? 'Copiado' : 'Copiar' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="instructions-list">
+            <h4>Como pagar:</h4>
+            <ol>
+              @for (step of instructions().instructions; track $index) {
+                <li>{{ step }}</li>
+              }
+            </ol>
+          </div>
+        </div>
+      }
+
+      <!-- Bank Transfer (Brazil) -->
+      @if (getPaymentMethodType() === 'bank_transfer') {
+        <div class="payment-details">
+          <div class="payment-header">
+            <mat-icon class="payment-icon">account_balance</mat-icon>
+            <h3>Transferência Bancária (TED/DOC)</h3>
+          </div>
+
+          <div class="bank-details-grid">
+            <div class="bank-detail-item">
+              <p class="label">Banco:</p>
+              <p class="value">{{ instructions().bankName }}</p>
+            </div>
+
+            <div class="bank-detail-item">
+              <p class="label">Agência:</p>
+              <div class="value-container">
+                <p class="value monospace">{{ instructions().bankRoutingNumber }}</p>
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="copyToClipboard(instructions().bankRoutingNumber!, 'Agência')"
+                  [attr.aria-label]="'Copiar agência'"
+                >
+                  <mat-icon>{{ isCopied('Agência') ? 'check' : 'content_copy' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="bank-detail-item">
+              <p class="label">Conta:</p>
+              <div class="value-container">
+                <p class="value monospace">{{ instructions().bankAccountNumber }}</p>
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="copyToClipboard(instructions().bankAccountNumber!, 'Conta')"
+                  [attr.aria-label]="'Copiar conta'"
+                >
+                  <mat-icon>{{ isCopied('Conta') ? 'check' : 'content_copy' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="instructions-list">
+            <h4>Como pagar:</h4>
+            <ol>
+              @for (step of instructions().instructions; track $index) {
+                <li>{{ step }}</li>
+              }
+            </ol>
+          </div>
+        </div>
+      }
+
+      <!-- Confirmation Message -->
+      <div class="confirmation-message">
+        <mat-icon class="info-icon">info</mat-icon>
+        <p>
+          As instruções de pagamento também foram enviadas para o seu email:
+          <strong>{{ instructions().donationId }}</strong>
+        </p>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button mat-raised-button color="primary" (click)="close()" class="close-action-button">
+        <mat-icon>check_circle</mat-icon>
+        Entendi
+      </button>
+    </div>
+  </div>
+</div>

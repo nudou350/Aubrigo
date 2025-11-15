@@ -2,75 +2,55 @@ import {
   IsNumber,
   IsString,
   IsEmail,
-  IsOptional,
   IsEnum,
   Min,
-  IsDateString,
+  MinLength,
+  MaxLength,
 } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+
+/**
+ * Simplified DTO for creating donations
+ * Payment method is auto-selected based on ONG configuration
+ */
 export class CreateDonationDto {
-  @ApiProperty({ example: "uuid-of-ong" })
+  @ApiProperty({ example: "uuid-of-ong", description: "ONG ID to receive the donation" })
   @IsString()
+  @MinLength(1, { message: "ONG ID is required" })
   ongId: string;
-  @ApiProperty({ example: "João Silva" })
+
+  @ApiProperty({ example: "João Silva", description: "Donor's full name" })
   @IsString()
+  @MinLength(2, { message: "Donor name must be at least 2 characters" })
+  @MaxLength(255, { message: "Donor name must be at most 255 characters" })
   donorName: string;
-  @ApiProperty({ example: "joao@example.com" })
-  @IsEmail()
+
+  @ApiProperty({ example: "joao@example.com", description: "Donor's email address" })
+  @IsEmail({}, { message: "Invalid email format" })
   donorEmail: string;
-  @ApiProperty({ example: "123.456.789-00", required: false })
-  @IsOptional()
-  @IsString()
-  donorCpf?: string;
-  @ApiProperty({ example: "1990-05-15", required: false })
-  @IsOptional()
-  @IsDateString()
-  donorBirthDate?: string;
-  @ApiProperty({ example: "male", required: false })
-  @IsOptional()
-  @IsString()
-  donorGender?: string;
-  @ApiProperty({ example: 50.0 })
-  @IsNumber()
-  @Min(0.05)
+
+  @ApiProperty({ example: 50.0, description: "Donation amount" })
+  @IsNumber({}, { message: "Amount must be a number" })
+  @Min(5, { message: "Minimum donation amount is 5" })
   amount: number;
-  @ApiProperty({ example: "one_time", enum: ["one_time", "monthly"] })
-  @IsEnum(["one_time", "monthly"])
+
+  @ApiProperty({
+    example: "one_time",
+    enum: ["one_time", "monthly"],
+    description: "Donation type (one-time or recurring monthly)",
+  })
+  @IsEnum(["one_time", "monthly"], {
+    message: "Donation type must be either 'one_time' or 'monthly'",
+  })
   donationType: string;
 
   @ApiProperty({
-    example: "PT",
-    enum: ["PT", "BR"],
-    description: "Country code (Portugal or Brazil)",
-  })
-  @IsEnum(["PT", "BR"])
-  country: string;
-
-  @ApiProperty({
-    example: "EUR",
-    enum: ["EUR", "BRL"],
-    description: "Currency code (Euro or Brazilian Real)",
-  })
-  @IsEnum(["EUR", "BRL"])
-  currency: string;
-
-  @ApiProperty({
     example: "mbway",
-    enum: ["mbway", "multibanco", "card", "pix", "boleto"],
-    description: "Payment method",
+    enum: ["mbway", "multibanco", "pix"],
+    description: "Payment method (must be configured by ONG)",
   })
-  @IsEnum(["mbway", "multibanco", "card", "pix", "boleto"])
+  @IsEnum(["mbway", "multibanco", "pix"], {
+    message: "Payment method must be one of: mbway, multibanco, pix",
+  })
   paymentMethod: string;
-
-  // For MB Way
-  @ApiProperty({ example: "+351912345678", required: false })
-  @IsOptional()
-  @IsString()
-  phoneNumber?: string;
-
-  // For Cards
-  @ApiProperty({ example: "JOAO SILVA", required: false })
-  @IsOptional()
-  @IsString()
-  cardHolderName?: string;
 }

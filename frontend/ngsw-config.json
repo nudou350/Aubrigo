@@ -2,11 +2,11 @@
   "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
   "appData": {
-    "version": "1.2.4.1763221421643",
+    "version": "1.2.4.1763224974014",
     "name": "Aubrigo",
     "build": {
-      "timestamp": "2025-11-15T15:43:41.664Z",
-      "commit": "5f85281"
+      "timestamp": "2025-11-15T16:42:54.037Z",
+      "commit": "21c3f02"
     }
   },
   "navigationFallback": {

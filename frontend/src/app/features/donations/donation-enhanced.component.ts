@@ -1,256 +1,215 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatIconModule } from '@angular/material/icon';
 
-// Services
-import { DonationsService, DonationRequest, DonationResponse, Ong } from '../../core/services/donations.service';
-import { CountryService, PaymentMethod } from '../../core/services/country.service';
+import { DonationsService, Ong } from '../../core/services/donations.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AnalyticsService, EventType } from '../../core/services/analytics.service';
+import { PaymentConfig, CreateDonationDto, PaymentInstructions } from '../../core/types';
+import { PaymentInstructionsModalComponent } from './payment-instructions-modal.component';
 
-// Components
-import { PixQrPaymentComponent } from '../../shared/components/pix-qr-payment/pix-qr-payment.component';
-import { BoletoPaymentComponent } from '../../shared/components/boleto-payment/boleto-payment.component';
-import { MultibancoPaymentComponent } from '../../shared/components/multibanco-payment/multibanco-payment.component';
-import { MBWayEnhancedComponent } from '../../shared/components/mbway-enhanced/mbway-enhanced.component';
-
-// Pipes
-import { CurrencyFormatPipe } from '../../shared/pipes/currency-format.pipe';
-
+/**
+ * Simplified Donation Page Component
+ *
+ * This component provides a streamlined donation experience where:
+ * - Donors only need to provide basic info (name, email, amount)
+ * - Payment methods are dynamically loaded based on ONG's configuration
+ * - Payment instructions are shown immediately after donation creation
+ * - Supports country-specific payment methods (PT: MB WAY/Multibanco, BR: PIX/Bank Transfer)
+ */
 @Component({
   selector: 'app-donation-enhanced',
   standalone: true,
+  templateUrl: './donation-enhanced.component.html',
+  styleUrls: ['./donation-enhanced.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    'class': 'donation-page'
+  },
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    PixQrPaymentComponent,
-    BoletoPaymentComponent,
-    MultibancoPaymentComponent,
-    MBWayEnhancedComponent,
-    CurrencyFormatPipe
-  ],
-  templateUrl: './donation-enhanced.component.html',
-  styleUrls: ['./donation-enhanced.component.scss']
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatIconModule,
+    PaymentInstructionsModalComponent
+  ]
 })
 export class DonationEnhancedComponent implements OnInit {
-  // Services
   private fb = inject(FormBuilder);
   private donationsService = inject(DonationsService);
-  private countryService = inject(CountryService);
   private toastService = inject(ToastService);
-  private analytics = inject(AnalyticsService);
-  private router = inject(Router);
 
-  // State
-  donationForm!: FormGroup;
-  currentStep = signal<'form' | 'payment'>('form');
-  selectedPaymentMethod = signal<string>('');
-  paymentResponse = signal<DonationResponse | null>(null);
-  isLoading = signal(false);
+  // State signals
+  selectedOng = signal<Ong | null>(null);
+  availablePaymentMethods = signal<PaymentConfig | null>(null);
+  selectedPaymentMethod = signal<string | null>(null);
+  paymentInstructions = signal<PaymentInstructions | null>(null);
+  showInstructionsModal = signal(false);
+  loading = signal(false);
+  error = signal<string | null>(null);
   ongs = signal<Ong[]>([]);
-  pixKeyCopied = signal(false);
 
-  // Dynamic data based on country
-  country = signal<string>('PT');
-  currency = signal<{ code: string; symbol: string; locale: string }>({ code: 'EUR', symbol: '€', locale: 'pt-PT' });
-  availablePaymentMethods = signal<PaymentMethod[]>([]);
+  // Computed values
+  hasAvailablePaymentMethods = computed(() => {
+    const config = this.availablePaymentMethods();
+    if (!config) return false;
+
+    const methods = config.availablePaymentMethods;
+    return (methods.mbway?.enabled || methods.multibanco?.enabled ||
+            methods.pix?.enabled || methods.bank_transfer?.enabled) ?? false;
+  });
+
+  paymentMethodOptions = computed(() => {
+    const config = this.availablePaymentMethods();
+    if (!config) return [];
+
+    const options: Array<{ value: string; label: string; icon: string }> = [];
+    const methods = config.availablePaymentMethods;
+
+    if (methods.mbway?.enabled) {
+      options.push({ value: 'mbway', label: 'MB WAY', icon: '📱' });
+    }
+    if (methods.multibanco?.enabled) {
+      options.push({ value: 'multibanco', label: 'Multibanco', icon: '🏦' });
+    }
+    if (methods.pix?.enabled) {
+      options.push({ value: 'pix', label: 'PIX', icon: '💰' });
+    }
+    if (methods.bank_transfer?.enabled) {
+      options.push({ value: 'bank_transfer', label: 'Transferência Bancária', icon: '🏦' });
+    }
+
+    return options;
+  });
+
+  // Form
+  donationForm!: FormGroup;
 
   ngOnInit(): void {
-    // Get country from CountryService
-    this.country.set(this.countryService.getCountry());
-    this.currency.set(this.countryService.getCurrency(this.country()));
-    this.availablePaymentMethods.set(this.countryService.getPaymentMethods(this.country()));
-
-    // Load ONGs for the current country
+    this.initializeForm();
     this.loadOngs();
+  }
 
-    // Initialize form
+  private initializeForm(): void {
     this.donationForm = this.fb.group({
       ongId: ['', Validators.required],
-      donorName: ['', Validators.required],
+      donorName: ['', [Validators.required, Validators.minLength(2)]],
       donorEmail: ['', [Validators.required, Validators.email]],
       amount: [10, [Validators.required, Validators.min(0.5)]],
       donationType: ['one_time', Validators.required],
-      country: [this.country(), Validators.required],
-      currency: [this.currency().code, Validators.required],
-      paymentMethod: ['', Validators.required],
-      phoneNumber: [''] // For MBWay only
-    });
-
-    // Watch payment method changes
-    this.donationForm.get('paymentMethod')?.valueChanges.subscribe((method) => {
-      this.selectedPaymentMethod.set(method);
-
-      // Make phone number required for MBWay
-      if (method === 'mbway') {
-        this.donationForm.get('phoneNumber')?.setValidators([
-          Validators.required,
-          Validators.pattern(/^\+351\d{9}$/)
-        ]);
-      } else {
-        this.donationForm.get('phoneNumber')?.clearValidators();
-      }
-      this.donationForm.get('phoneNumber')?.updateValueAndValidity();
+      paymentMethod: ['', Validators.required]
     });
   }
 
-  loadOngs(): void {
-    const filters = {
-      countryCode: this.countryService.getCountry()
-    };
-
-    this.donationsService.getAllOngs(filters).subscribe({
+  private loadOngs(): void {
+    this.loading.set(true);
+    this.donationsService.getAllOngs().subscribe({
       next: (ongs) => {
-        this.ongs.set(ongs);
+        // Filter only ONGs with payment methods configured
+        const configuredOngs = ongs.filter(ong => ong.paymentMethodsConfigured);
+        this.ongs.set(configuredOngs);
+        this.loading.set(false);
       },
       error: (error) => {
         console.error('Error loading ONGs:', error);
+        this.error.set('Erro ao carregar ONGs. Por favor, tente novamente.');
         this.toastService.error('Erro ao carregar ONGs');
+        this.loading.set(false);
       }
     });
   }
 
-  onSubmit(): void {
+  onOngSelected(ongId: string): void {
+    if (!ongId) {
+      this.selectedOng.set(null);
+      this.availablePaymentMethods.set(null);
+      this.donationForm.patchValue({ paymentMethod: '' });
+      return;
+    }
+
+    const ong = this.ongs().find(o => o.id === ongId);
+    this.selectedOng.set(ong || null);
+
+    // Fetch payment configuration for selected ONG
+    this.loading.set(true);
+    this.donationsService.getOngPaymentConfig(ongId).subscribe({
+      next: (config) => {
+        this.availablePaymentMethods.set(config);
+        this.loading.set(false);
+
+        // Reset payment method selection
+        this.donationForm.patchValue({ paymentMethod: '' });
+        this.selectedPaymentMethod.set(null);
+      },
+      error: (error) => {
+        console.error('Error loading payment config:', error);
+        this.toastService.error('Erro ao carregar métodos de pagamento');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  onPaymentMethodSelected(method: string): void {
+    this.selectedPaymentMethod.set(method);
+  }
+
+  submitDonation(): void {
     if (this.donationForm.invalid) {
-      this.donationForm.markAllAsTouched();
       this.toastService.error('Por favor, preencha todos os campos obrigatórios');
       return;
     }
 
-    this.isLoading.set(true);
+    const formValue = this.donationForm.value;
+    const donationData: CreateDonationDto = {
+      ongId: formValue.ongId,
+      donorName: formValue.donorName,
+      donorEmail: formValue.donorEmail,
+      amount: formValue.amount,
+      donationType: formValue.donationType,
+      paymentMethod: formValue.paymentMethod
+    };
 
-    const donationData: DonationRequest = this.donationForm.value;
+    this.loading.set(true);
+    this.error.set(null);
 
-    // Track donation start
-    this.analytics.track(EventType.DONATION_START, {
-      ongId: donationData.ongId,
-      metadata: {
-        amount: donationData.amount,
-        currency: donationData.currency,
-        paymentMethod: donationData.paymentMethod
-      }
-    });
-
-    this.donationsService.createDonation(donationData).subscribe({
+    this.donationsService.createSimplifiedDonation(donationData).subscribe({
       next: (response) => {
-        this.isLoading.set(false);
-        this.paymentResponse.set(response);
-        this.currentStep.set('payment');
-        this.toastService.success('Pagamento iniciado');
+        this.paymentInstructions.set(response.paymentInstructions);
+        this.showInstructionsModal.set(true);
+        this.loading.set(false);
+
+        // Reset form after successful submission
+        this.donationForm.reset({
+          ongId: formValue.ongId,
+          donationType: 'one_time',
+          amount: 10
+        });
       },
       error: (error) => {
-        this.isLoading.set(false);
-        console.error('Donation error:', error);
-        this.toastService.error(error.error?.message || 'Erro ao processar doação. Tente novamente.');
+        console.error('Error creating donation:', error);
+        const errorMessage = error.error?.message || 'Erro ao processar doação. Por favor, tente novamente.';
+        this.error.set(errorMessage);
+        this.toastService.error(errorMessage);
+        this.loading.set(false);
       }
     });
   }
 
-  onPaymentCompleted(): void {
-    // Track donation complete
-    this.analytics.track(EventType.DONATION_COMPLETE, {
-      ongId: this.donationForm.get('ongId')?.value,
-      metadata: {
-        amount: this.paymentResponse()?.donation.amount,
-        currency: this.paymentResponse()?.donation.currency,
-        paymentMethod: this.paymentResponse()?.donation.paymentMethod,
-        donationId: this.paymentResponse()?.donation.id
-      }
-    });
-
-    this.toastService.success('Pagamento confirmado! Obrigado pela sua doação.');
-    setTimeout(() => {
-      this.router.navigate(['/home']);
-    }, 3000);
-  }
-
-  onPaymentFailed(): void {
-    this.toastService.error('Pagamento falhou. Por favor, tente novamente.');
-    this.currentStep.set('form');
-    this.paymentResponse.set(null);
-  }
-
-  onPaymentExpired(): void {
-    this.toastService.warning('Pagamento expirou. Por favor, tente novamente.');
-    this.currentStep.set('form');
-    this.paymentResponse.set(null);
-  }
-
-  goBack(): void {
-    this.currentStep.set('form');
-    this.paymentResponse.set(null);
-  }
-
-  getSelectedOng(): Ong | null {
-    const ongId = this.donationForm.get('ongId')?.value;
-    if (!ongId || ongId === '') {
-      return null;
-    }
-    return this.ongs().find(o => o.id === ongId) || null;
-  }
-
-  copyPixKey(): void {
-    const pixKey = this.paymentResponse()?.payment?.pixKey;
-    if (!pixKey) return;
-
-    // Copy to clipboard
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(pixKey).then(() => {
-        this.pixKeyCopied.set(true);
-        this.toastService.success('Chave PIX copiada!');
-
-        // Reset after 3 seconds
-        setTimeout(() => {
-          this.pixKeyCopied.set(false);
-        }, 3000);
-      }).catch(() => {
-        // Fallback for older browsers
-        this.fallbackCopyPixKey(pixKey);
-      });
-    } else {
-      this.fallbackCopyPixKey(pixKey);
-    }
-  }
-
-  private fallbackCopyPixKey(text: string): void {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-
-    try {
-      document.execCommand('copy');
-      this.pixKeyCopied.set(true);
-      this.toastService.success('Chave PIX copiada!');
-      setTimeout(() => {
-        this.pixKeyCopied.set(false);
-      }, 3000);
-    } catch {
-      this.toastService.error('Erro ao copiar chave PIX');
-    }
-
-    document.body.removeChild(textarea);
-  }
-
-  formatCurrency(amount: number, currency: string): string {
-    if (!amount || !currency) return '';
-
-    const locale = currency === 'EUR' ? 'pt-PT' : 'pt-BR';
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: currency,
-    }).format(amount);
-  }
-
-  resetForm(): void {
-    this.paymentResponse.set(null);
-    this.donationForm.reset({
-      country: this.donationForm.get('country')?.value,
-      currency: this.donationForm.get('currency')?.value,
-    });
-    this.currentStep.set('form');
+  closeInstructionsModal(): void {
+    this.showInstructionsModal.set(false);
+    this.paymentInstructions.set(null);
   }
 }

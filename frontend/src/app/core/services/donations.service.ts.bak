@@ -7,10 +7,7 @@ import {
   SupportedCountry,
   SupportedCurrency,
   DonationType,
-  PaymentStatus,
-  PaymentConfig,
-  CreateDonationDto,
-  DonationCreatedResponse
+  PaymentStatus
 } from '../types';
 
 export interface DonationRequest {
@@ -78,7 +75,6 @@ export interface Ong {
   phone?: string;
   pixKey?: string;
   countryCode?: string;
-  paymentMethodsConfigured?: boolean;
 }
 
 export interface OngFilters {
@@ -101,11 +97,7 @@ export class DonationsService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/donations`;
   private usersUrl = `${environment.apiUrl}/users`;
-  private ongsUrl = `${environment.apiUrl}/ongs`;
 
-  /**
-   * Get all ONGs (for dropdown in donation form)
-   */
   getAllOngs(filters?: OngFilters): Observable<Ong[]> {
     let params = new HttpParams();
 
@@ -118,39 +110,14 @@ export class DonationsService {
     return this.http.get<Ong[]>(this.usersUrl, { params });
   }
 
-  /**
-   * Get payment configuration for a specific ONG
-   * Returns available payment methods configured by the ONG
-   */
-  getOngPaymentConfig(ongId: string): Observable<PaymentConfig> {
-    return this.http.get<PaymentConfig>(`${this.ongsUrl}/${ongId}/payment-config`);
-  }
-
-  /**
-   * Create donation with simplified country-specific payment
-   * Returns payment instructions for manual payment
-   */
-  createSimplifiedDonation(donationData: CreateDonationDto): Observable<DonationCreatedResponse> {
-    return this.http.post<DonationCreatedResponse>(`${this.apiUrl}/simplified`, donationData);
-  }
-
-  /**
-   * Legacy: Create donation (Stripe integration)
-   */
   createDonation(donationData: DonationRequest): Observable<DonationResponse> {
     return this.http.post<DonationResponse>(this.apiUrl, donationData);
   }
 
-  /**
-   * Check payment status by donation ID
-   */
   checkPaymentStatus(donationId: string): Observable<PaymentStatusResponse> {
     return this.http.get<PaymentStatusResponse>(`${this.apiUrl}/${donationId}/status`);
   }
 
-  /**
-   * Get donations for a specific ONG
-   */
   getDonationsByOng(filters: DonationFilters): Observable<DonationResponse[]> {
     let params = new HttpParams();
 

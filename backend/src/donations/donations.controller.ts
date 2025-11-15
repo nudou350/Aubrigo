@@ -16,24 +16,31 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 import { DonationsService } from "./donations.service";
 import { CreateDonationDto } from "./dto/create-donation.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+
 @ApiTags("Donations")
 @Controller("donations")
 export class DonationsController {
   constructor(private readonly donationsService: DonationsService) {}
+
   @Post()
+  @Throttle({ default: { limit: 5, ttl: 3600000 } }) // 5 donations per hour per IP
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: "Create a donation (MB Way, Stripe, or Multibanco)",
+    summary: "Create a donation (Manual payment with instructions)",
+    description:
+      "Create a donation and receive manual payment instructions. Rate limited to 5 per hour per IP.",
   })
   @ApiResponse({
     status: 201,
     description:
-      "Donation created successfully. Returns payment details including QR code for MB Way.",
+      "Donation created successfully. Returns payment instructions for completing the donation.",
   })
-  @ApiResponse({ status: 400, description: "Bad request" })
+  @ApiResponse({ status: 400, description: "Bad request or invalid payment method" })
+  @ApiResponse({ status: 429, description: "Too many requests - rate limit exceeded" })
   async createDonation(@Body() createDonationDto: CreateDonationDto) {
     return this.donationsService.createDonation(createDonationDto);
   }

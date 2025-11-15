@@ -7,6 +7,7 @@ import { PixPaymentComponent } from '../../shared/components/pix-payment/pix-pay
 import { CountryService } from '../../core/services/country.service';
 import { AnalyticsService, EventType } from '../../core/services/analytics.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { PaymentStatus } from '../../core/types';
 
 @Component({
   selector: 'app-donation',
@@ -392,7 +393,7 @@ export class DonationComponent implements OnInit {
   errorMessage = signal<string | null>(null);
   showMBWayQR = signal(false);
   mbwayResponse = signal<any>(null);
-  paymentStatus = signal<'pending' | 'succeeded' | 'failed' | 'expired' | 'canceled' | 'processing'>('pending');
+  paymentStatus = signal<PaymentStatus>('pending');
   ongs = signal<Ong[]>([]);
   selectedOngId = '';
   selectedOng = signal<Ong | null>(null);

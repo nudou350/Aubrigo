@@ -1,0 +1,252 @@
+<div class="payment-settings-container">
+  <mat-card class="settings-card">
+    <mat-card-header>
+      <mat-card-title>Configurações de Pagamento</mat-card-title>
+      <mat-card-subtitle>Configure os métodos de pagamento para receber doações</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+      @if (loading()) {
+        <div class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Carregando configurações...</p>
+        </div>
+      } @else {
+        <div class="settings-content">
+          <!-- Country Info -->
+          <div class="country-info">
+            <mat-icon class="country-icon">location_on</mat-icon>
+            <div class="country-details">
+              <span class="label">País da ONG:</span>
+              <span class="value">{{ isPortugal() ? 'Portugal' : 'Brasil' }}</span>
+            </div>
+          </div>
+
+          @if (!hasConfiguredMethods()) {
+            <div class="warning-banner">
+              <mat-icon>warning</mat-icon>
+              <p>
+                <strong>Atenção!</strong> Você ainda não configurou nenhum método de pagamento.
+                Configure pelo menos um método para começar a receber doações.
+              </p>
+            </div>
+          }
+
+          <!-- Portugal Forms -->
+          @if (isPortugal()) {
+            <form [formGroup]="portugalForm" (ngSubmit)="onSubmit()" class="payment-form">
+              <h3 class="section-title">
+                <mat-icon>payment</mat-icon>
+                Métodos de Pagamento - Portugal
+              </h3>
+
+              <!-- MB WAY -->
+              <div class="payment-method-section">
+                <h4>
+                  <mat-icon class="method-icon">phone_iphone</mat-icon>
+                  MB WAY
+                </h4>
+                <p class="method-description">
+                  Receba doações diretamente no seu número de telemóvel via MB WAY
+                </p>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Número de Telemóvel</mat-label>
+                  <mat-icon matPrefix>phone</mat-icon>
+                  <input
+                    matInput
+                    formControlName="mbwayPhone"
+                    placeholder="+351912345678"
+                    (blur)="formatPhone($event)"
+                  >
+                  <mat-hint>Formato: +351912345678</mat-hint>
+                  @if (portugalForm.get('mbwayPhone')?.invalid && portugalForm.get('mbwayPhone')?.touched) {
+                    <mat-error>{{ getErrorMessage('mbwayPhone') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <mat-divider class="method-divider"></mat-divider>
+
+              <!-- Multibanco / Bank Transfer -->
+              <div class="payment-method-section">
+                <h4>
+                  <mat-icon class="method-icon">account_balance</mat-icon>
+                  Multibanco / Transferência Bancária
+                </h4>
+                <p class="method-description">
+                  Receba doações via transferência bancária usando seu IBAN
+                </p>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>IBAN</mat-label>
+                  <mat-icon matPrefix>account_balance</mat-icon>
+                  <input
+                    matInput
+                    formControlName="iban"
+                    placeholder="PT50123456789012345678901"
+                    (blur)="formatIban($event)"
+                  >
+                  <mat-hint>Formato: PT50 seguido de 23 dígitos</mat-hint>
+                  @if (portugalForm.get('iban')?.invalid && portugalForm.get('iban')?.touched) {
+                    <mat-error>{{ getErrorMessage('iban') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="form-actions">
+                <button
+                  mat-stroked-button
+                  type="button"
+                  (click)="clearForm()"
+                  [disabled]="saving()"
+                >
+                  <mat-icon>clear</mat-icon>
+                  Limpar
+                </button>
+
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="portugalForm.invalid || saving()"
+                >
+                  @if (saving()) {
+                    <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                    <span>Salvando...</span>
+                  } @else {
+                    <mat-icon>save</mat-icon>
+                    <span>Salvar Configurações</span>
+                  }
+                </button>
+              </div>
+            </form>
+          }
+
+          <!-- Brazil Forms -->
+          @if (isBrazil()) {
+            <form [formGroup]="brazilForm" (ngSubmit)="onSubmit()" class="payment-form">
+              <h3 class="section-title">
+                <mat-icon>payment</mat-icon>
+                Métodos de Pagamento - Brasil
+              </h3>
+
+              <!-- PIX -->
+              <div class="payment-method-section">
+                <h4>
+                  <mat-icon class="method-icon">qr_code</mat-icon>
+                  PIX
+                </h4>
+                <p class="method-description">
+                  Receba doações instantaneamente via PIX
+                </p>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Tipo de Chave PIX</mat-label>
+                  <mat-select formControlName="pixKeyType">
+                    <mat-option value="email">Email</mat-option>
+                    <mat-option value="cpf">CPF</mat-option>
+                    <mat-option value="cnpj">CNPJ</mat-option>
+                    <mat-option value="phone">Telefone</mat-option>
+                    <mat-option value="random">Chave Aleatória</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Chave PIX</mat-label>
+                  <mat-icon matPrefix>vpn_key</mat-icon>
+                  <input matInput formControlName="pixKey" placeholder="sua@chave.pix">
+                  <mat-hint>Insira sua chave PIX conforme o tipo selecionado</mat-hint>
+                  @if (brazilForm.get('pixKey')?.invalid && brazilForm.get('pixKey')?.touched) {
+                    <mat-error>{{ getErrorMessage('pixKey') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <mat-divider class="method-divider"></mat-divider>
+
+              <!-- Bank Transfer -->
+              <div class="payment-method-section">
+                <h4>
+                  <mat-icon class="method-icon">account_balance</mat-icon>
+                  Transferência Bancária (TED/DOC)
+                </h4>
+                <p class="method-description">
+                  Receba doações via transferência bancária tradicional
+                </p>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Nome do Banco</mat-label>
+                  <mat-icon matPrefix>account_balance</mat-icon>
+                  <input matInput formControlName="bankName" placeholder="Ex: Banco do Brasil">
+                  @if (brazilForm.get('bankName')?.invalid && brazilForm.get('bankName')?.touched) {
+                    <mat-error>{{ getErrorMessage('bankName') }}</mat-error>
+                  }
+                </mat-form-field>
+
+                <div class="bank-details-row">
+                  <mat-form-field appearance="outline" class="bank-field">
+                    <mat-label>Agência</mat-label>
+                    <input matInput formControlName="bankRoutingNumber" placeholder="0001">
+                    @if (brazilForm.get('bankRoutingNumber')?.invalid && brazilForm.get('bankRoutingNumber')?.touched) {
+                      <mat-error>{{ getErrorMessage('bankRoutingNumber') }}</mat-error>
+                    }
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="bank-field">
+                    <mat-label>Conta</mat-label>
+                    <input matInput formControlName="bankAccountNumber" placeholder="12345-6">
+                    @if (brazilForm.get('bankAccountNumber')?.invalid && brazilForm.get('bankAccountNumber')?.touched) {
+                      <mat-error>{{ getErrorMessage('bankAccountNumber') }}</mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="form-actions">
+                <button
+                  mat-stroked-button
+                  type="button"
+                  (click)="clearForm()"
+                  [disabled]="saving()"
+                >
+                  <mat-icon>clear</mat-icon>
+                  Limpar
+                </button>
+
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="brazilForm.invalid || saving()"
+                >
+                  @if (saving()) {
+                    <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                    <span>Salvando...</span>
+                  } @else {
+                    <mat-icon>save</mat-icon>
+                    <span>Salvar Configurações</span>
+                  }
+                </button>
+              </div>
+            </form>
+          }
+
+          <!-- Success Message -->
+          @if (hasConfiguredMethods()) {
+            <div class="success-message">
+              <mat-icon>check_circle</mat-icon>
+              <p>
+                Configuração completa! Sua ONG já pode receber doações através dos métodos configurados.
+              </p>
+            </div>
+          }
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

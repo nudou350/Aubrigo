@@ -1,0 +1,158 @@
+<div class="donation-container">
+  <mat-card class="donation-card">
+    <mat-card-header>
+      <mat-card-title>Fazer uma Doação</mat-card-title>
+      <mat-card-subtitle>Apoie uma ONG e ajude os animais</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loadingOngs()) {
+        <div class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Carregando ONGs...</p>
+        </div>
+      } @else {
+        <form [formGroup]="donationForm" (ngSubmit)="onSubmit()" class="donation-form">
+          <!-- ONG Selection -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Selecione a ONG</mat-label>
+            <mat-select formControlName="ongId" required>
+              @for (ong of ongs(); track ong.id) {
+                <mat-option [value]="ong.id">
+                  {{ ong.ongName }}
+                  @if (ong.location) {
+                    <span class="ong-location"> - {{ ong.location }}</span>
+                  }
+                </mat-option>
+              }
+            </mat-select>
+            @if (donationForm.get('ongId')?.hasError('required') && donationForm.get('ongId')?.touched) {
+              <mat-error>Por favor, selecione uma ONG</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Donor Information -->
+          <div class="donor-info-section">
+            <h3>Seus Dados</h3>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nome Completo</mat-label>
+              <mat-icon matPrefix>person</mat-icon>
+              <input matInput formControlName="donorName" placeholder="Seu nome completo" required>
+              @if (donationForm.get('donorName')?.hasError('required') && donationForm.get('donorName')?.touched) {
+                <mat-error>Nome é obrigatório</mat-error>
+              }
+              @if (donationForm.get('donorName')?.hasError('minlength')) {
+                <mat-error>Nome deve ter pelo menos 3 caracteres</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email</mat-label>
+              <mat-icon matPrefix>email</mat-icon>
+              <input matInput formControlName="donorEmail" type="email" placeholder="seu@email.com" required>
+              @if (donationForm.get('donorEmail')?.hasError('required') && donationForm.get('donorEmail')?.touched) {
+                <mat-error>Email é obrigatório</mat-error>
+              }
+              @if (donationForm.get('donorEmail')?.hasError('email')) {
+                <mat-error>Email inválido</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Donation Details -->
+          <div class="donation-details-section">
+            <h3>Detalhes da Doação</h3>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Valor da Doação</mat-label>
+              <mat-icon matPrefix>attach_money</mat-icon>
+              <input matInput formControlName="amount" type="number" min="1" step="1" required>
+              @if (selectedOng()) {
+                <mat-hint>{{ formatCurrency(donationForm.get('amount')?.value || 0) }}</mat-hint>
+              }
+              @if (donationForm.get('amount')?.hasError('required') && donationForm.get('amount')?.touched) {
+                <mat-error>Valor é obrigatório</mat-error>
+              }
+              @if (donationForm.get('amount')?.hasError('min')) {
+                <mat-error>Valor mínimo é 1</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-radio-group formControlName="donationType" class="donation-type-group" aria-label="Tipo de doação">
+              <label class="donation-type-label">Tipo de Doação:</label>
+              <mat-radio-button value="one_time">Doação Única</mat-radio-button>
+              <mat-radio-button value="monthly">Doação Mensal</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <!-- Payment Method Selection -->
+          @if (selectedOng()) {
+            <div class="payment-method-section">
+              <h3>Método de Pagamento</h3>
+
+              @if (loadingPaymentMethods()) {
+                <div class="loading-container">
+                  <mat-spinner diameter="30"></mat-spinner>
+                  <p>Carregando métodos de pagamento...</p>
+                </div>
+              } @else if (!hasPaymentMethods()) {
+                <div class="warning-message">
+                  <mat-icon>warning</mat-icon>
+                  <p>Esta ONG ainda não configurou métodos de pagamento. Por favor, selecione outra ONG.</p>
+                </div>
+              } @else {
+                <div class="payment-methods-grid">
+                  @for (method of availablePaymentMethods(); track method.value) {
+                    <div
+                      class="payment-method-card"
+                      [class.selected]="donationForm.get('paymentMethod')?.value === method.value"
+                      (click)="donationForm.get('paymentMethod')?.setValue(method.value)"
+                      role="button"
+                      tabindex="0"
+                      [attr.aria-pressed]="donationForm.get('paymentMethod')?.value === method.value"
+                    >
+                      <mat-icon class="payment-icon">{{ method.icon }}</mat-icon>
+                      <h4>{{ method.label }}</h4>
+                      <p class="description">{{ method.description }}</p>
+                    </div>
+                  }
+                </div>
+                @if (donationForm.get('paymentMethod')?.hasError('required') && donationForm.get('paymentMethod')?.touched) {
+                  <mat-error class="payment-method-error">Por favor, selecione um método de pagamento</mat-error>
+                }
+              }
+            </div>
+          }
+
+          <!-- Submit Button -->
+          <div class="submit-section">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="donationForm.invalid || !hasPaymentMethods() || loading()"
+              class="submit-button"
+            >
+              @if (loading()) {
+                <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                <span>Processando...</span>
+              } @else {
+                <mat-icon>favorite</mat-icon>
+                <span>Continuar para Pagamento</span>
+              }
+            </button>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Payment Instructions Modal -->
+  @if (showInstructionsModal() && paymentInstructions()) {
+    <app-payment-instructions-modal
+      [instructions]="paymentInstructions()!"
+      (closed)="onModalClosed()"
+    />
+  }
+</div>

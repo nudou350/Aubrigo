@@ -13,7 +13,7 @@ import { PaymentGatewayFactory } from "./gateways/payment-gateway.factory";
 import { StripeGateway } from "./gateways/stripe.gateway";
 import { BrazilianGateway } from "./gateways/brazilian.gateway";
 import { ManualPixGateway } from "./gateways/manual-pix.gateway";
-import { Ong } from "../ongs/entities/ong.entity";
+import { User } from "../users/entities/user.entity";
 import { StripeConnectService } from "../stripe-connect/stripe-connect.service";
 import { EmailService } from "../email/email.service";
 
@@ -24,8 +24,8 @@ export class DonationsService implements OnModuleInit {
   constructor(
     @InjectRepository(Donation)
     private donationRepository: Repository<Donation>,
-    @InjectRepository(Ong)
-    private ongRepository: Repository<Ong>,
+    @InjectRepository(User)
+    private ongRepository: Repository<User>,
     private gatewayFactory: PaymentGatewayFactory,
     private stripeGateway: StripeGateway,
     private brazilianGateway: BrazilianGateway,
@@ -42,24 +42,7 @@ export class DonationsService implements OnModuleInit {
   }
 
   async createDonation(createDonationDto: CreateDonationDto) {
-    const { country, currency, paymentMethod, phoneNumber, ...donationData } =
-      createDonationDto;
-
-    // Validate country and currency match
-    if (country === "PT" && currency !== "EUR") {
-      throw new BadRequestException("Portugal must use EUR currency");
-    }
-    if (country === "BR" && currency !== "BRL") {
-      throw new BadRequestException("Brazil must use BRL currency");
-    }
-
-    // Validate payment method is supported for country
-    const supportedMethods: string[] = this.getSupportedMethodsForCountry(country as "PT" | "BR");
-    if (!supportedMethods.includes(paymentMethod)) {
-      throw new BadRequestException(
-        `Payment method ${paymentMethod} not supported for ${country}`,
-      );
-    }
+    const { paymentMethod, ...donationData } = createDonationDto;
 
     // Get ONG details for payment instructions
     const ong = await this.ongRepository.findOne({
@@ -70,13 +53,38 @@ export class DonationsService implements OnModuleInit {
       throw new NotFoundException("ONG not found");
     }
 
+    // Check if ONG has payment methods configured
+    if (!ong.paymentMethodsConfigured) {
+      throw new BadRequestException(
+        "This ONG has not configured payment methods yet. Please contact them directly.",
+      );
+    }
+
+    // Get available payment methods for the ONG
+    const availableMethods = this.getAvailablePaymentMethods(ong);
+    if (availableMethods.length === 0) {
+      throw new BadRequestException(
+        "No payment methods available for this ONG. Please contact them directly.",
+      );
+    }
+
+    // Validate that the selected payment method is available for this ONG
+    if (!availableMethods.includes(paymentMethod)) {
+      throw new BadRequestException(
+        `Payment method '${paymentMethod}' is not available for this ONG. Available methods: ${availableMethods.join(", ")}`,
+      );
+    }
+
+    // Determine currency and country based on ONG
+    const country = ong.countryCode;
+    const currency = country === "PT" ? "EUR" : "BRL";
+
     // Create donation record with pending_confirmation status (manual flow)
     const donation = this.donationRepository.create({
       ...donationData,
       country,
       currency,
       paymentMethod,
-      phoneNumber,
       paymentStatus: "pending_confirmation", // Manual confirmation required
       gatewayProvider: "manual", // Mark as manual payment
     });
@@ -185,10 +193,11 @@ export class DonationsService implements OnModuleInit {
 
   /**
    * Build manual payment instructions for donor
+   * Enhanced with proper validation and formatting
    */
-  private buildManualPaymentInstructions(ong: Ong, donation: Donation) {
+  private buildManualPaymentInstructions(ong: User, donation: Donation) {
     const instructions: any = {
-      ongName: ong.ongName,
+      ongName: ong.ongName || "ONG",
       amount: donation.amount,
       currency: donation.currency,
       paymentMethod: donation.paymentMethod,
@@ -197,52 +206,56 @@ export class DonationsService implements OnModuleInit {
     if (donation.country === "PT") {
       // Portugal payment methods
       if (donation.paymentMethod === "mbway") {
-        instructions.mbwayPhone = ong.phone || "+351 XXX XXX XXX";
+        instructions.mbwayPhone = ong.phone;
         instructions.instructions = [
           "1. Abra a aplicação MB WAY no seu telemóvel",
-          `2. Envie ${donation.currency} ${donation.amount} para o número:`,
-          `   ${instructions.mbwayPhone}`,
-          "3. Após efetuar o pagamento, aguarde a confirmação da ONG",
+          `2. Escolha a opção 'Transferir'`,
+          `3. Envie ${donation.currency} ${donation.amount} para o número ${instructions.mbwayPhone}`,
+          "4. Após efetuar o pagamento, aguarde a confirmação da ONG",
+          "5. Você receberá um email quando a doação for confirmada",
         ];
       } else if (donation.paymentMethod === "multibanco") {
-        instructions.iban = ong.bankAccountIban || "PT50 XXXX XXXX XXXX XXXX XXXX X";
+        instructions.iban = ong.bankAccountIban;
         instructions.instructions = [
           "1. Aceda ao multibanco ou homebanking",
-          '2. Escolha "Transferência Bancária" ou "Pagamentos"',
+          '2. Escolha "Transferência Bancária"',
           `3. IBAN: ${instructions.iban}`,
           `4. Montante: ${donation.currency} ${donation.amount}`,
-          `5. Referência: Doação ${donation.id.substring(0, 8)}`,
+          `5. Descrição: Doação ${ong.ongName} - Ref: ${donation.id.substring(0, 8).toUpperCase()}`,
           "6. Após efetuar o pagamento, aguarde a confirmação da ONG",
-        ];
-      } else if (donation.paymentMethod === "card") {
-        instructions.iban = ong.bankAccountIban || "PT50 XXXX XXXX XXXX XXXX XXXX X";
-        instructions.instructions = [
-          "Pagamento por cartão não está disponível via manual.",
-          "Por favor, use MB WAY ou Transferência Bancária.",
+          "7. Você receberá um email quando a doação for confirmada",
         ];
       }
     } else if (donation.country === "BR") {
       // Brazil payment methods
       if (donation.paymentMethod === "pix") {
-        instructions.pixKey = ong.pixKey || "pix@ong.com.br";
-        instructions.pixKeyType = this.detectPixKeyType(instructions.pixKey);
+        instructions.pixKey = ong.pixKey;
+        instructions.pixKeyType = ong.pixKeyType || this.detectPixKeyType(ong.pixKey);
         instructions.instructions = [
           "1. Abra o aplicativo do seu banco",
           "2. Escolha a opção PIX",
-          "3. Selecione 'Enviar PIX'",
-          `4. Chave PIX (${instructions.pixKeyType}): ${instructions.pixKey}`,
-          `5. Valor: ${donation.currency} ${donation.amount}`,
-          "6. Após efetuar o pagamento, aguarde a confirmação da ONG",
+          "3. Selecione 'Transferir' ou 'Enviar PIX'",
+          `4. Tipo de Chave: ${instructions.pixKeyType}`,
+          `5. Chave PIX: ${instructions.pixKey}`,
+          `6. Valor: ${donation.currency} ${donation.amount}`,
+          `7. Descrição: Doação ${ong.ongName}`,
+          "8. Confirme os dados e finalize o pagamento",
+          "9. Aguarde a confirmação da ONG por email",
         ];
-      } else if (donation.paymentMethod === "boleto") {
+      } else if (donation.paymentMethod === "bank_transfer") {
+        instructions.bankName = ong.bankName;
+        instructions.bankRoutingNumber = ong.bankRoutingNumber;
+        instructions.bankAccountNumber = ong.bankAccountNumber;
         instructions.instructions = [
-          "Boleto bancário não está disponível via manual.",
-          "Por favor, use PIX para doação instantânea.",
-        ];
-      } else if (donation.paymentMethod === "card") {
-        instructions.instructions = [
-          "Pagamento por cartão não está disponível via manual.",
-          "Por favor, use PIX para doação instantânea.",
+          "1. Aceda ao aplicativo do seu banco",
+          '2. Escolha "Transferência" ou "TED/DOC"',
+          `3. Banco: ${instructions.bankName}`,
+          `4. Agência: ${instructions.bankRoutingNumber}`,
+          `5. Conta: ${instructions.bankAccountNumber}`,
+          `6. Valor: ${donation.currency} ${donation.amount}`,
+          `7. Descrição: Doação ${ong.ongName}`,
+          "8. Finalize a transferência",
+          "9. Aguarde a confirmação da ONG por email",
         ];
       }
     }
@@ -262,11 +275,38 @@ export class DonationsService implements OnModuleInit {
   }
 
   /**
+   * Get available payment methods for an ONG based on configuration
+   */
+  private getAvailablePaymentMethods(ong: User): string[] {
+    const methods: string[] = [];
+
+    if (ong.countryCode === "PT") {
+      // Portugal
+      if (ong.phone) {
+        methods.push("mbway");
+      }
+      if (ong.bankAccountIban) {
+        methods.push("multibanco");
+      }
+    } else if (ong.countryCode === "BR") {
+      // Brazil
+      if (ong.pixKey && ong.pixKeyType) {
+        methods.push("pix");
+      }
+      if (ong.bankName && ong.bankRoutingNumber && ong.bankAccountNumber) {
+        methods.push("bank_transfer");
+      }
+    }
+
+    return methods;
+  }
+
+  /**
    * Send donation notification emails to donor and ONG
    */
   private async sendDonationEmails(
     donation: Donation,
-    ong: Ong,
+    ong: User,
     paymentInstructions: any,
   ): Promise<void> {
     try {
@@ -312,17 +352,6 @@ export class DonationsService implements OnModuleInit {
     } catch (error) {
       this.logger.error("Error sending donation emails:", error);
       throw error;
-    }
-  }
-
-  /**
-   * Get supported payment methods for a country
-   */
-  private getSupportedMethodsForCountry(country: "PT" | "BR"): string[] {
-    if (country === "PT") {
-      return ["mbway", "multibanco"];
-    } else {
-      return ["pix"];
     }
   }
 
@@ -594,7 +623,20 @@ export class DonationsService implements OnModuleInit {
     };
   }
 
-  async getSupportedPaymentMethods(country: "PT" | "BR") {
-    return this.getSupportedMethodsForCountry(country);
+  /**
+   * Get supported payment methods for a specific ONG
+   * @param ongId - ONG ID
+   * @returns Array of available payment methods
+   */
+  async getSupportedPaymentMethods(ongId: string): Promise<string[]> {
+    const ong = await this.ongRepository.findOne({
+      where: { id: ongId },
+    });
+
+    if (!ong) {
+      throw new NotFoundException("ONG not found");
+    }
+
+    return this.getAvailablePaymentMethods(ong);
   }
 }

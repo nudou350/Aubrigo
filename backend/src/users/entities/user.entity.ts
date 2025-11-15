@@ -71,6 +71,26 @@ export class User {
   allowAppointments: boolean;
   @Column({ name: "country_code", length: 2, default: "PT" })
   countryCode: string;
+
+  // Payment configuration fields
+  @Column({ name: "bank_name", nullable: true })
+  bankName: string; // For Brazil bank transfers
+
+  @Column({ name: "bank_account_iban", nullable: true })
+  bankAccountIban: string; // For Portugal Multibanco transfers
+
+  @Column({ name: "bank_routing_number", nullable: true })
+  bankRoutingNumber: string; // For Brazil bank transfers
+
+  @Column({ name: "bank_account_number", nullable: true })
+  bankAccountNumber: string; // For Brazil bank transfers
+
+  @Column({ name: "pix_key_type", nullable: true })
+  pixKeyType: string; // CPF, CNPJ, Email, Phone, Random
+
+  @Column({ name: "payment_methods_configured", default: false })
+  paymentMethodsConfigured: boolean; // Indicates if ONG has configured payment methods
+
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
   @UpdateDateColumn({ name: "updated_at" })

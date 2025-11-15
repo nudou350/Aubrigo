@@ -78,13 +78,6 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'donate/simple',
-    loadComponent: () =>
-      import('./features/donations/donation-page.component').then(
-        (m) => m.DonationPageComponent
-      ),
-  },
-  {
     path: 'favorites',
     loadComponent: () =>
       import('./features/favorites/favorites.component').then(
@@ -256,13 +249,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/analytics-dashboard/analytics-dashboard.component').then(
             (m) => m.AnalyticsDashboardComponent
-          ),
-      },
-      {
-        path: 'settings/payment',
-        loadComponent: () =>
-          import('./features/ong/payment-settings/payment-settings.component').then(
-            (m) => m.PaymentSettingsComponent
           ),
       },
     ]

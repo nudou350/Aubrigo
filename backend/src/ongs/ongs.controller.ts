@@ -29,6 +29,7 @@ import { OngsService } from "./ongs.service";
 import { UpdateOngDto } from "./dto/update-ong.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
+import { UpdatePaymentConfigDto } from "./dto/update-payment-config.dto";
 import { UploadService } from "../upload/upload.service";
 @ApiTags("ONGs")
 @Controller("ongs")
@@ -181,5 +182,42 @@ export class OngsController {
   ) {
     return this.ongsService.changePassword(user.id, changePasswordDto);
   }
+
+  @Get(":ongId/payment-config")
+  @ApiOperation({
+    summary: "Get public payment configuration for an ONG",
+    description: "Returns available payment methods for donors (public endpoint)",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Payment configuration retrieved successfully",
+  })
+  @ApiResponse({ status: 404, description: "ONG not found" })
+  async getPaymentConfig(@Param("ongId") ongId: string) {
+    return this.ongsService.getPaymentConfig(ongId);
+  }
+
+  @Put("my-ong/payment-config")
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.ONG)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Update payment configuration for current ONG",
+    description:
+      "Configure payment methods (MB WAY, Multibanco, PIX, Bank Transfer) - at least one method required",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Payment configuration updated successfully",
+  })
+  @ApiResponse({ status: 400, description: "Invalid payment configuration" })
+  @ApiResponse({ status: 404, description: "ONG not found" })
+  async updatePaymentConfig(
+    @CurrentUser() user: any,
+    @Body() updatePaymentConfigDto: UpdatePaymentConfigDto,
+  ) {
+    return this.ongsService.updatePaymentConfig(user.id, updatePaymentConfigDto);
+  }
+
   // Member management endpoints removed - not implemented in current architecture
 }

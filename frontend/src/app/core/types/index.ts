@@ -5,3 +5,4 @@
  */
 
 export * from './payment.types';
+export * from './donation.types';

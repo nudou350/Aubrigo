@@ -109,8 +109,6 @@ describe("DonationsService", () => {
         amount: 50,
         donationType: "one_time",
         paymentMethod: "card",
-        country: "PT",
-        currency: "EUR",
       });
 
       expect(result).toBeDefined();
@@ -153,8 +151,6 @@ describe("DonationsService", () => {
         amount: 50,
         donationType: "one_time",
         paymentMethod: "pix",
-        country: "PT",
-        currency: "EUR",
       });
 
       expect(result).toBeDefined();

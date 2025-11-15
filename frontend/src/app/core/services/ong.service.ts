@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Pet } from './pets.service';
+import { OngPaymentConfigResponse, PaymentConfigDto } from '../types';
 
 export interface OngProfile {
   id: string;
@@ -188,5 +189,22 @@ export class OngService {
    */
   deleteAccount(): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.apiUrl}/my-ong`);
+  }
+
+  /**
+   * Get payment configuration for the current ONG
+   */
+  getPaymentConfig(): Observable<OngPaymentConfigResponse> {
+    return this.http.get<OngPaymentConfigResponse>(`${this.apiUrl}/my-ong/payment-config`);
+  }
+
+  /**
+   * Update payment configuration for the current ONG
+   */
+  updatePaymentConfig(config: PaymentConfigDto): Observable<{ message: string; config: OngPaymentConfigResponse }> {
+    return this.http.put<{ message: string; config: OngPaymentConfigResponse }>(
+      `${this.apiUrl}/my-ong/payment-config`,
+      config
+    );
   }
 }

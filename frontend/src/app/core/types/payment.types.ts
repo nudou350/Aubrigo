@@ -117,16 +117,16 @@ export function isMultibancoPayment(
 // Payment Status Types
 export type PaymentStatus =
   | 'pending'
+  | 'pending_confirmation' // Manual donation awaiting ONG confirmation
   | 'processing'
   | 'succeeded'
   | 'failed'
   | 'canceled'
   | 'expired'
-  | 'pending_confirmation'
   | 'requires_action';
 
 // Payment Method Types
-export type PaymentMethod = 'mbway' | 'multibanco' | 'card' | 'pix' | 'boleto';
+export type PaymentMethod = 'mbway' | 'multibanco' | 'card' | 'pix' | 'boleto' | 'bank_transfer';
 
 // Country Types
 export type SupportedCountry = 'PT' | 'BR';
