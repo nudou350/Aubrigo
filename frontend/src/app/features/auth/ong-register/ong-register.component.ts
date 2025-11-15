@@ -8,6 +8,7 @@ import {
 } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
+import { CountryService } from "../../../core/services/country.service";
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface Country {
@@ -209,52 +210,79 @@ interface Country {
           <div class="payment-section">
             <h3>💳 Conta para Receber Doações (Opcional)</h3>
             <p class="help-text">
-              Preencha estes dados para configurar automaticamente sua conta de
-              pagamentos e começar a receber doações imediatamente
+              Preencha estes dados para configurar sua conta de pagamentos e começar a receber doações imediatamente
             </p>
 
-            <div class="form-group">
-              <label for="taxId">NIF / NIPC (Portugal) ou CNPJ (Brasil)</label>
-              <input
-                id="taxId"
-                type="text"
-                formControlName="taxId"
-                placeholder="Ex: 123456789 (PT) ou 12.345.678/0001-90 (BR)"
-              />
-              <small class="field-hint">
-                Número de identificação fiscal da sua organização
-              </small>
-            </div>
+            <!-- Portugal Fields -->
+            @if (isPortugal()) {
+              <div class="form-group">
+                <label for="taxId">NIF / NIPC (Portugal)</label>
+                <input
+                  id="taxId"
+                  type="text"
+                  formControlName="taxId"
+                  placeholder="Ex: 123456789"
+                />
+                <small class="field-hint">
+                  Número de identificação fiscal da sua organização
+                </small>
+              </div>
 
-            <div class="form-group">
-              <label for="bankAccountIban">IBAN (apenas para Portugal)</label>
-              <input
-                id="bankAccountIban"
-                type="text"
-                formControlName="bankAccountIban"
-                placeholder="PT50 0000 0000 0000 0000 0000 0"
-              />
-              <small class="field-hint">
-                As doações serão depositadas diretamente nesta conta
-              </small>
-            </div>
+              <div class="form-group">
+                <label for="bankAccountIban">IBAN</label>
+                <input
+                  id="bankAccountIban"
+                  type="text"
+                  formControlName="bankAccountIban"
+                  placeholder="PT50 0000 0000 0000 0000 0000 0"
+                />
+                <small class="field-hint">
+                  As doações serão depositadas diretamente nesta conta
+                </small>
+              </div>
+            }
 
-            <div class="brazil-bank-fields">
+            <!-- Brazil Fields -->
+            @if (isBrazil()) {
+              <div class="form-group">
+                <label for="taxId">CNPJ</label>
+                <input
+                  id="taxId"
+                  type="text"
+                  formControlName="taxId"
+                  placeholder="Ex: 12.345.678/0001-90"
+                />
+                <small class="field-hint">
+                  Número de identificação fiscal da sua organização
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="bankName">Nome do Banco</label>
+                <input
+                  id="bankName"
+                  type="text"
+                  formControlName="bankName"
+                  placeholder="Ex: Banco do Brasil"
+                />
+                <small class="field-hint">
+                  Nome do banco para transferências
+                </small>
+              </div>
+
               <div class="form-row">
                 <div class="form-group">
-                  <label for="bankRoutingNumber"
-                    >Código do Banco (apenas Brasil)</label
-                  >
+                  <label for="bankRoutingNumber">Código do Banco (Agência)</label>
                   <input
                     id="bankRoutingNumber"
                     type="text"
                     formControlName="bankRoutingNumber"
-                    placeholder="001"
+                    placeholder="0001"
                   />
                 </div>
 
                 <div class="form-group">
-                  <label for="bankAccountNumber">Número da Conta (apenas Brasil)</label>
+                  <label for="bankAccountNumber">Número da Conta</label>
                   <input
                     id="bankAccountNumber"
                     type="text"
@@ -265,7 +293,22 @@ interface Country {
               </div>
 
               <div class="form-group">
-                <label for="pixKey">Chave PIX (apenas Brasil)</label>
+                <label for="pixKeyType">Tipo de Chave PIX</label>
+                <select
+                  id="pixKeyType"
+                  formControlName="pixKeyType"
+                >
+                  <option value="">Selecione o tipo</option>
+                  <option value="CPF">CPF</option>
+                  <option value="CNPJ">CNPJ</option>
+                  <option value="Email">Email</option>
+                  <option value="Phone">Telefone</option>
+                  <option value="Random">Chave Aleatória</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="pixKey">Chave PIX</label>
                 <input
                   id="pixKey"
                   type="text"
@@ -276,7 +319,7 @@ interface Country {
                   Sua chave PIX para receber doações instantaneamente
                 </small>
               </div>
-            </div>
+            }
 
             <div class="info-box">
               <svg viewBox="0 0 24 24" fill="currentColor">
@@ -287,9 +330,8 @@ interface Country {
               <div>
                 <strong>Por que pedimos isso?</strong>
                 <p>
-                  Estes dados permitem configurar automaticamente sua conta para
-                  receber doações via Stripe (Portugal) ou EBANX (Brasil). Você
-                  pode preencher agora ou configurar mais tarde no painel.
+                  Estes dados permitem configurar sua conta para receber doações manualmente.
+                  Você pode preencher agora ou configurar mais tarde no painel.
                 </p>
               </div>
             </div>
@@ -779,11 +821,25 @@ interface Country {
 
       .form-row {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 20px;
 
-        @media (max-width: 600px) {
-          grid-template-columns: 1fr;
+        @media (min-width: 768px) {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .form-group {
+          margin-bottom: 0;
+          width: 100%;
+
+          label {
+            min-height: 40px;
+            display: flex;
+            align-items: flex-end;
+            line-height: 1.3;
+          }
         }
       }
 
@@ -881,6 +937,13 @@ export class OngRegisterComponent {
     { code: "LU", name: "Luxemburgo", dialCode: "+352", flag: "🇱🇺" },
   ];
 
+  // Inject CountryService
+  private countryService = inject(CountryService);
+
+  // Country helpers - use detected country from service
+  isPortugal = computed(() => this.countryService.currentCountry() === 'PT');
+  isBrazil = computed(() => this.countryService.currentCountry() === 'BR');
+
   filteredCountries = computed(() => {
     const query = this.searchQuery().toLowerCase();
     if (!query) {
@@ -917,16 +980,20 @@ export class OngRegisterComponent {
         // Payment account fields (optional)
         taxId: [""],
         bankAccountIban: [""],
+        bankName: [""],
         bankRoutingNumber: [""],
         bankAccountNumber: [""],
         pixKey: [""],
+        pixKeyType: [""],
       },
       { validators: this.passwordMatchValidator }
     );
 
-    // Set Brasil as default
-    this.selectedCountry.set(this.countries[0]); // Brasil is now at index 0
-    this.registerForm.patchValue({ countryCode: this.countries[0].dialCode });
+    // Initialize with auto-detected country from CountryService
+    const detectedCountryCode = this.countryService.currentCountry();
+    const initialCountry = this.countries.find(c => c.code === detectedCountryCode) || this.countries[1]; // PT is at index 1
+    this.selectedCountry.set(initialCountry);
+    this.registerForm.patchValue({ countryCode: initialCountry.dialCode });
   }
 
   passwordMatchValidator(form: FormGroup) {
@@ -962,6 +1029,8 @@ export class OngRegisterComponent {
 
   selectCountry(country: Country) {
     this.selectedCountry.set(country);
+    // Update CountryService so conditional fields react
+    this.countryService.setCountry(country.code);
     this.registerForm.patchValue({
       countryCode: country.dialCode,
       countrySearch: "",
@@ -997,12 +1066,15 @@ export class OngRegisterComponent {
       password: formValue.password,
       confirmPassword: formValue.confirmPassword,
       location: formValue.city, // Map city to location for backend
+      countryCode: this.selectedCountry()?.code, // Send country code (PT/BR)
       // Payment account fields (optional)
       taxId: formValue.taxId || undefined,
       bankAccountIban: formValue.bankAccountIban || undefined,
+      bankName: formValue.bankName || undefined,
       bankRoutingNumber: formValue.bankRoutingNumber || undefined,
       bankAccountNumber: formValue.bankAccountNumber || undefined,
       pixKey: formValue.pixKey || undefined,
+      pixKeyType: formValue.pixKeyType || undefined,
     };
 
     this.authService.registerOng(registerData).subscribe({
