@@ -90,6 +90,9 @@ jobs:
         EMAIL_USER: ${{ secrets.EMAIL_USER }}
         EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+        ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+        STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        STRIPE_CONNECT_WEBHOOK_SECRET: ${{ secrets.STRIPE_CONNECT_WEBHOOK_SECRET }}
       run: |
         # Copy deployment package to VPS
         scp deploy.tar.gz $VPS_USER@$VPS_HOST:/tmp/
@@ -128,6 +131,9 @@ jobs:
           echo "EMAIL_USER=$EMAIL_USER" >> current/backend/.env
           echo "EMAIL_PASSWORD=$EMAIL_PASSWORD" >> current/backend/.env
           echo "EMAIL_FROM=$EMAIL_FROM" >> current/backend/.env
+          echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> current/backend/.env
+          echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> current/backend/.env
+          echo "STRIPE_CONNECT_WEBHOOK_SECRET=$STRIPE_CONNECT_WEBHOOK_SECRET" >> current/backend/.env
           echo "FRONTEND_URL=${{ env.FRONTEND_URL }}" >> current/backend/.env
 
           # Create logs directory
