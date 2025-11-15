@@ -2,7 +2,7 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   workflow_dispatch:
 
 jobs:
@@ -12,6 +12,25 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
+    - name: Set deployment environment
+      id: deploy-env
+      run: |
+        if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          echo "DEPLOY_ENV=production" >> $GITHUB_ENV
+          echo "DEPLOY_PATH=/var/www/aubrigo" >> $GITHUB_ENV
+          echo "BACKEND_PORT=3002" >> $GITHUB_ENV
+          echo "PM2_APP_NAME=aubrigo-backend" >> $GITHUB_ENV
+          echo "DOMAIN=aubrigo.pt" >> $GITHUB_ENV
+          echo "FRONTEND_URL=https://aubrigo.pt" >> $GITHUB_ENV
+        else
+          echo "DEPLOY_ENV=development" >> $GITHUB_ENV
+          echo "DEPLOY_PATH=/var/www/aubrigo-dev" >> $GITHUB_ENV
+          echo "BACKEND_PORT=3003" >> $GITHUB_ENV
+          echo "PM2_APP_NAME=aubrigo-backend-dev" >> $GITHUB_ENV
+          echo "DOMAIN=dev.aubrigo.pt" >> $GITHUB_ENV
+          echo "FRONTEND_URL=https://dev.aubrigo.pt" >> $GITHUB_ENV
+        fi
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
@@ -71,7 +90,6 @@ jobs:
         EMAIL_USER: ${{ secrets.EMAIL_USER }}
         EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-        FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
       run: |
         # Copy deployment package to VPS
         scp deploy.tar.gz $VPS_USER@$VPS_HOST:/tmp/
@@ -84,8 +102,11 @@ jobs:
           export NVM_DIR="\$HOME/.nvm"
           [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
 
+          # Create deployment directory if it doesn't exist
+          mkdir -p ${{ env.DEPLOY_PATH }}
+
           # Extract deployment package
-          cd /var/www/aubrigo
+          cd ${{ env.DEPLOY_PATH }}
           tar -xzf /tmp/deploy.tar.gz
 
           # Backup current version
@@ -97,8 +118,8 @@ jobs:
           mv deploy current
 
           # Update environment variables
-          echo "NODE_ENV=production" > current/backend/.env
-          echo "PORT=3002" >> current/backend/.env
+          echo "NODE_ENV=${{ env.DEPLOY_ENV }}" > current/backend/.env
+          echo "PORT=${{ env.BACKEND_PORT }}" >> current/backend/.env
           echo "DATABASE_URL=$DATABASE_URL" >> current/backend/.env
           echo "JWT_SECRET=$JWT_SECRET" >> current/backend/.env
           echo "JWT_EXPIRATION=7d" >> current/backend/.env
@@ -107,10 +128,10 @@ jobs:
           echo "EMAIL_USER=$EMAIL_USER" >> current/backend/.env
           echo "EMAIL_PASSWORD=$EMAIL_PASSWORD" >> current/backend/.env
           echo "EMAIL_FROM=$EMAIL_FROM" >> current/backend/.env
-          echo "FRONTEND_URL=$FRONTEND_URL" >> current/backend/.env
+          echo "FRONTEND_URL=${{ env.FRONTEND_URL }}" >> current/backend/.env
 
           # Create logs directory
-          cd /var/www/aubrigo/current/backend
+          cd ${{ env.DEPLOY_PATH }}/current/backend
           mkdir -p logs
 
           # Run database migrations
@@ -140,8 +161,8 @@ jobs:
 
           # Restart backend with PM2
           echo "Restarting backend service..."
-          pm2 delete aubrigo-backend || true
-          pm2 start ecosystem.config.js
+          pm2 delete ${{ env.PM2_APP_NAME }} || true
+          PM2_APP_NAME=${{ env.PM2_APP_NAME }} PORT=${{ env.BACKEND_PORT }} pm2 start ecosystem.config.js --name ${{ env.PM2_APP_NAME }}
           pm2 save
           echo "✅ Backend service restarted"
 
@@ -152,17 +173,17 @@ jobs:
           rm /tmp/deploy.tar.gz
 
           # Keep only last 3 backups
-          cd /var/www/aubrigo
+          cd ${{ env.DEPLOY_PATH }}
           ls -t | grep backup | tail -n +4 | xargs rm -rf || true
 
-          echo "Deployment completed successfully!"
+          echo "Deployment completed successfully to ${{ env.DOMAIN }}!"
         EOF
 
     - name: Verify Deployment
       run: |
         echo "Waiting for service to start..."
         sleep 10
-        curl -f https://aubrigo.pt/api/health || echo "Health check failed"
+        curl -f https://${{ env.DOMAIN }}/api/health || echo "Health check failed"
 
     - name: Notify on failure
       if: failure()

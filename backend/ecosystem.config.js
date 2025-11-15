@@ -1,13 +1,13 @@
 module.exports = {
   apps: [
     {
-      name: 'aubrigo-backend',
+      name: process.env.PM2_APP_NAME || 'aubrigo-backend',
       script: './dist/main.js',
       instances: 1,
       exec_mode: 'cluster',
       env: {
-        NODE_ENV: 'production',
-        PORT: 3002,
+        NODE_ENV: process.env.NODE_ENV || 'production',
+        PORT: process.env.PORT || 3002,
       },
       error_file: './logs/error.log',
       out_file: './logs/output.log',
