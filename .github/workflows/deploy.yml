@@ -120,21 +120,22 @@ jobs:
           # Move new version to current
           mv deploy current
 
-          # Update environment variables
-          echo "NODE_ENV=${{ env.DEPLOY_ENV }}" > current/backend/.env
-          echo "PORT=${{ env.BACKEND_PORT }}" >> current/backend/.env
-          echo "DATABASE_URL=$DATABASE_URL" >> current/backend/.env
-          echo "JWT_SECRET=$JWT_SECRET" >> current/backend/.env
-          echo "JWT_EXPIRATION=7d" >> current/backend/.env
-          echo "EMAIL_HOST=$EMAIL_HOST" >> current/backend/.env
-          echo "EMAIL_PORT=$EMAIL_PORT" >> current/backend/.env
-          echo "EMAIL_USER=$EMAIL_USER" >> current/backend/.env
-          echo "EMAIL_PASSWORD=$EMAIL_PASSWORD" >> current/backend/.env
-          echo "EMAIL_FROM=$EMAIL_FROM" >> current/backend/.env
-          echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> current/backend/.env
-          echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> current/backend/.env
-          echo "STRIPE_CONNECT_WEBHOOK_SECRET=$STRIPE_CONNECT_WEBHOOK_SECRET" >> current/backend/.env
-          echo "FRONTEND_URL=${{ env.FRONTEND_URL }}" >> current/backend/.env
+          # Update environment variables (.env in root, not backend/)
+          # NestJS ConfigModule loads from ../.env (parent of backend/)
+          echo "NODE_ENV=${{ env.DEPLOY_ENV }}" > current/.env
+          echo "PORT=${{ env.BACKEND_PORT }}" >> current/.env
+          echo "DATABASE_URL=$DATABASE_URL" >> current/.env
+          echo "JWT_SECRET=$JWT_SECRET" >> current/.env
+          echo "JWT_EXPIRATION=7d" >> current/.env
+          echo "EMAIL_HOST=$EMAIL_HOST" >> current/.env
+          echo "EMAIL_PORT=$EMAIL_PORT" >> current/.env
+          echo "EMAIL_USER=$EMAIL_USER" >> current/.env
+          echo "EMAIL_PASSWORD=$EMAIL_PASSWORD" >> current/.env
+          echo "EMAIL_FROM=$EMAIL_FROM" >> current/.env
+          echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> current/.env
+          echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> current/.env
+          echo "STRIPE_CONNECT_WEBHOOK_SECRET=$STRIPE_CONNECT_WEBHOOK_SECRET" >> current/.env
+          echo "FRONTEND_URL=${{ env.FRONTEND_URL }}" >> current/.env
 
           # Create logs directory
           cd ${{ env.DEPLOY_PATH }}/current/backend
