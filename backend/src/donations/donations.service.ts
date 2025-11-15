@@ -15,6 +15,7 @@ import { BrazilianGateway } from "./gateways/brazilian.gateway";
 import { ManualPixGateway } from "./gateways/manual-pix.gateway";
 import { Ong } from "../ongs/entities/ong.entity";
 import { StripeConnectService } from "../stripe-connect/stripe-connect.service";
+import { EmailService } from "../email/email.service";
 
 @Injectable()
 export class DonationsService implements OnModuleInit {
@@ -30,6 +31,7 @@ export class DonationsService implements OnModuleInit {
     private brazilianGateway: BrazilianGateway,
     private manualPixGateway: ManualPixGateway,
     private stripeConnectService: StripeConnectService,
+    private emailService: EmailService,
   ) {}
 
   onModuleInit() {
@@ -52,59 +54,73 @@ export class DonationsService implements OnModuleInit {
     }
 
     // Validate payment method is supported for country
-    const supportedMethods = this.gatewayFactory.getSupportedMethodsForCountry(
-      country as "PT" | "BR",
-    );
-    if (!supportedMethods.includes(paymentMethod as any)) {
+    const supportedMethods: string[] = this.getSupportedMethodsForCountry(country as "PT" | "BR");
+    if (!supportedMethods.includes(paymentMethod)) {
       throw new BadRequestException(
         `Payment method ${paymentMethod} not supported for ${country}`,
       );
     }
 
-    // Check if ONG has Stripe Connect account (for Portugal only)
-    let ong: Ong | null = null;
-    let useStripeConnect = false;
+    // Get ONG details for payment instructions
+    const ong = await this.ongRepository.findOne({
+      where: { id: donationData.ongId },
+      relations: ["user"],
+    });
 
-    if (country === "PT") {
-      ong = await this.ongRepository.findOne({
-        where: { id: donationData.ongId },
-      });
-
-      if (ong && ong.stripeAccountId && ong.stripeChargesEnabled) {
-        useStripeConnect = true;
-        this.logger.log(
-          `Using Stripe Connect for ONG ${ong.ongName} (${ong.stripeAccountId})`,
-        );
-      } else if (ong && ong.stripeAccountId && !ong.stripeChargesEnabled) {
-        this.logger.warn(
-          `ONG ${ong.ongName} has Stripe account but charges not enabled yet`,
-        );
-      }
+    if (!ong) {
+      throw new NotFoundException("ONG not found");
     }
 
-    // Create donation record
+    // Create donation record with pending_confirmation status (manual flow)
     const donation = this.donationRepository.create({
       ...donationData,
       country,
       currency,
       paymentMethod,
       phoneNumber,
-      paymentStatus: "pending",
+      paymentStatus: "pending_confirmation", // Manual confirmation required
+      gatewayProvider: "manual", // Mark as manual payment
     });
 
     const savedDonation = await this.donationRepository.save(donation);
 
-    // Process payment
+    this.logger.log(
+      `Manual donation created: ${savedDonation.id} - ${savedDonation.amount} ${savedDonation.currency} via ${savedDonation.paymentMethod}`,
+    );
+
+    // Build manual payment instructions
+    const paymentInstructions = this.buildManualPaymentInstructions(
+      ong,
+      savedDonation,
+    );
+
+    // Send emails asynchronously (don't wait for them)
+    this.sendDonationEmails(savedDonation, ong, paymentInstructions).catch(
+      (error) => {
+        this.logger.error("Failed to send donation emails:", error);
+      },
+    );
+
+    return {
+      message: "Donation created successfully - Please complete payment manually",
+      donation: {
+        id: savedDonation.id,
+        amount: savedDonation.amount,
+        currency: savedDonation.currency,
+        country: savedDonation.country,
+        paymentMethod: savedDonation.paymentMethod,
+        paymentStatus: savedDonation.paymentStatus,
+      },
+      payment: paymentInstructions,
+    };
+
+    /* COMMENTED OUT: GATEWAY INTEGRATION (FOR FUTURE AUTOMATION)
     try {
       let paymentResponse: any;
       let gatewayName: string;
 
       if (useStripeConnect && ong) {
         // Use Stripe Connect for direct payment to ONG
-        this.logger.log(
-          `Creating connected payment for donation ${savedDonation.id}`,
-        );
-
         const paymentIntent =
           await this.stripeConnectService.createConnectedPayment({
             amount: savedDonation.amount,
@@ -152,46 +168,230 @@ export class DonationsService implements OnModuleInit {
       savedDonation.paymentIntentId = paymentResponse.paymentIntentId;
       savedDonation.paymentStatus = paymentResponse.status;
 
-      // Store payment method-specific data
-      if (paymentMethod === "pix") {
-        savedDonation.pixQrCode = paymentResponse.pixQrCode;
-        savedDonation.pixPaymentString = paymentResponse.pixPaymentString;
-      } else if (paymentMethod === "boleto") {
-        savedDonation.boletoUrl = paymentResponse.boletoUrl;
-        savedDonation.boletoBarcode = paymentResponse.boletoBarcode;
-      } else if (paymentMethod === "multibanco") {
-        savedDonation.multibancoEntity = paymentResponse.multibancoEntity;
-        savedDonation.multibancoReference = paymentResponse.multibancoReference;
-      }
-
-      if (paymentResponse.expiresAt) {
-        savedDonation.expiresAt = paymentResponse.expiresAt;
-      }
-
       await this.donationRepository.save(savedDonation);
 
       return {
         message: "Donation created successfully",
-        donation: {
-          id: savedDonation.id,
-          amount: savedDonation.amount,
-          currency: savedDonation.currency,
-          country: savedDonation.country,
-          paymentMethod: savedDonation.paymentMethod,
-          paymentStatus: savedDonation.paymentStatus,
-        },
+        donation: { ... },
         payment: this.buildPaymentResponse(savedDonation, paymentResponse),
       };
     } catch (error) {
-      this.logger.error(
-        `Payment creation failed for donation ${savedDonation.id}:`,
-        error,
-      );
-      // Mark donation as failed
+      this.logger.error(`Payment creation failed:`, error);
       savedDonation.paymentStatus = "failed";
       await this.donationRepository.save(savedDonation);
       throw error;
     }
+    */
+  }
+
+  /**
+   * Build manual payment instructions for donor
+   */
+  private buildManualPaymentInstructions(ong: Ong, donation: Donation) {
+    const instructions: any = {
+      ongName: ong.ongName,
+      amount: donation.amount,
+      currency: donation.currency,
+      paymentMethod: donation.paymentMethod,
+    };
+
+    if (donation.country === "PT") {
+      // Portugal payment methods
+      if (donation.paymentMethod === "mbway") {
+        instructions.mbwayPhone = ong.user?.phone || "+351 XXX XXX XXX";
+        instructions.instructions = [
+          "1. Abra a aplicação MB WAY no seu telemóvel",
+          `2. Envie ${donation.currency} ${donation.amount} para o número:`,
+          `   ${instructions.mbwayPhone}`,
+          "3. Após efetuar o pagamento, aguarde a confirmação da ONG",
+        ];
+      } else if (donation.paymentMethod === "multibanco") {
+        instructions.iban = ong.bankAccountIBAN || "PT50 XXXX XXXX XXXX XXXX XXXX X";
+        instructions.instructions = [
+          "1. Aceda ao multibanco ou homebanking",
+          '2. Escolha "Transferência Bancária" ou "Pagamentos"',
+          `3. IBAN: ${instructions.iban}`,
+          `4. Montante: ${donation.currency} ${donation.amount}`,
+          `5. Referência: Doação ${donation.id.substring(0, 8)}`,
+          "6. Após efetuar o pagamento, aguarde a confirmação da ONG",
+        ];
+      } else if (donation.paymentMethod === "card") {
+        instructions.iban = ong.bankAccountIBAN || "PT50 XXXX XXXX XXXX XXXX XXXX X";
+        instructions.instructions = [
+          "Pagamento por cartão não está disponível via manual.",
+          "Por favor, use MB WAY ou Transferência Bancária.",
+        ];
+      }
+    } else if (donation.country === "BR") {
+      // Brazil payment methods
+      if (donation.paymentMethod === "pix") {
+        instructions.pixKey = ong.user?.pixKey || "pix@ong.com.br";
+        instructions.pixKeyType = this.detectPixKeyType(instructions.pixKey);
+        instructions.instructions = [
+          "1. Abra o aplicativo do seu banco",
+          "2. Escolha a opção PIX",
+          "3. Selecione 'Enviar PIX'",
+          `4. Chave PIX (${instructions.pixKeyType}): ${instructions.pixKey}`,
+          `5. Valor: ${donation.currency} ${donation.amount}`,
+          "6. Após efetuar o pagamento, aguarde a confirmação da ONG",
+        ];
+      } else if (donation.paymentMethod === "boleto") {
+        instructions.instructions = [
+          "Boleto bancário não está disponível via manual.",
+          "Por favor, use PIX para doação instantânea.",
+        ];
+      } else if (donation.paymentMethod === "card") {
+        instructions.instructions = [
+          "Pagamento por cartão não está disponível via manual.",
+          "Por favor, use PIX para doação instantânea.",
+        ];
+      }
+    }
+
+    return instructions;
+  }
+
+  /**
+   * Detect PIX key type
+   */
+  private detectPixKeyType(pixKey: string): string {
+    if (/^\d{11}$/.test(pixKey)) return "CPF";
+    if (/^\d{14}$/.test(pixKey)) return "CNPJ";
+    if (/^[\w.-]+@[\w.-]+\.\w+$/.test(pixKey)) return "Email";
+    if (/^\+?\d{10,15}$/.test(pixKey)) return "Telefone";
+    return "Chave Aleatória";
+  }
+
+  /**
+   * Send donation notification emails to donor and ONG
+   */
+  private async sendDonationEmails(
+    donation: Donation,
+    ong: Ong,
+    paymentInstructions: any,
+  ): Promise<void> {
+    try {
+      // Extract account details for email
+      let accountDetails = "";
+      if (donation.paymentMethod === "mbway") {
+        accountDetails = paymentInstructions.mbwayPhone || "";
+      } else if (donation.paymentMethod === "multibanco") {
+        accountDetails = paymentInstructions.iban || "";
+      } else if (donation.paymentMethod === "pix") {
+        accountDetails = `${paymentInstructions.pixKey} (${paymentInstructions.pixKeyType})`;
+      }
+
+      // Send instructions to donor
+      await this.emailService.sendPaymentInstructionsEmail(
+        donation.donorEmail,
+        donation.donorName,
+        ong.ongName,
+        donation.amount,
+        donation.currency,
+        donation.paymentMethod,
+        paymentInstructions.instructions || [],
+        accountDetails,
+      );
+
+      this.logger.log(
+        `Payment instructions sent to donor: ${donation.donorEmail}`,
+      );
+
+      // Send pending donation notification to ONG
+      await this.emailService.sendDonationPendingToOng(
+        ong.user?.email || "",
+        ong.ongName,
+        donation.donorName,
+        donation.donorEmail,
+        donation.amount,
+        donation.currency,
+        donation.paymentMethod,
+        donation.id,
+      );
+
+      this.logger.log(`Pending donation notification sent to ONG: ${ong.ongName}`);
+    } catch (error) {
+      this.logger.error("Error sending donation emails:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get supported payment methods for a country
+   */
+  private getSupportedMethodsForCountry(country: "PT" | "BR"): string[] {
+    if (country === "PT") {
+      return ["mbway", "multibanco"];
+    } else {
+      return ["pix"];
+    }
+  }
+
+  /**
+   * Get pending donations for an ONG (manual confirmation required)
+   */
+  async getPendingDonations(ongId: string) {
+    const pendingDonations = await this.donationRepository.find({
+      where: {
+        ongId,
+        paymentStatus: "pending_confirmation",
+      },
+      order: { createdAt: "DESC" },
+    });
+
+    return {
+      count: pendingDonations.length,
+      donations: pendingDonations.map((donation) => ({
+        id: donation.id,
+        donorName: donation.donorName,
+        donorEmail: donation.donorEmail,
+        amount: donation.amount,
+        currency: donation.currency,
+        paymentMethod: donation.paymentMethod,
+        donationType: donation.donationType,
+        createdAt: donation.createdAt,
+      })),
+    };
+  }
+
+  /**
+   * Confirm a donation as received (ONG admin action)
+   */
+  async confirmDonation(donationId: string, ongId: string) {
+    const donation = await this.donationRepository.findOne({
+      where: { id: donationId, ongId },
+    });
+
+    if (!donation) {
+      throw new NotFoundException("Donation not found or access denied");
+    }
+
+    if (donation.paymentStatus !== "pending_confirmation") {
+      throw new BadRequestException(
+        `Donation is already ${donation.paymentStatus}`,
+      );
+    }
+
+    // Mark as completed/succeeded
+    donation.paymentStatus = "succeeded";
+    donation.updatedAt = new Date();
+
+    await this.donationRepository.save(donation);
+
+    this.logger.log(
+      `Donation ${donationId} confirmed by ONG ${ongId} - ${donation.amount} ${donation.currency}`,
+    );
+
+    return {
+      message: "Donation confirmed successfully",
+      donation: {
+        id: donation.id,
+        amount: donation.amount,
+        currency: donation.currency,
+        paymentStatus: donation.paymentStatus,
+        updatedAt: donation.updatedAt,
+      },
+    };
   }
 
   private buildPaymentResponse(donation: Donation, paymentResponse: any) {
@@ -396,6 +596,6 @@ export class DonationsService implements OnModuleInit {
   }
 
   async getSupportedPaymentMethods(country: "PT" | "BR") {
-    return this.gatewayFactory.getSupportedMethodsForCountry(country);
+    return this.getSupportedMethodsForCountry(country);
   }
 }

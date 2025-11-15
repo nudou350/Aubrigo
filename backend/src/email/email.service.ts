@@ -542,6 +542,90 @@ export class EmailService {
       html,
     });
   }
+  async sendPaymentInstructionsEmail(
+    donorEmail: string,
+    donorName: string,
+    ongName: string,
+    amount: number,
+    currency: string,
+    paymentMethod: string,
+    instructions: string[],
+    accountDetails: string,
+  ): Promise<boolean> {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4ca8a0;">Obrigado pela sua Doação! 💚</h1>
+        <p>Olá <strong>${donorName}</strong>,</p>
+        <p>Obrigado por apoiar a <strong>${ongName}</strong>!</p>
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #2c2c2c;">Detalhes da Doação:</h3>
+          <p><strong>Valor:</strong> ${currency} ${amount}</p>
+          <p><strong>Método de Pagamento:</strong> ${paymentMethod === "mbway" ? "MB WAY" : paymentMethod === "multibanco" ? "Multibanco/Transferência" : paymentMethod === "pix" ? "PIX" : paymentMethod}</p>
+        </div>
+        <div style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #2c2c2c;">📋 Instruções para Pagamento:</h3>
+          ${instructions.map((instruction) => `<p style="margin: 5px 0;">${instruction}</p>`).join("")}
+          <p style="margin-top: 15px; padding: 10px; background: white; border-radius: 4px; font-family: monospace;">
+            <strong>${accountDetails}</strong>
+          </p>
+        </div>
+        <p style="background: #e7f7f6; padding: 15px; border-left: 4px solid #4ca8a0; margin: 20px 0;">
+          <strong>💡 Importante:</strong> Após efetuar o pagamento, a ONG irá confirmar a receção e você receberá um email de confirmação.
+        </p>
+        <p>Sua contribuição ajuda a salvar vidas e proporcionar um lar amoroso para animais abandonados.</p>
+        <p>Atenciosamente,<br/>Equipe Aubrigo</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: donorEmail,
+      subject: `Instruções de Pagamento - Doação para ${ongName}`,
+      html,
+    });
+  }
+
+  async sendDonationPendingToOng(
+    ongEmail: string,
+    ongName: string,
+    donorName: string,
+    donorEmail: string,
+    amount: number,
+    currency: string,
+    paymentMethod: string,
+    donationId: string,
+  ): Promise<boolean> {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4ca8a0;">💰 Nova Doação Pendente</h1>
+        <p>Olá <strong>${ongName}</strong>,</p>
+        <p>Você recebeu uma nova intenção de doação!</p>
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #2c2c2c;">Detalhes da Doação:</h3>
+          <p><strong>Doador:</strong> ${donorName}</p>
+          <p><strong>Email:</strong> ${donorEmail}</p>
+          <p><strong>Valor:</strong> ${currency} ${amount}</p>
+          <p><strong>Método:</strong> ${paymentMethod === "mbway" ? "MB WAY" : paymentMethod === "multibanco" ? "Multibanco/Transferência" : paymentMethod === "pix" ? "PIX" : paymentMethod}</p>
+          <p><strong>ID da Doação:</strong> ${donationId}</p>
+        </div>
+        <p style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+          <strong>⚠️ Ação Necessária:</strong> Quando receber o pagamento, acesse o painel administrativo para confirmar esta doação.
+        </p>
+        <p style="text-align: center; margin: 30px 0;">
+          <a href="${this.frontendUrl}/ong/dashboard/donations" style="background: #4ca8a0; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+            Ver Doações Pendentes
+          </a>
+        </p>
+        <p>Atenciosamente,<br/>Equipe Aubrigo</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: ongEmail,
+      subject: `💰 Nova Doação Pendente - ${currency} ${amount}`,
+      html,
+    });
+  }
+
   private stripHtml(html: string): string {
     return html
       .replace(/<[^>]*>/g, "")

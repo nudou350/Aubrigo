@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Patch,
   Body,
   Param,
   UseGuards,
@@ -43,6 +44,42 @@ export class DonationsController {
   async checkPaymentStatus(@Param("id") id: string) {
     return this.donationsService.checkPaymentStatus(id);
   }
+
+  @Get("ong/:ongId/pending")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Get pending donations for an ONG (awaiting manual confirmation)",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Returns list of pending donations",
+  })
+  async getPendingDonations(@Param("ongId") ongId: string) {
+    return this.donationsService.getPendingDonations(ongId);
+  }
+
+  @Patch(":id/confirm")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: "Confirm a donation as received (ONG admin only)",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Donation confirmed successfully",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Donation not found or access denied",
+  })
+  async confirmDonation(@Param("id") id: string, @Req() req: any) {
+    // Get ONG ID from authenticated user
+    const ongId = req.user.ongId || req.user.id;
+    return this.donationsService.confirmDonation(id, ongId);
+  }
+
   @Post("webhook/:gateway")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
