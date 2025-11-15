@@ -64,7 +64,6 @@ export class DonationsService implements OnModuleInit {
     // Get ONG details for payment instructions
     const ong = await this.ongRepository.findOne({
       where: { id: donationData.ongId },
-      relations: ["user"],
     });
 
     if (!ong) {
@@ -198,7 +197,7 @@ export class DonationsService implements OnModuleInit {
     if (donation.country === "PT") {
       // Portugal payment methods
       if (donation.paymentMethod === "mbway") {
-        instructions.mbwayPhone = ong.user?.phone || "+351 XXX XXX XXX";
+        instructions.mbwayPhone = ong.phone || "+351 XXX XXX XXX";
         instructions.instructions = [
           "1. Abra a aplicação MB WAY no seu telemóvel",
           `2. Envie ${donation.currency} ${donation.amount} para o número:`,
@@ -206,7 +205,7 @@ export class DonationsService implements OnModuleInit {
           "3. Após efetuar o pagamento, aguarde a confirmação da ONG",
         ];
       } else if (donation.paymentMethod === "multibanco") {
-        instructions.iban = ong.bankAccountIBAN || "PT50 XXXX XXXX XXXX XXXX XXXX X";
+        instructions.iban = ong.bankAccountIban || "PT50 XXXX XXXX XXXX XXXX XXXX X";
         instructions.instructions = [
           "1. Aceda ao multibanco ou homebanking",
           '2. Escolha "Transferência Bancária" ou "Pagamentos"',
@@ -216,7 +215,7 @@ export class DonationsService implements OnModuleInit {
           "6. Após efetuar o pagamento, aguarde a confirmação da ONG",
         ];
       } else if (donation.paymentMethod === "card") {
-        instructions.iban = ong.bankAccountIBAN || "PT50 XXXX XXXX XXXX XXXX XXXX X";
+        instructions.iban = ong.bankAccountIban || "PT50 XXXX XXXX XXXX XXXX XXXX X";
         instructions.instructions = [
           "Pagamento por cartão não está disponível via manual.",
           "Por favor, use MB WAY ou Transferência Bancária.",
@@ -225,7 +224,7 @@ export class DonationsService implements OnModuleInit {
     } else if (donation.country === "BR") {
       // Brazil payment methods
       if (donation.paymentMethod === "pix") {
-        instructions.pixKey = ong.user?.pixKey || "pix@ong.com.br";
+        instructions.pixKey = ong.pixKey || "pix@ong.com.br";
         instructions.pixKeyType = this.detectPixKeyType(instructions.pixKey);
         instructions.instructions = [
           "1. Abra o aplicativo do seu banco",
@@ -299,7 +298,7 @@ export class DonationsService implements OnModuleInit {
 
       // Send pending donation notification to ONG
       await this.emailService.sendDonationPendingToOng(
-        ong.user?.email || "",
+        ong.email,
         ong.ongName,
         donation.donorName,
         donation.donorEmail,

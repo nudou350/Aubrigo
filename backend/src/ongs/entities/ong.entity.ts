@@ -72,6 +72,9 @@ export class Ong {
   @Column({ name: "bank_account_number", nullable: true })
   bankAccountNumber: string; // For Brazil
 
+  @Column({ name: "pix_key", nullable: true })
+  pixKey: string; // For Brazil PIX payments
+
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
   @UpdateDateColumn({ name: "updated_at" })
