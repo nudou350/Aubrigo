@@ -13,14 +13,14 @@ interface AnalyticsStats {
     appointments: number;
     shares: number;
   };
-  viewsByDay: Array<{ date: string; count: number }>;
-  topPets: Array<{
+  viewsByDay: { date: string; count: number }[];
+  topPets: {
     petId: string;
     petName: string;
     petSpecies: string;
     views: number;
-  }>;
-  eventBreakdown: Array<{ eventType: string; count: number }>;
+  }[];
+  eventBreakdown: { eventType: string; count: number }[];
 }
 
 /**

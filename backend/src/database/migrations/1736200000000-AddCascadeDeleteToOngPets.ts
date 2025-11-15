@@ -1,8 +1,8 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm";
 export class AddCascadeDeleteToOngPets1736200000000
   implements MigrationInterface
 {
-  name = 'AddCascadeDeleteToOngPets1736200000000';
+  name = "AddCascadeDeleteToOngPets1736200000000";
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Drop existing foreign key constraint
     await queryRunner.query(`

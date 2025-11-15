@@ -4,12 +4,19 @@
   "description": "Aubrigo Frontend - Progressive Web App for Animal Adoption",
   "scripts": {
     "ng": "ng",
+    "sync-env": "node scripts/sync-env.js",
+    "prestart": "npm run sync-env",
     "start": "set NODE_OPTIONS=--no-deprecation && ng serve",
-    "prebuild": "node scripts/update-pwa-version.js",
+    "prebuild": "npm run sync-env && node scripts/update-pwa-version.js",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
     "lint": "ng lint"
   },
   "private": true,
@@ -27,6 +34,7 @@
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
     "@stripe/stripe-js": "^2.2.0",
+    "angularx-qrcode": "^17.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.2"
@@ -35,16 +43,21 @@
     "@angular-devkit/build-angular": "^17.0.0",
     "@angular/cli": "^17.0.0",
     "@angular/compiler-cli": "^17.0.0",
+    "@playwright/test": "^1.56.1",
     "@types/jasmine": "~5.1.0",
+    "angular-eslint": "20.6.0",
+    "eslint": "^9.39.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
+    "karma-edge-launcher": "^0.4.2",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "pwa-asset-generator": "^8.1.2",
     "sharp": "^0.34.5",
     "sharp-cli": "^5.2.0",
-    "typescript": "~5.2.2"
+    "typescript": "~5.2.2",
+    "typescript-eslint": "8.46.3"
   }
 }

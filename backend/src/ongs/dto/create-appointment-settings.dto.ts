@@ -1,4 +1,4 @@
-import { IsInt, IsBoolean, IsOptional, Min } from 'class-validator';
+import { IsInt, IsBoolean, IsOptional, Min } from "class-validator";
 export class CreateAppointmentSettingsDto {
   @IsOptional()
   @IsInt()

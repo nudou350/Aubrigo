@@ -1,0 +1,211 @@
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dialog-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.dialog-header {
+  padding: 24px;
+  text-align: center;
+  background: linear-gradient(135deg, #5CB5B0 0%, #4A9A96 100%);
+  color: white;
+
+  .icon-wrapper {
+    margin-bottom: 12px;
+
+    .globe-icon {
+      font-size: 48px;
+      display: inline-block;
+      animation: rotate 2s linear infinite;
+    }
+  }
+
+  h2 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.95;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.dialog-body {
+  padding: 24px;
+
+  .info-text {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+    text-align: center;
+  }
+
+  .country-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .country-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border: 2px solid #E0E0E0;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 16px;
+    position: relative;
+
+    &:hover {
+      border-color: #5CB5B0;
+      background: #F5FFFE;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(92, 181, 176, 0.1);
+    }
+
+    &.selected {
+      border-color: #5CB5B0;
+      background: #F5FFFE;
+      box-shadow: 0 0 0 3px rgba(92, 181, 176, 0.1);
+    }
+
+    .country-flag {
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .country-name {
+      flex: 1;
+      text-align: left;
+      font-weight: 500;
+      color: #2C2C2C;
+    }
+
+    .check-icon {
+      color: #5CB5B0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  }
+}
+
+.dialog-footer {
+  padding: 0 24px 24px 24px;
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: #5CB5B0;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #4A9A96;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(92, 181, 176, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Mobile adjustments
+@media (max-width: 480px) {
+  .dialog-content {
+    max-width: calc(100% - 32px);
+  }
+
+  .dialog-header {
+    padding: 20px;
+
+    .icon-wrapper .globe-icon {
+      font-size: 40px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+    }
+  }
+
+  .dialog-body {
+    padding: 20px;
+
+    .country-button {
+      padding: 14px;
+
+      .country-flag {
+        font-size: 28px;
+      }
+
+      .country-name {
+        font-size: 15px;
+      }
+    }
+  }
+}

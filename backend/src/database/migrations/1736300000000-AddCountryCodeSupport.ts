@@ -1,19 +1,19 @@
-import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
 export class AddCountryCodeSupport1736300000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Add country_code column to users table
-    const usersTable = await queryRunner.getTable('users');
-    const usersColumn = usersTable?.findColumnByName('country_code');
+    const usersTable = await queryRunner.getTable("users");
+    const usersColumn = usersTable?.findColumnByName("country_code");
     if (!usersColumn) {
       await queryRunner.addColumn(
-        'users',
+        "users",
         new TableColumn({
-          name: 'country_code',
-          type: 'varchar',
-          length: '2',
+          name: "country_code",
+          type: "varchar",
+          length: "2",
           default: "'PT'",
           isNullable: false,
-          comment: 'ISO 3166-1 alpha-2 country code',
+          comment: "ISO 3166-1 alpha-2 country code",
         }),
       );
       // Set existing users to 'PT' (Portugal) for backwards compatibility
@@ -24,18 +24,18 @@ export class AddCountryCodeSupport1736300000000 implements MigrationInterface {
       `);
     }
     // Add country_code column to ongs table
-    const ongsTable = await queryRunner.getTable('ongs');
-    const ongsColumn = ongsTable?.findColumnByName('country_code');
+    const ongsTable = await queryRunner.getTable("ongs");
+    const ongsColumn = ongsTable?.findColumnByName("country_code");
     if (!ongsColumn) {
       await queryRunner.addColumn(
-        'ongs',
+        "ongs",
         new TableColumn({
-          name: 'country_code',
-          type: 'varchar',
-          length: '2',
+          name: "country_code",
+          type: "varchar",
+          length: "2",
           default: "'PT'",
           isNullable: false,
-          comment: 'ISO 3166-1 alpha-2 country code',
+          comment: "ISO 3166-1 alpha-2 country code",
         }),
       );
       // Set existing ongs to 'PT' (Portugal) for backwards compatibility
@@ -46,18 +46,18 @@ export class AddCountryCodeSupport1736300000000 implements MigrationInterface {
       `);
     }
     // Add country_code column to pets table
-    const petsTable = await queryRunner.getTable('pets');
-    const petsColumn = petsTable?.findColumnByName('country_code');
+    const petsTable = await queryRunner.getTable("pets");
+    const petsColumn = petsTable?.findColumnByName("country_code");
     if (!petsColumn) {
       await queryRunner.addColumn(
-        'pets',
+        "pets",
         new TableColumn({
-          name: 'country_code',
-          type: 'varchar',
-          length: '2',
+          name: "country_code",
+          type: "varchar",
+          length: "2",
           default: "'PT'",
           isNullable: false,
-          comment: 'ISO 3166-1 alpha-2 country code',
+          comment: "ISO 3166-1 alpha-2 country code",
         }),
       );
       // Set existing pets to 'PT' (Portugal) for backwards compatibility
@@ -84,8 +84,8 @@ export class AddCountryCodeSupport1736300000000 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX IF EXISTS idx_ongs_country_code`);
     await queryRunner.query(`DROP INDEX IF EXISTS idx_pets_country_code`);
     // Drop columns
-    await queryRunner.dropColumn('users', 'country_code');
-    await queryRunner.dropColumn('ongs', 'country_code');
-    await queryRunner.dropColumn('pets', 'country_code');
+    await queryRunner.dropColumn("users", "country_code");
+    await queryRunner.dropColumn("ongs", "country_code");
+    await queryRunner.dropColumn("pets", "country_code");
   }
 }

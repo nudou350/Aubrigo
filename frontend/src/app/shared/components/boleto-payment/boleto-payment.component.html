@@ -1,0 +1,78 @@
+<div class="boleto-container">
+  <div class="header">
+    <div class="logo">
+      <span class="icon">🧾</span>
+      <h2>Boleto Bancário</h2>
+    </div>
+    <div class="amount">
+      <span class="label">Valor:</span>
+      <span class="value">{{ amount() | currencyFormat: 'BRL' }}</span>
+    </div>
+  </div>
+
+  <div class="status-badge" [ngClass]="paymentStatus()">
+    @switch (paymentStatus()) {
+      @case ('pending') {
+        <span class="icon">⏳</span>
+        <span>Aguardando pagamento</span>
+      }
+      @case ('succeeded') {
+        <span class="icon">✅</span>
+        <span>Pagamento confirmado!</span>
+      }
+      @case ('expired') {
+        <span class="icon">⏰</span>
+        <span>Boleto expirado</span>
+      }
+    }
+  </div>
+
+  @if (paymentStatus() === 'pending' || paymentStatus() === 'processing') {
+    <div class="barcode-section">
+      <h3>Código de barras</h3>
+      <div class="barcode-container">
+        <code class="barcode">{{ boletoBarcode() }}</code>
+        <button class="copy-btn" [class.copied]="copied()" (click)="copyBarcode()">
+          {{ copied() ? '✓ Copiado!' : '📋 Copiar' }}
+        </button>
+      </div>
+    </div>
+
+    @if (expiresAt()) {
+      <div class="expiration">
+        <span class="icon">📅</span>
+        <span>Vencimento: {{ expiresAt() | date:'dd/MM/yyyy' }}</span>
+        <span class="timer">{{ timeRemaining() }}</span>
+      </div>
+    }
+
+    <div class="actions">
+      <button class="btn btn-primary" (click)="downloadBoleto()">
+        <span class="icon">💾</span>
+        Baixar Boleto
+      </button>
+      <button class="btn btn-secondary" (click)="printBoleto()">
+        <span class="icon">🖨️</span>
+        Imprimir
+      </button>
+    </div>
+
+    <div class="instructions">
+      <h4>Como pagar</h4>
+      <ol>
+        <li>Baixe o boleto clicando no botão acima</li>
+        <li>Pague em qualquer banco, lotérica ou app bancário</li>
+        <li>Use o código de barras para pagamento</li>
+        <li>O pagamento pode levar até 3 dias úteis para confirmar</li>
+      </ol>
+    </div>
+  }
+
+  @if (paymentStatus() === 'succeeded') {
+    <div class="success-message">
+      <div class="icon">🎉</div>
+      <h3>Pagamento confirmado!</h3>
+      <p>Obrigado pela sua doação.</p>
+    </div>
+  }
+</div>

@@ -73,8 +73,8 @@ export const routes: Routes = [
   {
     path: 'donate',
     loadComponent: () =>
-      import('./features/donations/donation.component').then(
-        (m) => m.DonationComponent
+      import('./features/donations/donation-enhanced.component').then(
+        (m) => m.DonationEnhancedComponent
       ),
   },
   {

@@ -1,0 +1,35 @@
+<div class="dialog-overlay" *ngIf="isVisible()" (click)="closeDialog()">
+  <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <div class="icon-wrapper">
+        <span class="globe-icon">🌍</span>
+      </div>
+      <h2>Confirme seu país</h2>
+      <p class="subtitle">Detectamos que você está em {{ getCountryName(detectedCountry()) }} {{ getCountryFlag(detectedCountry()) }}</p>
+    </div>
+
+    <div class="dialog-body">
+      <p class="info-text">
+        Isso nos ajuda a mostrar os melhores métodos de pagamento e conteúdo relevante para você.
+      </p>
+
+      <div class="country-options">
+        <button
+          *ngFor="let country of countries"
+          class="country-button"
+          [class.selected]="country.code === detectedCountry()"
+          (click)="selectCountry(country.code)">
+          <span class="country-flag">{{ country.flag }}</span>
+          <span class="country-name">{{ country.name }}</span>
+          <span class="check-icon" *ngIf="country.code === detectedCountry()">✓</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <button class="btn-primary" (click)="confirmDetectedCountry()">
+        Confirmar
+      </button>
+    </div>
+  </div>
+</div>

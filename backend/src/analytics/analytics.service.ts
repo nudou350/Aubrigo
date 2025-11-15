@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, MoreThan } from 'typeorm';
-import { AnalyticsEvent } from './entities/analytics-event.entity';
-import { SingleEventDto } from './dto/track-event.dto';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, Between, MoreThan } from "typeorm";
+import { AnalyticsEvent } from "./entities/analytics-event.entity";
+import { SingleEventDto } from "./dto/track-event.dto";
 @Injectable()
 export class AnalyticsService {
   constructor(
@@ -65,7 +65,7 @@ export class AnalyticsService {
     const petViews = await this.analyticsEventRepository.count({
       where: {
         ongId,
-        eventType: 'pet_view',
+        eventType: "pet_view",
         createdAt: MoreThan(startDate),
       },
     });
@@ -73,7 +73,7 @@ export class AnalyticsService {
     const favorites = await this.analyticsEventRepository.count({
       where: {
         ongId,
-        eventType: 'pet_favorite',
+        eventType: "pet_favorite",
         createdAt: MoreThan(startDate),
       },
     });
@@ -81,7 +81,7 @@ export class AnalyticsService {
     const appointments = await this.analyticsEventRepository.count({
       where: {
         ongId,
-        eventType: 'appointment_create',
+        eventType: "appointment_create",
         createdAt: MoreThan(startDate),
       },
     });
@@ -89,7 +89,7 @@ export class AnalyticsService {
     const shares = await this.analyticsEventRepository.count({
       where: {
         ongId,
-        eventType: 'pet_share',
+        eventType: "pet_share",
         createdAt: MoreThan(startDate),
       },
     });
@@ -118,14 +118,14 @@ export class AnalyticsService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     const result = await this.analyticsEventRepository
-      .createQueryBuilder('event')
-      .select("DATE(event.created_at)", 'date')
-      .addSelect('COUNT(*)', 'count')
-      .where('event.ong_id = :ongId', { ongId })
-      .andWhere('event.event_type = :eventType', { eventType: 'pet_view' })
-      .andWhere('event.created_at > :startDate', { startDate })
+      .createQueryBuilder("event")
+      .select("DATE(event.created_at)", "date")
+      .addSelect("COUNT(*)", "count")
+      .where("event.ong_id = :ongId", { ongId })
+      .andWhere("event.event_type = :eventType", { eventType: "pet_view" })
+      .andWhere("event.created_at > :startDate", { startDate })
       .groupBy("DATE(event.created_at)")
-      .orderBy("DATE(event.created_at)", 'ASC')
+      .orderBy("DATE(event.created_at)", "ASC")
       .getRawMany();
     return result.map((row) => ({
       date: row.date,
@@ -137,19 +137,19 @@ export class AnalyticsService {
    */
   async getTopPets(ongId: string, limit: number = 10): Promise<any[]> {
     const result = await this.analyticsEventRepository
-      .createQueryBuilder('event')
-      .select('event.pet_id', 'petId')
-      .addSelect('COUNT(*)', 'views')
-      .leftJoin('event.pet', 'pet')
-      .addSelect('pet.name', 'petName')
-      .addSelect('pet.species', 'petSpecies')
-      .where('event.ong_id = :ongId', { ongId })
-      .andWhere('event.event_type = :eventType', { eventType: 'pet_view' })
-      .andWhere('event.pet_id IS NOT NULL')
-      .groupBy('event.pet_id')
-      .addGroupBy('pet.name')
-      .addGroupBy('pet.species')
-      .orderBy('COUNT(*)', 'DESC')
+      .createQueryBuilder("event")
+      .select("event.pet_id", "petId")
+      .addSelect("COUNT(*)", "views")
+      .leftJoin("event.pet", "pet")
+      .addSelect("pet.name", "petName")
+      .addSelect("pet.species", "petSpecies")
+      .where("event.ong_id = :ongId", { ongId })
+      .andWhere("event.event_type = :eventType", { eventType: "pet_view" })
+      .andWhere("event.pet_id IS NOT NULL")
+      .groupBy("event.pet_id")
+      .addGroupBy("pet.name")
+      .addGroupBy("pet.species")
+      .orderBy("COUNT(*)", "DESC")
       .limit(limit)
       .getRawMany();
     return result.map((row) => ({
@@ -166,13 +166,13 @@ export class AnalyticsService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     const result = await this.analyticsEventRepository
-      .createQueryBuilder('event')
-      .select('event.event_type', 'eventType')
-      .addSelect('COUNT(*)', 'count')
-      .where('event.ong_id = :ongId', { ongId })
-      .andWhere('event.created_at > :startDate', { startDate })
-      .groupBy('event.event_type')
-      .orderBy('COUNT(*)', 'DESC')
+      .createQueryBuilder("event")
+      .select("event.event_type", "eventType")
+      .addSelect("COUNT(*)", "count")
+      .where("event.ong_id = :ongId", { ongId })
+      .andWhere("event.created_at > :startDate", { startDate })
+      .groupBy("event.event_type")
+      .orderBy("COUNT(*)", "DESC")
       .getRawMany();
     return result.map((row) => ({
       eventType: row.eventType,
@@ -207,7 +207,7 @@ export class AnalyticsService {
     const result = await this.analyticsEventRepository
       .createQueryBuilder()
       .delete()
-      .where('created_at < :cutoffDate', { cutoffDate })
+      .where("created_at < :cutoffDate", { cutoffDate })
       .execute();
     return result.affected || 0;
   }

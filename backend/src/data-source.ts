@@ -1,16 +1,22 @@
-import { DataSource } from 'typeorm';
-import * as dotenv from 'dotenv';
+import { DataSource } from "typeorm";
+import * as dotenv from "dotenv";
 dotenv.config();
 export const AppDataSource = new DataSource({
-  type: 'postgres',
+  type: "postgres",
   url: process.env.DATABASE_URL,
-  entities: [__dirname + '/**/*.entity{.ts,.js}'],
-  migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
+  entities: [__dirname + "/**/*.entity{.ts,.js}"],
+  migrations: [__dirname + "/database/migrations/*{.ts,.js}"],
   synchronize: false,
-  logging: process.env.NODE_ENV === 'development' ? ['error', 'warn', 'schema'] : ['error'],
-  logger: 'advanced-console',
+  logging:
+    process.env.NODE_ENV === "development"
+      ? ["error", "warn", "schema"]
+      : ["error"],
+  logger: "advanced-console",
   maxQueryExecutionTime: 1000, // Log slow queries > 1s
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
 
   // Connection pool settings for better performance
   extra: {

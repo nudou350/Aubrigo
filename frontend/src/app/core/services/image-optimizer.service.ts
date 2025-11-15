@@ -112,7 +112,7 @@ export class ImageOptimizerService {
    * getSizes({ '768px': '100vw', '1024px': '50vw' })
    * // Returns: "(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
    */
-  getSizes(breakpoints: { [key: string]: string }): string {
+  getSizes(breakpoints: Record<string, string>): string {
     const entries = Object.entries(breakpoints);
     const sizesArray = entries.map(([bp, size]) => `(max-width: ${bp}) ${size}`);
     sizesArray.push('33vw'); // Default size for larger screens
@@ -145,7 +145,7 @@ export class ImageOptimizerService {
    * @param color - Placeholder color
    * @returns Base64 data URL for blur placeholder
    */
-  getBlurPlaceholder(width: number = 20, height: number = 20, color: string = '#f0f0f0'): string {
+  getBlurPlaceholder(width = 20, height = 20, color = '#f0f0f0'): string {
     // Simple placeholder - in production, this should come from the backend
     // as a low-quality image placeholder (LQIP)
     const svg = `

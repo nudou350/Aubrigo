@@ -23,11 +23,11 @@ export interface PushNotificationPayload {
   icon?: string;
   badge?: string;
   data?: any;
-  actions?: Array<{
+  actions?: {
     action: string;
     title: string;
     icon?: string;
-  }>;
+  }[];
 }
 
 /**
@@ -174,7 +174,8 @@ export class PushNotificationService {
       return null;
     }
 
-    return await this.swPush.subscription.toPromise();
+    const subscription = await this.swPush.subscription.toPromise();
+    return subscription ?? null;
   }
 
   /**

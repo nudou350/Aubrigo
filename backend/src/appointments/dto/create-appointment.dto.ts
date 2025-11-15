@@ -1,4 +1,10 @@
-import { IsString, IsEmail, IsOptional, IsUUID, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsUUID,
+  IsDateString,
+} from "class-validator";
 export class CreateAppointmentDto {
   @IsUUID()
   petId: string;

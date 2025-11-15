@@ -98,7 +98,7 @@ export class CityService {
   /**
    * Filter cities by query
    */
-  filterCities(query: string, limit: number = 5): string[] {
+  filterCities(query: string, limit = 5): string[] {
     const cities = this.cities();
 
     if (!query.trim()) {

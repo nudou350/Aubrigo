@@ -179,7 +179,7 @@ export type SkeletonType = 'text' | 'circle' | 'rectangle' | 'card' | 'pet-card'
 })
 export class SkeletonComponent {
   @Input() type: SkeletonType = 'text';
-  @Input() width: string = '100%';
-  @Input() height: string = '16px';
-  @Input() count: number = 1;
+  @Input() width = '100%';
+  @Input() height = '16px';
+  @Input() count = 1;
 }

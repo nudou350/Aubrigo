@@ -1,6 +1,6 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm";
 export class MultiRoleSystem1730736000000 implements MigrationInterface {
-  name = 'MultiRoleSystem1730736000000';
+  name = "MultiRoleSystem1730736000000";
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create role enum type
     await queryRunner.query(`
@@ -186,8 +186,12 @@ export class MultiRoleSystem1730736000000 implements MigrationInterface {
     // Drop ONGs table
     await queryRunner.query(`DROP TABLE IF EXISTS "ongs"`);
     // Remove columns from users table
-    await queryRunner.query(`ALTER TABLE "users" DROP COLUMN IF EXISTS "last_name"`);
-    await queryRunner.query(`ALTER TABLE "users" DROP COLUMN IF EXISTS "first_name"`);
+    await queryRunner.query(
+      `ALTER TABLE "users" DROP COLUMN IF EXISTS "last_name"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "users" DROP COLUMN IF EXISTS "first_name"`,
+    );
     await queryRunner.query(`ALTER TABLE "users" DROP COLUMN IF EXISTS "role"`);
     // Make ong_name NOT NULL again
     await queryRunner.query(`

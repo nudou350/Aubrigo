@@ -52,7 +52,7 @@ async function bootstrap() {
       xssFilter: true,
       referrerPolicy: { policy: "strict-origin-when-cross-origin" },
       permittedCrossDomainPolicies: { permittedPolicies: "none" },
-    })
+    }),
   );
   // Security: Rate limiting to prevent DDoS attacks
   // More permissive in development to avoid blocking during testing
@@ -99,7 +99,7 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
-    })
+    }),
   );
   // API prefix
   app.setGlobalPrefix("api");

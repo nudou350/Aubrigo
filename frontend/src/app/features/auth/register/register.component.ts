@@ -5,6 +5,8 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
+  AbstractControl,
+  ValidationErrors,
 } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
@@ -569,9 +571,10 @@ export class RegisterComponent {
       Validators.minLength(6),
     ]),
     confirmPassword: new FormControl("", [Validators.required]),
-  }, { validators: this.passwordMatchValidator.bind(this) });
+  }, { validators: this.passwordMatchValidator });
 
-  passwordMatchValidator(form: FormGroup) {
+  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const form = control as FormGroup;
     const password = form.get("password");
     const confirmPassword = form.get("confirmPassword");
 

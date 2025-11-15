@@ -310,9 +310,9 @@ export class ShareButtonComponent {
     url?: string;
   };
 
-  @Input() buttonText: string = 'Compartilhar';
-  @Input() compact: boolean = false;
-  @Input() ariaLabel: string = 'Compartilhar conteúdo';
+  @Input() buttonText = 'Compartilhar';
+  @Input() compact = false;
+  @Input() ariaLabel = 'Compartilhar conteúdo';
 
   /**
    * Emits the platform name when sharing succeeds.

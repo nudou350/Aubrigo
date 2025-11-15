@@ -1,8 +1,8 @@
-import { IsString, IsDateString, IsOptional, IsIn } from 'class-validator';
+import { IsString, IsDateString, IsOptional, IsIn } from "class-validator";
 export class CreateAvailabilityExceptionDto {
   @IsString()
-  @IsIn(['blocked', 'available'])
-  exceptionType: 'blocked' | 'available';
+  @IsIn(["blocked", "available"])
+  exceptionType: "blocked" | "available";
   @IsDateString()
   startDate: string;
   @IsDateString()

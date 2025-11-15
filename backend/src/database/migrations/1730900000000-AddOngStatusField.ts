@@ -1,9 +1,9 @@
-import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
+import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
 export class AddOngStatusField1730900000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Check if column already exists
-    const table = await queryRunner.getTable('users');
-    const column = table?.findColumnByName('ong_status');
+    const table = await queryRunner.getTable("users");
+    const column = table?.findColumnByName("ong_status");
     if (!column) {
       // Create enum type for ong_status
       await queryRunner.query(`
@@ -11,11 +11,11 @@ export class AddOngStatusField1730900000000 implements MigrationInterface {
       `);
       // Add ong_status column to users table
       await queryRunner.addColumn(
-        'users',
+        "users",
         new TableColumn({
-          name: 'ong_status',
-          type: 'enum',
-          enum: ['pending', 'approved', 'rejected'],
+          name: "ong_status",
+          type: "enum",
+          enum: ["pending", "approved", "rejected"],
           default: "'approved'",
           isNullable: false,
         }),
@@ -30,7 +30,7 @@ export class AddOngStatusField1730900000000 implements MigrationInterface {
   }
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Drop the column
-    await queryRunner.dropColumn('users', 'ong_status');
+    await queryRunner.dropColumn("users", "ong_status");
     // Drop the enum type
     await queryRunner.query(`DROP TYPE "ong_status_enum"`);
   }

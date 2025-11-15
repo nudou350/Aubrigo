@@ -17,29 +17,29 @@ export class EmailService {
   constructor(private configService: ConfigService) {
     this.fromEmail = this.configService.get<string>(
       "EMAIL_FROM",
-      "noreply@aubrigo.pt"
+      "noreply@aubrigo.pt",
     );
     this.adminEmail = this.configService.get<string>(
       "ADMIN_EMAIL",
-      "admin@aubrigo.pt"
+      "admin@aubrigo.pt",
     );
     // Get first URL from FRONTEND_URL (it might be a comma-separated list)
     const frontendUrls = this.configService.get<string>(
       "FRONTEND_URL",
-      "http://localhost:4200"
+      "http://localhost:4200",
     );
     this.frontendUrl = frontendUrls.split(",")[0].trim();
     // Create transporter (using EMAIL_* env variables)
     const emailHost = this.configService.get<string>(
       "EMAIL_HOST",
-      "smtp.gmail.com"
+      "smtp.gmail.com",
     );
     const emailPort = this.configService.get<number>("EMAIL_PORT", 587);
     const emailUser = this.configService.get<string>("EMAIL_USER");
     const emailPassword = this.configService.get<string>("EMAIL_PASSWORD");
     if (!emailUser || !emailPassword) {
       this.logger.warn(
-        "Email credentials not configured. Email sending will be disabled."
+        "Email credentials not configured. Email sending will be disabled.",
       );
       return;
     }
@@ -74,7 +74,7 @@ export class EmailService {
         text: options.text || this.stripHtml(options.html),
       });
       this.logger.log(
-        `Email sent successfully to ${options.to}: ${options.subject}`
+        `Email sent successfully to ${options.to}: ${options.subject}`,
       );
       return true;
     } catch (error) {
@@ -108,7 +108,7 @@ export class EmailService {
   async sendPasswordResetEmail(
     email: string,
     token: string,
-    resetUrl: string
+    resetUrl: string,
   ): Promise<boolean> {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -140,7 +140,7 @@ export class EmailService {
     petName: string,
     ongName: string,
     date: string,
-    time: string
+    time: string,
   ): Promise<boolean> {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -174,7 +174,7 @@ export class EmailService {
     petName: string,
     date: string,
     time: string,
-    notes?: string
+    notes?: string,
   ): Promise<boolean> {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -208,7 +208,7 @@ export class EmailService {
     ongName: string,
     amount: number,
     donationType: string,
-    transactionId: string
+    transactionId: string,
   ): Promise<boolean> {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -237,7 +237,7 @@ export class EmailService {
     ongEmail: string,
     phone: string,
     location: string,
-    instagramHandle?: string
+    instagramHandle?: string,
   ): Promise<boolean> {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -266,7 +266,7 @@ export class EmailService {
   }
   async sendWelcomeEmailToOng(
     ongEmail: string,
-    ongName: string
+    ongName: string,
   ): Promise<boolean> {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -296,7 +296,7 @@ export class EmailService {
   }
   async sendOngApprovalEmail(
     ongEmail: string,
-    ongName: string
+    ongName: string,
   ): Promise<boolean> {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -328,7 +328,7 @@ export class EmailService {
   async sendOngRejectionEmail(
     ongEmail: string,
     ongName: string,
-    reason?: string
+    reason?: string,
   ): Promise<boolean> {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -362,7 +362,7 @@ export class EmailService {
     ongName: string,
     ongPhone: string,
     ongLocation: string,
-    scheduledStartTime: Date
+    scheduledStartTime: Date,
   ): Promise<boolean> {
     const dateStr = scheduledStartTime.toLocaleDateString("pt-PT", {
       weekday: "long",
@@ -414,7 +414,7 @@ export class EmailService {
     visitorPhone: string,
     petName: string,
     scheduledStartTime: Date,
-    notes?: string
+    notes?: string,
   ): Promise<boolean> {
     const dateStr = scheduledStartTime.toLocaleDateString("pt-PT", {
       weekday: "long",
@@ -460,7 +460,7 @@ export class EmailService {
     petName: string,
     ongName: string,
     scheduledStartTime: Date,
-    reason?: string
+    reason?: string,
   ): Promise<boolean> {
     const dateStr = scheduledStartTime.toLocaleDateString("pt-PT", {
       weekday: "long",
@@ -508,7 +508,7 @@ export class EmailService {
     ongName: string,
     visitorName: string,
     petName: string,
-    scheduledStartTime: Date
+    scheduledStartTime: Date,
   ): Promise<boolean> {
     const dateStr = scheduledStartTime.toLocaleDateString("pt-PT", {
       weekday: "long",

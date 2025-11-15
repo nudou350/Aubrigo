@@ -1,7 +1,14 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import {
+  PaymentMethod,
+  SupportedCountry,
+  SupportedCurrency,
+  DonationType,
+  PaymentStatus
+} from '../types';
 
 export interface DonationRequest {
   ongId: string;
@@ -11,34 +18,53 @@ export interface DonationRequest {
   donorBirthDate?: string;
   donorGender?: string;
   amount: number;
-  donationType: 'one_time' | 'monthly';
-  paymentMethod: 'mbway' | 'stripe' | 'multibanco' | 'pix';
-  phoneNumber?: string; // For MB Way / PIX
-  cardHolderName?: string; // For Stripe
+  donationType: DonationType;
+  country: SupportedCountry;
+  currency: SupportedCurrency;
+  paymentMethod: PaymentMethod;
+  phoneNumber?: string; // For MB Way
+  cardHolderName?: string; // For Cards
 }
 
-export interface MBWayPaymentResponse {
+export interface DonationResponse {
   message: string;
   donation: {
     id: string;
     amount: number;
+    currency: string;
+    country: string;
     paymentMethod: string;
     paymentStatus: string;
   };
-  mbway: {
-    transactionId: string;
-    reference: string;
-    qrCode: string; // Base64 data URL
-    phoneNumber: string;
-    expiresAt: string;
-    instructions: string[];
+  payment: {
+    paymentIntentId: string;
+    clientSecret?: string;
+    // MBWay
+    requiresAction?: boolean;
+    // Manual PIX (ONG's PIX key)
+    pixKey?: string;
+    pixKeyType?: string;
+    // Gateway PIX (EBANX QR Code)
+    pixQrCode?: string;
+    pixPaymentString?: string;
+    // Boleto
+    boletoUrl?: string;
+    boletoBarcode?: string;
+    // Multibanco
+    entity?: string;
+    reference?: string;
+    // Common
+    expiresAt?: string;
+    instructions?: string | string[];
   };
 }
 
 export interface PaymentStatusResponse {
   donationId: string;
-  paymentStatus: 'pending' | 'completed' | 'failed';
-  mbwayStatus?: 'pending' | 'paid' | 'expired' | 'cancelled';
+  paymentStatus: PaymentStatus;
+  paymentMethod?: string;
+  amount?: number;
+  currency?: string;
 }
 
 export interface Ong {
@@ -51,6 +77,19 @@ export interface Ong {
   countryCode?: string;
 }
 
+export interface OngFilters {
+  search?: string;
+  location?: string;
+  countryCode?: string;
+}
+
+export interface DonationFilters {
+  ongId: string;
+  startDate?: string;
+  endDate?: string;
+  paymentStatus?: PaymentStatus;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -59,34 +98,33 @@ export class DonationsService {
   private apiUrl = `${environment.apiUrl}/donations`;
   private usersUrl = `${environment.apiUrl}/users`;
 
-  getAllOngs(filters?: { search?: string; location?: string; countryCode?: string }): Observable<Ong[]> {
-    let params: any = {};
+  getAllOngs(filters?: OngFilters): Observable<Ong[]> {
+    let params = new HttpParams();
 
     if (filters) {
-      if (filters.search) params.search = filters.search;
-      if (filters.location) params.location = filters.location;
-      if (filters.countryCode) params.countryCode = filters.countryCode;
+      if (filters.search) params = params.set('search', filters.search);
+      if (filters.location) params = params.set('location', filters.location);
+      if (filters.countryCode) params = params.set('countryCode', filters.countryCode);
     }
 
     return this.http.get<Ong[]>(this.usersUrl, { params });
   }
 
-  createDonation(donationData: DonationRequest): Observable<MBWayPaymentResponse> {
-    return this.http.post<MBWayPaymentResponse>(this.apiUrl, donationData);
+  createDonation(donationData: DonationRequest): Observable<DonationResponse> {
+    return this.http.post<DonationResponse>(this.apiUrl, donationData);
   }
 
   checkPaymentStatus(donationId: string): Observable<PaymentStatusResponse> {
     return this.http.get<PaymentStatusResponse>(`${this.apiUrl}/${donationId}/status`);
   }
 
-  confirmMBWayPayment(transactionId: string): Observable<{ success: boolean }> {
-    return this.http.post<{ success: boolean }>(
-      `${this.apiUrl}/mbway/confirm/${transactionId}`,
-      {},
-    );
-  }
+  getDonationsByOng(filters: DonationFilters): Observable<DonationResponse[]> {
+    let params = new HttpParams();
 
-  getDonationsByOng(ongId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/ong/${ongId}`);
+    if (filters.startDate) params = params.set('startDate', filters.startDate);
+    if (filters.endDate) params = params.set('endDate', filters.endDate);
+    if (filters.paymentStatus) params = params.set('paymentStatus', filters.paymentStatus);
+
+    return this.http.get<DonationResponse[]>(`${this.apiUrl}/ong/${filters.ongId}`, { params });
   }
 }

@@ -8,25 +8,25 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
-} from '@nestjs/common';
-import { Request } from 'express';
-import { AnalyticsService } from './analytics.service';
-import { TrackEventDto } from './dto/track-event.dto';
-@Controller('analytics')
+} from "@nestjs/common";
+import { Request } from "express";
+import { AnalyticsService } from "./analytics.service";
+import { TrackEventDto } from "./dto/track-event.dto";
+@Controller("analytics")
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
   /**
    * Track events (batch endpoint)
    * POST /api/analytics/track
    */
-  @Post('track')
+  @Post("track")
   @HttpCode(HttpStatus.OK)
   async trackEvents(
     @Body() trackEventDto: TrackEventDto,
     @Req() request: Request,
   ) {
     const userIp = this.getClientIp(request);
-    const userAgent = request.headers['user-agent'];
+    const userAgent = request.headers["user-agent"];
     try {
       await this.analyticsService.trackEvents(
         trackEventDto.events,
@@ -35,13 +35,13 @@ export class AnalyticsController {
       );
       return {
         success: true,
-        message: 'Events tracked successfully',
+        message: "Events tracked successfully",
         count: trackEventDto.events.length,
       };
     } catch (error) {
       return {
         success: false,
-        message: 'Failed to track events',
+        message: "Failed to track events",
         error: error.message,
       };
     }
@@ -50,16 +50,13 @@ export class AnalyticsController {
    * Get statistics for an ONG
    * GET /api/analytics/stats?ongId=xxx&days=30
    */
-  @Get('stats')
-  async getStats(
-    @Query('ongId') ongId: string,
-    @Query('days') days?: string,
-  ) {
+  @Get("stats")
+  async getStats(@Query("ongId") ongId: string, @Query("days") days?: string) {
     const daysNumber = days ? parseInt(days, 10) : 30;
     if (!ongId) {
       return {
         success: false,
-        message: 'ongId is required',
+        message: "ongId is required",
       };
     }
     try {
@@ -71,7 +68,7 @@ export class AnalyticsController {
     } catch (error) {
       return {
         success: false,
-        message: 'Failed to get stats',
+        message: "Failed to get stats",
         error: error.message,
       };
     }
@@ -80,16 +77,16 @@ export class AnalyticsController {
    * Get top pets for an ONG
    * GET /api/analytics/top-pets?ongId=xxx&limit=10
    */
-  @Get('top-pets')
+  @Get("top-pets")
   async getTopPets(
-    @Query('ongId') ongId: string,
-    @Query('limit') limit?: string,
+    @Query("ongId") ongId: string,
+    @Query("limit") limit?: string,
   ) {
     const limitNumber = limit ? parseInt(limit, 10) : 10;
     if (!ongId) {
       return {
         success: false,
-        message: 'ongId is required',
+        message: "ongId is required",
       };
     }
     try {
@@ -104,7 +101,7 @@ export class AnalyticsController {
     } catch (error) {
       return {
         success: false,
-        message: 'Failed to get top pets',
+        message: "Failed to get top pets",
         error: error.message,
       };
     }
@@ -113,16 +110,16 @@ export class AnalyticsController {
    * Get views by day
    * GET /api/analytics/views-by-day?ongId=xxx&days=30
    */
-  @Get('views-by-day')
+  @Get("views-by-day")
   async getViewsByDay(
-    @Query('ongId') ongId: string,
-    @Query('days') days?: string,
+    @Query("ongId") ongId: string,
+    @Query("days") days?: string,
   ) {
     const daysNumber = days ? parseInt(days, 10) : 30;
     if (!ongId) {
       return {
         success: false,
-        message: 'ongId is required',
+        message: "ongId is required",
       };
     }
     try {
@@ -137,7 +134,7 @@ export class AnalyticsController {
     } catch (error) {
       return {
         success: false,
-        message: 'Failed to get views by day',
+        message: "Failed to get views by day",
         error: error.message,
       };
     }
@@ -146,7 +143,7 @@ export class AnalyticsController {
    * Get total events count (admin only)
    * GET /api/analytics/total
    */
-  @Get('total')
+  @Get("total")
   async getTotalEvents() {
     try {
       const total = await this.analyticsService.getTotalEvents();
@@ -157,7 +154,7 @@ export class AnalyticsController {
     } catch (error) {
       return {
         success: false,
-        message: 'Failed to get total events',
+        message: "Failed to get total events",
         error: error.message,
       };
     }
@@ -167,12 +164,12 @@ export class AnalyticsController {
    */
   private getClientIp(request: Request): string | undefined {
     // Check various headers for the real IP
-    const forwarded = request.headers['x-forwarded-for'];
+    const forwarded = request.headers["x-forwarded-for"];
     if (forwarded) {
-      const ips = (forwarded as string).split(',');
+      const ips = (forwarded as string).split(",");
       return ips[0].trim();
     }
-    const realIp = request.headers['x-real-ip'];
+    const realIp = request.headers["x-real-ip"];
     if (realIp) {
       return realIp as string;
     }

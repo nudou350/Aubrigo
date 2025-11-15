@@ -1,7 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { CacheService } from './cache.service';
 
@@ -9,6 +9,16 @@ export interface Country {
   code: string;
   name: string;
   flag: string;
+  currency?: string;
+  currencySymbol?: string;
+}
+
+export interface PaymentMethod {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  requiresPhone?: boolean;
 }
 
 @Injectable({
@@ -98,7 +108,7 @@ export class CountryService {
   /**
    * Search countries by name or code
    */
-  searchCountries(query: string, limit: number = 5): Observable<Country[]> {
+  searchCountries(query: string, limit = 5): Observable<Country[]> {
     return this.http.get<Country[]>(`${this.API_URL}/search`, {
       params: { q: query, limit: limit.toString() }
     });
@@ -176,5 +186,113 @@ export class CountryService {
       error: () => {
       }
     });
+  }
+
+  /**
+   * Get currency information for a country
+   */
+  getCurrency(countryCode: string): { code: string; symbol: string; locale: string } {
+    const country = countryCode.toUpperCase();
+
+    if (country === 'BR') {
+      return { code: 'BRL', symbol: 'R$', locale: 'pt-BR' };
+    } else if (country === 'PT') {
+      return { code: 'EUR', symbol: '€', locale: 'pt-PT' };
+    }
+
+    // Default to EUR for other countries
+    return { code: 'EUR', symbol: '€', locale: 'pt-PT' };
+  }
+
+  /**
+   * Get available payment methods for a country
+   */
+  getPaymentMethods(countryCode: string): PaymentMethod[] {
+    const country = countryCode.toUpperCase();
+
+    if (country === 'PT') {
+      return [
+        {
+          id: 'mbway',
+          name: 'MB WAY',
+          description: 'Pagamento instantâneo via telemóvel',
+          icon: 'phone_iphone',
+          requiresPhone: true
+        },
+        {
+          id: 'multibanco',
+          name: 'Multibanco',
+          description: 'Referência para pagamento em ATM',
+          icon: 'account_balance',
+          requiresPhone: false
+        },
+        {
+          id: 'card',
+          name: 'Cartão',
+          description: 'Cartão de crédito ou débito',
+          icon: 'credit_card',
+          requiresPhone: false
+        }
+      ];
+    } else if (country === 'BR') {
+      return [
+        {
+          id: 'pix',
+          name: 'PIX',
+          description: 'Pagamento instantâneo',
+          icon: 'account_balance',
+          requiresPhone: false
+        },
+        {
+          id: 'boleto',
+          name: 'Boleto',
+          description: 'Boleto bancário',
+          icon: 'receipt',
+          requiresPhone: false
+        },
+        {
+          id: 'card',
+          name: 'Cartão',
+          description: 'Cartão de crédito ou débito',
+          icon: 'credit_card',
+          requiresPhone: false
+        }
+      ];
+    }
+
+    // Default to card only for other countries
+    return [
+      {
+        id: 'card',
+        name: 'Cartão',
+        description: 'Cartão de crédito ou débito',
+        icon: 'credit_card',
+        requiresPhone: false
+      }
+    ];
+  }
+
+  /**
+   * Check if country confirmation is needed (first time load)
+   */
+  needsConfirmation(): boolean {
+    const CONFIRMATION_KEY = 'countryConfirmed';
+    return !localStorage.getItem(CONFIRMATION_KEY);
+  }
+
+  /**
+   * Mark country as confirmed by user
+   */
+  markAsConfirmed(): void {
+    const CONFIRMATION_KEY = 'countryConfirmed';
+    localStorage.setItem(CONFIRMATION_KEY, 'true');
+  }
+
+  /**
+   * Reset confirmation status (for testing or user request)
+   */
+  resetConfirmation(): void {
+    const CONFIRMATION_KEY = 'countryConfirmed';
+    localStorage.removeItem(CONFIRMATION_KEY);
   }
 }

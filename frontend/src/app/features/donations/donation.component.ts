@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
-import { DonationsService, MBWayPaymentResponse, Ong } from '../../core/services/donations.service';
+import { DonationsService, Ong } from '../../core/services/donations.service';
 import { MbwayQrcodeComponent } from '../../shared/components/mbway-qrcode/mbway-qrcode.component';
 import { PixPaymentComponent } from '../../shared/components/pix-payment/pix-payment.component';
 import { CountryService } from '../../core/services/country.service';
@@ -391,10 +391,10 @@ export class DonationComponent implements OnInit {
   loading = signal(false);
   errorMessage = signal<string | null>(null);
   showMBWayQR = signal(false);
-  mbwayResponse = signal<MBWayPaymentResponse | null>(null);
-  paymentStatus = signal<'pending' | 'paid' | 'expired' | 'cancelled'>('pending');
+  mbwayResponse = signal<any>(null);
+  paymentStatus = signal<'pending' | 'succeeded' | 'failed' | 'expired' | 'canceled' | 'processing'>('pending');
   ongs = signal<Ong[]>([]);
-  selectedOngId: string = '';
+  selectedOngId = '';
   selectedOng = signal<Ong | null>(null);
 
   // Helper method to check if current country is Brazil
@@ -529,10 +529,10 @@ export class DonationComponent implements OnInit {
 
     this.donationsService.checkPaymentStatus(donationId).subscribe({
       next: (status) => {
-        if (status.mbwayStatus) {
-          this.paymentStatus.set(status.mbwayStatus);
+        if (status.paymentStatus) {
+          this.paymentStatus.set(status.paymentStatus);
         }
-        if (status.paymentStatus === 'completed') {
+        if (status.paymentStatus === 'succeeded') {
           const formValue = this.donationForm.value;
 
           // Track donation complete

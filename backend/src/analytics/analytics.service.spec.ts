@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AnalyticsService } from './analytics.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { AnalyticsEvent } from './entities/analytics-event.entity';
-describe('AnalyticsService', () => {
+import { Test, TestingModule } from "@nestjs/testing";
+import { AnalyticsService } from "./analytics.service";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { AnalyticsEvent } from "./entities/analytics-event.entity";
+describe("AnalyticsService", () => {
   let service: AnalyticsService;
   const mockAnalyticsEventRepository = {
     create: jest.fn(),
@@ -28,46 +28,51 @@ describe('AnalyticsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AnalyticsService,
-        { provide: getRepositoryToken(AnalyticsEvent), useValue: mockAnalyticsEventRepository },
+        {
+          provide: getRepositoryToken(AnalyticsEvent),
+          useValue: mockAnalyticsEventRepository,
+        },
       ],
     }).compile();
     service = module.get<AnalyticsService>(AnalyticsService);
-    mockAnalyticsEventRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
+    mockAnalyticsEventRepository.createQueryBuilder.mockReturnValue(
+      mockQueryBuilder,
+    );
     jest.clearAllMocks();
   });
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
-  describe('trackEvent', () => {
-    it('should track a single event', async () => {
+  describe("trackEvent", () => {
+    it("should track a single event", async () => {
       mockAnalyticsEventRepository.create.mockReturnValue({
-        id: 'event-1',
-        eventType: 'pet_view',
+        id: "event-1",
+        eventType: "pet_view",
       });
       mockAnalyticsEventRepository.save.mockResolvedValue({
-        id: 'event-1',
-        eventType: 'pet_view',
+        id: "event-1",
+        eventType: "pet_view",
       });
       const result = await service.trackEvent(
         {
-          id: 'evt-1',
-          type: 'pet_view',
-          category: 'engagement',
-          petId: 'pet-1',
-          sessionId: 'session-1',
+          id: "evt-1",
+          type: "pet_view",
+          category: "engagement",
+          petId: "pet-1",
+          sessionId: "session-1",
           timestamp: Date.now(),
           offline: false,
           sent: false,
         },
-        '192.168.1.1',
-        'Mozilla/5.0',
+        "192.168.1.1",
+        "Mozilla/5.0",
       );
       expect(result).toBeDefined();
-      expect(result.eventType).toBe('pet_view');
+      expect(result.eventType).toBe("pet_view");
     });
   });
-  describe('getOngStats', () => {
-    it('should return ONG statistics', async () => {
+  describe("getOngStats", () => {
+    it("should return ONG statistics", async () => {
       mockAnalyticsEventRepository.count
         .mockResolvedValueOnce(100) // petViews
         .mockResolvedValueOnce(20) // favorites
@@ -75,18 +80,18 @@ describe('AnalyticsService', () => {
         .mockResolvedValueOnce(5); // shares
       mockQueryBuilder.getRawMany
         .mockResolvedValueOnce([
-          { date: '2024-01-01', count: '10' },
-          { date: '2024-01-02', count: '15' },
+          { date: "2024-01-01", count: "10" },
+          { date: "2024-01-02", count: "15" },
         ]) // viewsByDay
         .mockResolvedValueOnce([
-          { petId: 'pet-1', petName: 'Max', petSpecies: 'Dog', views: '50' },
-          { petId: 'pet-2', petName: 'Luna', petSpecies: 'Cat', views: '30' },
+          { petId: "pet-1", petName: "Max", petSpecies: "Dog", views: "50" },
+          { petId: "pet-2", petName: "Luna", petSpecies: "Cat", views: "30" },
         ]) // topPets
         .mockResolvedValueOnce([
-          { eventType: 'pet_view', count: '100' },
-          { eventType: 'pet_favorite', count: '20' },
+          { eventType: "pet_view", count: "100" },
+          { eventType: "pet_favorite", count: "20" },
         ]); // eventBreakdown
-      const result = await service.getOngStats('ong-1', 30);
+      const result = await service.getOngStats("ong-1", 30);
       expect(result.summary.petViews).toBe(100);
       expect(result.summary.favorites).toBe(20);
       expect(result.summary.appointments).toBe(10);

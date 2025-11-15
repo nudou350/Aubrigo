@@ -8,18 +8,18 @@ import {
   MaxLength,
   MinLength,
   IsNumber,
-} from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+} from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 export class CreatePetDto {
-  @ApiProperty({ example: 'Nina' })
+  @ApiProperty({ example: "Nina" })
   @IsString()
   @MinLength(2)
   name: string;
-  @ApiProperty({ example: 'dog', enum: ['dog', 'cat', 'fish', 'hamster'] })
-  @IsEnum(['dog', 'cat', 'fish', 'hamster'])
+  @ApiProperty({ example: "dog", enum: ["dog", "cat", "fish", "hamster"] })
+  @IsEnum(["dog", "cat", "fish", "hamster"])
   species: string;
-  @ApiProperty({ example: 'Border Collie', required: false })
+  @ApiProperty({ example: "Border Collie", required: false })
   @IsOptional()
   @IsString()
   breed?: string;
@@ -30,19 +30,19 @@ export class CreatePetDto {
   @Min(0)
   @Max(30)
   age?: number;
-  @ApiProperty({ example: 'male', enum: ['male', 'female'], required: false })
+  @ApiProperty({ example: "male", enum: ["male", "female"], required: false })
   @IsOptional()
-  @IsEnum(['male', 'female'])
+  @IsEnum(["male", "female"])
   gender?: string;
   @ApiProperty({
-    example: 'large',
-    enum: ['small', 'medium', 'large'],
+    example: "large",
+    enum: ["small", "medium", "large"],
     required: false,
   })
   @IsOptional()
-  @IsEnum(['small', 'medium', 'large'])
+  @IsEnum(["small", "medium", "large"])
   size?: string;
-  @ApiProperty({ example: 'black and white', required: false })
+  @ApiProperty({ example: "black and white", required: false })
   @IsOptional()
   @IsString()
   color?: string;
@@ -52,18 +52,22 @@ export class CreatePetDto {
   @Type(() => Number)
   weight?: number;
   @ApiProperty({
-    example: 'A Nina é uma cachorrinha bem brincalhona...',
+    example: "A Nina é uma cachorrinha bem brincalhona...",
     required: false,
   })
   @IsOptional()
   @IsString()
   @MaxLength(500)
   description?: string;
-  @ApiProperty({ example: 'Lisboa', required: false })
+  @ApiProperty({ example: "Lisboa", required: false })
   @IsOptional()
   @IsString()
   location?: string;
-  @ApiProperty({ example: 'PT', required: false, description: 'ISO 3166-1 alpha-2 country code' })
+  @ApiProperty({
+    example: "PT",
+    required: false,
+    description: "ISO 3166-1 alpha-2 country code",
+  })
   @IsOptional()
   @IsString()
   countryCode?: string;

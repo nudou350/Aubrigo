@@ -1,11 +1,11 @@
-import { DataSource } from 'typeorm';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
+import { DataSource } from "typeorm";
+import * as dotenv from "dotenv";
+import * as path from "path";
 // Load environment variables
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+dotenv.config({ path: path.join(__dirname, "../../.env") });
 async function addAllowAppointmentsColumn() {
   const dataSource = new DataSource({
-    type: 'postgres',
+    type: "postgres",
     url: process.env.DATABASE_URL,
     synchronize: false,
   });

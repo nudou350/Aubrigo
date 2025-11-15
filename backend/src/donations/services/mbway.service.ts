@@ -26,7 +26,7 @@ export class MBWayService {
    * with the actual MB Way API (SIBS or payment gateway that supports MB Way)
    */
   async createPaymentRequest(
-    request: MBWayPaymentRequest
+    request: MBWayPaymentRequest,
   ): Promise<MBWayPaymentResponse> {
     try {
       // Generate unique transaction ID
@@ -68,10 +68,10 @@ export class MBWayService {
         () => {
           this.expireTransaction(transactionId);
         },
-        15 * 60 * 1000
+        15 * 60 * 1000,
       );
       this.logger.log(
-        `MB Way payment request created: ${transactionId} for €${request.amount}`
+        `MB Way payment request created: ${transactionId} for €${request.amount}`,
       );
       return response;
     } catch (error) {
@@ -84,7 +84,7 @@ export class MBWayService {
    * In production, this would query the MB Way API
    */
   async checkPaymentStatus(
-    transactionId: string
+    transactionId: string,
   ): Promise<MBWayPaymentResponse | null> {
     return this.pendingTransactions.get(transactionId) || null;
   }

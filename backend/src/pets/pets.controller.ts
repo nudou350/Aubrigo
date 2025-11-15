@@ -11,64 +11,67 @@ import {
   Request,
   UseInterceptors,
   UploadedFiles,
-} from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+} from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
   ApiConsumes,
-} from '@nestjs/swagger';
-import { PetsService } from './pets.service';
-import { CreatePetDto } from './dto/create-pet.dto';
-import { UpdatePetDto } from './dto/update-pet.dto';
-import { SearchPetsDto } from './dto/search-pets.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UploadService } from '../upload/upload.service';
-@ApiTags('Pets')
-@Controller('pets')
+} from "@nestjs/swagger";
+import { PetsService } from "./pets.service";
+import { CreatePetDto } from "./dto/create-pet.dto";
+import { UpdatePetDto } from "./dto/update-pet.dto";
+import { SearchPetsDto } from "./dto/search-pets.dto";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { UploadService } from "../upload/upload.service";
+@ApiTags("Pets")
+@Controller("pets")
 export class PetsController {
   constructor(
     private readonly petsService: PetsService,
     private readonly uploadService: UploadService,
   ) {}
   @Get()
-  @ApiOperation({ summary: 'Search and filter pets' })
-  @ApiResponse({ status: 200, description: 'Returns list of pets' })
+  @ApiOperation({ summary: "Search and filter pets" })
+  @ApiResponse({ status: 200, description: "Returns list of pets" })
   async search(@Query() searchDto: SearchPetsDto) {
     return this.petsService.search(searchDto);
   }
-  @Get('cities')
-  @ApiOperation({ summary: 'Get cities with available pets' })
-  @ApiResponse({ status: 200, description: 'Returns list of cities that have pets' })
-  async getCitiesWithPets(@Query('countryCode') countryCode?: string) {
+  @Get("cities")
+  @ApiOperation({ summary: "Get cities with available pets" })
+  @ApiResponse({
+    status: 200,
+    description: "Returns list of cities that have pets",
+  })
+  async getCitiesWithPets(@Query("countryCode") countryCode?: string) {
     return this.petsService.getCitiesWithPets(countryCode);
   }
-  @Get('my-pets')
+  @Get("my-pets")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all pets belonging to current ONG' })
-  @ApiResponse({ status: 200, description: 'Returns list of ONG pets' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOperation({ summary: "Get all pets belonging to current ONG" })
+  @ApiResponse({ status: 200, description: "Returns list of ONG pets" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async findMyPets(@Request() req) {
     return this.petsService.findByOng(req.user.userId);
   }
-  @Get(':id')
-  @ApiOperation({ summary: 'Get pet by ID' })
-  @ApiResponse({ status: 200, description: 'Returns pet details' })
-  @ApiResponse({ status: 404, description: 'Pet not found' })
-  async findOne(@Param('id') id: string) {
+  @Get(":id")
+  @ApiOperation({ summary: "Get pet by ID" })
+  @ApiResponse({ status: 200, description: "Returns pet details" })
+  @ApiResponse({ status: 404, description: "Pet not found" })
+  async findOne(@Param("id") id: string) {
     return this.petsService.findOne(id);
   }
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @UseInterceptors(FilesInterceptor('images', 5))
-  @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Create a new pet' })
-  @ApiResponse({ status: 201, description: 'Pet created successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @UseInterceptors(FilesInterceptor("images", 5))
+  @ApiConsumes("multipart/form-data")
+  @ApiOperation({ summary: "Create a new pet" })
+  @ApiResponse({ status: 201, description: "Pet created successfully" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async create(
     @Body() createPetDto: CreatePetDto,
     @UploadedFiles() files: Express.Multer.File[],
@@ -77,21 +80,21 @@ export class PetsController {
     // Upload images if provided
     let imageUrls: string[] = [];
     if (files && files.length > 0) {
-      imageUrls = await this.uploadService.uploadMultipleImages(files, 'pets');
+      imageUrls = await this.uploadService.uploadMultipleImages(files, "pets");
     }
     return this.petsService.create(createPetDto, req.user.userId, imageUrls);
   }
-  @Put(':id')
+  @Put(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @UseInterceptors(FilesInterceptor('images', 5))
-  @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Update pet' })
-  @ApiResponse({ status: 200, description: 'Pet updated successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden' })
-  @ApiResponse({ status: 404, description: 'Pet not found' })
+  @UseInterceptors(FilesInterceptor("images", 5))
+  @ApiConsumes("multipart/form-data")
+  @ApiOperation({ summary: "Update pet" })
+  @ApiResponse({ status: 200, description: "Pet updated successfully" })
+  @ApiResponse({ status: 403, description: "Forbidden" })
+  @ApiResponse({ status: 404, description: "Pet not found" })
   async update(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updatePetDto: UpdatePetDto,
     @UploadedFiles() files: Express.Multer.File[],
     @Request() req,
@@ -99,29 +102,38 @@ export class PetsController {
     // Upload new images if provided
     let imageUrls: string[] = [];
     if (files && files.length > 0) {
-      imageUrls = await this.uploadService.uploadMultipleImages(files, 'pets');
+      imageUrls = await this.uploadService.uploadMultipleImages(files, "pets");
     }
     // Get deleted image IDs from body (sent as comma-separated string)
-    const deletedImageIds = updatePetDto['deletedImageIds']
-      ? String(updatePetDto['deletedImageIds']).split(',').filter(id => id.trim())
+    const deletedImageIds = updatePetDto["deletedImageIds"]
+      ? String(updatePetDto["deletedImageIds"])
+          .split(",")
+          .filter((id) => id.trim())
       : [];
     // Get primary image ID from body
-    const primaryImageId = updatePetDto['primaryImageId']
-      ? String(updatePetDto['primaryImageId']).trim()
+    const primaryImageId = updatePetDto["primaryImageId"]
+      ? String(updatePetDto["primaryImageId"]).trim()
       : undefined;
     // Remove non-entity properties from DTO
-    delete updatePetDto['deletedImageIds'];
-    delete updatePetDto['primaryImageId'];
-    return this.petsService.update(id, updatePetDto, req.user.userId, imageUrls, deletedImageIds, primaryImageId);
+    delete updatePetDto["deletedImageIds"];
+    delete updatePetDto["primaryImageId"];
+    return this.petsService.update(
+      id,
+      updatePetDto,
+      req.user.userId,
+      imageUrls,
+      deletedImageIds,
+      primaryImageId,
+    );
   }
-  @Delete(':id')
+  @Delete(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete pet' })
-  @ApiResponse({ status: 200, description: 'Pet deleted successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden' })
-  @ApiResponse({ status: 404, description: 'Pet not found' })
-  async remove(@Param('id') id: string, @Request() req) {
+  @ApiOperation({ summary: "Delete pet" })
+  @ApiResponse({ status: 200, description: "Pet deleted successfully" })
+  @ApiResponse({ status: 403, description: "Forbidden" })
+  @ApiResponse({ status: 404, description: "Pet not found" })
+  async remove(@Param("id") id: string, @Request() req) {
     return this.petsService.remove(id, req.user.userId);
   }
 }

@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { AppointmentSettings } from '../entities/appointment-settings.entity';
-import { CreateAppointmentSettingsDto } from '../dto/create-appointment-settings.dto';
-import { UpdateAppointmentSettingsDto } from '../dto/update-appointment-settings.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { AppointmentSettings } from "../entities/appointment-settings.entity";
+import { CreateAppointmentSettingsDto } from "../dto/create-appointment-settings.dto";
+import { UpdateAppointmentSettingsDto } from "../dto/update-appointment-settings.dto";
 @Injectable()
 export class AppointmentSettingsService {
   constructor(
@@ -20,7 +20,10 @@ export class AppointmentSettingsService {
     }
     return settings;
   }
-  async createOrUpdate(ongId: string, dto: CreateAppointmentSettingsDto | UpdateAppointmentSettingsDto): Promise<AppointmentSettings> {
+  async createOrUpdate(
+    ongId: string,
+    dto: CreateAppointmentSettingsDto | UpdateAppointmentSettingsDto,
+  ): Promise<AppointmentSettings> {
     const existing = await this.settingsRepository.findOne({
       where: { ongId },
     });
@@ -43,7 +46,9 @@ export class AppointmentSettingsService {
       throw new NotFoundException(`Settings for ONG ${ongId} not found`);
     }
   }
-  private async createDefaultSettings(ongId: string): Promise<AppointmentSettings> {
+  private async createDefaultSettings(
+    ongId: string,
+  ): Promise<AppointmentSettings> {
     const settings = this.settingsRepository.create({
       ongId,
       visitDurationMinutes: 60,

@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../app.module';
-import { DataSource } from 'typeorm';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "../app.module";
+import { DataSource } from "typeorm";
 /**
  * Script to update all pets and users to Portugal (PT) country code
  * Run with: npm run ts-node src/scripts/fix-country-codes.ts
@@ -11,23 +11,21 @@ async function fixCountryCodes() {
   try {
     // Update all pets to PT
     const petsResult = await dataSource.query(
-      `UPDATE pets SET country_code = 'PT' WHERE country_code != 'PT' OR country_code IS NULL`
+      `UPDATE pets SET country_code = 'PT' WHERE country_code != 'PT' OR country_code IS NULL`,
     );
     // Update all users/ONGs to PT
     const usersResult = await dataSource.query(
-      `UPDATE users SET country_code = 'PT' WHERE country_code != 'PT' OR country_code IS NULL`
+      `UPDATE users SET country_code = 'PT' WHERE country_code != 'PT' OR country_code IS NULL`,
     );
     // Show summary
     const petsCount = await dataSource.query(
-      `SELECT country_code, COUNT(*) as count FROM pets GROUP BY country_code`
+      `SELECT country_code, COUNT(*) as count FROM pets GROUP BY country_code`,
     );
-    petsCount.forEach((row: any) => {
-    });
+    petsCount.forEach((row: any) => {});
     const usersCount = await dataSource.query(
-      `SELECT country_code, COUNT(*) as count FROM users WHERE role = 'ong' GROUP BY country_code`
+      `SELECT country_code, COUNT(*) as count FROM users WHERE role = 'ong' GROUP BY country_code`,
     );
-    usersCount.forEach((row: any) => {
-    });
+    usersCount.forEach((row: any) => {});
   } catch (error) {
     throw error;
   } finally {

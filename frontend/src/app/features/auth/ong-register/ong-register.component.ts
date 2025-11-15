@@ -205,6 +205,96 @@ interface Country {
             />
           </div>
 
+          <!-- Payment Account Section -->
+          <div class="payment-section">
+            <h3>💳 Conta para Receber Doações (Opcional)</h3>
+            <p class="help-text">
+              Preencha estes dados para configurar automaticamente sua conta de
+              pagamentos e começar a receber doações imediatamente
+            </p>
+
+            <div class="form-group">
+              <label for="taxId">NIF / NIPC (Portugal) ou CNPJ (Brasil)</label>
+              <input
+                id="taxId"
+                type="text"
+                formControlName="taxId"
+                placeholder="Ex: 123456789 (PT) ou 12.345.678/0001-90 (BR)"
+              />
+              <small class="field-hint">
+                Número de identificação fiscal da sua organização
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="bankAccountIban">IBAN (apenas para Portugal)</label>
+              <input
+                id="bankAccountIban"
+                type="text"
+                formControlName="bankAccountIban"
+                placeholder="PT50 0000 0000 0000 0000 0000 0"
+              />
+              <small class="field-hint">
+                As doações serão depositadas diretamente nesta conta
+              </small>
+            </div>
+
+            <div class="brazil-bank-fields">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="bankRoutingNumber"
+                    >Código do Banco (apenas Brasil)</label
+                  >
+                  <input
+                    id="bankRoutingNumber"
+                    type="text"
+                    formControlName="bankRoutingNumber"
+                    placeholder="001"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="bankAccountNumber">Número da Conta (apenas Brasil)</label>
+                  <input
+                    id="bankAccountNumber"
+                    type="text"
+                    formControlName="bankAccountNumber"
+                    placeholder="12345678-9"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="pixKey">Chave PIX (apenas Brasil)</label>
+                <input
+                  id="pixKey"
+                  type="text"
+                  formControlName="pixKey"
+                  placeholder="CPF, CNPJ, Email, Telefone ou Chave Aleatória"
+                />
+                <small class="field-hint">
+                  Sua chave PIX para receber doações instantaneamente
+                </small>
+              </div>
+            </div>
+
+            <div class="info-box">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                />
+              </svg>
+              <div>
+                <strong>Por que pedimos isso?</strong>
+                <p>
+                  Estes dados permitem configurar automaticamente sua conta para
+                  receber doações via Stripe (Portugal) ou EBANX (Brasil). Você
+                  pode preencher agora ou configurar mais tarde no painel.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div class="form-group">
             <label for="password">{{ 'auth.register.password' | translate }}</label>
             <input
@@ -653,6 +743,86 @@ interface Country {
         }
       }
 
+      .payment-section {
+        background: #f8f9fa;
+        border: 2px solid #5cb5b0;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+
+        h3 {
+          color: #2c2c2c;
+          font-size: 18px;
+          font-weight: 600;
+          margin: 0 0 8px 0;
+        }
+
+        .help-text {
+          color: #666;
+          font-size: 14px;
+          margin: 0 0 20px 0;
+          line-height: 1.5;
+        }
+
+        .form-group {
+          margin-bottom: 16px;
+        }
+
+        .field-hint {
+          display: block;
+          color: #666;
+          font-size: 12px;
+          margin-top: 4px;
+          font-style: italic;
+        }
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+
+        @media (max-width: 600px) {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .info-box {
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+        border-radius: 8px;
+        padding: 16px;
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+
+        svg {
+          width: 24px;
+          height: 24px;
+          color: #2196f3;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+
+        div {
+          flex: 1;
+
+          strong {
+            color: #1976d2;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 4px;
+          }
+
+          p {
+            color: #1565c0;
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.5;
+          }
+        }
+      }
+
       .footer-links {
         margin-top: 24px;
         text-align: center;
@@ -744,6 +914,12 @@ export class OngRegisterComponent {
         instagramHandle: [""],
         password: ["", [Validators.required, Validators.minLength(8)]],
         confirmPassword: ["", Validators.required],
+        // Payment account fields (optional)
+        taxId: [""],
+        bankAccountIban: [""],
+        bankRoutingNumber: [""],
+        bankAccountNumber: [""],
+        pixKey: [""],
       },
       { validators: this.passwordMatchValidator }
     );
@@ -821,10 +997,16 @@ export class OngRegisterComponent {
       password: formValue.password,
       confirmPassword: formValue.confirmPassword,
       location: formValue.city, // Map city to location for backend
+      // Payment account fields (optional)
+      taxId: formValue.taxId || undefined,
+      bankAccountIban: formValue.bankAccountIban || undefined,
+      bankRoutingNumber: formValue.bankRoutingNumber || undefined,
+      bankAccountNumber: formValue.bankAccountNumber || undefined,
+      pixKey: formValue.pixKey || undefined,
     };
 
     this.authService.registerOng(registerData).subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading.set(false);
         this.successMessage.set(
           this.translate.instant('auth.register.ongSuccessMessage')

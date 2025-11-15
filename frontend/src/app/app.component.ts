@@ -8,12 +8,13 @@ import { UpdateNotificationComponent } from './shared/components/update-notifica
 import { InstallPromptComponent } from './shared/components/install-prompt/install-prompt.component';
 import { NetworkStatusComponent } from './shared/components/network-status/network-status.component';
 import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badge/offline-sync-badge.component';
+import { CountryConfirmationDialogComponent } from './shared/components/country-confirmation-dialog/country-confirmation-dialog.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent, TranslateModule],
+  imports: [RouterOutlet, BottomNavComponent, ToastComponent, UpdateNotificationComponent, InstallPromptComponent, NetworkStatusComponent, OfflineSyncBadgeComponent, CountryConfirmationDialogComponent, TranslateModule],
   template: `
     <div class="app-container">
       <main class="main-content">
@@ -41,6 +42,7 @@ import { OfflineSyncBadgeComponent } from './shared/components/offline-sync-badg
       <app-install-prompt></app-install-prompt>
       <app-network-status></app-network-status>
       <app-offline-sync-badge></app-offline-sync-badge>
+      <app-country-confirmation-dialog></app-country-confirmation-dialog>
       <app-toast></app-toast>
     </div>
   `,
@@ -136,7 +138,7 @@ export class AppComponent implements OnInit {
   private translate = inject(TranslateService);
   title = 'Aubrigo';
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
     // Initialize available languages
     this.translate.addLangs(['pt', 'es', 'en']);
 

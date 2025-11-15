@@ -30,7 +30,7 @@ import { UploadService } from "../upload/upload.service";
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly uploadService: UploadService
+    private readonly uploadService: UploadService,
   ) {}
   @Get()
   @ApiOperation({ summary: "Get all ONGs with optional filters" })
@@ -38,7 +38,7 @@ export class UsersController {
   async getAllOngs(
     @Query("search") search?: string,
     @Query("location") location?: string,
-    @Query("countryCode") countryCode?: string
+    @Query("countryCode") countryCode?: string,
   ) {
     return this.usersService.findAll({ search, location, countryCode });
   }
@@ -62,7 +62,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: "User not found" })
   async updateProfile(
     @CurrentUser() user: any,
-    @Body() updateProfileDto: UpdateUserProfileDto
+    @Body() updateProfileDto: UpdateUserProfileDto,
   ) {
     return this.usersService.updateProfile(user.id, updateProfileDto);
   }
@@ -80,7 +80,7 @@ export class UsersController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async uploadProfileImage(
     @CurrentUser() user: any,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {
       throw new BadRequestException("No file provided");
@@ -88,7 +88,7 @@ export class UsersController {
     const imageUrl = await this.uploadService.uploadImage(file, "profiles");
     const updatedUser = await this.usersService.updateProfileImage(
       user.id,
-      imageUrl
+      imageUrl,
     );
     return {
       message: "Profile image uploaded successfully",
@@ -104,7 +104,7 @@ export class UsersController {
   @ApiResponse({ status: 401, description: "Current password is incorrect" })
   async changePassword(
     @CurrentUser() user: any,
-    @Body() changePasswordDto: ChangeUserPasswordDto
+    @Body() changePasswordDto: ChangeUserPasswordDto,
   ) {
     return this.usersService.changePassword(user.id, changePasswordDto);
   }

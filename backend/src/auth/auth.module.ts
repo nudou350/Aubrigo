@@ -1,27 +1,30 @@
-import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../users/entities/user.entity';
-import { PasswordResetToken } from './entities/password-reset-token.entity';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { EmailModule } from '../email/email.module';
-import { CountryModule } from '../country/country.module';
+import { Module } from "@nestjs/common";
+import { JwtModule } from "@nestjs/jwt";
+import { PassportModule } from "@nestjs/passport";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { User } from "../users/entities/user.entity";
+import { PasswordResetToken } from "./entities/password-reset-token.entity";
+import { AuthService } from "./auth.service";
+import { AuthController } from "./auth.controller";
+import { JwtStrategy } from "./strategies/jwt.strategy";
+import { EmailModule } from "../email/email.module";
+import { CountryModule } from "../country/country.module";
+import { StripeConnectModule } from "../stripe-connect/stripe-connect.module";
+import { Ong } from "../ongs/entities/ong.entity";
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, PasswordResetToken]),
+    TypeOrmModule.forFeature([User, PasswordResetToken, Ong]),
     PassportModule,
     EmailModule,
     CountryModule,
+    StripeConnectModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET') || 'default-secret-key',
-        signOptions: { expiresIn: '7d' },
+        secret: configService.get("JWT_SECRET") || "default-secret-key",
+        signOptions: { expiresIn: "7d" },
       }),
     }),
   ],

@@ -40,7 +40,7 @@ export class PullToRefreshDirective implements OnInit, OnDestroy {
   private refreshIndicator?: HTMLElement;
   private isRefreshing = false;
 
-  private listeners: Array<() => void> = [];
+  private listeners: (() => void)[] = [];
 
   ngOnInit(): void {
     this.createRefreshIndicator();

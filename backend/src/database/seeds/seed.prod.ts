@@ -1,22 +1,22 @@
-import { DataSource } from 'typeorm';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
-import * as bcrypt from 'bcrypt';
-import { User, UserRole, OngStatus } from '../../users/entities/user.entity';
-import { Pet } from '../../pets/entities/pet.entity';
-import { PetImage } from '../../pets/entities/pet-image.entity';
-import { Appointment } from '../../appointments/entities/appointment.entity';
-import { Favorite } from '../../favorites/entities/favorite.entity';
-import { Donation } from '../../donations/entities/donation.entity';
-import { Article } from '../../articles/entities/article.entity';
-import { PasswordResetToken } from '../../auth/entities/password-reset-token.entity';
-import { OngOperatingHours } from '../../ongs/entities/ong-operating-hours.entity';
-import { AppointmentSettings } from '../../ongs/entities/appointment-settings.entity';
-import { OngAvailabilityException } from '../../ongs/entities/ong-availability-exception.entity';
+import { DataSource } from "typeorm";
+import * as dotenv from "dotenv";
+import * as path from "path";
+import * as bcrypt from "bcrypt";
+import { User, UserRole, OngStatus } from "../../users/entities/user.entity";
+import { Pet } from "../../pets/entities/pet.entity";
+import { PetImage } from "../../pets/entities/pet-image.entity";
+import { Appointment } from "../../appointments/entities/appointment.entity";
+import { Favorite } from "../../favorites/entities/favorite.entity";
+import { Donation } from "../../donations/entities/donation.entity";
+import { Article } from "../../articles/entities/article.entity";
+import { PasswordResetToken } from "../../auth/entities/password-reset-token.entity";
+import { OngOperatingHours } from "../../ongs/entities/ong-operating-hours.entity";
+import { AppointmentSettings } from "../../ongs/entities/appointment-settings.entity";
+import { OngAvailabilityException } from "../../ongs/entities/ong-availability-exception.entity";
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 const AppDataSource = new DataSource({
-  type: 'postgres',
+  type: "postgres",
   url: process.env.DATABASE_URL,
   entities: [
     User,
@@ -36,35 +36,35 @@ const AppDataSource = new DataSource({
 });
 // Admin account - Production
 const adminData = {
-  email: 'admin@aubrigo.pt',
-  password: 'IIIlll33#',
-  firstName: 'Admin',
-  lastName: 'Aubrigo',
-  countryCode: 'PT',
+  email: "admin@aubrigo.pt",
+  password: "IIIlll33#",
+  firstName: "Admin",
+  lastName: "Aubrigo",
+  countryCode: "PT",
 };
 // Production ONG accounts for Portugal (demo/showcase)
 const portugueseOngs = [
   {
-    email: 'ong.lisboa@aubrigo.pt',
-    password: 'OngLisboa2025!',
-    ongName: 'Amigos dos Animais Lisboa',
-    phone: '+351 21 234 5678',
+    email: "ong.lisboa@aubrigo.pt",
+    password: "OngLisboa2025!",
+    ongName: "Amigos dos Animais Lisboa",
+    phone: "+351 21 234 5678",
     hasWhatsapp: true,
-    instagramHandle: '@amigosdosanimais_lisboa',
-    location: 'Lisboa',
-    countryCode: 'PT',
+    instagramHandle: "@amigosdosanimais_lisboa",
+    location: "Lisboa",
+    countryCode: "PT",
     latitude: 38.7223,
     longitude: -9.1393,
   },
   {
-    email: 'ong.porto@aubrigo.pt',
-    password: 'OngPorto2025!',
-    ongName: 'Patinhas Felizes Porto',
-    phone: '+351 22 345 6789',
+    email: "ong.porto@aubrigo.pt",
+    password: "OngPorto2025!",
+    ongName: "Patinhas Felizes Porto",
+    phone: "+351 22 345 6789",
     hasWhatsapp: true,
-    instagramHandle: '@patinhasfelizes_porto',
-    location: 'Porto',
-    countryCode: 'PT',
+    instagramHandle: "@patinhasfelizes_porto",
+    location: "Porto",
+    countryCode: "PT",
     latitude: 41.1579,
     longitude: -8.6291,
   },
@@ -72,52 +72,62 @@ const portugueseOngs = [
 // Sample pets for Portugal (demo/showcase)
 const portuguesePets = [
   {
-    name: 'Rex',
-    species: 'dog',
-    breed: 'Labrador Retriever',
+    name: "Rex",
+    species: "dog",
+    breed: "Labrador Retriever",
     age: 3,
-    gender: 'male',
-    size: 'large',
-    color: 'Dourado',
+    gender: "male",
+    size: "large",
+    color: "Dourado",
     weight: 28.5,
-    description: 'O Rex é um Labrador muito amigável e brincalhão. Adora crianças e é perfeito para famílias ativas. Está vacinado e castrado.',
-    images: ['https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800'],
+    description:
+      "O Rex é um Labrador muito amigável e brincalhão. Adora crianças e é perfeito para famílias ativas. Está vacinado e castrado.",
+    images: [
+      "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800",
+    ],
   },
   {
-    name: 'Luna',
-    species: 'cat',
-    breed: 'Gato Persa',
+    name: "Luna",
+    species: "cat",
+    breed: "Gato Persa",
     age: 2,
-    gender: 'female',
-    size: 'medium',
-    color: 'Branco',
+    gender: "female",
+    size: "medium",
+    color: "Branco",
     weight: 4.5,
-    description: 'A Luna é uma gata Persa elegante e carinhosa. Ideal para apartamentos e pessoas que buscam companhia tranquila.',
-    images: ['https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=800'],
+    description:
+      "A Luna é uma gata Persa elegante e carinhosa. Ideal para apartamentos e pessoas que buscam companhia tranquila.",
+    images: ["https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=800"],
   },
   {
-    name: 'Bela',
-    species: 'dog',
-    breed: 'Golden Retriever',
+    name: "Bela",
+    species: "dog",
+    breed: "Golden Retriever",
     age: 5,
-    gender: 'female',
-    size: 'large',
-    color: 'Dourado claro',
+    gender: "female",
+    size: "large",
+    color: "Dourado claro",
     weight: 30.0,
-    description: 'A Bela é uma Golden muito dócil e amorosa. Ótima com crianças e outros animais.',
-    images: ['https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=800'],
+    description:
+      "A Bela é uma Golden muito dócil e amorosa. Ótima com crianças e outros animais.",
+    images: [
+      "https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=800",
+    ],
   },
   {
-    name: 'Mimi',
-    species: 'cat',
-    breed: 'Gato Europeu',
+    name: "Mimi",
+    species: "cat",
+    breed: "Gato Europeu",
     age: 1,
-    gender: 'female',
-    size: 'small',
-    color: 'Tricolor',
+    gender: "female",
+    size: "small",
+    color: "Tricolor",
     weight: 3.2,
-    description: 'A Mimi é uma gatinha jovem e brincalhona. Muito ativa e curiosa, perfeita para quem gosta de energia felina.',
-    images: ['https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800'],
+    description:
+      "A Mimi é uma gatinha jovem e brincalhona. Muito ativa e curiosa, perfeita para quem gosta de energia felina.",
+    images: [
+      "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800",
+    ],
   },
 ];
 async function seedProduction() {
@@ -182,7 +192,7 @@ async function seedProduction() {
       const pet = petRepository.create({
         ...petWithoutImages,
         ongId: ong.id,
-        status: 'available',
+        status: "available",
         location: ong.location,
         countryCode: ong.countryCode,
       });
@@ -198,8 +208,7 @@ async function seedProduction() {
       }
       petCount++;
     }
-    portugueseOngs.forEach((ong) => {
-    });
+    portugueseOngs.forEach((ong) => {});
     await AppDataSource.destroy();
     process.exit(0);
   } catch (error) {

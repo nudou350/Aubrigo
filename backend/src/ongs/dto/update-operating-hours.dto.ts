@@ -1,4 +1,4 @@
-import { IsBoolean, IsString, IsOptional } from 'class-validator';
+import { IsBoolean, IsString, IsOptional } from "class-validator";
 export class UpdateOperatingHoursDto {
   @IsOptional()
   @IsBoolean()

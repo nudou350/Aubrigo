@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
-import { OngOperatingHours } from '../entities/ong-operating-hours.entity';
-import { AppointmentSettings } from '../entities/appointment-settings.entity';
-import { OngAvailabilityException } from '../entities/ong-availability-exception.entity';
-import { Appointment } from '../../appointments/entities/appointment.entity';
-import { AvailableSlotDto, AvailableSlotsResponseDto, AvailableDatesResponseDto } from '../dto/available-slot.dto';
-import { OperatingHoursService } from './operating-hours.service';
-import { AppointmentSettingsService } from './appointment-settings.service';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, Between, LessThanOrEqual, MoreThanOrEqual } from "typeorm";
+import { OngOperatingHours } from "../entities/ong-operating-hours.entity";
+import { AppointmentSettings } from "../entities/appointment-settings.entity";
+import { OngAvailabilityException } from "../entities/ong-availability-exception.entity";
+import { Appointment } from "../../appointments/entities/appointment.entity";
+import {
+  AvailableSlotDto,
+  AvailableSlotsResponseDto,
+  AvailableDatesResponseDto,
+} from "../dto/available-slot.dto";
+import { OperatingHoursService } from "./operating-hours.service";
+import { AppointmentSettingsService } from "./appointment-settings.service";
 @Injectable()
 export class AvailableSlotsService {
   constructor(
@@ -18,11 +22,17 @@ export class AvailableSlotsService {
     private operatingHoursService: OperatingHoursService,
     private settingsService: AppointmentSettingsService,
   ) {}
-  async getAvailableSlots(ongId: string, date: Date): Promise<AvailableSlotsResponseDto> {
+  async getAvailableSlots(
+    ongId: string,
+    date: Date,
+  ): Promise<AvailableSlotsResponseDto> {
     const dateString = this.formatDate(date);
     const dayOfWeek = date.getDay();
     // 1. Get operating hours for this day
-    const operatingHours = await this.operatingHoursService.findByOngAndDay(ongId, dayOfWeek);
+    const operatingHours = await this.operatingHoursService.findByOngAndDay(
+      ongId,
+      dayOfWeek,
+    );
     if (!operatingHours || !operatingHours.isOpen) {
       return {
         date: dateString,
@@ -46,7 +56,9 @@ export class AvailableSlotsService {
         endDate: MoreThanOrEqual(date),
       },
     });
-    const blockedExceptions = exceptions.filter((e) => e.exceptionType === 'blocked');
+    const blockedExceptions = exceptions.filter(
+      (e) => e.exceptionType === "blocked",
+    );
     if (blockedExceptions.length > 0) {
       return {
         date: dateString,
@@ -69,30 +81,37 @@ export class AvailableSlotsService {
       where: {
         ongId,
         scheduledStartTime: Between(startOfDay, endOfDay),
-        status: 'confirmed',
+        status: "confirmed",
       },
     });
     // 6. Mark slots as available or not
     const now = new Date();
-    const minBookingTime = new Date(now.getTime() + settings.minAdvanceBookingHours * 60 * 60 * 1000);
+    const minBookingTime = new Date(
+      now.getTime() + settings.minAdvanceBookingHours * 60 * 60 * 1000,
+    );
     const slots: AvailableSlotDto[] = allSlots.map((slot) => {
       // Check if slot is in the past or too soon
       if (slot.startTime < minBookingTime) {
         return {
           ...slot,
           available: false,
-          reason: 'Too soon to book',
+          reason: "Too soon to book",
         };
       }
       // Count concurrent appointments at this time
       const concurrentCount = appointments.filter((apt) =>
-        this.isOverlapping(slot.startTime, slot.endTime, apt.scheduledStartTime, apt.scheduledEndTime),
+        this.isOverlapping(
+          slot.startTime,
+          slot.endTime,
+          apt.scheduledStartTime,
+          apt.scheduledEndTime,
+        ),
       ).length;
       const available = concurrentCount < settings.maxConcurrentVisits;
       return {
         ...slot,
         available,
-        reason: available ? undefined : 'Fully booked',
+        reason: available ? undefined : "Fully booked",
       };
     });
     return {
@@ -107,7 +126,11 @@ export class AvailableSlotsService {
       },
     };
   }
-  async getAvailableDates(ongId: string, year: number, month: number): Promise<AvailableDatesResponseDto> {
+  async getAvailableDates(
+    ongId: string,
+    year: number,
+    month: number,
+  ): Promise<AvailableDatesResponseDto> {
     const settings = await this.settingsService.findByOng(ongId);
     const operatingHours = await this.operatingHoursService.findByOng(ongId);
     // Get all days in the month
@@ -140,7 +163,7 @@ export class AvailableSlotsService {
           ongId,
           startDate: LessThanOrEqual(date),
           endDate: MoreThanOrEqual(date),
-          exceptionType: 'blocked',
+          exceptionType: "blocked",
         },
       });
       if (exceptions.length > 0) {
@@ -148,7 +171,9 @@ export class AvailableSlotsService {
       }
       // Check if this date has at least one available slot
       const slotsResponse = await this.getAvailableSlots(ongId, date);
-      const availableSlots = slotsResponse.slots.filter(slot => slot.available);
+      const availableSlots = slotsResponse.slots.filter(
+        (slot) => slot.available,
+      );
       const hasAvailableSlots = availableSlots.length > 0;
       if (!hasAvailableSlots) {
         continue;
@@ -172,8 +197,12 @@ export class AvailableSlotsService {
     const slots: AvailableSlotDto[] = [];
     const openMinutes = this.timeToMinutes(operatingHours.openTime);
     const closeMinutes = this.timeToMinutes(operatingHours.closeTime);
-    const lunchStartMinutes = operatingHours.lunchBreakStart ? this.timeToMinutes(operatingHours.lunchBreakStart) : null;
-    const lunchEndMinutes = operatingHours.lunchBreakEnd ? this.timeToMinutes(operatingHours.lunchBreakEnd) : null;
+    const lunchStartMinutes = operatingHours.lunchBreakStart
+      ? this.timeToMinutes(operatingHours.lunchBreakStart)
+      : null;
+    const lunchEndMinutes = operatingHours.lunchBreakEnd
+      ? this.timeToMinutes(operatingHours.lunchBreakEnd)
+      : null;
     let currentMinutes = openMinutes;
     while (currentMinutes + settings.visitDurationMinutes <= closeMinutes) {
       // Check if slot overlaps with lunch break
@@ -195,11 +224,16 @@ export class AvailableSlotsService {
     }
     return slots;
   }
-  private isOverlapping(start1: Date, end1: Date, start2: Date, end2: Date): boolean {
+  private isOverlapping(
+    start1: Date,
+    end1: Date,
+    start2: Date,
+    end2: Date,
+  ): boolean {
     return start1 < end2 && end1 > start2;
   }
   private timeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(':').map(Number);
+    const [hours, minutes] = time.split(":").map(Number);
     return hours * 60 + minutes;
   }
   private minutesToDateTime(date: Date, minutes: number): Date {
@@ -215,8 +249,8 @@ export class AvailableSlotsService {
   }
   private formatDate(date: Date): string {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
 }

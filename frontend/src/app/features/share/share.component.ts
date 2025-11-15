@@ -342,11 +342,11 @@ export class ShareComponent implements OnInit {
     title?: string;
     text?: string;
     url?: string;
-    files?: Array<{
+    files?: {
       name: string;
       type: string;
       preview?: string;
-    }>;
+    }[];
   } | null = null;
 
   constructor(

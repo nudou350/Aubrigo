@@ -1,0 +1,448 @@
+
+> pet-sos-frontend@1.2.4 lint
+> ng lint
+
+
+Linting "pet-sos-frontend"...
+
+E:\Projetos\aubrigo\frontend\src\app\app.component.ts
+  141:15  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\admin.service.ts
+  215:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  216:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\analytics.service.ts
+   58:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  144:20  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  149:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  172:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  185:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  208:33  error  'err' is defined but never used           @typescript-eslint/no-unused-vars
+  208:40  error  Unexpected empty arrow function           @typescript-eslint/no-empty-function
+  211:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  244:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  280:16  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  315:16  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  357:16  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  384:16  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  423:22  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  428:18  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  436:16  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  440:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  476:35  error  Empty block statement                     no-empty
+  489:16  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  536:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  578:22  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  590:18  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  594:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\auth.service.ts
+  226:16  error  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\cache.service.ts
+    1:22  error  'signal' is defined but never used        @typescript-eslint/no-unused-vars
+    1:30  error  'Signal' is defined but never used        @typescript-eslint/no-unused-vars
+   58:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  179:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  184:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\country.service.ts
+   95:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   96:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  186:20  error  Unexpected empty method 'error'           @typescript-eslint/no-empty-function
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\geolocation.service.ts
+  42:10  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\image-optimizer.service.ts
+  77:57  error  'format' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\language.service.ts
+  114:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\network-status.service.ts
+  2:21  error  'merge' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\offline-queue.service.ts
+   21:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  138:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  203:16  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  326:31  error  'action' is defined but never used        @typescript-eslint/no-unused-vars
+  379:31  error  Unexpected empty arrow function           @typescript-eslint/no-empty-function
+  381:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  381:21  error  Empty block statement                     no-empty
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\payment-polling.service.ts
+  3:54  error  'map' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\push-notification.service.ts
+   25:10  error  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+   76:25  error  Empty block statement                      no-empty
+   77:14  error  Empty block statement                      no-empty
+   82:46  error  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  125:14  error  'error' is defined but never used          @typescript-eslint/no-unused-vars
+  152:14  error  'error' is defined but never used          @typescript-eslint/no-unused-vars
+  211:14  error  'error' is defined but never used          @typescript-eslint/no-unused-vars
+  229:14  error  'error' is defined but never used          @typescript-eslint/no-unused-vars
+  229:21  error  Empty block statement                      no-empty
+  236:39  error  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  238:19  error  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  263:65  error  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\pwa.service.ts
+   84:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   96:28  error  Empty block statement                     no-empty
+   97:14  error  Empty block statement                     no-empty
+  115:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  132:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  160:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  217:24  error  Empty block statement                     no-empty
+  218:14  error  Empty block statement                     no-empty
+  221:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  239:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  239:21  error  Empty block statement                     no-empty
+  257:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  257:21  error  Empty block statement                     no-empty
+
+E:\Projetos\aubrigo\frontend\src\app\core\services\share.service.ts
+   23:17  error  Unexpected empty constructor                  @typescript-eslint/no-empty-function
+   64:21  error  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+   65:40  error  Empty block statement                         no-empty
+   66:14  error  Empty block statement                         no-empty
+  176:14  error  'error' is defined but never used             @typescript-eslint/no-unused-vars
+  198:14  error  'error' is defined but never used             @typescript-eslint/no-unused-vars
+  235:9   error  Unexpected lexical declaration in case block  no-case-declarations
+
+E:\Projetos\aubrigo\frontend\src\app\features\admin\analytics-dashboard\analytics-dashboard.component.ts
+  592:23  error  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  599:14  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  599:21  error  Empty block statement                                     no-empty
+   45:11  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+
+E:\Projetos\aubrigo\frontend\src\app\features\admin\dashboard\admin-dashboard.component.ts
+  529:15  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  539:15  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\features\admin\ongs\ongs.component.ts
+  441:15  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  441:25  error  Unexpected empty method 'error'    @typescript-eslint/no-empty-function
+
+E:\Projetos\aubrigo\frontend\src\app\features\admin\reports\reports.component.ts
+  536:15  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  550:15  error  'error' is defined but never used                                                                                                                                       @typescript-eslint/no-unused-vars
+  550:25  error  Unexpected empty method 'error'                                                                                                                                         @typescript-eslint/no-empty-function
+  560:15  error  'error' is defined but never used                                                                                                                                       @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\features\auth\account-type\account-type.component.ts
+  200:15  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+
+E:\Projetos\aubrigo\frontend\src\app\features\auth\login\login.component.ts
+  529:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\features\auth\ong-register\ong-register.component.ts
+  901:5   error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  902:5   error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  903:5   error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  154:15  error  click must be accompanied by either keyup, keydown or keypress event for accessibility                                                                                  @angular-eslint/template/click-events-have-key-events
+  154:15  error  Elements with interaction handlers must be focusable                                                                                                                    @angular-eslint/template/interactive-supports-focus
+  170:19  error  click must be accompanied by either keyup, keydown or keypress event for accessibility                                                                                  @angular-eslint/template/click-events-have-key-events
+  170:19  error  Elements with interaction handlers must be focusable                                                                                                                    @angular-eslint/template/interactive-supports-focus
+
+E:\Projetos\aubrigo\frontend\src\app\features\auth\register\register.component.ts
+  599:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\features\auth\user-register\user-register.component.ts
+  309:5  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  310:5  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  311:5  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+
+E:\Projetos\aubrigo\frontend\src\app\features\donations\donation-enhanced.component.html
+   13:11  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+   45:13  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+   57:13  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+   71:11  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+   88:11  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  115:11  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  140:13  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+
+E:\Projetos\aubrigo\frontend\src\app\features\donations\donation-enhanced.component.spec.ts
+    4:10  error  'signal' is defined but never used                   @typescript-eslint/no-unused-vars
+  373:58  error  Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+  658:13  error  'execCommandSpy' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\features\donations\donation.component.ts
+  394:26  error  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  429:20  error  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  439:15  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  503:58  error  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  552:15  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  552:25  error  Unexpected empty method 'error'                           @typescript-eslint/no-empty-function
+  102:15  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+
+E:\Projetos\aubrigo\frontend\src\app\features\favorites\favorites.component.ts
+  328:15  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  345:15  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\features\home\home.component.ts
+  1790:15  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  1790:25  error  Unexpected empty method 'error'                                                         @typescript-eslint/no-empty-function
+  1817:19  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  1830:17  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  1911:15  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  1994:15  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  2089:15  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  2174:9   error  Unexpected lexical declaration in case block                                            no-case-declarations
+  2229:15  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  2229:25  error  Unexpected empty method 'error'                                                         @typescript-eslint/no-empty-function
+  2310:9   error  Unexpected lexical declaration in case block                                            no-case-declarations
+   242:13  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+   242:13  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+   243:13  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+   243:13  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+   246:19  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+   259:19  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+   272:19  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+   286:19  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+   392:9   error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+   392:9   error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+   515:5   error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+   515:5   error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+   516:7   error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+   516:7   error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+E:\Projetos\aubrigo\frontend\src\app\features\ong\appointments\appointments.component.ts
+  480:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  545:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  551:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  552:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  556:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  561:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  571:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\features\ong\articles\articles.component.ts
+  605:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  657:17  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  670:17  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  691:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  708:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  746:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\features\ong\availability-exceptions\availability-exceptions.component.ts
+  597:15  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  664:15  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  696:15  error  'error' is defined but never used                                                       @typescript-eslint/no-unused-vars
+  118:13  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  118:13  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  119:15  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  119:15  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  131:21  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+  143:23  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+  152:23  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+  174:25  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+  182:25  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+
+E:\Projetos\aubrigo\frontend\src\app\features\ong\dashboard\ong-dashboard.component.ts
+  633:19  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  639:15  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\features\ong\donations\donations.component.ts
+  502:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  541:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  549:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\features\ong\pets\manage-pets.component.ts
+  450:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  505:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  510:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  519:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  529:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  537:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\features\ong\profile\profile-edit.component.ts
+  506:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  513:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  532:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  538:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  640:14  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\features\ong\scheduling-settings\scheduling-settings.component.ts
+    6:29  error  'OngOperatingHours' is defined but never used             @typescript-eslint/no-unused-vars
+    6:48  error  'AppointmentSettings' is defined but never used           @typescript-eslint/no-unused-vars
+  752:15  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  758:15  error  'day' is defined but never used                           @typescript-eslint/no-unused-vars
+   75:27  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+   82:27  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  101:29  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  108:29  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  151:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  162:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  173:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  184:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  195:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+
+E:\Projetos\aubrigo\frontend\src\app\features\ongs\ong-detail\ong-detail.component.ts
+   95:17  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  108:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  139:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  180:11  error  'method' is defined but never used        @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\features\ongs\ongs.component.html
+  134:5  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  134:5  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+E:\Projetos\aubrigo\frontend\src\app\features\ongs\ongs.component.ts
+   76:15  error  'error' is defined but never used             @typescript-eslint/no-unused-vars
+   76:25  error  Unexpected empty method 'error'               @typescript-eslint/no-empty-function
+   84:20  error  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  108:17  error  'error' is defined but never used             @typescript-eslint/no-unused-vars
+  127:15  error  'error' is defined but never used             @typescript-eslint/no-unused-vars
+  127:25  error  Unexpected empty method 'error'               @typescript-eslint/no-empty-function
+  204:9   error  Unexpected lexical declaration in case block  no-case-declarations
+  321:9   error  Unexpected lexical declaration in case block  no-case-declarations
+  369:19  error  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\features\pets\pet-detail\pet-detail.component.ts
+   911:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+   911:25  error  Unexpected empty method 'error'           @typescript-eslint/no-empty-function
+   940:19  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+   959:19  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+   970:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  1002:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  1014:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  1014:25  error  Unexpected empty method 'error'           @typescript-eslint/no-empty-function
+  1101:55  error  Unnecessary escape character: \(          no-useless-escape
+  1101:57  error  Unnecessary escape character: \)          no-useless-escape
+  1160:16  error  'event' is defined but never used         @typescript-eslint/no-unused-vars
+  1168:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   157:13  error  <button> should have content              @angular-eslint/template/elements-content
+
+E:\Projetos\aubrigo\frontend\src\app\features\pets\pet-form\pet-form.component.ts
+   665:5   error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+   666:5   error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+   667:5   error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+   668:5   error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+   705:19  error  Unexpected any. Specify a different type                                                                                                                                @typescript-eslint/no-explicit-any
+   727:48  error  Unexpected any. Specify a different type                                                                                                                                @typescript-eslint/no-explicit-any
+   734:15  error  'error' is defined but never used                                                                                                                                       @typescript-eslint/no-unused-vars
+   741:24  error  Unexpected any. Specify a different type                                                                                                                                @typescript-eslint/no-explicit-any
+   760:25  error  Unexpected any. Specify a different type                                                                                                                                @typescript-eslint/no-explicit-any
+   842:9   error  Unexpected lexical declaration in case block                                                                                                                            no-case-declarations
+   910:9   error  Unexpected lexical declaration in case block                                                                                                                            no-case-declarations
+  1005:15  error  'error' is defined but never used                                                                                                                                       @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\features\pets\schedule-appointment\schedule-appointment.component.ts
+  828:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  835:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  844:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  865:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  890:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  985:15  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\features\profile\profile.component.ts
+  675:17  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  695:17  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  752:17  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  781:17  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  811:19  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  833:19  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+  876:15  error  'error' is defined but never used                         @typescript-eslint/no-unused-vars
+   89:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  103:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  117:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  132:15  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  138:15  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  153:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  169:15  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  184:17  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  229:19  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  239:19  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+  249:19  error  A label component must be associated with a form element  @angular-eslint/template/label-has-associated-control
+
+E:\Projetos\aubrigo\frontend\src\app\features\share\share.component.ts
+  353:5   error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  354:5   error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  394:14  error  'error' is defined but never used                                                                                                                                       @typescript-eslint/no-unused-vars
+  394:21  error  Empty block statement                                                                                                                                                   no-empty
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\back-button\back-button.component.ts
+  66:5  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  67:5  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\bottom-nav\bottom-nav.component.ts
+    1:54  error  'computed' is defined but never used                                                                                                                                    @typescript-eslint/no-unused-vars
+  603:15  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+  608:26  error  Unexpected any. Specify a different type                                                                                                                                @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\country-confirmation-dialog\country-confirmation-dialog.component.html
+  1:1  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  1:1  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  2:3  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  2:3  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\country-confirmation-dialog\country-confirmation-dialog.component.ts
+   3:26  error  'Country' is defined but never used                                                                                                                                     @typescript-eslint/no-unused-vars
+  20:15  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\country-selector\country-selector.component.html
+   3:5  error  A label component must be associated with a form element                                @angular-eslint/template/label-has-associated-control
+  46:9  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  46:9  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\country-selector\country-selector.component.ts
+  27:15  error  Prefer using the inject() function over constructor parameter injection. Use Angular's migration schematic to automatically refactor: ng generate @angular/core:inject  @angular-eslint/prefer-inject
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\install-prompt\install-prompt.component.ts
+  24:7  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  24:7  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  25:9  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  25:9  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\language-selector\language-selector.component.ts
+  14:5  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  14:5  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  65:5  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  65:5  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\mbway-qrcode\mbway-qrcode.component.ts
+  1:53  error  'signal' is defined but never used  @typescript-eslint/no-unused-vars
+  1:61  error  'effect' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\network-status\network-status.component.ts
+  169:3   error  Lifecycle methods should not be empty  @angular-eslint/no-empty-lifecycle-method
+  169:20  error  Unexpected empty method 'ngOnInit'     @typescript-eslint/no-empty-function
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\notification-settings\notification-settings.component.ts
+  464:14  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  464:21  error  Empty block statement              no-empty
+  479:16  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  479:23  error  Empty block statement              no-empty
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\offline-sync-badge\offline-sync-badge.component.ts
+  167:14  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  167:21  error  Empty block statement              no-empty
+  181:14  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  181:21  error  Empty block statement              no-empty
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\share-button\share-button.component.ts
+   34:9  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+   34:9  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  111:9  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  111:9  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+E:\Projetos\aubrigo\frontend\src\app\shared\components\toast\toast.component.ts
+  14:9  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  14:9  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+E:\Projetos\aubrigo\frontend\src\app\shared\pipes\currency-format.pipe.ts
+  8:69  error  'showSymbol' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 317 problems (317 errors, 0 warnings)
+
+Lint errors found in the listed files.
+

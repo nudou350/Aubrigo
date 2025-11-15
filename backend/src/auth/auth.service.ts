@@ -4,47 +4,55 @@ import {
   UnauthorizedException,
   BadRequestException,
   NotFoundException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan } from 'typeorm';
-import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
-import { User, UserRole, OngStatus } from '../users/entities/user.entity';
-import { PasswordResetToken } from './entities/password-reset-token.entity';
-import { RegisterDto } from './dto/register.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { RegisterOngDto } from './dto/register-ong.dto';
-import { LoginDto } from './dto/login.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { EmailService } from '../email/email.service';
-import { CountryService } from '../country/country.service';
+  Logger,
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, MoreThan } from "typeorm";
+import { ConfigService } from "@nestjs/config";
+import * as bcrypt from "bcrypt";
+import * as crypto from "crypto";
+import { User, UserRole, OngStatus } from "../users/entities/user.entity";
+import { PasswordResetToken } from "./entities/password-reset-token.entity";
+import { RegisterDto } from "./dto/register.dto";
+import { RegisterUserDto } from "./dto/register-user.dto";
+import { RegisterOngDto } from "./dto/register-ong.dto";
+import { LoginDto } from "./dto/login.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { EmailService } from "../email/email.service";
+import { CountryService } from "../country/country.service";
+import { StripeConnectService } from "../stripe-connect/stripe-connect.service";
+import { Ong } from "../ongs/entities/ong.entity";
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(PasswordResetToken)
     private resetTokenRepository: Repository<PasswordResetToken>,
+    @InjectRepository(Ong)
+    private ongRepository: Repository<Ong>,
     private jwtService: JwtService,
     private emailService: EmailService,
     private configService: ConfigService,
     private countryService: CountryService,
+    private stripeConnectService: StripeConnectService,
   ) {}
   async register(registerDto: RegisterDto) {
     const { email, password, confirmPassword, ongName } = registerDto;
     // Check if passwords match
     if (password !== confirmPassword) {
-      throw new BadRequestException('Passwords do not match');
+      throw new BadRequestException("Passwords do not match");
     }
     // Check if user already exists
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
     if (existingUser) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException("Email already registered");
     }
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
@@ -60,7 +68,7 @@ export class AuthService {
     // Remove password from response
     delete user.passwordHash;
     return {
-      message: 'Registration successful',
+      message: "Registration successful",
       user,
       accessToken,
     };
@@ -72,16 +80,18 @@ export class AuthService {
       where: { email },
     });
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
     // Check if ONG account was rejected
     if (user.role === UserRole.ONG && user.ongStatus === OngStatus.REJECTED) {
-      throw new UnauthorizedException('Your account request was not approved. Please contact admin@aubrigo.pt if you believe this was an error.');
+      throw new UnauthorizedException(
+        "Your account request was not approved. Please contact admin@aubrigo.pt if you believe this was an error.",
+      );
     }
     // Generate token
     const accessToken = this.generateToken(user);
@@ -101,22 +111,33 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
   async registerUser(registerUserDto: RegisterUserDto, req?: any) {
-    const { email, password, confirmPassword, firstName, lastName, phone, location, countryCode } = registerUserDto;
+    const {
+      email,
+      password,
+      confirmPassword,
+      firstName,
+      lastName,
+      phone,
+      location,
+      countryCode,
+    } = registerUserDto;
     // Check if passwords match
     if (password !== confirmPassword) {
-      throw new BadRequestException('Passwords do not match');
+      throw new BadRequestException("Passwords do not match");
     }
     // Check if user already exists
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
     if (existingUser) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException("Email already registered");
     }
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
     // Detect country from request if not provided
-    const detectedCountryCode = countryCode || (req ? await this.countryService.detectCountryFromRequest(req) : 'PT');
+    const detectedCountryCode =
+      countryCode ||
+      (req ? await this.countryService.detectCountryFromRequest(req) : "PT");
     // Create user
     const user = this.userRepository.create({
       email,
@@ -134,7 +155,7 @@ export class AuthService {
     // Remove password from response
     delete user.passwordHash;
     return {
-      message: 'User registration successful',
+      message: "User registration successful",
       user,
       accessToken,
     };
@@ -151,24 +172,31 @@ export class AuthService {
       city,
       location,
       countryCode,
+      taxId,
+      bankAccountIban,
+      bankRoutingNumber,
+      bankAccountNumber,
+      pixKey,
     } = registerOngDto;
     // Check if passwords match
     if (password !== confirmPassword) {
-      throw new BadRequestException('Passwords do not match');
+      throw new BadRequestException("Passwords do not match");
     }
     // Check if email already exists
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
     if (existingUser) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException("Email already registered");
     }
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
     // Use city if location is not provided
     const finalLocation = location || city;
     // Detect country from request if not provided
-    const detectedCountryCode = countryCode || (req ? await this.countryService.detectCountryFromRequest(req) : 'PT');
+    const detectedCountryCode =
+      countryCode ||
+      (req ? await this.countryService.detectCountryFromRequest(req) : "PT");
     // Create ONG user (set status to PENDING for admin approval)
     const user = this.userRepository.create({
       email,
@@ -181,8 +209,74 @@ export class AuthService {
       location: finalLocation,
       ongStatus: OngStatus.PENDING,
       countryCode: detectedCountryCode,
+      pixKey,
     });
     const savedUser = await this.userRepository.save(user);
+
+    // Create corresponding ONG entity with payment details
+    const ong = this.ongRepository.create({
+      id: savedUser.id, // Use same ID as User
+      email: savedUser.email,
+      ongName: savedUser.ongName,
+      phone: savedUser.phone,
+      instagramHandle: savedUser.instagramHandle,
+      location: savedUser.location,
+      countryCode: detectedCountryCode,
+      taxId,
+      bankAccountIban,
+      bankRoutingNumber,
+      bankAccountNumber,
+      approvalStatus: "pending",
+    });
+    const savedOng = await this.ongRepository.save(ong);
+
+    // Automatically create Stripe Express Account if payment details provided
+    let stripeAccountInfo: any = null;
+    if (
+      taxId &&
+      (bankAccountIban || (bankRoutingNumber && bankAccountNumber))
+    ) {
+      try {
+        this.logger.log(`Creating Stripe Express Account for ONG: ${ongName}`);
+
+        const stripeAccount =
+          await this.stripeConnectService.createExpressAccount({
+            email: savedUser.email,
+            ongName: savedUser.ongName,
+            taxId,
+            country: detectedCountryCode as "PT" | "BR",
+            iban: bankAccountIban,
+            routingNumber: bankRoutingNumber,
+            accountNumber: bankAccountNumber,
+          });
+
+        // Update ONG entity with Stripe account details
+        savedOng.stripeAccountId = stripeAccount.accountId;
+        savedOng.stripeAccountConnected = !stripeAccount.requiresOnboarding;
+        await this.ongRepository.save(savedOng);
+
+        stripeAccountInfo = {
+          accountId: stripeAccount.accountId,
+          onboardingUrl: stripeAccount.onboardingUrl,
+          requiresOnboarding: stripeAccount.requiresOnboarding,
+        };
+
+        this.logger.log(
+          `Stripe Express Account created successfully: ${stripeAccount.accountId}`,
+        );
+      } catch (error) {
+        this.logger.error(
+          `Failed to create Stripe account for ${ongName}:`,
+          error.message,
+        );
+        // Don't block registration if Stripe fails - they can set it up later
+        stripeAccountInfo = {
+          error: true,
+          message: "Payment account setup will need to be completed later",
+        };
+      }
+    }
+
     // Send welcome email to ONG
     await this.emailService.sendWelcomeEmailToOng(
       savedUser.email,
@@ -201,9 +295,10 @@ export class AuthService {
     // Remove password from response
     delete savedUser.passwordHash;
     return {
-      message: 'ONG registration successful.',
+      message: "ONG registration successful.",
       user: savedUser,
       accessToken,
+      stripeAccount: stripeAccountInfo,
     };
   }
   async validateUser(userId: string): Promise<User> {
@@ -223,11 +318,11 @@ export class AuthService {
     if (!user) {
       // Don't reveal if email exists or not for security
       return {
-        message: 'If this email exists, a password reset link will be sent.',
+        message: "If this email exists, a password reset link will be sent.",
       };
     }
     // Generate reset token
-    const token = crypto.randomBytes(32).toString('hex');
+    const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1); // Expires in 1 hour
     // Save token
@@ -238,18 +333,21 @@ export class AuthService {
     });
     await this.resetTokenRepository.save(resetToken);
     // Send email
-    const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:4200');
+    const frontendUrl = this.configService.get<string>(
+      "FRONTEND_URL",
+      "http://localhost:4200",
+    );
     const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
     await this.emailService.sendPasswordResetEmail(email, token, resetUrl);
     return {
-      message: 'If this email exists, a password reset link will be sent.',
+      message: "If this email exists, a password reset link will be sent.",
     };
   }
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { token, newPassword, confirmPassword } = resetPasswordDto;
     // Check if passwords match
     if (newPassword !== confirmPassword) {
-      throw new BadRequestException('Passwords do not match');
+      throw new BadRequestException("Passwords do not match");
     }
     // Find valid token
     const resetToken = await this.resetTokenRepository.findOne({
@@ -258,10 +356,10 @@ export class AuthService {
         used: false,
         expiresAt: MoreThan(new Date()),
       },
-      relations: ['user'],
+      relations: ["user"],
     });
     if (!resetToken) {
-      throw new BadRequestException('Invalid or expired reset token');
+      throw new BadRequestException("Invalid or expired reset token");
     }
     // Hash new password
     const passwordHash = await bcrypt.hash(newPassword, 10);
@@ -272,7 +370,8 @@ export class AuthService {
     resetToken.used = true;
     await this.resetTokenRepository.save(resetToken);
     return {
-      message: 'Password reset successful. You can now login with your new password.',
+      message:
+        "Password reset successful. You can now login with your new password.",
     };
   }
 }

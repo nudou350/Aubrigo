@@ -1,4 +1,11 @@
-import { IsInt, IsBoolean, IsString, IsOptional, Min, Max } from 'class-validator';
+import {
+  IsInt,
+  IsBoolean,
+  IsString,
+  IsOptional,
+  Min,
+  Max,
+} from "class-validator";
 export class CreateOperatingHoursDto {
   @IsInt()
   @Min(0)

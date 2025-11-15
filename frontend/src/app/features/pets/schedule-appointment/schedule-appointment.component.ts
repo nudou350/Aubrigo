@@ -16,7 +16,7 @@ interface Pet {
   name: string;
   species: string;
   breed: string;
-  images: Array<{ url: string; isPrimary: boolean }>;
+  images: { url: string; isPrimary: boolean }[];
   ong: {
     id: string;
     ongName: string;
@@ -795,7 +795,7 @@ export class ScheduleAppointmentComponent implements OnInit {
     const startingDayOfWeek = firstDay.getDay();
     const daysInMonth = lastDay.getDate();
 
-    const days: Array<{ dayNumber: number | null; dateStr: string; isAvailable: boolean }> = [];
+    const days: { dayNumber: number | null; dateStr: string; isAvailable: boolean }[] = [];
 
     // Empty cells before first day
     for (let i = 0; i < startingDayOfWeek; i++) {

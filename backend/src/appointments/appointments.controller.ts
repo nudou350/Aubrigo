@@ -8,50 +8,54 @@ import {
   Delete,
   UseGuards,
   Request,
-} from '@nestjs/common';
-import { AppointmentsService } from './appointments.service';
-import { CreateAppointmentDto } from './dto/create-appointment.dto';
-import { UpdateAppointmentStatusDto } from './dto/update-appointment-status.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RoleGuard } from '../auth/guards/role.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../users/entities/user.entity';
-@Controller('appointments')
+} from "@nestjs/common";
+import { AppointmentsService } from "./appointments.service";
+import { CreateAppointmentDto } from "./dto/create-appointment.dto";
+import { UpdateAppointmentStatusDto } from "./dto/update-appointment-status.dto";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RoleGuard } from "../auth/guards/role.guard";
+import { Roles } from "../auth/decorators/roles.decorator";
+import { UserRole } from "../users/entities/user.entity";
+@Controller("appointments")
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
   @Post()
   create(@Body() createAppointmentDto: CreateAppointmentDto) {
     return this.appointmentsService.create(createAppointmentDto);
   }
-  @Get('ong')
+  @Get("ong")
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
   findAllForOng(@Request() req) {
     return this.appointmentsService.findAllForOng(req.user.id);
   }
-  @Get(':id')
+  @Get(":id")
   @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: string) {
+  findOne(@Param("id") id: string) {
     return this.appointmentsService.findOne(id);
   }
-  @Patch(':id/status')
+  @Patch(":id/status")
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
   updateStatus(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updateStatusDto: UpdateAppointmentStatusDto,
     @Request() req,
   ) {
-    return this.appointmentsService.updateStatus(id, updateStatusDto, req.user.id);
+    return this.appointmentsService.updateStatus(
+      id,
+      updateStatusDto,
+      req.user.id,
+    );
   }
-  @Patch(':id/cancel')
-  cancel(@Param('id') id: string, @Body('reason') reason?: string) {
+  @Patch(":id/cancel")
+  cancel(@Param("id") id: string, @Body("reason") reason?: string) {
     return this.appointmentsService.cancel(id, reason);
   }
-  @Delete(':id')
+  @Delete(":id")
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(UserRole.ONG)
-  delete(@Param('id') id: string, @Request() req) {
+  delete(@Param("id") id: string, @Request() req) {
     return this.appointmentsService.delete(id, req.user.id);
   }
 }

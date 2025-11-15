@@ -1,0 +1,387 @@
+
+> pet-sos-backend@1.1.1 lint
+> eslint "{src,apps,libs,test}/**/*.ts" --fix
+
+
+E:\Projetos\aubrigo\backend\src\admin\admin.controller.ts
+  4:3  error  'Post' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\admin\admin.service.spec.ts
+  4:10  error  'Repository' is defined but never used  @typescript-eslint/no-unused-vars
+  5:16  error  'UserRole' is defined but never used    @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\admin\admin.service.ts
+  29:59  error  'availablePets' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  55:18  error  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+  75:18  error  Unexpected any. Specify a different type            @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\analytics\analytics.controller.ts
+  10:3  error  'UseGuards' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\analytics\analytics.service.spec.ts
+  4:10  error  'Repository' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\analytics\analytics.service.ts
+   61:64  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  117:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:64  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  165:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\analytics\dto\track-event.dto.ts
+  26:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\analytics\entities\analytics-event.entity.ts
+  39:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\appointments\appointments.service.spec.ts
+  4:10  error  'Repository' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\articles\articles.controller.ts
+   38:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   66:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:62  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\articles\articles.service.spec.ts
+   4:10  error  'Repository' is defined but never used         @typescript-eslint/no-unused-vars
+  11:10  error  'NotFoundException' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\auth\auth.controller.spec.ts
+   6:10  error  'JwtService' is defined but never used            @typescript-eslint/no-unused-vars
+   7:10  error  'getRepositoryToken' is defined but never used    @typescript-eslint/no-unused-vars
+   8:10  error  'User' is defined but never used                  @typescript-eslint/no-unused-vars
+   9:10  error  'PasswordResetToken' is defined but never used    @typescript-eslint/no-unused-vars
+  10:10  error  'EmailService' is defined but never used          @typescript-eslint/no-unused-vars
+  11:10  error  'ConfigService' is defined but never used         @typescript-eslint/no-unused-vars
+  20:7   error  'authService' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\auth\auth.service.spec.ts
+    6:22  error  'MoreThan' is defined but never used                       @typescript-eslint/no-unused-vars
+   27:7   error  'userRepository' is assigned a value but never used        @typescript-eslint/no-unused-vars
+   28:7   error  'resetTokenRepository' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   29:7   error  'jwtService' is assigned a value but never used            @typescript-eslint/no-unused-vars
+   30:7   error  'emailService' is assigned a value but never used          @typescript-eslint/no-unused-vars
+   31:7   error  'configService' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  456:13  error  'expiredToken' is assigned a value but never used          @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\auth\auth.service.ts
+    6:3   error  'NotFoundException' is defined but never used  @typescript-eslint/no-unused-vars
+  113:62  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  163:59  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  234:28  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\auth\strategies\jwt.strategy.ts
+  21:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\common\cache\cache.module.ts
+  11:26  error  'configService' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\common\cache\cache.service.ts
+  68:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  74:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\common\filters\http-exception.filter.ts
+  19:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  27:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\country\country.service.ts
+   55:39  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   59:7   warning  Unexpected console statement              no-console
+   69:7   warning  Unexpected console statement              no-console
+   79:7   warning  Unexpected console statement              no-console
+   88:5   warning  Unexpected console statement              no-console
+  100:11  warning  Unexpected console statement              no-console
+  109:7   warning  Unexpected console statement              no-console
+  115:5   warning  Unexpected console statement              no-console
+  124:28  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\database\migrations\1762400000000-AddPerformanceIndexes.ts
+    7:5  warning  Unexpected console statement  no-console
+   14:5  warning  Unexpected console statement  no-console
+   20:5  warning  Unexpected console statement  no-console
+   26:5  warning  Unexpected console statement  no-console
+   32:5  warning  Unexpected console statement  no-console
+   38:5  warning  Unexpected console statement  no-console
+   45:5  warning  Unexpected console statement  no-console
+   52:5  warning  Unexpected console statement  no-console
+   59:5  warning  Unexpected console statement  no-console
+   65:5  warning  Unexpected console statement  no-console
+   72:5  warning  Unexpected console statement  no-console
+   79:5  warning  Unexpected console statement  no-console
+   85:5  warning  Unexpected console statement  no-console
+   91:5  warning  Unexpected console statement  no-console
+   97:5  warning  Unexpected console statement  no-console
+  104:5  warning  Unexpected console statement  no-console
+  111:5  warning  Unexpected console statement  no-console
+  117:5  warning  Unexpected console statement  no-console
+  123:5  warning  Unexpected console statement  no-console
+  129:5  warning  Unexpected console statement  no-console
+  136:5  warning  Unexpected console statement  no-console
+  145:5  warning  Unexpected console statement  no-console
+  152:5  warning  Unexpected console statement  no-console
+  154:5  warning  Unexpected console statement  no-console
+  155:5  warning  Unexpected console statement  no-console
+  156:5  warning  Unexpected console statement  no-console
+  157:5  warning  Unexpected console statement  no-console
+  158:5  warning  Unexpected console statement  no-console
+  159:5  warning  Unexpected console statement  no-console
+  160:5  warning  Unexpected console statement  no-console
+  164:5  warning  Unexpected console statement  no-console
+  202:5  warning  Unexpected console statement  no-console
+
+E:\Projetos\aubrigo\backend\src\database\seeds\seed.prod.ts
+  211:29  error  'ong' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\database\seeds\seed.ts
+  303:29  error  'ong' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  304:28  error  'ong' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\donations\donations.controller.ts
+  56:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\donations\donations.service.old.ts
+  78:5  error  'dto' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  93:5  error  'dto' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\donations\donations.service.spec.ts
+   4:10  error  'Repository' is defined but never used         @typescript-eslint/no-unused-vars
+  12:10  error  'NotFoundException' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\donations\donations.service.ts
+   58:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   99:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  130:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  197:69  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  198:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  314:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\donations\gateways\brazilian.gateway.ts
+  282:5   error  'request' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+  368:26  error  'payload' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+  368:35  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
+  368:40  error  'signature' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  375:32  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
+  379:31  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\donations\gateways\manual-pix.gateway.ts
+  144:26  error  'payload' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+  144:35  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
+  144:40  error  'signature' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  152:23  error  'payload' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+  152:32  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
+  156:31  error  Unexpected any. Specify a different type                                     @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\donations\gateways\payment-gateway.interface.ts
+   10:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\donations\gateways\stripe.gateway.spec.ts
+    9:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   56:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  175:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  275:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  405:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  433:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  473:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  474:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  487:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\donations\gateways\stripe.gateway.ts
+  144:62  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  262:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  280:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  284:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\favorites\favorites.service.spec.ts
+  10:7  error  'favoriteRepository' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  11:7  error  'petRepository' is assigned a value but never used       @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\ongs\controllers\operating-hours.controller.ts
+   54:50  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   67:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   84:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   99:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  137:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  159:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  215:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  227:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  239:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  253:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  265:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  277:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  290:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\ongs\dto\update-profile.dto.ts
+  5:3  error  'IsEmail' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\ongs\ongs.controller.spec.ts
+  15:7  error  'ongsService' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  16:7  error  'uploadService' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\ongs\ongs.controller.ts
+   10:3   error  'Request' is defined but never used       @typescript-eslint/no-unused-vars
+   53:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   63:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   73:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   90:67  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:62  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  179:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\ongs\ongs.service.spec.ts
+  21:7  error  'userRepository' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  22:7  error  'petRepository' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  23:7  error  'donationRepository' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  24:7  error  'appointmentRepository' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\ongs\ongs.service.ts
+  185:20  error  'ongId' is defined but never used. Allowed unused args must match /^_/u        @typescript-eslint/no-unused-vars
+  185:35  error  'userId' is defined but never used. Allowed unused args must match /^_/u       @typescript-eslint/no-unused-vars
+  190:22  error  'ongId' is defined but never used. Allowed unused args must match /^_/u        @typescript-eslint/no-unused-vars
+  190:37  error  'inviteDto' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+  190:48  error  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  190:53  error  'userId' is defined but never used. Allowed unused args must match /^_/u       @typescript-eslint/no-unused-vars
+  196:26  error  'token' is defined but never used. Allowed unused args must match /^_/u        @typescript-eslint/no-unused-vars
+  196:41  error  'userId' is defined but never used. Allowed unused args must match /^_/u       @typescript-eslint/no-unused-vars
+  199:26  error  'token' is defined but never used. Allowed unused args must match /^_/u        @typescript-eslint/no-unused-vars
+  199:41  error  'userId' is defined but never used. Allowed unused args must match /^_/u       @typescript-eslint/no-unused-vars
+  202:22  error  'ongId' is defined but never used. Allowed unused args must match /^_/u        @typescript-eslint/no-unused-vars
+  202:37  error  'memberId' is defined but never used. Allowed unused args must match /^_/u     @typescript-eslint/no-unused-vars
+  202:55  error  'userId' is defined but never used. Allowed unused args must match /^_/u       @typescript-eslint/no-unused-vars
+  206:5   error  'ongId' is defined but never used. Allowed unused args must match /^_/u        @typescript-eslint/no-unused-vars
+  207:5   error  'memberId' is defined but never used. Allowed unused args must match /^_/u     @typescript-eslint/no-unused-vars
+  208:5   error  'role' is defined but never used. Allowed unused args must match /^_/u         @typescript-eslint/no-unused-vars
+  208:11  error  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  209:5   error  'permissions' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  210:5   error  'userId' is defined but never used. Allowed unused args must match /^_/u       @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\ongs\services\availability-exceptions.service.ts
+  7:56  error  'Between' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\pets\pets.service.spec.ts
+   14:7   error  'petRepository' is assigned a value but never used       @typescript-eslint/no-unused-vars
+   15:7   error  'petImageRepository' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   31:27  error  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  141:59  error  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\pets\pets.service.ts
+  202:15  error  'imagesToDelete' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  204:17  error  Require statement not part of import statement       @typescript-eslint/no-var-requires
+
+E:\Projetos\aubrigo\backend\src\scripts\check-country-codes.ts
+  15:5   warning  Unexpected console statement                                             no-console
+  19:5   warning  Unexpected console statement                                             no-console
+  24:5   warning  Unexpected console statement                                             no-console
+  28:5   warning  Unexpected console statement                                             no-console
+  30:11  error    'petsNull' is assigned a value but never used                            @typescript-eslint/no-unused-vars
+  33:11  error    'usersNull' is assigned a value but never used                           @typescript-eslint/no-unused-vars
+  47:11  error    'error' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\scripts\fix-country-codes.ts
+  13:11  error  'petsResult' is assigned a value but never used                          @typescript-eslint/no-unused-vars
+  17:11  error  'usersResult' is assigned a value but never used                         @typescript-eslint/no-unused-vars
+  24:24  error  'row' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+  24:29  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+  28:25  error  'row' is defined but never used. Allowed unused args must match /^_/u    @typescript-eslint/no-unused-vars
+  28:30  error  Unexpected any. Specify a different type                                 @typescript-eslint/no-explicit-any
+  40:11  error  'error' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\stripe-connect\stripe-connect.controller.ts
+  74:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  74:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\stripe-connect\stripe-connect.service.spec.ts
+   13:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  130:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  152:73  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  225:73  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  255:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  257:73  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  271:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  325:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  449:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  479:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  506:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  507:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\stripe-connect\stripe-connect.service.ts
+  103:9   error  'bankAccountAdded' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  361:35  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  389:32  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  445:47  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  470:53  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  490:56  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  508:60  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  531:47  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  559:44  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  588:42  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  610:44  error  Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\users\dto\update-user-profile.dto.ts
+  4:3  error  'IsEmail' is defined but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\users\users.controller.spec.ts
+  13:7  error  'usersService' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  14:7  error  'uploadService' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\users\users.controller.ts
+   53:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   64:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   82:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\src\users\users.service.spec.ts
+  16:7  error  'userRepository' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+E:\Projetos\aubrigo\backend\src\users\users.service.ts
+   80:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  164:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+E:\Projetos\aubrigo\backend\test\auth.e2e-spec.ts
+  0:0  error  Parsing error: ESLint was configured to run on `<tsconfigRootDir>/test\auth.e2e-spec.ts` using `parserOptions.project`: <tsconfigRootDir>/tsconfig.json
+However, that TSConfig does not include this file. Either:
+- Change ESLint's list of included files to not include this file
+- Change that TSConfig to include this file
+- Create a new TSConfig that includes this file and include it in your parserOptions.project
+See the typescript-eslint docs for more info: https://typescript-eslint.io/linting/troubleshooting#i-get-errors-telling-me-eslint-was-configured-to-run--however-that-tsconfig-does-not--none-of-those-tsconfigs-include-this-file
+
+E:\Projetos\aubrigo\backend\test\ongs.e2e-spec.ts
+  0:0  error  Parsing error: ESLint was configured to run on `<tsconfigRootDir>/test\ongs.e2e-spec.ts` using `parserOptions.project`: <tsconfigRootDir>/tsconfig.json
+However, that TSConfig does not include this file. Either:
+- Change ESLint's list of included files to not include this file
+- Change that TSConfig to include this file
+- Create a new TSConfig that includes this file and include it in your parserOptions.project
+See the typescript-eslint docs for more info: https://typescript-eslint.io/linting/troubleshooting#i-get-errors-telling-me-eslint-was-configured-to-run--however-that-tsconfig-does-not--none-of-those-tsconfigs-include-this-file
+
+E:\Projetos\aubrigo\backend\test\pets.e2e-spec.ts
+  0:0  error  Parsing error: ESLint was configured to run on `<tsconfigRootDir>/test\pets.e2e-spec.ts` using `parserOptions.project`: <tsconfigRootDir>/tsconfig.json
+However, that TSConfig does not include this file. Either:
+- Change ESLint's list of included files to not include this file
+- Change that TSConfig to include this file
+- Create a new TSConfig that includes this file and include it in your parserOptions.project
+See the typescript-eslint docs for more info: https://typescript-eslint.io/linting/troubleshooting#i-get-errors-telling-me-eslint-was-configured-to-run--however-that-tsconfig-does-not--none-of-those-tsconfigs-include-this-file
+
+E:\Projetos\aubrigo\backend\test\users.e2e-spec.ts
+  0:0  error  Parsing error: ESLint was configured to run on `<tsconfigRootDir>/test\users.e2e-spec.ts` using `parserOptions.project`: <tsconfigRootDir>/tsconfig.json
+However, that TSConfig does not include this file. Either:
+- Change ESLint's list of included files to not include this file
+- Change that TSConfig to include this file
+- Create a new TSConfig that includes this file and include it in your parserOptions.project
+See the typescript-eslint docs for more info: https://typescript-eslint.io/linting/troubleshooting#i-get-errors-telling-me-eslint-was-configured-to-run--however-that-tsconfig-does-not--none-of-those-tsconfigs-include-this-file
+
+✖ 250 problems (207 errors, 43 warnings)
+

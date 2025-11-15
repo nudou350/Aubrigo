@@ -1,0 +1,117 @@
+<div class="pix-payment-container">
+  <!-- Header -->
+  <div class="payment-header">
+    <div class="pix-logo">
+      <span class="pix-icon">📱</span>
+      <h2>Pagamento PIX</h2>
+    </div>
+    <div class="amount-display">
+      <span class="label">Valor:</span>
+      <span class="value">{{ amount() | currencyFormat: 'BRL' }}</span>
+    </div>
+  </div>
+
+  <!-- Status Badge -->
+  <div class="status-badge" [ngClass]="paymentStatus()">
+    @switch (paymentStatus()) {
+      @case ('pending') {
+        <span class="icon">⏳</span>
+        <span>Aguardando pagamento...</span>
+      }
+      @case ('processing') {
+        <span class="icon">🔄</span>
+        <span>Processando...</span>
+      }
+      @case ('succeeded') {
+        <span class="icon">✅</span>
+        <span>Pagamento confirmado!</span>
+      }
+      @case ('expired') {
+        <span class="icon">⏰</span>
+        <span>PIX expirado</span>
+      }
+      @case ('failed') {
+        <span class="icon">❌</span>
+        <span>Pagamento falhou</span>
+      }
+    }
+  </div>
+
+  @if (paymentStatus() === 'pending' || paymentStatus() === 'processing') {
+    <!-- QR Code Section -->
+    <div class="qr-section">
+      <div class="qr-code-wrapper">
+        @if (pixPaymentString()) {
+          <qrcode
+            [qrdata]="pixPaymentString()"
+            [width]="256"
+            [errorCorrectionLevel]="'M'"
+            [cssClass]="'qr-code'"
+          ></qrcode>
+        }
+      </div>
+
+      <p class="qr-instruction">Escaneie o QR Code com o app do seu banco</p>
+
+      @if (expiresAt()) {
+        <div class="expiration-timer">
+          <span class="icon">⏱️</span>
+          <span>Expira em: {{ timeRemaining() }}</span>
+        </div>
+      }
+
+      <button class="download-btn" (click)="downloadQRCode()">
+        <span class="icon">💾</span>
+        Baixar QR Code
+      </button>
+    </div>
+
+    <!-- PIX Copy & Paste -->
+    <div class="pix-string-section">
+      <h3>Ou copie o código PIX</h3>
+      <div class="code-container">
+        <code class="pix-code">{{ pixPaymentString() }}</code>
+        <button
+          class="copy-btn"
+          [class.copied]="copied()"
+          (click)="copyToClipboard()">
+          @if (copied()) {
+            <span>✓ Copiado!</span>
+          } @else {
+            <span>📋 Copiar</span>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+      <h4>Como pagar</h4>
+      <ol>
+        <li>Abra o aplicativo do seu banco</li>
+        <li>Escolha a opção <strong>PIX</strong></li>
+        <li>Selecione <strong>Pagar com QR Code</strong></li>
+        <li>Escaneie o código acima ou cole o código copiado</li>
+        <li>Confirme o pagamento</li>
+        <li>Aguarde a confirmação automática</li>
+      </ol>
+    </div>
+  }
+
+  @if (paymentStatus() === 'succeeded') {
+    <div class="success-message">
+      <div class="success-icon">🎉</div>
+      <h3>Pagamento confirmado!</h3>
+      <p>Obrigado pela sua doação. O recibo foi enviado para o seu e-mail.</p>
+    </div>
+  }
+
+  @if (paymentStatus() === 'expired' || paymentStatus() === 'failed') {
+    <div class="error-message">
+      <div class="error-icon">😔</div>
+      <h3>Pagamento não concluído</h3>
+      <p>{{ paymentStatus() === 'expired' ? 'O código PIX expirou.' : 'Ocorreu um erro no pagamento.' }}</p>
+      <p>Por favor, tente novamente.</p>
+    </div>
+  }
+</div>

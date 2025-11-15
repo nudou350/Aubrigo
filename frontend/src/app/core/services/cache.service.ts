@@ -117,7 +117,7 @@ export class CacheService {
    * @param staleTtl Percentage of TTL to consider stale (default: 0.5 = 50%)
    * @returns True if data is stale
    */
-  isStale(key: string, staleTtl: number = 0.5): boolean {
+  isStale(key: string, staleTtl = 0.5): boolean {
     const entry = this.cache.get(key);
     if (!entry) return true;
 
