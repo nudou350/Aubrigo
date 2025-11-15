@@ -34,7 +34,9 @@ export class StripeGateway implements IPaymentGateway {
   }
 
   getSupportedMethods(): PaymentMethodType[] {
-    return ["mbway", "multibanco", "card"];
+    // Note: MB WAY is not supported by Stripe API
+    // Use IFTHENPAY or EUPAGO gateway for MB WAY payments
+    return ["multibanco", "card"];
   }
 
   async createPayment(request: PaymentRequest): Promise<PaymentResponse> {
@@ -43,7 +45,9 @@ export class StripeGateway implements IPaymentGateway {
 
       switch (request.paymentMethod) {
         case "mbway":
-          return await this.createMBWayPayment(request, amountInCents);
+          throw new BadRequestException(
+            "MB WAY is not supported by Stripe. Please use IFTHENPAY or EUPAGO gateway for MB WAY payments.",
+          );
         case "multibanco":
           return await this.createMultibancoPayment(request, amountInCents);
         case "card":
